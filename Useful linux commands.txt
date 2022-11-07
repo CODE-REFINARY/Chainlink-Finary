@@ -1,0 +1,34 @@
+Linux Commands that I use:
+
+This command will export an ascii armored version of the public key:
+gpg --output public.pgp --armor --export gtdubinin@gmail.com
+
+This command runs a new process in an already running container which launches /bin/bash in that container so you can explore the image:
+docker exec -t -i mycontainer /bin/bash
+
+This command creates an interactive container from the alpine image with a pseudo-TTY attached but doesn't start the container
+docker container create -ti --name mycontainer alpine
+
+This command starts a stopped container and connects to STDIN and also attaches STDOUT/STDERR
+docker container start -i --attach mycontainer
+
+This command renames the repository belonging to image 4c224a568bf1 to "ujava" with tag "latest"
+docker image tag 4c224a568bf1 ujava:latest
+
+This command builds an image from a Dockerfile utilizing the current working directory as context. The t flag names the image
+docker build -t flol/books .
+
+This command commit the container (ID c3f279d17e0a) changes saving them into a new image (named "svendowideit/testimage" with tag titled "version3"):
+docker commit c3f279d17e0a  svendowideit/testimage:version3
+
+This command copies a specific file to a container:
+docker cp foo.txt container_id:/foo.txt
+
+This command copies a specific file from a container:
+docker cp container_id:/foo.txt foo.txt
+
+This command copies a specific file on the host (using a relative file path) to an image (using absolute path)
+COPY foo.txt /data/foo.txt
+
+This command runs <command> on a container called "web"
+docker-compose run web <command>

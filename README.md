@@ -1,0 +1,1 @@
+This project is the Python/Django/Posgre implementation of the REFINARY concept. This web application is containerized and runs out-of-the box on localhost:8000 with a simple `docker-compose up`
