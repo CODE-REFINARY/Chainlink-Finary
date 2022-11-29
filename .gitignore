@@ -1,2 +1,6 @@
 Scripts/
 Lib/
+data/
+*.pyc
+.env
+db.sqlite3
