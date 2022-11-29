@@ -9,6 +9,8 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
   web:
     build: .
     # The server will run on localhost:8000 for whatever reason
@@ -23,3 +25,5 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+    entrypoint: "entrypoint.sh"
+    
