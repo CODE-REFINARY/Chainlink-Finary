@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="meeting-minutes" content="meeting recap 10/07/2022">
+        <meta charset="utf-8">
+        <title>INTERNAL Proj29 &lt;CLEARANCE: CONFIDENTIAL&gt; Meeting Minutes @10/07/2022</title>
+        <link rel="icon" type="image/x-icon" href="{% static 'images/lock_icon.png' %}">
+        <link rel="stylesheet" href="{% static 'css/reset.css' %}">        
+        <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    </head>
+    <style>
+        @media (max-width: 1025px)
+        {
+            img, video {display: none;}
+        }
+    </style>
+    <body>
+        <header>
+            <h1><em>INTERNAL</em> Meeting Minutes</h1>
+            <h3>The following information has been deemed <em>priviledged</em> by <em>TPOWELL Industries Inc.</em> and shall not, under any circumstance, be distributed elsewhere without the express permission of <b class="CLWSEC_I1Clearance">Senior Admin Powell</b></h3>
+            <nav>
+                <ol>
+                    <li><a href="#">Opening Thoughts: Recap of activities and developments since last meeting</a></li>
+                    <li><a href="#">Developments on the <i><span class="redacted">&lt;REDACTED&gt;</span></i> disaster situation</a>
+                    <li><a href="#">Closing thoughts</a></li>
+                    <li><a href="#">Secure Transmission</a></li>
+                </ol>
+            </nav>
+            <div id="button">
+                <button type="button">Light/Dark Mode Toggle</button>
+            </div>
+        </header>
+        {% block content %}
+        {% endblock %}
+        <footer>
+            <hr>
+            <audio controls loop src="resources/cutter.mp3" style="border:10px solid #2C2E43; border-radius: 50px;">ABORT Signal</audio>
+            <div class="recantation">
+                It has to start somewhere_<br>
+                It has to start sometime_<br>
+                What better place than here_<br>
+                What better time than now_<br>
+            </div>
+            <div class="checksum">
+                <details>
+                    <summary>Verify Transmission Integrity</summary>
+                    120EA8A25E5D487BF68B5F7096440019
+                </details>
+            </div>
+            <hr>
+            <div id="the-form">
+                <H2>Secure Transmission</H2>
+                <form>
+                    <label>DATE:</label>
+                    <input type="date" name="f-date" required><br>
+                    <fieldset>
+                        <legend>SECURITY VALIDATION</legend>
+                        <label>ID:</label>
+                        <input type="text" name="f-id" required>
+                        <label>ATTN:</label>
+                        <input type="text" name="f-attn" required>
+                        <label>CLEARANCE</label>
+                        <select name="f-clearance">
+                            <option value="1" selected="selected">CONFIDENTIAL</option>
+                            <option value="2">SECRET</option>
+                            <option value="3">TOP SECRET</option>
+                        </select>
+                        <input type="checkbox" name="f-encrypted">
+                        <label>ENCRYPTED</label>
+                        <br><label>COMM ROUTING:</label><br>
+                        <input type="radio" id="f-anomalous_materials_unit" name="anomalous_materials_unit" value="anomalous_materials_unit">
+                        <label>ANOMALOUS MATERIALS UNIT</label><br>
+                        <input type="radio" id="f-sector_b34_control_tower" name="sector_b34_control_tower" value="sector_b34_control_tower">
+                        <label>SECTOR B34 CONTROL TOWER</label><br>
+                        <input type="radio" id="f-the_basement" name="the_basement" value="the_basement">
+                        <label>THE BASEMENT</label><br>
+                        <label>PARAMETER:</label>
+                        <input list="f-parameter">
+                        <datalist id="f-parameter">
+                            <option value="Tradecence">
+                            <option value="Questig">
+                            <option value="Mitsteel">
+                            <option value="Cencecon">
+                            <option value="Firetal">
+                        </datalist>
+                    </fieldset>
+                    <label>TRANSMISSION PAYLOAD</label><br>
+                    <textarea id="f-transmission_payload">START TRANSMISSION&gt;&gt;&gt;</textarea><br>
+                    <input type="submit" id="f-submit"><br>
+                </form>
+            </div>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,206 @@
+/* SEE reset.css FOR ALL OTHER CSS RULES */
+
+/* /////////////// Custom Fonts /////////////// */
+
+@font-face {
+	font-family: 'Cipher';
+	src: url('../fonts/cipher.ttf') format("truetype");
+	font-display: fallback;
+}
+	
+@font-face {
+    font-family: 'Matrix';
+    src: url('../fonts/OCR-A.ttf') format("truetype");
+	font-weight: 500;
+	font-display: fallback;
+}
+
+@font-face {
+	font-family: 'Retro';
+	src: url('../fonts/retro.ttf') format("truetype");
+	font-display: fallback;
+}
+
+@font-face {
+	font-family: 'Space';
+	src: url('../fonts/unispace.ttf') format("truetype");
+	font-display: fallback;
+}
+
+@font-face {
+	font-family: 'Eple';
+	src: url('../fonts/OCR-B.ttf') format("truetype");
+	font-display: fallback;
+}
+
+/* /////////////// General Styling /////////////// */
+
+body {
+    background-image: url('../images/groove-minimal.jpg');
+	margin: 3% 4% 3% 4%;
+}
+
+main {
+	background-color: #2C2E43;
+	padding-left: 1cm;
+	padding-right: 1cm;
+	padding-top: 1cm;
+	padding-bottom: 1cm;
+}
+
+[href="#"] {
+    font-family: serif;
+	text-decoration: none;
+	color: hsl(240, 100%, 50%);
+	font-size: 1.1rem;
+}
+
+a:active {
+	color: #800080;
+}
+
+h1 {
+    font-family: Retro;
+    font-weight: 100;
+	background-color: #494B4D;
+	text-align: center;
+	color: whitesmoke;
+	font-size: xx-large;
+}
+
+h2 {
+	font-size: x-large;
+	color: whitesmoke;
+	background-color: #334756;
+	margin: 6px 0px 6px 0px;
+}
+
+h3 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: large;
+	font-weight: 600;
+    display: block;
+    text-align: center;
+	padding: 3em 5% 3em 5%;
+	color: rgb(208, 68, 35)
+}
+
+section {
+	margin: 6mm 0mm 6mm 0mm;
+}
+
+ol {
+	list-style-type: number;
+	list-style-position: inside;
+
+}
+
+li {
+    font-family: 'Courier New';
+	line-height: 1.2em;
+}
+
+ul > li {
+	font-family: sarif;
+	margin-top: 4mm;
+	color: whitesmoke;
+}
+
+div#agenda-main p {
+	color: #f5f5f5;
+}
+
+h2 + p {
+	margin-top: 3mm;
+	background-color: #2C394B;
+}
+
+div.media-section {
+	margin-top: 12mm;
+	margin-bottom: 12mm;
+	margin-left: 12mm;
+	margin-right: 12mm;
+}
+
+div#button {
+	text-align: right;
+	margin-right: 1%;
+}
+
+div#col1 {
+	display: flex;
+	flex-direction: row;
+    justify-content: center;
+}
+
+div#col2 {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+img, video {
+	height: 15em;
+	width: 20em;
+	max-height: 300px;
+	max-width: 300px;
+	border: 1px solid #f1f1f1;
+}
+
+audio {
+	position: relative;
+	left: 72%;
+}
+
+div.recantation {
+	border-style: double;
+	border-width: 2px 2px 2px 2px;
+	border-color: #334756;
+	border-radius: 9px;
+	margin: 10px 10px 10px 10px;
+
+}
+
+button {
+	position: static;
+	size:10px;
+	font-family: Matrix;
+	background-color: #f1f1f1;
+	color: black;
+	font-size: 16px;
+	padding: 16px 30px;
+	border: none;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+button:hover {
+	background-color: #494B4D;
+}
+
+div#the-form {
+	margin: auto;
+	border-style: dashed;
+	border-width: 2px 2px 2px 2px;
+	border-color: #334756;
+	border-radius: 9px;
+}
+
+form {
+	display: grid;
+    justify-items: stretch;
+    justify-content: start;
+	align-content: space-evenly;   
+}
+
+label ~ input {
+	font-family: monospace;
+	color:hsl(240, 100%, 50%);
+}
+
+span.redacted {
+	font-family: Matrix;
+	display: inline-block;
+	text-decoration:underline;
+	font-weight: 100;
+}
