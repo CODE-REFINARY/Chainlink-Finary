@@ -36,7 +36,8 @@
 /* /////////////// General Styling /////////////// */
 
 body {
-    background-image: url('../images/groove-minimal.jpg');
+    background-image: url('../images/groove-minimal-lengthy.jpg'); 
+    background-repeat: y-repeat;
 	margin: 3% 4% 3% 4%;
 }
 
@@ -127,16 +128,23 @@ div#button {
 	margin-right: 1%;
 }
 
-div#col1 {
+.media-cols {
 	display: flex;
 	flex-direction: row;
     justify-content: center;
 }
 
-div#col2 {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
+.recantation {
+    font-family: Retro;
+    font-size: small;
+    text-align: center;
+    margin: 3em;
+}
+
+.authored-by {
+    display: block;
+    text-align: right;
+    padding-top: 10px;
 }
 
 img, video {

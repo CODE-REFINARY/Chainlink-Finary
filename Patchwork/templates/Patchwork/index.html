@@ -1,5 +1,5 @@
 {% extends 'Patchwork/base.html' %}
-
+{% load static %}
 {% block content %}
     <main>
         <div id="agenda-main">
@@ -8,18 +8,24 @@
                 <p>On-prem staffing continues to be strained with the situation on the ground worsening. L4 and L5 management will be demanding substantial positive developments within <i><span>&lt;REDACTED&gt;</span></i> or heads will roll. Stay vigilant and stay behind the yellow tape.</p>
             </section>
             <section>
-                <h2>Developments on <i><span class="redacted">&lt;REDACTED&gt;</span></i></h2>
-                <p>The temporal degradation tests are at a standstill while spillage leaks through sectors B34 with a torrential downpour gliding east toward <i><span class="redacted">&lt;REDACTED&gt;</span></i>. Casualty figures remain a mystery and currently suggest upwards of 137 in critical condition. The true effects of the contagion remain a mystery as are its transmission mechanisms.</p>
+                <h2>Vapor Gallery</h2>
+                <p class="information">The Chainlink project is a loveletter to abandoned industrial settings and the art that depicts it. With modern artistic movements like Vaporwave and Nostalgiacore drawing upon artistic sensibilities of 80s and 90s futurism, there is a growing body of artistic work depicting these themes and I've sought out to highlight a small subset below.</p>
+                <p class="recantation">"Global capitalism is nearly there. At the end of the world there will only be liquid advertisement and gaseous desire. Sublimated from our bodies, our untethered senses will endlessly ride escalators through pristine artificial environments, more and less than human, drugged-up and drugged down, catalyzed, consuming and consumed by a relentlessly rich economy of sensory information, valued by the pixel. The Virtual Plaza welcomes you, and you will welcome it too."<span class="authored-by">r/Vaporwave</span></p>
                 <div class="media-section">
-                    <div id="col1">
-                        <img src="resources/SCN_119.png" alt="incubation furnace capture">
-                        <img src="resources/SCN_120.png" alt="arial snapshot">
-                        <img src="resources/SCN_118.png" alt="sector B34 leakage">
+                    <div id="col1" class="media-cols">
+                        <img src="{% static 'images/fc-kahuna.jpg' %}" alt="FC Kahuna - Machine Says Yes">
+                        <img src="{% static 'images/vapor-city-archives.jpg' %}"  alt="Vapor City Archives by Machinedrum">
+                        <img src="{% static 'images/deus-ex-goty.jpg' %}" alt="Deus Ex: Game of the Year Edition">
                     </div>
-                    <div id="col2">
-                        <img src="resources/SCN_120.png" alt="arial snapshot">
-                        <video controls src="resources/CPT_4.mp4">CPT4_Anomalous</video>
-                        <img src="resources/SCN_119.png" alt="incubation furnace capture">
+                    <div id="col2" class="media-cols">
+                        <img src="{% static 'images/desert-sand-feels-warm.jpg'%}" alt="GEO - C05; desert sand feels warm at nighn">
+                        <img src="{% static 'images/black-celebration.jpg' %}" alt="Depeche Mode - Black Celebration">
+                        <img src="{% static 'images/fsol-environments-4.jpg' %}" alt="Environments 4 by The Future Sound Of London">
+                    </div>
+                    <div id="col3" class="media-cols">
+                        <img src="{% static 'images/some-great-reward.jpg'%}" alt="Depeche Mode - Some Great Reward">
+                        <img src="{% static 'images/vapor-city.jpg' %}" alt="Vapor City by Machinedrum">
+                        <img src="{% static 'images/tyrell-corp.jpg' %}" alt="Tyrell Corporation Blade Runner 1982">
                     </div>
                 </div>
             </section>
