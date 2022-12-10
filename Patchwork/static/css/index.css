@@ -33,6 +33,16 @@
 	font-display: fallback;
 }
 
+/* latin */
+@font-face {
+  font-family: 'Aphex';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* /////////////// General Styling /////////////// */
 
 body {
@@ -125,7 +135,7 @@ div.media-section {
 
 div#button {
 	text-align: right;
-	margin-right: 1%;
+	-margin-right: 1%;
 }
 
 .media-cols {
@@ -142,9 +152,9 @@ div#button {
 }
 
 .authored-by {
-    display: block;
-    text-align: right;
-    padding-top: 10px;
+    -display: block;
+    -text-align: right;
+    -padding-top: 10px;
 }
 
 img, video {
@@ -169,21 +179,28 @@ div.recantation {
 
 }
 
+#button {
+	font-size: 0;
+}
+
 button {
 	position: static;
-	size:10px;
-	font-family: Matrix;
-	background-color: #f1f1f1;
-	color: black;
-	font-size: 16px;
-	padding: 16px 30px;
+	font-family: Aphex;
+	background-color: #334756;
+	color: #f5f5f5;
+	font-size: 10px;
+	height: 3em;
 	border: none;
 	cursor: pointer;
-	border-radius: 5px;
+	border-radius: 50px;
+	border: solid;
+	border-color: #2C2E43; 
+	border-left-width: 10px;
+	border-right-width: 10px;
 }
 
 button:hover {
-	background-color: #494B4D;
+	background-color: #494b4dad;
 }
 
 div#the-form {

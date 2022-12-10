@@ -28,11 +28,16 @@
                 </ol>
             </nav>
             <div id="button">
-                <button type="button">Light/Dark Mode Toggle</button>
+                <!-- Upon pressing this button a new selection of images is chosen randomly and loaded in -->
+                <button type="button" id="tabbed-button-1">Load Random Selection</button>
+                <!-- Upon pressing this button the page is instantly redrdawn (without reloading) to display the negative of every color on the page -->
+                <button type="button" id="tabbed-button-2">Invert Page Negative</button>
             </div>
         </header>
-        {% block content %}
-        {% endblock %}
+            <main>
+            {% block content %}
+            {% endblock %}
+            </main>
         <footer>
             <hr>
             <audio controls loop src="resources/cutter.mp3" style="border:10px solid #2C2E43; border-radius: 50px;">ABORT Signal</audio>
