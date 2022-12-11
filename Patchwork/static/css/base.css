@@ -1,0 +1,144 @@
+/* SEE reset.css FOR ALL OTHER CSS RULES */
+
+/* /////////////// Custom Fonts /////////////// */
+
+@font-face {
+	font-family: 'Cipher';
+	src: url('../fonts/cipher.ttf') format("truetype");
+	font-display: fallback;
+}
+	
+@font-face {
+    font-family: 'Matrix';
+    src: url('../fonts/OCR-A.ttf') format("truetype");
+	font-weight: 500;
+	font-display: fallback;
+}
+
+@font-face {
+	font-family: 'Retro';
+	src: url('../fonts/retro.ttf') format("truetype");
+	font-display: fallback;
+}
+
+@font-face {
+	font-family: 'Space';
+	src: url('../fonts/unispace.ttf') format("truetype");
+	font-display: fallback;
+}
+
+@font-face {
+	font-family: 'Eple';
+	src: url('../fonts/OCR-B.ttf') format("truetype");
+	font-display: fallback;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Aphex';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* /////////////// General Styling /////////////// */
+
+body {
+    background-image: url('../images/groove-minimal-lengthy.jpg'); 
+    background-repeat: y-repeat;
+	margin: 3% 4% 3% 4%;
+}
+
+main {
+	background-color: #2C2E43;
+	padding-left: 1cm;
+	padding-right: 1cm;
+	padding-top: 1cm;
+	padding-bottom: 1cm;
+}
+
+[href="#"] {
+    -font-family: serif;
+	text-decoration: none;
+	color: hsl(239, 100%, 50%);
+	-font-size: 0.1rem;
+}
+
+a:active {
+	color: #800080;
+}
+
+h1 {
+    font-family: Aphex;
+    font-weight: 100;
+	background-color: #494B4D;
+	text-align: center;
+	color: whitesmoke;
+	font-size: xx-large;
+    padding: 10px;
+}
+
+h2 {
+	font-size: x-large;
+	color: whitesmoke;
+	background-color: #334756;
+	margin: 6px 0px 6px 0px;
+}
+
+h3 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: large;
+	font-weight: 600;
+    display: block;
+    text-align: center;
+	padding: 3em 5% 3em 5%;
+	color: rgb(208, 68, 35)
+}
+
+section {
+	margin: 6mm 0mm 6mm 0mm;
+}
+
+ol {
+	list-style-type: number;
+	list-style-position: inside;
+
+}
+
+li {
+    font-family: 'Courier New';
+	line-height: 1.2em;
+}
+
+ul > li {
+	font-family: sarif;
+	margin-top: 4mm;
+	color: whitesmoke;
+}
+
+#tabbed-buttons {
+    font-size: 0;
+	text-align: right;
+}
+
+.tabbed-buttons {
+	position: static;
+	font-family: Aphex;
+	background-color: #334756;
+	color: #f5f5f5;
+	font-size: 10px;
+	height: 3em;
+	border: none;
+	cursor: pointer;
+	border-radius: 50px;
+	border: solid;
+	border-color: #2C2E43;
+	border-left-width: 10px;
+	border-right-width: 10px;
+}
+
+.tabbed-buttons:hover {
+	background-color: #494b4dad;
+}

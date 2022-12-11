@@ -1,0 +1,19 @@
+div#the-form {
+	margin: auto;
+	border-style: dashed;
+	border-width: 2px 2px 2px 2px;
+	border-color: #334756;
+	border-radius: 9px;
+}
+
+form {
+	display: grid;
+    justify-items: stretch;
+    justify-content: start;
+	align-content: space-evenly;   
+}
+
+label ~ input {
+	font-family: monospace;
+	color:hsl(240, 100%, 50%);
+}

@@ -1,0 +1,41 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+<section>
+    <h2>Introduction</h2>
+    <div class="intro-content">
+        <section class="body-text-column">
+            <p>
+                Hello World! My name is George and I am a third year student at the University of California San Diego. 
+                I am interested in computer science - more specifically the web with a focus on studying how end users perceive
+                the internet. To complement the technical toolkit of a web developer I am also focused on product marketing. My
+                current goals are to develop a holistic approach to software development and to bring my knowledge with me to a 
+                California startup that is looking for a passionate developer with a robust understanding not only of how the web
+                works but also how the end-user perceives the software that we as developers craft for them. I am also deeply 
+                passionate about electronic music history.
+            </p>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id nisl ultricies, accumsan tortor non, 
+                molestie nisi. Mauris sed porta augue. Ut ornare velit consectetur dui fermentum, non faucibus mauris feugiat. Phasellus
+                dictum, massa non laoreet sagittis, erat augue pretium enim, vitae mattis quam risus eget nisl. 
+            </p>
+        </section>
+        <section class="body-image-column">
+            <picture>
+                <source srcset="{% static 'images/intro-image-main.jpg' %}">
+                <img src="{% static 'images/intro-image-main.jpg' %}" alt="Me smiling in the snow">
+            </picture>
+        </section>
+    </div>
+</section>
+<section class="resume-content">
+    <h2>CV & Related Links</h2>
+    <ul>
+        <li><a href="#" class="main-links">CV</a></li>
+        <li><a href="#" class="main-links">Food Journal Application</a></li>
+        <li><a href="#" class="main-links">Ziggomatic: 9-bit Microprocessor</a></li>
+    </ul>
+</section>
+{% endblock %}
