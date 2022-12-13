@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+    <head>
+        <meta name="" content="">
+        <meta charset="utf-8">
+        <title>Patchwork Finary</title>
+        <link rel="icon" type="image/x-icon" href="{% static 'images/lock_icon.png' %}">
+        <link rel="stylesheet" href="{% static 'css/reset.css' %}">        
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to the Chainlink Finary portal</h1>
+            <h3>the portal is currently under construction</h3>
+            <nav>
+                <ol>
+                    <li><a href="patchwork/index.html">Patchwork Finary Portal</a></li>
+                </ol>
+            </nav>
+        </header>
+            <main>
+            {% block content %}
+            {% endblock %}
+            </main>
+        <footer>
+        </footer>
+    </body>

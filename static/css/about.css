@@ -25,17 +25,16 @@
 
 div.intro-content {
 	display: flex;
-	padding-bottom: 25px;
 	justify-content: space-evenly;
+    align-items: center;
 }
 
 .body-text-column {
 	width: 50%;
-    padding-left: 25px;
 }
 
 .body-image-column {
-	width: 50%;
+	-width: 50%;
 }
 
 img {
