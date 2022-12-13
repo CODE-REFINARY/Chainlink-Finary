@@ -81,6 +81,7 @@ h1 {
 }
 
 h2 {
+    font-family: 'Courier New', Courier, monospace;
 	font-size: x-large;
 	color: whitesmoke;
 	background-color: #334756;
@@ -125,7 +126,8 @@ ul > li {
 }
 
 .tabbed-buttons {
-	font-family: serif;
+	font-family: 'Courier New', Courier, monospace;
+	font-weight:bolder;
 	position: static;
 	background-color: #334756;
 	color: #f5f5f5;
@@ -138,7 +140,7 @@ ul > li {
 	width: 16.6666666%;
 	border-left-width: 10px;
 	border-right-width: 10px;
-	font-size: 1vw;
+	font-size: 12px;
 	white-space: nowrap;
     word-break: keep-all;
 }

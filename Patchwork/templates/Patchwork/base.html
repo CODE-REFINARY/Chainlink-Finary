@@ -2,12 +2,19 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <title>Patchwork Finary</title>
+
+        <!-- Document Metadata -->
         <meta name="" content="">
         <meta charset="utf-8">
-        <title>Patchwork Finary</title>
+
+        <!-- Static CSS -->
         <link rel="icon" type="image/x-icon" href="{% static 'images/lock_icon.png' %}">
         <link rel="stylesheet" href="{% static 'css/reset.css' %}">        
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+        <!-- Scripts -->
+        <script src="{% static 'scripts/patchwork-base.js' %}" type="module"></script>
     </head>
     <style>
         @media (max-width: 1025px)
@@ -37,6 +44,7 @@
             {% endblock %}
             </main>
         <footer>
+            <div id="responseOutput">&nbsp;</div>
         </footer>
     </body>
 </html>
