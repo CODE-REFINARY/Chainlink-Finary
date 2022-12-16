@@ -1,6 +1,7 @@
-Scripts/
 Lib/
 data/
 *.pyc
 .env
 db.sqlite3
+__pycache__
+*.exe
