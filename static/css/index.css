@@ -2,13 +2,10 @@
 
 /* /////////////// General Styling /////////////// */
 
-div#agenda-main p {
+p {
 	color: #f5f5f5;
-}
-
-h2 + p {
-	margin-top: 3mm;
 	background-color: #2C394B;
+	margin: 2rem;
 }
 
 div.media-section {
@@ -18,17 +15,16 @@ div.media-section {
 	margin-right: 12mm;
 }
 
-.media-cols {
+#vapor-gallery {
 	display: flex;
-	flex-direction: row;
-    justify-content: center;
+	flex-direction: column;
+	align-items: center;
 }
 
 .recantation {
     font-family: Retro;
     font-size: small;
     text-align: center;
-    margin: 3em;
 }
 
 .authored-by {

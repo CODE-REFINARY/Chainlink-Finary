@@ -1,7 +1,26 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
-{% block content %}
 
+{% block init-gallery %}
+<script type="text/javascript">
+    const imgFolder = "{% static 'images/' %}";
+	var jqxhr = $.get("{% static 'json/img-manifest-blue.json' %}",
+		function(data) 
+		{
+			synthesizeGallery(data);
+		}
+	);
+	
+	window.onload = function ()
+	{
+		document.getElementById("tabbed-button-1").onclick = function() {sendRequest("1");};
+		document.getElementById("tabbed-button-2").onclick = function() {sendRequest("2");};
+		document.getElementById("tabbed-button-3").onclick = function() {sendRequest("3");};
+	}
+</script>
+{% endblock %}
+
+{% block content %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <div id="agenda-main">
     <section>
@@ -11,22 +30,7 @@
     <section>
         <h2>Vapor Gallery</h2>
         <p class="information">The Chainlink project is a loveletter to abandoned industrial settings and the art that depicts it. With modern artistic movements like Vaporwave and Nostalgiacore drawing upon artistic sensibilities of 80s and 90s futurism, there is a growing body of artistic work depicting these themes and I've sought ouIndustrial Precision Refined Artistrylight a small few notable examples below.</p>
-        <div class="media-section">
-            <div id="col1" class="media-cols">
-                <img src="{% static 'images/fc-kahuna.jpg' %}" class="gallery-image" alt="FC Kahuna - Machine Says Yes">
-                <img src="{% static 'images/vapor-city-archives.jpg' %}" class="gallery-image" alt="Vapor City Archives by Machinedrum">
-                <img src="{% static 'images/deus-ex-goty.jpg' %}" class="gallery-image" alt="Deus Ex: Game of the Year Edition">
-            </div>
-            <div id="col2" class="media-cols">
-                <img src="{% static 'images/desert-sand-feels-warm.jpg' %}" class="gallery-image" alt="GEO - C05; desert sand feels warm at nighn">
-                <img src="{% static 'images/black-celebration.jpg' %}" class="gallery-image" alt="Depeche Mode - Black Celebration">
-                <img src="{% static 'images/fsol-environments-4.jpg' %}" class="gallery-image" alt="Environments 4 by The Future Sound Of London">
-            </div>
-            <div id="col3" class="media-cols">
-                <img src="{% static 'images/some-great-reward.jpg' %}" class="gallery-image" alt="Depeche Mode - Some Great Reward">
-                <img src="{% static 'images/vapor-city.jpg' %}" class="gallery-image" alt="Vapor City by Machinedrum">
-                <img src="{% static 'images/tyrell-corp.jpg' %}" class="gallery-image" alt="Tyrell Corporation Blade Runner 1982">
-            </div>
+        <div class="media-section" id="vapor-gallery">
         </div>
     </section>
 </div>
@@ -40,6 +44,20 @@
             <li><i><span class="redacted">&lt;REDACTED&gt;</span></i>
             <li><i><span class="redacted">&lt;REDACTED&gt;</span></i></li>
         </ul>
+    </section>
+</div>
+<hr>
+<div id="beat-the-clock">
+    <section>
+        <h2>Beat The Clock</h2>
+        <p class="recantation">
+            "R-R-R-R-R-R-R-R-Right about now..." the deep dish surround-sounditorium rumbled with a low-thud membrane shaking 130 bpm rhythm & shred-edited human
+            language. G closed his eyes and pushed his way thru the tightly packed dance area of his penthouse barracks, out safely to the terrace.
+            <br>
+            His party would be reviewed tomorrowas one of the top 5 ways to have spent the last 15 minutes of the century. He had personally spent every free
+            moment of the past month arrangin & preparing for it. Admittedly, that only added up to about 10 minutes, but luckily it was easier to do more in less
+            time these days. 
+        </p>
     </section>
 </div>
 {% endblock %}
