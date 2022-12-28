@@ -53,3 +53,14 @@ div.recantation {
 	border-style: solid;
 	border-color: whitesmoke;
 }
+
+.expand-me {
+	-text-decoration: none;
+	display: block;
+	font-family: 'Courier New';
+	color: #4271c2;
+	text-decoration: underline;
+	text-align: right;
+    margin-right: 2rem;
+	margin-bottom: 1rem;
+}

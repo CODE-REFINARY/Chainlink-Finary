@@ -9,3 +9,6 @@ def transfer_email(request):
 
 def about(request):
     return render(request, 'Patchwork/about.html', {})
+
+def beat_the_clock(request):
+    return render(request, 'Patchwork/beat-the-clock.html', {})
