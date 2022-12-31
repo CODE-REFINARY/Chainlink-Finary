@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block init-gallery %}
-<script type="text/javascript">
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<script>
     const imgFolder = "{% static 'images/' %}";
 	var jqxhr = $.get("{% static 'json/img-manifest-blue.json' %}",
 		function(data) 
@@ -11,31 +12,29 @@
 		}
 	);
 	
-	window.onload = function ()
+	/*window.onload = function ()
 	{
 		document.getElementById("tabbed-button-1").onclick = function() {sendRequest("1");};
 		document.getElementById("tabbed-button-2").onclick = function() {sendRequest("2");};
 		document.getElementById("tabbed-button-3").onclick = function() {sendRequest("3");};
-	}
+	}*/
 </script>
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/index.css' %}">
 <div id="agenda-main">
     <section>
         <h2>Industrial Precision Refined Artistry</h2>
         <p class="recantation">"Global capitalism is nearly there. At the end of the world there will only be liquid advertisement and gaseous desire. Sublimated from our bodies, our untethered senses will endlessly ride escalators through pristine artificial environments, more and less than human, drugged-up and drugged down, catalyzed, consuming and consumed by a relentlessly rich economy of sensory information, valued by the pixel. The Virtual Plaza welcomes you, and you will welcome it too."<span class="authored-by"> ~~ r/Vaporwave</span></p>
     </section>
+    <hr>
     <section>
         <h2>Vapor Gallery</h2>
         <p class="information">The Chainlink project is a loveletter to abandoned industrial settings and the art that depicts it. With modern artistic movements like Vaporwave and Nostalgiacore drawing upon artistic sensibilities of 80s and 90s futurism, there is a growing body of artistic work depicting these themes with some notable examples below</p>
         <div class="media-section" id="vapor-gallery">
         </div>
     </section>
-</div>
-<hr>
-<div id="agenda-addendum">
+    <hr>
     <section>
         <h2>Associated Works</h2>
         <ul>
@@ -45,10 +44,8 @@
             <li><i><span class="redacted">&lt;REDACTED&gt;</span></i></li>
         </ul>
     </section>
-</div>
-<hr>
-<div id="beat-the-clock">
-    <section>
+    <hr>
+    <section id="beat-the-clock">
         <h2>Beat The Clock</h2>
         <p class="recantation">
             "R-R-R-R-R-R-R-R-Right about now..." the deep dish surround-sounditorium rumbled with a low-thud membrane shaking 130 bpm rhythm & shred-edited human
@@ -57,8 +54,9 @@
             His party would be reviewed tomorrowas one of the top 5 ways to have spent the last 15 minutes of the century. He had personally spent every free
             moment of the past month arrangin & preparing for it. Admittedly, that only added up to about 10 minutes, but luckily it was easier to do more in less
             time these days.
+            <a class="expand-me" href="beat-the-clock.html">&gt;&gt;Expand&lt;&lt;</a>
         </p>
-        <a class="expand-me" href="beat-the-clock.html">>>Expand<<</a>
     </section>
+    <hr>
 </div>
 {% endblock %}

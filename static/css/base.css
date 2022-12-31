@@ -65,13 +65,6 @@ p {
 	margin: 2rem;
 }
 
-[href="#"] {
-    -font-family: serif;
-	text-decoration: none;
-	color: hsl(239, 100%, 50%);
-	-font-size: 0.1rem;
-}
-
 a:active {
 	color: #800080;
 }
@@ -104,6 +97,22 @@ h3 {
 	color: rgb(208, 68, 35)
 }
 
+section > p, section > ul {
+	display: block;
+    -font-family: Eple, Arial;
+	background-color: #2C394B;
+    margin: 2rem;
+    color: whitesmoke;
+    line-height: 160%;
+    letter-spacing: .00em;
+    -padding-bottom: 15px;
+    font-size: large;
+}
+
+section > ul {
+	padding-left: 2rem;
+}
+
 section {
 	margin: 6mm 0mm 6mm 0mm;
 }
@@ -111,18 +120,23 @@ section {
 ol {
 	list-style-type: number;
 	list-style-position: inside;
-
-}
-
-li {
-    font-family: 'Courier New';
-	line-height: 1.2em;
 }
 
 ul > li {
-	font-family: sarif;
-	margin-top: 4mm;
+	font-family: monospace;
+	margin-top: 2mm;
 	color: whitesmoke;
+	line-height: 1.2em;
+}
+
+ul > li > a {
+	text-decoration: none;
+	color: whitesmoke;
+}
+
+section > ul > li > a:hover {
+	text-decoration: underline;
+	background-color: #334756ec;
 }
 
 #tabbed-buttons {
@@ -156,4 +170,40 @@ ul > li {
 .tabbed-buttons:hover {
 	background-color: #334756ec;
 	text-decoration: underline;
+}
+
+.tabbed-buttons:active {
+	-color:rgb(208, 68, 35);
+}
+
+#upper-navigation ul {
+	background-color: #acacacd5;
+	margin-bottom: 30px;
+}
+
+#uppger-navigation ul li {
+	margin-top: 0px;
+	padding-top: 2mm;
+}
+
+#upper-navigation ul li:hover {
+	background-color: #959595c7;
+}
+
+#upper-navigation ul li a {
+	text-decoration: none;
+	font-family: 'Courier New';
+	font-size: 14px;
+	font-weight: bolder;
+	color: rgb(208, 68, 35);
+}
+
+#upper-navigation ul li a:hover{
+	text-decoration: underline;
+}
+
+#copyright {
+	display: block;
+	text-align: center;
+	color: #2c2e43;
 }

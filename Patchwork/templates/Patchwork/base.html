@@ -5,7 +5,7 @@
         <title>Patchwork Finary</title>
 
         <!-- Document Metadata -->
-        <meta name="" content="">
+        <meta name="Patchwork Base" content="Patchwork">
         <meta charset="utf-8">
 
         <!-- Static CSS -->
@@ -14,32 +14,37 @@
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
         <!-- Scripts -->
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-        <script src="{% static 'scripts/patchwork-function.js' %}" type="text/javascript"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script src="{% static 'scripts/patchwork-function.js' %}"></script>
         {% block init-gallery %}
         {% endblock %}
+        <style>
+            @media (max-width: 1025px)
+            {
+                img, video {display: none;}
+            }
+        </style>
     </head>
-    <style>
-        @media (max-width: 1025px)
-        {
-            img, video {display: none;}
-        }
-    </style>
     <body>
         <header>
             <h1>Patchwork Finary</h1>
             <h3>the patchwork portal is currently under construction</h3>
-            <nav>
-                <ol>
-                    <li><a href="index.html">Portal Landing</a></li>
-                    <li><a href="about.html">About The Creator</a></li>
-                    <li><a href="transfer-email.html">Transfer Email</a></li>
-                </ol>
+            <nav id="upper-navigation">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Chainlink Finary</a></li>
+                    <li><a href="#">Patchwork Finary</a></li>
+                </ul>
             </nav>
+            <script>
+                function doGet1() {window.location.href = 'index.html';}
+                function doGet2() {window.location.href = 'about.html';}
+                function doGet3() {window.location.href = 'transfer-email.html';}
+            </script>
             <div id="tabbed-buttons">
-                <button type="button" id="tabbed-button-1" class="tabbed-buttons">Portal Landing</button>
-                <button type="button" id="tabbed-button-2" class="tabbed-buttons">About</button>
-                <button type="button" id="tabbed-button-3" class="tabbed-buttons">Transfer Email</button>
+                <button type="button" id="tabbed-button-1" class="tabbed-buttons" onclick="doGet1()">Portal Landing</button>
+                <button type="button" id="tabbed-button-2" class="tabbed-buttons" onclick="doGet2()">About</button>
+                <button type="button" id="tabbed-button-3" class="tabbed-buttons" onclick="doGet3()">Transfer Email</button>
             </div>
         </header>
             <main>
@@ -48,6 +53,7 @@
             </main>
         <footer>
             <div id="responseOutput">&nbsp;</div>
+            <div id="copyright">©️Chainlink Finary</div>
         </footer>
     </body>
 </html>

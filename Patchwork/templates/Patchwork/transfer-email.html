@@ -3,45 +3,47 @@
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'css/transfer-email.css' %}">
-<div id="the-form">
-    <H2>Secure Transmission</H2>
-    <form>
-        <label>DATE:</label>
-        <input type="date" name="f-date" required><br>
-        <fieldset>
-            <legend>SECURITY VALIDATION</legend>
-            <label>ID:</label>
-            <input type="text" name="f-id" required>
-            <label>ATTN:</label>
-            <input type="text" name="f-attn" required>
-            <label>CLEARANCE</label>
-            <select name="f-clearance">
-                <option value="1" selected="selected">CONFIDENTIAL</option>
-                <option value="2">SECRET</option>
-                <option value="3">TOP SECRET</option>
-            </select>
-            <input type="checkbox" name="f-encrypted">
-            <label>ENCRYPTED</label>
-            <br><label>COMM ROUTING:</label><br>
-            <input type="radio" id="f-anomalous_materials_unit" name="anomalous_materials_unit" value="anomalous_materials_unit">
-            <label>ANOMALOUS MATERIALS UNIT</label><br>
-            <input type="radio" id="f-sector_b34_control_tower" name="sector_b34_control_tower" value="sector_b34_control_tower">
-            <label>SECTOR B34 CONTROL TOWER</label><br>
-            <input type="radio" id="f-the_basement" name="the_basement" value="the_basement">
-            <label>THE BASEMENT</label><br>
-            <label>PARAMETER:</label>
-            <input list="f-parameter">
-            <datalist id="f-parameter">
-                <option value="Tradecence">
-                <option value="Questig">
-                <option value="Mitsteel">
-                <option value="Cencecon">
-                <option value="Firetal">
-            </datalist>
-        </fieldset>
-        <label>TRANSMISSION PAYLOAD</label><br>
-        <textarea id="f-transmission_payload">START TRANSMISSION&gt;&gt;&gt;</textarea><br>
-        <input type="submit" id="f-submit"><br>
-    </form>
-</div>
+<section>
+    <div id="the-form">
+        <H2>Secure Transmission</H2>
+        <form>
+            <label>DATE:</label>
+            <input type="date" name="f-date" required><br>
+            <fieldset>
+                <legend>SECURITY VALIDATION</legend>
+                <label>ID:</label>
+                <input type="text" name="f-id" required>
+                <label>ATTN:</label>
+                <input type="text" name="f-attn" required>
+                <label>CLEARANCE</label>
+                <select name="f-clearance">
+                    <option value="1" selected="selected">CONFIDENTIAL</option>
+                    <option value="2">SECRET</option>
+                    <option value="3">TOP SECRET</option>
+                </select>
+                <input type="checkbox" name="f-encrypted">
+                <label>ENCRYPTED</label>
+                <br><label>COMM ROUTING:</label><br>
+                <input type="radio" id="f-anomalous_materials_unit" name="anomalous_materials_unit" value="anomalous_materials_unit">
+                <label>ANOMALOUS MATERIALS UNIT</label><br>
+                <input type="radio" id="f-sector_b34_control_tower" name="sector_b34_control_tower" value="sector_b34_control_tower">
+                <label>SECTOR B34 CONTROL TOWER</label><br>
+                <input type="radio" id="f-the_basement" name="the_basement" value="the_basement">
+                <label>THE BASEMENT</label><br>
+                <label>PARAMETER:</label>
+                <input list="f-parameter">
+                <datalist id="f-parameter">
+                    <option value="Tradecence">
+                    <option value="Questig">
+                    <option value="Mitsteel">
+                    <option value="Cencecon">
+                    <option value="Firetal">
+                </datalist>
+            </fieldset>
+            <label>TRANSMISSION PAYLOAD</label><br>
+            <textarea id="f-transmission_payload">START TRANSMISSION&gt;&gt;&gt;</textarea><br>
+            <input type="submit" id="f-submit"><br>
+        </form>
+    </div>
+</section>
 {% endblock %}

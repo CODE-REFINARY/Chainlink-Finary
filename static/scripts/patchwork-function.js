@@ -1,10 +1,9 @@
-const NUM_IMGS_PER_ROW = 3;
-
 /**
  * Creates a form and associates a new ID with the new review card.
  * @param: Object selection: a subset of the img-manifest.json properties to display on the gallery
  */
 function synthesizeGallery(selection) {
+    var NUM_IMGS_PER_ROW = parseInt(window.getComputedStyle(document.documentElement).getPropertyValue('--NUM-IMGS-PER-ROW').trim());
     let vg = document.getElementById("vapor-gallery");
     let outerLoopCounter = 0;
     for (let i = 0; i < Object.keys(selection).length; i = i + NUM_IMGS_PER_ROW)

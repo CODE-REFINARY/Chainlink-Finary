@@ -44,12 +44,12 @@ img {
 	padding-right: 5%;
 }
 
-p {
-	display: block;
-	font-family: Eple, Arial;
-    color: whitesmoke;
-	line-height: 160%;
-    letter-spacing: .00em;
-	padding-bottom: 15px;
-	font-size: small;
+-p {
+	-display: block;
+	-font-family: Eple, Arial;
+    -color: whitesmoke;
+	-line-height: 160%;
+    -letter-spacing: .00em;
+	-padding-bottom: 15px;
+	-font-size: large;
 }
