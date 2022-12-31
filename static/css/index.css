@@ -1,29 +1,29 @@
 /* /////////////// Variables /////////////// */
 :root {
-	--NUM-IMGS-PER-ROW: 0;
+	--NUM-IMGS-PER-ROW: 1;
 }
 /* /////////////// Media Queries /////////////// */
 @media (min-width: 400px) and (max-width: 600px) {
-	:root {
-		--NUM-IMGS-PER-ROW: 1;
-	}
-}
-
-@media (min-width: 601px) and (max-width: 1050px) {
 	:root {
 		--NUM-IMGS-PER-ROW: 2;
 	}
 }
 
-@media (min-width: 1051px) and (max-width: 1200px) {
+@media (min-width: 601px) and (max-width: 1050px) {
 	:root {
 		--NUM-IMGS-PER-ROW: 3;
 	}
 }
 
-@media (min-width: 1201px) {
+@media (min-width: 1051px) and (max-width: 1200px) {
 	:root {
 		--NUM-IMGS-PER-ROW: 4;
+	}
+}
+
+@media (min-width: 1201px) {
+	:root {
+		--NUM-IMGS-PER-ROW: 5;
 	}
 }
 /* /////////////// General Styling /////////////// */
@@ -42,11 +42,21 @@ p {
 #vapor-gallery > div {
 	display: flex;
     flex-direction: row;
-    justify-content: center;
+	justify-content: center;
 }
 
 #vapor-gallery > div > img {
-	max-width:max-content;
+	display: block;
+	max-width: 18%;
+	min-width: 200px;
+	margin: 10px;
+	height: auto;
+	object-fit: fill; 
+}
+
+/* This class is shared only by divs that are the last row of a gallery */
+.last-row {
+	-justify-content: flex-start !important;
 }
 
 .recantation {
