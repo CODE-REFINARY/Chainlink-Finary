@@ -8,7 +8,8 @@
 	var jqxhr = $.get("{% static 'json/img-manifest-blue.json' %}",
 		function(data) 
 		{
-			synthesizeGallery(data);
+            synthesizeGalleryBasic(data);
+			// synthesizeGallery(data);
 		}
 	);
 	
@@ -27,14 +28,12 @@
         <h2>Industrial Precision Refined Artistry</h2>
         <p class="recantation">"Global capitalism is nearly there. At the end of the world there will only be liquid advertisement and gaseous desire. Sublimated from our bodies, our untethered senses will endlessly ride escalators through pristine artificial environments, more and less than human, drugged-up and drugged down, catalyzed, consuming and consumed by a relentlessly rich economy of sensory information, valued by the pixel. The Virtual Plaza welcomes you, and you will welcome it too."<span class="authored-by"> ~~ r/Vaporwave</span></p>
     </section>
-    <hr>
     <section>
         <h2>Vapor Gallery</h2>
         <p class="information">The Chainlink project is a loveletter to abandoned industrial settings and the art that depicts it. With modern artistic movements like Vaporwave and Nostalgiacore drawing upon artistic sensibilities of 80s and 90s futurism, there is a growing body of artistic work depicting these themes with some notable examples below</p>
         <div class="media-section" id="vapor-gallery">
         </div>
     </section>
-    <hr>
     <section>
         <h2>Associated Works</h2>
         <ul>
@@ -44,7 +43,6 @@
             <li><i><span class="redacted">&lt;REDACTED&gt;</span></i></li>
         </ul>
     </section>
-    <hr>
     <section id="beat-the-clock">
         <h2>Beat The Clock</h2>
         <p class="recantation">
@@ -57,6 +55,5 @@
             <a class="expand-me" href="beat-the-clock.html">&gt;&gt;Expand&lt;&lt;</a>
         </p>
     </section>
-    <hr>
 </div>
 {% endblock %}

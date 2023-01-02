@@ -1,5 +1,29 @@
 /**
- * Creates a form and associates a new ID with the new review card.
+ * Creates a gallery with rows defined by a JSON file.
+ * @param: Object selection: a subset of the img-manifest.json properties to display on the gallery
+ */
+function synthesizeGalleryBasic(selection) {
+    // Counter and Constants for determining how many loops to display how many images in a row
+    let vg = document.getElementById("vapor-gallery");
+    let outerLoopCounter = 0;
+    let numImages = Object.keys(selection).length 
+    let div = document.createElement('div');
+
+    // display a grid of images row by row with width determined by the num images above
+    for (let i = 0; i < numImages; i = i + 1) {
+        let img = document.createElement("img");
+        img.src = imgFolder + Object.keys(selection)[i] + "-sq500.jpg";
+        img.className = "gallery-image";
+        img.alt = Object.values(selection)[i];
+        div.append(img); 
+    }
+    vg.append(div);
+}
+
+/**
+ * Creates a gallery with rows defined by a JSON file. The rows are div elements. This is the appropriate
+ * synthesize method for situations where the viewport won't change. The gallery isn't responsive with 
+ * traditional flex methods so in the case of changing viewport use synthesizeGalleryBasic.
  * @param: Object selection: a subset of the img-manifest.json properties to display on the gallery
  */
 function synthesizeGallery(selection) {

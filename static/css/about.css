@@ -38,10 +38,10 @@ div.intro-content {
 }
 
 img {
+	display: block;
 	max-width: 100%;
     height: auto;
-	padding-left: 5%;
-	padding-right: 5%;
+	padding: 8%;
 }
 
 -p {

@@ -34,22 +34,29 @@ p {
 }
 
 #vapor-gallery {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+	-display: flex;
+	-flex-direction: column;
+	-align-items: center;
+	margin: 2rem;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	background-color: #2C394B;
 }
 
 #vapor-gallery > div {
 	display: flex;
     flex-direction: row;
-	justify-content: center;
+	justify-content: flex-start;
+	flex-wrap: wrap;
+	margin: 0px 15px 0px 15px;
 }
 
 #vapor-gallery > div > img {
 	display: block;
-	max-width: 18%;
-	min-width: 200px;
-	margin: 10px;
+	width: 20%;
+	-max-width: max-content;
+	-min-width: 200px;
+	-margin: 10px;
 	height: auto;
 	object-fit: fill; 
 }
@@ -60,8 +67,8 @@ p {
 }
 
 .recantation {
-    font-family: Retro;
-    font-size: small;
+    font-family: Audiowide;
+	font-size: 12px;
     text-align: center;
 }
 

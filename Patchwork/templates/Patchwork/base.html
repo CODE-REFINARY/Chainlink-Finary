@@ -41,15 +41,15 @@
                 function doGet2() {window.location.href = 'about.html';}
                 function doGet3() {window.location.href = 'transfer-email.html';}
             </script>
-            <div id="tabbed-buttons">
-                <button type="button" id="tabbed-button-1" class="tabbed-buttons" onclick="doGet1()">Portal Landing</button>
-                <button type="button" id="tabbed-button-2" class="tabbed-buttons" onclick="doGet2()">About</button>
-                <button type="button" id="tabbed-button-3" class="tabbed-buttons" onclick="doGet3()">Transfer Email</button>
-            </div>
         </header>
             <main>
-            {% block content %}
-            {% endblock %}
+                <div id="tabbed-buttons">
+                    <button type="button" id="tabbed-button-1" class="tabbed-buttons" onclick="doGet1()">Portal Landing</button>
+                    <button type="button" id="tabbed-button-2" class="tabbed-buttons" onclick="doGet2()">About</button>
+                    <button type="button" id="tabbed-button-3" class="tabbed-buttons" onclick="doGet3()">Transfer Email</button>
+                </div>
+                {% block content %}
+                {% endblock %}
             </main>
         <footer>
             <div id="responseOutput">&nbsp;</div>
