@@ -131,14 +131,14 @@ h3 {
 	color: rgb(208, 68, 35)
 }
 
-main, h1, section > p, section > h2, section > ul, .section > p, .media-section, #upper-navigation > ul {
+main, h1, section > p, section > h2, section > ul, .text-section > p, .media-section, #upper-navigation > ul {
 	border-style: solid;
     border-width: 5px;
     border-color: transparent;
     border-radius: 12px;
 }
 
-section > p, .section > p, section > ul {
+section > p, .text-section > p, section > ul {
 	display: block;
     font-family: Audiowide;
 	background-color: #2C394B;
@@ -150,12 +150,38 @@ section > p, .section > p, section > ul {
     font-size: 12px;
 }
 
+section > div {
+    margin: 2rem;	
+}
+
+.text-section {
+	max-width: 60%;
+	margin-right: 15px;
+}
+
+.text-section > p {
+	margin-left: 0px;
+	margin-right: 0px
+}
+
+.text-section > p:first-child {
+	margin-top: 0px;
+}
+
+.text-section > p:last-child {
+	margin-bottom: 0px;
+}
+
 .media-section {
-	margin: 2rem;
-	-padding-top: 15px;
-	-padding-bottom: 15px;
-	-padding: 15px;
 	background-color: #2C394B;
+	border-width: 10px;
+	margin-left: 15px;
+}
+
+.media-section > img {
+	display: block;
+	max-width: 100%;
+    height: auto;
 }
 
 section > ul {

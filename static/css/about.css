@@ -30,7 +30,7 @@ div.intro-content {
 }
 
 .body-text-column {
-	width: 50%;
+	-width: 50%;
 }
 
 .body-image-column {
@@ -38,9 +38,9 @@ div.intro-content {
 }
 
 img {
-	display: block;
-	max-width: 100%;
-    height: auto;
+	-display: block;
+	-max-width: 100%;
+    -height: auto;
 	-padding: 8%;
 }
 
