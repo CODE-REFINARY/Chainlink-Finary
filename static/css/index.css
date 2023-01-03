@@ -7,11 +7,19 @@
 	:root {
 		--NUM-IMGS-PER-ROW: 2;
 	}
+
+	#vapor-gallery > div > img {
+		width: 50% !important;
+	}
 }
 
 @media (min-width: 601px) and (max-width: 1050px) {
 	:root {
 		--NUM-IMGS-PER-ROW: 3;
+	}
+
+	#vapor-gallery > div > img {
+		width: 33.3333333333% !important;
 	}
 }
 
@@ -19,11 +27,19 @@
 	:root {
 		--NUM-IMGS-PER-ROW: 4;
 	}
+
+	#vapor-gallery > div > img {
+		width: 25% !important;
+	}
 }
 
 @media (min-width: 1201px) {
 	:root {
 		--NUM-IMGS-PER-ROW: 5;
+	}
+
+	#vapor-gallery > div > img {
+		width: 20% !important;
 	}
 }
 /* /////////////// General Styling /////////////// */
@@ -33,10 +49,7 @@ p {
 	margin: 2rem;
 }
 
-#vapor-gallery {
-	-display: flex;
-	-flex-direction: column;
-	-align-items: center;
+.media-section {
 	margin: 2rem;
 	padding-top: 15px;
 	padding-bottom: 15px;
@@ -48,7 +61,6 @@ p {
     flex-direction: row;
 	justify-content: flex-start;
 	flex-wrap: wrap;
-	margin: 0px 15px 0px 15px;
 }
 
 #vapor-gallery > div > img {
@@ -58,7 +70,13 @@ p {
 	-min-width: 200px;
 	-margin: 10px;
 	height: auto;
-	object-fit: fill; 
+	object-fit: fill;
+	padding: 10px;
+}
+
+#vapor-gallery > div > img::after {
+	border-style: solid;
+	border-color: whitesmoke;
 }
 
 /* This class is shared only by divs that are the last row of a gallery */
@@ -81,7 +99,6 @@ p {
 img, video {
 	width: 25%;
     height: auto;
-	border: 1px solid #f1f1f1;
 }
 
 div.recantation {
@@ -90,11 +107,6 @@ div.recantation {
 	border-color: #334756;
 	border-radius: 9px;
 	margin: 10px 10px 10px 10px;
-}
-
-.gallery-image {
-	border-style: solid;
-	border-color: whitesmoke;
 }
 
 .expand-me {

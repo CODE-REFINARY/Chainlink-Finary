@@ -131,7 +131,7 @@ h3 {
 	color: rgb(208, 68, 35)
 }
 
-section > p, section > ul {
+section > p, .section > p, section > ul {
 	display: block;
     font-family: Audiowide;
 	background-color: #2C394B;
@@ -141,6 +141,14 @@ section > p, section > ul {
     letter-spacing: .00em;
     -padding-bottom: 15px;
     font-size: 12px;
+}
+
+.media-section {
+	margin: 2rem;
+	-padding-top: 15px;
+	-padding-bottom: 15px;
+	padding: 15px;
+	background-color: #2C394B;
 }
 
 section > ul {

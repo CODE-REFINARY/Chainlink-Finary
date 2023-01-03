@@ -41,7 +41,7 @@ img {
 	display: block;
 	max-width: 100%;
     height: auto;
-	padding: 8%;
+	-padding: 8%;
 }
 
 -p {
