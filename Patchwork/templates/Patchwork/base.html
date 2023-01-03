@@ -39,14 +39,14 @@
             <script>
                 function doGet1() {window.location.href = 'index.html';}
                 function doGet2() {window.location.href = 'about.html';}
-                function doGet3() {window.location.href = 'transfer-email.html';}
+                function doGet3() {window.location.href = 'settings.html';}
             </script>
         </header>
             <main>
                 <nav id="tabbed-buttons">
                     <button type="button" id="tabbed-button-1" class="tabbed-buttons" onclick="doGet1()">Portal Landing</button>
                     <button type="button" id="tabbed-button-2" class="tabbed-buttons" onclick="doGet2()">About</button>
-                    <button type="button" id="tabbed-button-3" class="tabbed-buttons" onclick="doGet3()">Transfer Email</button>
+                    <button type="button" id="tabbed-button-3" class="tabbed-buttons" onclick="doGet3()">Settings</button>
                 </nav>
                 {% block content %}
                 {% endblock %}

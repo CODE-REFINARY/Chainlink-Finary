@@ -8,12 +8,12 @@
 		--NUM-IMGS-PER-ROW: 2;
 	}
 
-	#vapor-gallery > div > img {
-		width: 50% !important;
-	}
+	-#vapor-gallery > div > img {
+		-width: 50% !important;
+	-}
 }
 
-@media (min-width: 601px) and (max-width: 1050px) {
+@media (min-width: 401px) and (max-width: 800px) {
 	:root {
 		--NUM-IMGS-PER-ROW: 3;
 	}
@@ -23,7 +23,7 @@
 	}
 }
 
-@media (min-width: 1051px) and (max-width: 1200px) {
+@media (min-width: 801px) and (max-width: 1200px) {
 	:root {
 		--NUM-IMGS-PER-ROW: 4;
 	}
@@ -51,8 +51,6 @@ p {
 
 .media-section {
 	margin: 2rem;
-	padding-top: 15px;
-	padding-bottom: 15px;
 	background-color: #2C394B;
 }
 
@@ -71,7 +69,7 @@ p {
 	-margin: 10px;
 	height: auto;
 	object-fit: fill;
-	padding: 10px;
+	padding: 5px;
 }
 
 #vapor-gallery > div > img::after {
@@ -117,5 +115,5 @@ div.recantation {
 	text-decoration: underline;
 	text-align: right;
     -margin-right: 2rem;
-	margin-bottom: 1rem;
+	-margin-bottom: 1rem;
 }

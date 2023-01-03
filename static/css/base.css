@@ -81,7 +81,7 @@
 body {
     background-image: url('../images/groove-minimal-lengthy.jpg'); 
     background-repeat: y-repeat;
-	margin: 3% 4% 3% 4%;
+	margin: 2% 4% 1% 4%;
 }
 
 main {
@@ -89,7 +89,7 @@ main {
 	padding-left: 1cm;
 	padding-right: 1cm;
 	-padding-top: 0.3cm;
-	padding-bottom: 1cm;
+	-padding-bottom: 1cm;
 }
 
 p {
@@ -103,7 +103,7 @@ a:active {
 }
 
 h1 {
-    font-family: Aphex;
+    font-family: Audiowide;
     font-weight: 100;
 	background-color: #494B4D;
 	text-align: center;
@@ -131,6 +131,13 @@ h3 {
 	color: rgb(208, 68, 35)
 }
 
+main, h1, section > p, section > h2, section > ul, .section > p, .media-section, #upper-navigation > ul {
+	border-style: solid;
+    border-width: 5px;
+    border-color: transparent;
+    border-radius: 12px;
+}
+
 section > p, .section > p, section > ul {
 	display: block;
     font-family: Audiowide;
@@ -147,7 +154,7 @@ section > p, .section > p, section > ul {
 	margin: 2rem;
 	-padding-top: 15px;
 	-padding-bottom: 15px;
-	padding: 15px;
+	-padding: 15px;
 	background-color: #2C394B;
 }
 
@@ -166,7 +173,8 @@ ol {
 
 ul > li {
 	font-family: monospace;
-	margin-top: 2mm;
+	margin-top: 1mm;
+	margin-bottom: 1mm;
 	color: whitesmoke;
 	line-height: 1.2em;
 }
@@ -200,10 +208,10 @@ section > ul > li > a:hover {
 	margin-top: 12px;
 	margin-bottom: 12px;
 	cursor: pointer;
-	border-radius: 50px;
-	border: solid;
+	border-radius: 10px;
+	-border: solid;
 	border-color: #b0b0b057;
-	width: 16.6666666%;
+	-width: 16.6666666%;
 	-border-left-width: 10px;
 	-border-right-width: 10px;
 	font-size: 12px;
