@@ -155,7 +155,7 @@ section > div {
 }
 
 .text-section {
-	max-width: 60%;
+	max-width: 65%;
 	margin-right: 15px;
 }
 
@@ -175,7 +175,7 @@ section > div {
 .media-section {
 	background-color: #2C394B;
 	border-width: 10px;
-	margin-left: 15px;
+	margin-left: 6%;
 }
 
 .media-section > img {
