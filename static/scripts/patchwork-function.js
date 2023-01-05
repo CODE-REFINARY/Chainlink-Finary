@@ -1,13 +1,15 @@
 /**
  * Creates a gallery with rows defined by a JSON file.
  * @param: Object selection: a subset of the img-manifest.json properties to display on the gallery
+ * @param: String element: the name of the div object within which to place the gallery
  */
-function synthesizeGalleryBasic(selection) {
+function synthesizeGalleryBasic(selection, element) {
     // Counter and Constants for determining how many loops to display how many images in a row
-    let vg = document.getElementById("vapor-gallery");
+    let vg = document.getElementById(element);
     let outerLoopCounter = 0;
     let numImages = Object.keys(selection).length 
     let div = document.createElement('div');
+    div.className = "img-gallery"
 
     // display a grid of images row by row with width determined by the num images above
     for (let i = 0; i < numImages; i = i + 1) {
@@ -27,6 +29,7 @@ function synthesizeGalleryBasic(selection) {
  * @param: Object selection: a subset of the img-manifest.json properties to display on the gallery
  */
 function synthesizeGallery(selection) {
+    const imgFolder = "{% static 'images/' %}";
     // Transparent placeholder images
     let transImg = document.createElement("img"); 
     transImg.src = imgFolder + "transparent-sq500.jpg";    
@@ -67,25 +70,5 @@ function synthesizeGallery(selection) {
             div.className = "last-row";
 
         vg.append(div);
-    }
-}
-
-function createXHR()
-{
-    try { return new XMLHttpRequest(); } catch(e) {}
-    try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch (e) {}
-    try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch (e) {}
-    try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (e) {}
-    try { return new ActiveXObject("Microsoft.XMLHTTP"); } catch (e) {}
-    alert("XMLHttpRequest not supported"); 
-    return null;
-}
-
-function sendRequest(id)
-{
-    var xhr = createXHR(); // cross browser XHR creation
-    if (xhr)
-    {
-        xhr.open("GET","http://ajaxref.com/ch1/sayhello.php",true);
     }
 }

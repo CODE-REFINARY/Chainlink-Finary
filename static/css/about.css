@@ -29,27 +29,9 @@ div.intro-content {
     align-items: center;
 }
 
-.body-text-column {
-	-width: 50%;
-}
-
-.body-image-column {
-	-width: 50%;
-}
-
 img {
 	-display: block;
 	-max-width: 100%;
     -height: auto;
 	-padding: 8%;
-}
-
--p {
-	-display: block;
-	-font-family: Eple, Arial;
-    -color: whitesmoke;
-	-line-height: 160%;
-    -letter-spacing: .00em;
-	-padding-bottom: 15px;
-	-font-size: large;
 }

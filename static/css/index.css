@@ -2,46 +2,7 @@
 :root {
 	--NUM-IMGS-PER-ROW: 1;
 }
-/* /////////////// Media Queries /////////////// */
-@media (min-width: 400px) and (max-width: 600px) {
-	:root {
-		--NUM-IMGS-PER-ROW: 2;
-	}
 
-	-#vapor-gallery > div > img {
-		-width: 50% !important;
-	-}
-}
-
-@media (min-width: 401px) and (max-width: 800px) {
-	:root {
-		--NUM-IMGS-PER-ROW: 3;
-	}
-
-	#vapor-gallery > div > img {
-		width: 33.3333333333% !important;
-	}
-}
-
-@media (min-width: 801px) and (max-width: 1200px) {
-	:root {
-		--NUM-IMGS-PER-ROW: 4;
-	}
-
-	#vapor-gallery > div > img {
-		width: 25% !important;
-	}
-}
-
-@media (min-width: 1201px) {
-	:root {
-		--NUM-IMGS-PER-ROW: 5;
-	}
-
-	#vapor-gallery > div > img {
-		width: 20% !important;
-	}
-}
 /* /////////////// General Styling /////////////// */
 p {
 	color: #f5f5f5;
@@ -54,44 +15,10 @@ p {
 	background-color: #2C394B;
 }
 
-#vapor-gallery > div {
-	display: flex;
-    flex-direction: row;
-	justify-content: flex-start;
-	flex-wrap: wrap;
-}
-
-#vapor-gallery > div > img {
-	display: block;
-	width: 20%;
-	-max-width: max-content;
-	-min-width: 200px;
-	-margin: 10px;
-	height: auto;
-	object-fit: fill;
-	padding: 5px;
-}
-
-#vapor-gallery > div > img::after {
-	border-style: solid;
-	border-color: whitesmoke;
-}
-
-/* This class is shared only by divs that are the last row of a gallery */
-.last-row {
-	-justify-content: flex-start !important;
-}
-
 .recantation {
     font-family: Audiowide;
 	font-size: 12px;
     text-align: center;
-}
-
-.authored-by {
-    -display: block;
-    -text-align: right;
-    -padding-top: 10px;
 }
 
 img, video{
@@ -108,12 +35,9 @@ div.recantation {
 }
 
 .expand-me {
-	-text-decoration: none;
 	display: block;
 	font-family: 'Courier New';
 	color: #4271c2;
 	text-decoration: underline;
 	text-align: right;
-    -margin-right: 2rem;
-	-margin-bottom: 1rem;
 }

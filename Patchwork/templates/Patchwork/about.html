@@ -1,8 +1,9 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
-{% block content %}
-
+{% block header %}
 <link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+{% block content %}
 <section>
     <h2>Introduction</h2>
     <div class="intro-content">
@@ -29,10 +30,6 @@
         </div>
         <div class="body-image-column media-section">
            <img src="{% static 'images/intro-image-main.jpg' %}" alt="Me smiling in the snow"> 
-            <!--<picture>
-                <source srcset="{% static 'images/intro-image-main.jpg' %}">
-                <img src="{% static 'images/intro-image-main.jpg' %}" alt="Me smiling in the snow">
-            </picture>-->
         </div>
     </div>
 </section>
