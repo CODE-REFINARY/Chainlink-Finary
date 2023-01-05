@@ -23,15 +23,8 @@
     text-decoration: none;
 }
 
-div.intro-content {
+div.combination {
 	display: flex;
 	justify-content: space-evenly;
     align-items: center;
-}
-
-img {
-	-display: block;
-	-max-width: 100%;
-    -height: auto;
-	-padding: 8%;
 }
