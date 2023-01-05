@@ -1,7 +1,21 @@
+# Python
 Lib/
 data/
 *.pyc
-.env
-db.sqlite3
 __pycache__
+*~
+
+# Env
+.env
+myvenv/
+venv/
+
+# Database
+db.sqlite3
 *.exe
+migrations/
+
+# Visual Studio
+.vscode/
+.history/
+*.code-workspace
