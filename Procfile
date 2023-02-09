@@ -1,0 +1,1 @@
+web: chainlink-finary.wsgi -log-file -
