@@ -1,5 +1,9 @@
 Linux Commands that I use:
 
+This command runs the manage.py server with settings file specified:
+python manage.py runserver --settings=Chainlink.settings.docker
+python manage.py runserver --settings=Chainlink.settings.heroku
+
 This command will export an ascii armored version of the public key:
 gpg --output public.pgp --armor --export gtdubinin@gmail.com
 
