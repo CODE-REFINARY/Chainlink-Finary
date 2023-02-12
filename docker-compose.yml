@@ -13,8 +13,8 @@ services:
       - "5432:5432"
   web:
     build: .
-    # The server will run on localhost:8000 for whatever reason
-    command: python manage.py runserver 0.0.0.0:8000
+    # The server will run on localhost:8000
+    command: python manage.py runserver 0.0.0.0:8000 --settings=Chainlink.settings.docker
     volumes:
       - .:/code
     ports:
