@@ -19,3 +19,5 @@ migrations/
 .vscode/
 .history/
 *.code-workspace
+
+staticfiles/
