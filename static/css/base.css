@@ -121,6 +121,7 @@ main {
 	background-color: #2C2E43;
 	padding-left: 1cm;
 	padding-right: 1cm;
+	padding-bottom: 2rem;
 	-padding-top: 0.3cm;
 	-padding-bottom: 1cm;
 }
@@ -151,10 +152,22 @@ h2 {
 	font-size: x-large;
 	color: whitesmoke;
 	background-color: #334756;
+	margin: 2rem 0 2rem 0;
 	-margin: 6px 0px 6px 0px;
 }
 
 h3 {
+	display: inline-block;
+	font-family: 'Courier';
+	font-weight: 300;
+	font-size: x-large;
+	color: #959595;
+	margin: 0px 2rem 0px 2rem;
+	background-color: #000000;
+	border-radius: 0.4em;
+}
+
+h6 {
     font-family: 'Courier New', Courier, monospace;
     font-size: large;
 	font-weight: 600;
@@ -164,7 +177,7 @@ h3 {
 	color: rgb(208, 68, 35)
 }
 
-main, h1, section > p, section > h2, section > ul, .text-section > p, .media-section, #upper-navigation > ul {
+main, h1, section > p, section > h2, section > ul, section > code, .text-section > p, .media-section, #upper-navigation > ul {
 	border-style: solid;
     border-width: 5px;
     border-color: transparent;
@@ -175,7 +188,7 @@ section > p, .text-section > p, section > ul {
 	display: block;
     font-family: Audiowide;
 	background-color: #2C394B;
-    margin: 2rem;
+    margin: 8px 2rem 8px 2rem;
     color: whitesmoke;
     line-height: 160%;
     letter-spacing: .00em;
@@ -184,7 +197,7 @@ section > p, .text-section > p, section > ul {
 }
 
 section > div {
-    margin: 2rem;	
+    -margin: 2rem;	
 }
 
 .text-section {
@@ -262,6 +275,7 @@ div.combination {
 	display: flex;
 	justify-content: space-evenly;
     align-items: center;
+	margin: 0 2rem 0 2rem;
 }
 
 #tabbed-buttons {
@@ -324,4 +338,21 @@ div.combination {
 	display: block;
 	text-align: center;
 	color: #2c2e43;
+}
+
+/* /////////////// Specific Tags /////////////// */
+section > code {
+	font-family: monospace;
+	display: block;
+	color: #8ecd95;
+	background-color: #0d0208;
+	margin: 0 2rem 0 2rem;
+	
+	border-width: 5px !important;
+	border-radius: 3px !important;
+	line-height: 1.2em;
+}
+
+p > code {
+
 }

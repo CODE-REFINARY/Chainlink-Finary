@@ -17,3 +17,6 @@ def about(request):
 
 def beat_the_clock(request):
     return render(request, 'Patchwork/beat-the-clock.html', {})
+    
+def gsdocs(request):
+    return render(request, 'Patchwork/gsdocs.html', {})

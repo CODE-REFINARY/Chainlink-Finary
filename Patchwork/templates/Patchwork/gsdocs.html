@@ -1,0 +1,60 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block header %}
+<link rel="stylesheet" href="{% static 'css/gsdocs.css' %}">
+{% endblock %}
+{% block content %}
+<section>
+    <h2>ServiceNow (Glide)</h2>
+    <div class="combination">
+        <div class="text-section">
+            <p>
+                The ServiceNow Glide classes can be difficult for newcomers to navigate. Regardless of your programming experience I hope this doc can be a useful resource with jumpstarting
+				you on the client side programming in ServiceNow! 
+            </p>
+        </div>
+        <div class="media-section">
+           <img src="{% static 'images/GlideAjax.png' %}" alt="image logo for GlideAjax"> 
+        </div>
+    </div>
+</section>
+<section>
+    <h2>GlideForm (g_form) - Manipulate form elements</h2>
+	<p>
+		Sometimes it's much easier to specify functionality in your forms with javascript instead of the browser interface. There are lots of options within
+		ServiceNow for writing client side code (i.e. code that runns on the user's browser) including Client Scripts, Catalog Client Scripts,
+		UI Actions, UI Policies, and UI Scripts. These are just a few commands that will come in handy when you want to manipulate a form from any
+		of these environments. These commands are all available thanks to ServiceNow's own GlideForm class which is available in any and all of these
+		environments.
+	</p>
+	<br>
+	<br>
+	<h3>setMandatory()</h3>
+	<p>
+		Mandatory fields in ServiceNow are fields that are required to be filled in prior to form submission. This is an option that can be set in the browser interface but, as you can see, is also
+		very easy to set with some simple javascript.
+	</p>
+	<code>
+		g_form.setMandatory('field_name', true);&nbsp;&nbsp;// make ‘field_name’ mandatory<br>
+	</code>
+	<br>
+	<br>
+	<br>
+	<h3>setDisplay()</h3>
+	<p>
+		Each element of your form has a display modifier. If display is set to <code>false</code> for a field then it will not appear on your form. When the form is submitted this field will not be
+		filled in by the user and thus its variable value will be its defined default.
+	</p>
+	<code>
+		g_form.setDisplay('field_name', true);&nbsp;&nbsp;&emsp;&emsp;// make ‘field_name’ visible<br>
+	</code>
+	<br>
+	<br>
+	<br>
+	<h3>getValue()</h3>
+	<p>The <code>getValue</code> function is useful for retrieving the value associated with a particular field at the point of form submission.</p>
+	<code>
+		var val = g_form.getValue('field_name');&emsp;&emsp;// extract value from the form<br>
+	</code>
+</section>
+{% endblock %}
