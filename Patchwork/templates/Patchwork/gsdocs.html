@@ -6,17 +6,10 @@
 {% block content %}
 <section>
     <h2>ServiceNow (Glide)</h2>
-    <div class="combination">
-        <div class="text-section">
-            <p>
-                The ServiceNow Glide classes can be difficult for newcomers to navigate. Regardless of your programming experience I hope this doc can be a useful resource with jumpstarting
-				you on the client side programming in ServiceNow! 
-            </p>
-        </div>
-        <div class="media-section">
-           <img src="{% static 'images/glideajax.png' %}" alt="image logo for GlideAjax">
-        </div>
-    </div>
+	<p>
+		The ServiceNow Glide classes can be difficult for newcomers to navigate. Regardless of your programming experience I hope this doc can be a useful resource with jumpstarting
+		you on the client side programming in ServiceNow! 
+	</p>
 </section>
 <section>
     <h2>GlideForm (g_form) - Manipulate form elements</h2>
@@ -48,6 +41,8 @@
 	<code>
 		g_form.setDisplay('field_name', true);&nbsp;&nbsp;&emsp;&emsp;// make ‘field_name’ visible<br>
 	</code>
+	<p>Alternatively make this field invisible:</p>
+	<code>g_form.setDisplay('field_name', false);&nbsp;&emsp;&emsp;// make ‘field_name’ invisible</code>
 	<br>
 	<br>
 	<br>
@@ -55,6 +50,49 @@
 	<p>The <code>getValue</code> function is useful for retrieving the value associated with a particular field at the point of form submission.</p>
 	<code>
 		var val = g_form.getValue('field_name');&emsp;&emsp;// extract value from the form<br>
+	</code>
+	<br><br><br>
+	<h3>setReadOnly()</h3>
+	<p>Read-only fields cannot be edited by form users and, therefore, should be set via <code>Default Value</code>. This attribute should be set inside of an <code>onLoad()</code>. Set a form field read-only with the following command:</p>
+	<code>g_form.setReadOnly('field_name', true);</code>
+</section>
+<br>
+<br>
+<section>
+	<h2>GlideSystem (gs) - Access system resources</h2>
+	<p>
+		The <code>GlideSystem</code> class offers a number of methods to easily access system resources such as logging, user session, and data time function. <code>GlideSystem</code> is represented by the <code>gs</code> 
+		global object and is available for use on server-side scripts.
+	</p>
+	<br><br>
+	<h3>getUserId()</h3>
+	<p>
+		The <code>getUserId()</code> function will return the <code>sys_id</code> of the user who submitted the form. This is particularly useful in setting a default value. One easy way to set the default value of a form
+		field of type <code>reference</code> is to navigate to <code>Default Value</code> and enter the following:
+	</p>
+	<code>javascript:gs.getUserID()</code>
+	<p>Set this field if you want to pre-fill a field like <code>Submitted by</code> so that the form user knows from which account they are accesssing the form and so that server side can easily and reliably gather user information.</p>
+	<br><br>
+	
+</section>
+<section>
+	<h2>GlideRecord()</h2>
+	<h3>GlideRecord()</h3>
+	<p><code>GlideRecord</code> objects contain records (rows) from a single table. The argument specifies which table to retrieve data from.</p>
+	<code>var usr = new GlideRecord('sys_user');</code>
+	<br><br>
+	<h3>get()</h3>
+	<p>Return the record record specified by the function argument.</p>
+	<code>
+	    var grIncident = new GlideRecord('incident');<br>
+		grIncident.get('57af7aec73d423002728660c4cf6a71c');
+	</code>
+	<br><br>
+	<h3>getEmail()</h3>
+	<p>If you'd like to retrieve the email address of the currently logged in user, you could do the following:</p>
+	<code>
+		var currentUser = gs.getUser();<br>
+		var usersEmail = currentUser.getEmail(); // this is the current users email
 	</code>
 </section>
 {% endblock %}

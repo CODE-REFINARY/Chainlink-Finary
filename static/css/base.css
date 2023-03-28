@@ -152,7 +152,7 @@ h2 {
 	font-size: x-large;
 	color: whitesmoke;
 	background-color: #334756;
-	margin: 2rem 0 2rem 0;
+	margin: 1.6rem 0 1.6rem 0;
 	-margin: 6px 0px 6px 0px;
 }
 
@@ -162,7 +162,7 @@ h3 {
 	font-weight: 300;
 	font-size: x-large;
 	color: #959595;
-	margin: 0px 2rem 0px 2rem;
+	margin: 4px 2rem 4px 2rem;
 	background-color: #000000;
 	border-radius: 0.4em;
 }
@@ -188,7 +188,7 @@ section > p, .text-section > p, section > ul {
 	display: block;
     font-family: Audiowide;
 	background-color: #2C394B;
-    margin: 8px 2rem 8px 2rem;
+    margin: 4px 2rem 4px 2rem;
     color: whitesmoke;
     line-height: 160%;
     letter-spacing: .00em;
@@ -346,7 +346,7 @@ section > code {
 	display: block;
 	color: #8ecd95;
 	background-color: #0d0208;
-	margin: 0 2rem 0 2rem;
+	margin: 4px 2rem 4px 2rem;
 	
 	border-width: 5px !important;
 	border-radius: 3px !important;
