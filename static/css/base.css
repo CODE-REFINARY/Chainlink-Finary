@@ -221,7 +221,7 @@ section > div {
 .media-section {
 	background-color: #2C394B;
 	border-width: 10px;
-	margin-left: 6%;
+	-margin-left: 6%;
 }
 
 .media-section > img {
