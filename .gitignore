@@ -21,3 +21,6 @@ migrations/
 *.code-workspace
 
 staticfiles/
+
+# This can cause conflicts with custom settings files
+Chainlink/settings.py
