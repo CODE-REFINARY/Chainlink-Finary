@@ -118,10 +118,12 @@ body {
 }
 
 main {
+	border-radius: 12px;
 	background-color: #2C2E43;
 	padding-left: 1cm;
 	padding-right: 1cm;
-	padding-bottom: 2rem;
+	padding-top: 1.3rem;
+	padding-bottom: 1.3rem;
 	-padding-top: 0.3cm;
 	-padding-bottom: 1cm;
 }
@@ -177,7 +179,7 @@ h6 {
 	color: rgb(208, 68, 35)
 }
 
-main, h1, section > p, section > h2, section > ul, section > code, .text-section > p, .media-section, #upper-navigation > ul {
+h1, section > p, section > h2, section > ul, section > code, .text-section > p, .media-section, #upper-navigation > ul {
 	border-style: solid;
     border-width: 5px;
     border-color: transparent;
