@@ -36,3 +36,9 @@ COPY foo.txt /data/foo.txt
 
 This command runs <command> on a container called "web"
 docker-compose run web <command>
+
+To specify the custom settings file we are using for heroku use:
+--settings=Chainlink.settings.heroku
+
+to specify the custom settisgn file we are using for docker use:
+--settings=Chainlink.settings.docker

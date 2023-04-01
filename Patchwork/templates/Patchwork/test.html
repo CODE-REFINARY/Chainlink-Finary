@@ -1,0 +1,17 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+
+<nav id="tabbed-buttons">
+{% for doc in docs %}
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}'">{{ doc.title }}</button>
+{% endfor %}
+</nav>
+<h1>{{ document.title|linebreaksbr }}</h1>
+{% for chainlink in chainlinks %}
+	<section>
+		<h2>{{ chainlink.name|linebreaksbr }}</h2>
+	</section>
+{% endfor %}
+{% endblock %}

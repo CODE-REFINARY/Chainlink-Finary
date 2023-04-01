@@ -4,6 +4,11 @@
 <link rel="stylesheet" href="{% static 'css/gsdocs.css' %}">
 {% endblock %}
 {% block content %}
+<nav id="tabbed-buttons">
+{% for doc in docs %}
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}'">{{ doc.title }}</button>
+{% endfor %}
+</nav>
 <section>
     <h2>ServiceNow (Glide)</h2>
 	<p>

@@ -7,4 +7,6 @@ urlpatterns = [
     path('about.html', views.about),                     # this is the about page
     path('beat-the-clock.html', views.beat_the_clock),   # this is the "beat the clock" curiosity
     path('gsdocs.html', views.gsdocs),                   # gsdocs
+    path('test.html', views.test),                       # testing page
+    path('pckb.html', views.pckb),                       # parent cases knowledge base
 ]
