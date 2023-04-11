@@ -3,6 +3,14 @@ from django.utils import timezone
 
 from django.utils.translation import gettext_lazy as _
 
+class TagType(models.TextChoices):                                  # Define available tag that content can be wrapped in
+    HEADER2     = 'h2'  , _('header2')                              # define new chainlink, wrap in <section> and create <h2>
+    PARAGRAPH   = 'p'   , _('paragraph')                            # wrap content in <p>
+    CODE        = 'code', _('code')                                 # wrap content in <code>
+    HEADER3     = 'h3'  , _('header3')                              # wrap content in <h3>
+    LINEBREAK   = 'br'  , _('linebreak')                            # insert <br>
+    DELIMITER   = 'del' , _('delimiter')                            # indicate end of content for a chainlink
+
 class Doc(models.Model):
     key = models.BigAutoField(primary_key=True)                         # primary key (useful for testing)
     title = models.CharField(max_length=200)                            # The title of the doc
@@ -15,6 +23,7 @@ class Doc(models.Model):
         
 class Chainlink(models.Model):
     key = models.BigAutoField(primary_key=True)                         # primary key
+    tag = TagType.HEADER2                                               # all chainlinks are displayed in <h2>
     doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)   # identifer for which doc this chainlink belongs
     name = models.CharField(max_length=200)                             # Header element for this chainlink
     order = models.BigIntegerField(default=0)                           # integer value specifying which order on the doc this chainlink appears
@@ -25,11 +34,6 @@ class Chainlink(models.Model):
         return self.name
 
 class Content(models.Model):
-    class TagType(models.TextChoices):                                  # Define available tag that content can be wrapped in
-        PARAGRAPH   = 'p'   , _('paragraph')                            # wrap content in <p>
-        CODE        = 'code', _('code')                                 # wrap content in <code>
-        HEADER      = 'h3'  , _('header')                               # wrap content in <h3>
-        LINEBREAK   = 'br'  , _('linebreak')                            # insert <br>
 
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)       # identifer for which chainlink this content is for
     tag = models.CharField(                                                             # specify tag to wrap content in

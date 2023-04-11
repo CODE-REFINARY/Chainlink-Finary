@@ -1,0 +1,27 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<nav id="tabbed-buttons">
+{% for doc in docs %}
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}'">{{ doc.title }}</button>
+{% endfor %}
+</nav>
+<h1>{{ document.title|linebreaksbr }}</h1>
+	{% for content in contents %}
+		{% if content.tag == 'h2' %}
+		<section><h2>{{ content.name }}</h2>
+		{% elif content.tag == 'p' %}
+		<p>{{ content.content }}</p>
+		{% elif content.tag == 'code' %}
+		<code>{{ content.content }}</code>
+		{% elif content.tag == 'h3' %}
+		<h3>{{ content.content }}</h3>
+		{% elif content.tag == 'br' %}
+		<br>
+		{% elif content.tag == 'del' %}
+		</section>
+		{% endif %}
+	{% endfor %}
+{% endblock %}
