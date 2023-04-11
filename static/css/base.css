@@ -359,7 +359,6 @@ div.combination {
 	color: #2c2e43;
 }
 
-/* /////////////// Specific Tags /////////////// */
 section > code {
 	font-family: monospace;
 	display: block;
@@ -373,6 +372,9 @@ section > code {
 	line-height: 1.2em;
 }
 
-p > code {
+/* /////////////// Specific IDs /////////////// */
 
+#add-page-btn {
+	padding-left: 25px;
+	padding-right: 25px;
 }
