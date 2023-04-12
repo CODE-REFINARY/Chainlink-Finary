@@ -1,0 +1,47 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/generate.css' %}">
+<script>
+	document.addEventListener("DOMContentLoaded", function(){		// defer submit-post execution until DOM is fully loaded
+		let submit = document.getElementById("submit")				// access submit button
+		submit.addEventListener("click", function(){				// when submit button is pressed ...	
+			let new_form = true;
+			let title = document.getElementById('title').value;
+			let is_public = (document.getElementById('public').checked == true);
+			let date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", "generate.html", true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.send(JSON.stringify({
+				new_form: true,
+				title: title,
+				is_public: is_public,
+				date: date
+			}));
+		});
+	});
+</script>
+<nav id="tabbed-buttons">
+{% for doc in docs %}
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}'">{{ doc.title }}</button>
+{% endfor %}
+	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
+</nav>
+<h1>Doc Generation</h1>
+<!-- Form Contents -->
+	<form>
+		<div>
+			<label for="title">Doc Title</label>
+			<input type="text" id="title" name="title">
+		</div>
+		<br>
+		<div>
+			<label for="public">Public</label>
+			<input type="checkbox" id="public" name="public" value="public">
+		</div>
+		<div id="submit-btn">
+			<button type="button" id="submit" class="submit-btn" onclick="">Submit</button>
+		</div>
+	</form>
+{% endblock %}
