@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/generic.css' %}">
 <nav id="tabbed-buttons">
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}'">{{ doc.title }}</button>
@@ -25,5 +25,11 @@
 	</section>
 	{% endif %}
 {% endfor %}
-
+	<div id="add-buttons">
+		<button type="button" id="add-p-btn" class="add-buttons">paragraph &#60;p&#62;</button>
+		<button type="button" id="add-h3-btn" class="add-buttons">header &#60;h3&#62;</button>
+		<button type="button" id="add-cl-btn" class="add-buttons">New Chainlink</button>
+		<button type="button" id="add-code-btn" class="add-buttons">code &#60;code&#62;</button>
+		<button type="button" id="add-br-btn" class="add-buttons">linebreak &#60;br&#62;</button>
+	<div>
 {% endblock %}
