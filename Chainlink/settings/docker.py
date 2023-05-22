@@ -83,7 +83,8 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': 'host.docker.internal',
+        #'HOST': 'host.docker.internal', # for Windows/Mac
+        'HOST': '172.17.0.1', # static IP
         'PORT': '5432',
     },
     'sqlite': {
