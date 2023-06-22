@@ -24,3 +24,6 @@ staticfiles/
 
 # This can cause conflicts with custom settings files
 Chainlink/settings.py
+
+# Pycharm
+.idea/

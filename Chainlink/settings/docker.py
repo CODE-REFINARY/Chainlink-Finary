@@ -131,7 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_ROOT  = os.path.join(BASE_DIR, 'staticfiles')        # This is where collectstatic will place static files for serving
-STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in productoin
+STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]     # This is where static files are located in the project
 
 # Default primary key field type
