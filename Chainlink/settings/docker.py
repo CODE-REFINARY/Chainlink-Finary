@@ -73,6 +73,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Chainlink.wsgi.application'
 
+# CSRF
+CSRF_USE_SESSIONS = True        # store the CSRF token in the user session instead of a cookie
+CSRF_COOKIE_HTTPONLY = False    # no practical benefit here
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

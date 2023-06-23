@@ -20,6 +20,8 @@ def generate(request):
     # once generic.html is loaded user enters a title for the new doc
     # submit button on generic.html causes a POST which sends date, title, public field info to the server. Server creates a doc with a primary key
     # server hashes primary key (key field) using HashId, appends ".html" onto it and stores value in the url field
+    if request.method == 'POST':
+        return render(request, 'Patchwork/index.html', {})
     docs = Doc.objects.all()
     return render(request, 'Patchwork/generate.html', {'docs': docs})
 
