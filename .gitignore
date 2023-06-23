@@ -9,6 +9,7 @@ __pycache__
 .env
 myvenv/
 venv/
+Scripts/
 
 # Database
 db.sqlite3
@@ -20,6 +21,7 @@ migrations/
 .history/
 *.code-workspace
 
+# Django generated stuff
 staticfiles/
 
 # This can cause conflicts with custom settings files

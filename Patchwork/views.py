@@ -13,7 +13,7 @@ def generic(request, key):
             contents.append(cont)
             
     #contents = Content.objects.filter(contains(chainlinks, chainlink)).order_by('chainlink', 'order')
-    return render(request, 'patchwork/generic.html', {'docs': docs, 'document': document, 'contents': contents})
+    return render(request, 'Patchwork/generic.html', {'docs': docs, 'document': document, 'contents': contents})
     
 def generate(request):
     # generate.html is just a standard form for creating a new doc entry in the database
@@ -21,7 +21,7 @@ def generate(request):
     # submit button on generic.html causes a POST which sends date, title, public field info to the server. Server creates a doc with a primary key
     # server hashes primary key (key field) using HashId, appends ".html" onto it and stores value in the url field
     docs = Doc.objects.all()
-    return render(request, 'patchwork/generate.html', {'docs': docs})
+    return render(request, 'Patchwork/generate.html', {'docs': docs})
 
 def index(request):
     chainlinks = Chainlink.objects.filter()
@@ -49,7 +49,7 @@ def pckb(request):
 
 def test(request):
     docs = Doc.objects.all()
-    document = Doc.objects.get(key=6)
-    chainlinks = Chainlink.objects.filter(doc=6)
+    document = Doc.objects.get(key=1)
+    chainlinks = Chainlink.objects.filter(doc=1)
     contents = Content.objects.all()
     return render(request, 'Patchwork/test.html', {'document': document, 'docs': docs, 'chainlinks': chainlinks, 'contents': contents})
