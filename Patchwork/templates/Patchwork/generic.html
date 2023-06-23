@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{% static 'css/generic.css' %}">
 <nav id="tabbed-buttons">
 {% for doc in docs %}
-	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}'">{{ doc.title }}</button>
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
 </nav>
