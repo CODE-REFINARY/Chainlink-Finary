@@ -1,8 +1,53 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
 {% block content %}
-
 <link rel="stylesheet" href="{% static 'css/generic.css' %}">
+<script>
+	document.addEventListener("DOMContentLoaded", function() {								// await full DOM load before adding DB items
+		// Prompt Buttons
+		let newParagraph = document.getElementById("add-p-btn");
+		let newHeader = document.getElementById("add-h3-btn");
+		let newChainlink = document.getElementById("add-cl-btn");
+		let newCode = document.getElementById("add-code-btn");
+		let newBreak = document.getElementById("add-br-btn");
+
+		// fields to populate in the table
+		var title;
+		var is_public;
+		var order;
+
+		// csrf protection token for making ajax requests
+		const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+		// add items to database
+		function addElement(type) {
+			if (type == "chainlink") {
+				title = "test"
+				is_public = "True";
+				order = 0;
+			}
+
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", window.location.href, true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.setRequestHeader('X-CSRFToken', csrftoken);
+			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "order": order }));
+
+			xhr.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+
+				}
+			}
+		}
+
+		// Prompt Button Presses
+		newParagraph.addEventListener("click", function() {addElement('paragraph')});
+		newHeader.addEventListener("click", function() {addElement('header')});
+		newChainlink.addEventListener("click", function() {addElement('chainlink')});
+		newCode.addEventListener("click", function() {addElement('code')});
+		newBreak.addEventListener("click", function() {addElement('break')});
+	});
+</script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}.html'">{{ doc.title }}</button>
@@ -31,5 +76,5 @@
 		<button type="button" id="add-cl-btn" class="add-buttons">New Chainlink</button>
 		<button type="button" id="add-code-btn" class="add-buttons">code &#60;code&#62;</button>
 		<button type="button" id="add-br-btn" class="add-buttons">linebreak &#60;br&#62;</button>
-	<div>
+	</div>
 {% endblock %}

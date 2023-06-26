@@ -3,21 +3,24 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/generate.css' %}">
 <script>
-	document.addEventListener("DOMContentLoaded", function(){								// defer submit-post execution until DOM is fully loaded
+	document.addEventListener("DOMContentLoaded", function() {								// defer submit-post execution until DOM is fully loaded
 		let submit = document.getElementById("submit")										// access submit button
 		const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;		// store csrftoken
-		const max = 1000;																	// max possible url value
 		submit.addEventListener("click", function() {										// when submit button is pressed ...
-			let new_form = true;
 			let title = document.getElementById('title').value;
 			let is_public = (document.getElementById('public').checked == true);
-			let date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-			let url = Math.floor(Math.random() * max);
 			let xhr = new XMLHttpRequest();
 			xhr.open("POST", "generate.html", true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.setRequestHeader('X-CSRFToken', csrftoken);
-			xhr.send(JSON.stringify({ "new_form": new_form, "title": title, "is_public": is_public, "date": date, "url":url }));
+			xhr.send(JSON.stringify({ "title": title, "is_public": is_public }));
+
+			xhr.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					const url = xhr.getResponseHeader('url');
+					window.location.replace(url + ".html");
+				}
+			}
 		});
 	});
 </script>

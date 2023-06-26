@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
-
 from django.utils.translation import gettext_lazy as _
+
 
 class TagType(models.TextChoices):                                  # Define available tag that content can be wrapped in
     HEADER2     = 'h2'  , _('header2')                              # define new chainlink, wrap in <section> and create <h2>
@@ -10,6 +10,7 @@ class TagType(models.TextChoices):                                  # Define ava
     HEADER3     = 'h3'  , _('header3')                              # wrap content in <h3>
     LINEBREAK   = 'br'  , _('linebreak')                            # insert <br>
     DELIMITER   = 'del' , _('delimiter')                            # indicate end of content for a chainlink
+
 
 class Doc(models.Model):
     key = models.BigAutoField(primary_key=True)                         # primary key (useful for testing)
@@ -20,7 +21,8 @@ class Doc(models.Model):
     
     def __str__(self):
         return self.title
-        
+
+
 class Chainlink(models.Model):
     key = models.BigAutoField(primary_key=True)                         # primary key
     tag = TagType.HEADER2                                               # all chainlinks are displayed in <h2>
@@ -33,11 +35,12 @@ class Chainlink(models.Model):
     def __str__(self):
         return self.name
 
+
 class Content(models.Model):
 
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)       # identifer for which chainlink this content is for
     tag = models.CharField(                                                             # specify tag to wrap content in
-        max_length = 10,
+        max_length=10,
         choices=TagType.choices,
         default=TagType.PARAGRAPH,
     )
