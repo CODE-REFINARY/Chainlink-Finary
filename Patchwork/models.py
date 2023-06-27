@@ -18,6 +18,7 @@ class Doc(models.Model):
     public = models.BooleanField(default=False)                         # Indicate whether this doc will be shareable
     date = models.DateTimeField(default=timezone.now)                   # Creation date for this doc
     url = models.CharField(max_length=75)                               # relative url for this doc
+    count = models.BigIntegerField(default=0)
     
     def __str__(self):
         return self.title
@@ -27,13 +28,15 @@ class Chainlink(models.Model):
     key = models.BigAutoField(primary_key=True)                         # primary key
     tag = TagType.HEADER2                                               # all chainlinks are displayed in <h2>
     doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)   # identifer for which doc this chainlink belongs
-    name = models.CharField(max_length=200)                             # Header element for this chainlink
+    title = models.CharField(max_length=200)                             # Header element for this chainlink
+    url = models.CharField(max_length=75)                               # relative url for the chainlink
     order = models.BigIntegerField(default=0)                           # integer value specifying which order on the doc this chainlink appears
     public = models.BooleanField(default=False)                         # Indicate whether this chainlink will be shareable
     date = models.DateTimeField(default=timezone.now)                   # Creation date for this chainlink. May or may not be visible
+    count = models.BigIntegerField(default=0)
   
     def __str__(self):
-        return self.name
+        return self.title
 
 
 class Content(models.Model):

@@ -10,5 +10,6 @@ urlpatterns = [
     path('gsdocs.html', views.gsdocs),                      # gsdocs
     path('test.html', views.test),                          # testing page
     path('pckb.html', views.pckb),                          # parent cases knowledge base
-    path('<str:key>.html', views.generic, name='generic'),  # regularly generated blog pages match here
+    path('doc<str:key>.html', views.generic, name='generic'),  # regularly generated blog pages match here
+    path('chainlink<str:key>.html', views.chainlink, name='chainlink'),
 ]

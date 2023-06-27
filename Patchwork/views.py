@@ -15,25 +15,47 @@ def generic(request, key):
         json_data = json.loads(request.body)
 
         type = json_data["type"]
+        try_title = json_data["title"]
 
         if type == "chainlink":
             chainlink = Chainlink()
-            chainlink.title = json_data["title"]
-            chainlink.public = json_data["is_public"]
             chainlink.doc = document
-            chainlink.order = json_data["order"]
+
+            while (Chainlink.objects.filter(title=try_title).exists() or try_title == ''):
+                try_title += "+"
+            chainlink.title = try_title
+
+
+            chainlink.order = document.count
+            document.count = document.count + 1
+
+            try_url = hashlib.sha256(chainlink.title.encode('UTF-8')).hexdigest()
+            chainlink.url = try_url
+
+            chainlink.public = json_data["is_public"]
             chainlink.date = timezone.now()
+            document.save()
             chainlink.save()
 
         return render(request, 'Patchwork/success.html', {})
 
     docs = Doc.objects.all()
+    chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')
     contents = []
-    for link in Chainlink.objects.filter(doc=document.pk).order_by('order'):
+    for link in chainlinks:
         contents.append(link)
         for cont in Content.objects.filter(chainlink=link.pk).order_by('order'):
             contents.append(cont)
-    return render(request, 'Patchwork/generic.html', {'docs': docs, 'document': document, 'contents': contents})
+    return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
+
+
+def chainlink(request, key):
+    target = get_object_or_404(Chainlink, url=key)
+    docs = Doc.objects.all()
+    contents = []
+    for cont in Content.objects.filter(chainlink=target).order_by('order'):
+        contents.append(cont)
+    return render(request, 'Patchwork/chainlink.html', {'docs': docs, 'target': target, 'contents': contents})
 
 
 def generate(request):
@@ -48,7 +70,7 @@ def generate(request):
         # Make sure doc title is unique otherwise fail
         try_title = json_data['title']
         if Doc.objects.filter(title=try_title).exists() or try_title == '':
-            return render(request, failure.html, {})
+            try_title += "+"
 
         # Ensure url is unique
         try_url = hashlib.sha256(try_title.encode('UTF-8')).hexdigest()
@@ -73,11 +95,8 @@ def generate(request):
 
 
 def index(request):
-    chainlinks = Chainlink.objects.filter()
-    context = {  # This logic will determine which chainlinks are displayed
-        'dfd': 'joe'
-    }
-    return render(request, 'Patchwork/index.html', context)
+    docs = Doc.objects.all()
+    return render(request, 'Patchwork/index.html', {'docs': docs})
 
 
 def transfer_email(request):

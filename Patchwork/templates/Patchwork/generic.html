@@ -11,6 +11,8 @@
 		let newCode = document.getElementById("add-code-btn");
 		let newBreak = document.getElementById("add-br-btn");
 
+		var list = document.getElementById('chainlink-display');
+
 		// fields to populate in the table
 		var title;
 		var is_public;
@@ -20,22 +22,19 @@
 		const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 		// add items to database
-		function addElement(type) {
+		function addElement(type, title) {
 			if (type == "chainlink") {
-				title = "test"
 				is_public = "True";
 				order = 0;
 			}
-
 			let xhr = new XMLHttpRequest();
 			xhr.open("POST", window.location.href, true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.setRequestHeader('X-CSRFToken', csrftoken);
 			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "order": order }));
-
 			xhr.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
-
+					window.location.reload()
 				}
 			}
 		}
@@ -43,33 +42,52 @@
 		// Prompt Button Presses
 		newParagraph.addEventListener("click", function() {addElement('paragraph')});
 		newHeader.addEventListener("click", function() {addElement('header')});
-		newChainlink.addEventListener("click", function() {addElement('chainlink')});
+
+		// Chainlink creation logic
+		newChainlink.addEventListener("click", function() {
+			const section = document.createElement('section');
+			const form = document.createElement('form');
+			const input = document.createElement('input');
+			form.addEventListener("submit", function(event) { event.preventDefault(); addElement('chainlink', input.value); });
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter chainlink name');
+			form.appendChild(input);
+			section.appendChild(form);
+			list.appendChild(section);
+		});
+
 		newCode.addEventListener("click", function() {addElement('code')});
 		newBreak.addEventListener("click", function() {addElement('break')});
 	});
 </script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
-	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}.html'">{{ doc.title }}</button>
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
 </nav>
 <h1>{{ document.title|linebreaksbr }}</h1>
-{% for content in contents %}
-	{% if content.tag == 'h2' %}
-	<section><h2>{{ content.name }}</h2>
-	{% elif content.tag == 'p' %}
-	<p>{{ content.content }}</p>
-	{% elif content.tag == 'code' %}
-	<code>{{ content.content }}</code>
-	{% elif content.tag == 'h3' %}
-	<h3>{{ content.content }}</h3>
-	{% elif content.tag == 'br' %}
-	<br>
-	{% elif content.tag == 'del' %}
-	</section>
-	{% endif %}
+<div id="chainlink-display">
+{% for chainlink in chainlinks %}
+<h6>chainlink{{ chainlink.url }}.html</h6><br>
 {% endfor %}
+{% for content in contents %}
+		{% if content.tag == 'h2' %}
+		<section><h2>{{ content.title }}</h2>
+		{% elif content.tag == 'p' %}
+		<p>{{ content.content }}</p>
+		{% elif content.tag == 'code' %}
+		<code>{{ content.content }}</code>
+		{% elif content.tag == 'h3' %}
+		<h3>{{ content.content }}</h3>
+		{% elif content.tag == 'br' %}
+		<br>
+		{% elif content.tag == 'del' %}
+		</section>
+		{% endif %}
+{% endfor %}
+
+</div>
 	<div id="add-buttons">
 		<button type="button" id="add-p-btn" class="add-buttons">paragraph &#60;p&#62;</button>
 		<button type="button" id="add-h3-btn" class="add-buttons">header &#60;h3&#62;</button>

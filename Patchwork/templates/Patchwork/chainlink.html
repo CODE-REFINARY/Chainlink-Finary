@@ -1,0 +1,29 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/generic.css' %}">
+<nav id="tabbed-buttons">
+{% for doc in docs %}
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
+{% endfor %}
+	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
+</nav>
+<h1>{{ target.title|linebreaksbr }}</h1>
+<div id="chainlink-display">
+{% for content in contents %}
+	{% if content.tag == 'h2' %}
+	<section><h2>{{ content.title }}</h2>
+	{% elif content.tag == 'p' %}
+	<p>{{ content.content }}</p>
+	{% elif content.tag == 'code' %}
+	<code>{{ content.content }}</code>
+	{% elif content.tag == 'h3' %}
+	<h3>{{ content.content }}</h3>
+	{% elif content.tag == 'br' %}
+	<br>
+	{% elif content.tag == 'del' %}
+	</section>
+	{% endif %}
+{% endfor %}
+</div>
+{% endblock %}
