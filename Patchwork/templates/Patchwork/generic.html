@@ -16,23 +16,20 @@
 		// fields to populate in the table
 		var title;
 		var is_public;
-		var order;
 
 		// csrf protection token for making ajax requests
 		const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 		// add items to database
-		function addElement(type, title, url) {
+		function addElement(type, title, url, order) {
 			if (type == 'header2') {
 				is_public = "True";
-				order = 0;
 			}
-			order = -1;
 			let xhr = new XMLHttpRequest();
 			xhr.open("POST", window.location.href, true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.setRequestHeader('X-CSRFToken', csrftoken);
-			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "order": order, "url": url }));
+			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
 			xhr.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
 					window.location.reload()
@@ -40,12 +37,38 @@
 			}
 		}
 
-		// Prompt Button Presses
-		newParagraph.addEventListener("click", function() {addElement('paragraph')});
+		// Paragraph creation logic
+		newParagraph.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('textarea');
+			const submit = document.createElement('button');
+			const textNode = document.createTextNode("submit");
+
+
+			input.setAttribute('rows', '10');
+			input.setAttribute('cols', '100');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter paragraph body');
+			submit.setAttribute('id', 'paragraph-submit');
+			submit.setAttribute('type', 'submit');
+
+			submit.appendChild(textNode);
+			form.appendChild(input);
+			form.appendChild(submit);
+			chainlink.appendChild(form);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('paragraph', input.value, url, order);
+			});
+		});
 
 		// H3 creation logic
 		newHeader.addEventListener("click", function() {
-			const chainlink = document.getElementById("chainlink-display").lastElementChild
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
 			const url = chainlink.firstElementChild.getAttribute('id');
 			const form = document.createElement('form');
 			const input = document.createElement('input');
@@ -55,13 +78,14 @@
 			chainlink.appendChild(form);
 			form.addEventListener("submit", function(event) {
 				event.preventDefault();
-				addElement('header3', input.value, url);
+				addElement('header3', input.value, url, order);
 			});
 		});
 
 		// Chainlink creation logic
 		newChainlink.addEventListener("click", function() {
 			const section = document.createElement('section');
+			const order = document.getElementById("chainlink-display").childElementCount - 1;
 			const form = document.createElement('form');
 			const input = document.createElement('input');
 			input.setAttribute('type', 'text');
@@ -75,8 +99,40 @@
 			});
 		});
 
-		newCode.addEventListener("click", function() {addElement('code')});
-		newBreak.addEventListener("click", function() {addElement('break')});
+		// Code block creation logic
+		newCode.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('textarea');
+			const submit = document.createElement('button');
+			const textNode = document.createTextNode("submit");
+
+			input.setAttribute('rows', '10');
+			input.setAttribute('cols', '100');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter code block');
+			submit.setAttribute('id', 'code-submit');
+			submit.setAttribute('type', 'submit');
+
+			submit.appendChild(textNode);
+			form.appendChild(input);
+			form.appendChild(submit);
+			chainlink.appendChild(form);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('code', input.value, url, order);
+			});
+		});
+
+		// Linebreak logic
+		newBreak.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			addElement('linebreak', '', url, order);
+		});
 	});
 </script>
 <nav id="tabbed-buttons">

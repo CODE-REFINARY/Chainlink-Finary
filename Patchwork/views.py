@@ -9,7 +9,6 @@ import hashlib
 
 def generic(request, key):
     document = get_object_or_404(Doc, url=key)
-    print(document)
     if request.method == 'POST':
         # get POST request json payload
         json_data = json.loads(request.body)
@@ -38,6 +37,7 @@ def generic(request, key):
             # save the chainlink
             chainlink.public = json_data["is_public"]
             chainlink.date = timezone.now()
+            chainlink.count = 0     # delimiter doesn't count in total count
             document.save()
             chainlink.save()
 
@@ -53,13 +53,68 @@ def generic(request, key):
         elif type == 'header3':
             # Create header content
             url = json_data["url"]
-            print(url)
             chainlink = Chainlink.objects.filter(url=url).first()
+            delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
+            delimiter.order += 1
+            delimiter.save()
             header = Content()
             header.url = url
             header.chainlink = chainlink
             header.tag = TagType.HEADER3
-            header.order = json_data["order"]
+            header.order = chainlink.count
+            chainlink.count += 1
+            chainlink.save()
+            header.content = json_data["title"]
+            header.save()
+
+        elif type == 'paragraph':
+            # Create header content
+            url = json_data["url"]
+            chainlink = Chainlink.objects.filter(url=url).first()
+            delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
+            delimiter.order += 1
+            delimiter.save()
+            header = Content()
+            header.url = url
+            header.chainlink = chainlink
+            header.tag = TagType.PARAGRAPH
+            header.order = chainlink.count
+            chainlink.count += 1
+            chainlink.save()
+            header.content = json_data["title"]
+            header.save()
+
+        elif type == 'code':
+            # Create header content
+            url = json_data["url"]
+            chainlink = Chainlink.objects.filter(url=url).first()
+            delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
+            delimiter.order += 1
+            delimiter.save()
+            header = Content()
+            header.url = url
+            header.chainlink = chainlink
+            header.tag = TagType.CODE
+            header.order = chainlink.count
+            chainlink.count += 1
+            chainlink.save()
+            header.content = json_data["title"]
+            header.save()
+
+        elif type == 'linebreak':
+            # Create header content
+            url = json_data["url"]
+            chainlink = Chainlink.objects.filter(url=url).first()
+            delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
+            delimiter.order += 1
+            delimiter.save()
+            header = Content()
+            header.url = url
+            header.chainlink = chainlink
+            header.tag = TagType.LINEBREAK
+            header.order = chainlink.count
+            chainlink.count += 1
+            chainlink.save()
             header.content = json_data["title"]
             header.save()
 

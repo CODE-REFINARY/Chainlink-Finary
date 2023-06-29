@@ -51,4 +51,4 @@ class Content(models.Model):
     content = models.CharField(max_length=3000)                         # specify content to place between tags specified by tag
     
     def __str__(self):
-        return self.chainlink.title + " - " + self.tag
+        return str(self.order) + " " + self.chainlink.title + " - " + self.tag
