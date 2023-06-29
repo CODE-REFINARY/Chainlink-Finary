@@ -68,12 +68,19 @@
 </nav>
 <h1>{{ document.title|linebreaksbr }}</h1>
 <div id="chainlink-display">
-{% for chainlink in chainlinks %}
-<h6>chainlink{{ chainlink.url }}.html</h6><br>
-{% endfor %}
+<ul id="chainlink-manifest">
+<h2>Chainlink Manifest</h2>
+	{% if chainlinks %}
+	{% for chainlink in chainlinks %}
+	<li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
+	{% endfor %}
+	{% else %}
+	<li><i>&#60;list empty&#62;</i></li>
+	{% endif %}
+</ul>
 {% for content in contents %}
 		{% if content.tag == 'h2' %}
-		<section><h2>{{ content.title }}</h2>
+		<section><h2 id="{{ content.url }}">{{ content.title }}<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a></h2>
 		{% elif content.tag == 'p' %}
 		<p>{{ content.content }}</p>
 		{% elif content.tag == 'code' %}

@@ -18,7 +18,7 @@
 			xhr.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
 					const url = xhr.getResponseHeader('url');
-					window.location.replace(url + ".html");
+					window.location.replace("doc" + url + ".html");
 				}
 			}
 		});

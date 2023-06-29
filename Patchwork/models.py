@@ -3,13 +3,13 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-class TagType(models.TextChoices):                                  # Define available tag that content can be wrapped in
-    HEADER2     = 'h2'  , _('header2')                              # define new chainlink, wrap in <section> and create <h2>
-    PARAGRAPH   = 'p'   , _('paragraph')                            # wrap content in <p>
-    CODE        = 'code', _('code')                                 # wrap content in <code>
-    HEADER3     = 'h3'  , _('header3')                              # wrap content in <h3>
-    LINEBREAK   = 'br'  , _('linebreak')                            # insert <br>
-    DELIMITER   = 'del' , _('delimiter')                            # indicate end of content for a chainlink
+class TagType(models.TextChoices):                                      # Define available tag that content can be wrapped in
+    HEADER2 = 'h2', _('header2')                                        # define new chainlink, wrap in <section> and create <h2>
+    PARAGRAPH = 'p', _('paragraph')                                     # wrap content in <p>
+    CODE = 'code', _('code')                                            # wrap content in <code>
+    HEADER3 = 'h3', _('header3')                                        # wrap content in <h3>
+    LINEBREAK = 'br', _('linebreak')                                    # insert <br>
+    DELIMITER = 'del', _('delimiter')                                   # indicate end of content for a chainlink
 
 
 class Doc(models.Model):
@@ -40,8 +40,8 @@ class Chainlink(models.Model):
 
 
 class Content(models.Model):
-
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)       # identifer for which chainlink this content is for
+    url = models.CharField(max_length=75)                                               # chainlink's url
     tag = models.CharField(                                                             # specify tag to wrap content in
         max_length=10,
         choices=TagType.choices,
@@ -51,4 +51,4 @@ class Content(models.Model):
     content = models.CharField(max_length=3000)                         # specify content to place between tags specified by tag
     
     def __str__(self):
-        return self.content
+        return self.chainlink.title + " - " + self.tag

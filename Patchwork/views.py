@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Doc, Content
+from .models import Chainlink, Doc, Content, TagType
 from django.utils import timezone
 import random
 import json
@@ -18,24 +18,38 @@ def generic(request, key):
         try_title = json_data["title"]
 
         if type == "chainlink":
+            # Create a new chainlink
             chainlink = Chainlink()
             chainlink.doc = document
 
-            while (Chainlink.objects.filter(title=try_title).exists() or try_title == ''):
+            # assign the chainlink a unique title. If desired title already exists then append "+" until it's unique
+            while Chainlink.objects.filter(title=try_title).exists() or try_title == '':
                 try_title += "+"
             chainlink.title = try_title
 
-
+            # assign the chainlink's order in the document and update the number of chainlinks present in the doc
             chainlink.order = document.count
             document.count = document.count + 1
 
+            # generate url for this chainlink
             try_url = hashlib.sha256(chainlink.title.encode('UTF-8')).hexdigest()
             chainlink.url = try_url
 
+            # save the chainlink
             chainlink.public = json_data["is_public"]
             chainlink.date = timezone.now()
             document.save()
             chainlink.save()
+
+            # create a delimiter content for this chainlink
+            delimiter = Content()
+            delimiter.chainlink = chainlink
+            delimiter.tag = TagType.DELIMITER
+            delimiter.url = chainlink.url
+            delimiter.order = 0
+            delimiter.content = ''
+            delimiter.save()
+
 
         return render(request, 'Patchwork/success.html', {})
 
@@ -69,7 +83,7 @@ def generate(request):
 
         # Make sure doc title is unique otherwise fail
         try_title = json_data['title']
-        if Doc.objects.filter(title=try_title).exists() or try_title == '':
+        while Doc.objects.filter(title=try_title).exists() or try_title == '':
             try_title += "+"
 
         # Ensure url is unique
@@ -92,6 +106,7 @@ def generate(request):
         return response
     docs = Doc.objects.all()
     return render(request, 'Patchwork/generate.html', {'docs': docs})
+
 
 
 def index(request):
