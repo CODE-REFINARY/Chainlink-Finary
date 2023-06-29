@@ -22,16 +22,17 @@
 		const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 		// add items to database
-		function addElement(type, title) {
-			if (type == "chainlink") {
+		function addElement(type, title, url) {
+			if (type == 'header2') {
 				is_public = "True";
 				order = 0;
 			}
+			order = -1;
 			let xhr = new XMLHttpRequest();
 			xhr.open("POST", window.location.href, true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.setRequestHeader('X-CSRFToken', csrftoken);
-			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "order": order }));
+			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "order": order, "url": url }));
 			xhr.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
 					window.location.reload()
@@ -41,19 +42,37 @@
 
 		// Prompt Button Presses
 		newParagraph.addEventListener("click", function() {addElement('paragraph')});
-		newHeader.addEventListener("click", function() {addElement('header')});
+
+		// H3 creation logic
+		newHeader.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter header title');
+			form.appendChild(input);
+			chainlink.appendChild(form);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('header3', input.value, url);
+			});
+		});
 
 		// Chainlink creation logic
 		newChainlink.addEventListener("click", function() {
 			const section = document.createElement('section');
 			const form = document.createElement('form');
 			const input = document.createElement('input');
-			form.addEventListener("submit", function(event) { event.preventDefault(); addElement('chainlink', input.value); });
 			input.setAttribute('type', 'text');
 			input.setAttribute('placeholder', 'enter chainlink name');
 			form.appendChild(input);
 			section.appendChild(form);
 			list.appendChild(section);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('header2', input.value, '');
+			});
 		});
 
 		newCode.addEventListener("click", function() {addElement('code')});
@@ -79,17 +98,17 @@
 	{% endif %}
 </ul>
 {% for content in contents %}
-		{% if content.tag == 'h2' %}
+		{% if content.tag == 'header2' %}
 		<section><h2 id="{{ content.url }}">{{ content.title }}<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a></h2>
-		{% elif content.tag == 'p' %}
+		{% elif content.tag == 'paragraph' %}
 		<p>{{ content.content }}</p>
 		{% elif content.tag == 'code' %}
 		<code>{{ content.content }}</code>
-		{% elif content.tag == 'h3' %}
+		{% elif content.tag == 'header3' %}
 		<h3>{{ content.content }}</h3>
-		{% elif content.tag == 'br' %}
+		{% elif content.tag == 'linebreak' %}
 		<br>
-		{% elif content.tag == 'del' %}
+		{% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}
 {% endfor %}

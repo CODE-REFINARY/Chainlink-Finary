@@ -4,12 +4,12 @@ from django.utils.translation import gettext_lazy as _
 
 
 class TagType(models.TextChoices):                                      # Define available tag that content can be wrapped in
-    HEADER2 = 'h2', _('header2')                                        # define new chainlink, wrap in <section> and create <h2>
-    PARAGRAPH = 'p', _('paragraph')                                     # wrap content in <p>
+    HEADER2 = 'header2', _('header2')                                   # define new chainlink, wrap in <section> and create <h2>
+    PARAGRAPH = 'paragraph', _('paragraph')                             # wrap content in <p>
     CODE = 'code', _('code')                                            # wrap content in <code>
-    HEADER3 = 'h3', _('header3')                                        # wrap content in <h3>
-    LINEBREAK = 'br', _('linebreak')                                    # insert <br>
-    DELIMITER = 'del', _('delimiter')                                   # indicate end of content for a chainlink
+    HEADER3 = 'header3', _('header3')                                   # wrap content in <h3>
+    LINEBREAK = 'linebreak', _('linebreak')                             # insert <br>
+    DELIMITER = 'delimiter', _('delimiter')                             # indicate end of content for a chainlink
 
 
 class Doc(models.Model):

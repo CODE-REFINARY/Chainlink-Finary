@@ -17,7 +17,7 @@ def generic(request, key):
         type = json_data["type"]
         try_title = json_data["title"]
 
-        if type == "chainlink":
+        if type == "header2":
             # Create a new chainlink
             chainlink = Chainlink()
             chainlink.doc = document
@@ -50,6 +50,18 @@ def generic(request, key):
             delimiter.content = ''
             delimiter.save()
 
+        elif type == 'header3':
+            # Create header content
+            url = json_data["url"]
+            print(url)
+            chainlink = Chainlink.objects.filter(url=url).first()
+            header = Content()
+            header.url = url
+            header.chainlink = chainlink
+            header.tag = TagType.HEADER3
+            header.order = json_data["order"]
+            header.content = json_data["title"]
+            header.save()
 
         return render(request, 'Patchwork/success.html', {})
 
