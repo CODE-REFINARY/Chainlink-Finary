@@ -9,6 +9,7 @@ __pycache__
 .env
 myvenv/
 venv/
+Scripts/
 
 # Database
 db.sqlite3
@@ -19,10 +20,15 @@ db.sqlite3
 .history/
 *.code-workspace
 
+# Django generated stuff
 staticfiles/
 
 # This can cause conflicts with custom settings files
 Chainlink/settings.py
 
 # Pycharm
+<<<<<<< HEAD
 .idea
+=======
+.idea/
+>>>>>>> bf9a8cc019a81b2082d89e08cd50edd0635e4fb8

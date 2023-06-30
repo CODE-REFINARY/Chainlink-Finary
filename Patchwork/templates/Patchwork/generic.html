@@ -1,35 +1,180 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
 {% block content %}
-
 <link rel="stylesheet" href="{% static 'css/generic.css' %}">
+<script>
+	document.addEventListener("DOMContentLoaded", function() {								// await full DOM load before adding DB items
+		// Prompt Buttons
+		let newParagraph = document.getElementById("add-p-btn");
+		let newHeader = document.getElementById("add-h3-btn");
+		let newChainlink = document.getElementById("add-cl-btn");
+		let newCode = document.getElementById("add-code-btn");
+		let newBreak = document.getElementById("add-br-btn");
+
+		var list = document.getElementById('chainlink-display');
+
+		// fields to populate in the table
+		var title;
+		var is_public;
+
+		// csrf protection token for making ajax requests
+		const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+		// add items to database
+		function addElement(type, title, url, order) {
+			if (type == 'header2') {
+				is_public = "True";
+			}
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", window.location.href, true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.setRequestHeader('X-CSRFToken', csrftoken);
+			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
+			xhr.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					window.location.reload()
+				}
+			}
+		}
+
+		// Paragraph creation logic
+		newParagraph.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('textarea');
+			const submit = document.createElement('button');
+			const textNode = document.createTextNode("submit");
+
+
+			input.setAttribute('rows', '10');
+			input.setAttribute('cols', '100');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter paragraph body');
+			submit.setAttribute('id', 'paragraph-submit');
+			submit.setAttribute('type', 'submit');
+
+			submit.appendChild(textNode);
+			form.appendChild(input);
+			form.appendChild(submit);
+			chainlink.appendChild(form);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('paragraph', input.value, url, order);
+			});
+		});
+
+		// H3 creation logic
+		newHeader.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter header title');
+			form.appendChild(input);
+			chainlink.appendChild(form);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('header3', input.value, url, order);
+			});
+		});
+
+		// Chainlink creation logic
+		newChainlink.addEventListener("click", function() {
+			const section = document.createElement('section');
+			const order = document.getElementById("chainlink-display").childElementCount - 1;
+			const form = document.createElement('form');
+			const input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter chainlink name');
+			form.appendChild(input);
+			section.appendChild(form);
+			list.appendChild(section);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('header2', input.value, '');
+			});
+		});
+
+		// Code block creation logic
+		newCode.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('textarea');
+			const submit = document.createElement('button');
+			const textNode = document.createTextNode("submit");
+
+			input.setAttribute('rows', '10');
+			input.setAttribute('cols', '100');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter code block');
+			submit.setAttribute('id', 'code-submit');
+			submit.setAttribute('type', 'submit');
+
+			submit.appendChild(textNode);
+			form.appendChild(input);
+			form.appendChild(submit);
+			chainlink.appendChild(form);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('code', input.value, url, order);
+			});
+		});
+
+		// Linebreak logic
+		newBreak.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			addElement('linebreak', '', url, order);
+		});
+	});
+</script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
-	<button type="button" class="tabbed-buttons" onclick="window.location.href ='{{ doc.url }}'">{{ doc.title }}</button>
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
 </nav>
 <h1>{{ document.title|linebreaksbr }}</h1>
-{% for content in contents %}
-	{% if content.tag == 'h2' %}
-	<section><h2>{{ content.name }}</h2>
-	{% elif content.tag == 'p' %}
-	<p>{{ content.content }}</p>
-	{% elif content.tag == 'code' %}
-	<code>{{ content.content }}</code>
-	{% elif content.tag == 'h3' %}
-	<h3>{{ content.content }}</h3>
-	{% elif content.tag == 'br' %}
-	<br>
-	{% elif content.tag == 'del' %}
-	</section>
+<div id="chainlink-display">
+<ul id="chainlink-manifest">
+<h2>Chainlink Manifest</h2>
+	{% if chainlinks %}
+	{% for chainlink in chainlinks %}
+	<li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
+	{% endfor %}
+	{% else %}
+	<li><i>&#60;list empty&#62;</i></li>
 	{% endif %}
+</ul>
+{% for content in contents %}
+		{% if content.tag == 'header2' %}
+		<section><h2 id="{{ content.url }}">{{ content.title }}<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a></h2>
+		{% elif content.tag == 'paragraph' %}
+		<p>{{ content.content }}</p>
+		{% elif content.tag == 'code' %}
+		<code>{{ content.content }}</code>
+		{% elif content.tag == 'header3' %}
+		<h3>{{ content.content }}</h3>
+		{% elif content.tag == 'linebreak' %}
+		<br>
+		{% elif content.tag == 'delimiter' %}
+		</section>
+		{% endif %}
 {% endfor %}
+
+</div>
 	<div id="add-buttons">
 		<button type="button" id="add-p-btn" class="add-buttons">paragraph &#60;p&#62;</button>
 		<button type="button" id="add-h3-btn" class="add-buttons">header &#60;h3&#62;</button>
 		<button type="button" id="add-cl-btn" class="add-buttons">New Chainlink</button>
 		<button type="button" id="add-code-btn" class="add-buttons">code &#60;code&#62;</button>
 		<button type="button" id="add-br-btn" class="add-buttons">linebreak &#60;br&#62;</button>
-	<div>
+	</div>
 {% endblock %}

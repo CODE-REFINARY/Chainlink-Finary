@@ -73,6 +73,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Chainlink.wsgi.application'
 
+# CSRF
+CSRF_USE_SESSIONS = True        # store the CSRF token in the user session instead of a cookie
+CSRF_COOKIE_HTTPONLY = False    # no practical benefit here
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -124,14 +127,14 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = True       # Make dates timezone aware
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_ROOT  = os.path.join(BASE_DIR, 'staticfiles')        # This is where collectstatic will place static files for serving
-STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in productoin
+STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]     # This is where static files are located in the project
 
 # Default primary key field type

@@ -120,7 +120,7 @@
 body {
     background-image: url('../images/groove-minimal-lengthy.jpg'); 
     background-repeat: y-repeat;
-	margin: 2% 4% 1% 4%;
+	margin: 2% 20% 1% 20%;
 }
 
 main {
@@ -155,9 +155,9 @@ header > h1 {
 }
 
 main > h1 {
-    font-family: Matrix;	
+    font-family: Audiowide;
     font-weight: 100;
-	background-color: #660000;
+	background-color: #334756;
 	text-align: center;
 	color: whitesmoke;
 	font-size: xx-large;
@@ -272,11 +272,11 @@ ol {
 }
 
 ul > li {
-	font-family: monospace;
-	margin-top: 1mm;
-	margin-bottom: 1mm;
-	color: whitesmoke;
-	line-height: 1.2em;
+	-font-family: monospace;
+	-margin-top: 1mm;
+	-margin-bottom: 1mm;
+	-color: whitesmoke;
+	-line-height: 1.2em;
 }
 
 section > ul > li > a {
@@ -301,25 +301,6 @@ div.combination {
 	background-image: linear-gradient(180deg, #b4000000 0%, #2c2e43 0%);
     font-size: 0;
 	text-align: right;
-}
-
-.tabbed-buttons {
-	font-family: 'Courier New', Courier, monospace;
-	font-weight:bolder;
-	position: static;
-	background-color: #334756;
-	color: #f5f5f5;
-	height: 30px;
-	margin-top: 12px;
-	margin-bottom: 12px;
-	cursor: pointer;
-	border-radius: 10px;
-	-border: solid;
-	border-color: #b0b0b057;
-	-width: 16.6666666%;
-	font-size: 12px;
-	white-space: nowrap;
-    word-break: keep-all;
 }
 
 .tabbed-buttons:hover {
