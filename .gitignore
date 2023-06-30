@@ -5,9 +5,6 @@ data/
 __pycache__
 *~
 
-# README
-README.md
-
 # Env
 .env
 myvenv/
@@ -25,9 +22,6 @@ db.sqlite3
 
 # Django generated stuff
 staticfiles/
-
-# This can cause conflicts with custom settings files
-Chainlink/settings.py
 
 # Pycharm
 .idea/
