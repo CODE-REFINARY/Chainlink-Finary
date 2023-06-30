@@ -29,3 +29,6 @@ Chainlink/settings.py
 
 # Pycharm
 .idea/
+
+# README
+README.md
