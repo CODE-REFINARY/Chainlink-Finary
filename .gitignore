@@ -26,8 +26,5 @@ staticfiles/
 # Pycharm
 .idea/
 
-# README
-README.md
-
 # To stop tracking a file that was being tracked but now you don't want to and it's in .gitignore use:
 # git rm --cached <file>;
