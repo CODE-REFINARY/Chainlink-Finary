@@ -5,6 +5,9 @@ data/
 __pycache__
 *~
 
+# README
+README.md
+
 # Env
 .env
 myvenv/
@@ -27,3 +30,4 @@ staticfiles/
 Chainlink/settings.py
 
 # Pycharm
+.idea/
