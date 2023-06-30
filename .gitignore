@@ -14,7 +14,6 @@ Scripts/
 # Database
 db.sqlite3
 *.exe
-migrations/
 
 # Visual Studio
 .vscode/
@@ -23,9 +22,6 @@ migrations/
 
 # Django generated stuff
 staticfiles/
-
-# This can cause conflicts with custom settings files
-Chainlink/settings.py
 
 # Pycharm
 .idea/

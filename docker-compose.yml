@@ -14,7 +14,9 @@ services:
   web:
     build: .
     # The server will run on localhost:8000
-    command: python manage.py runserver 0.0.0.0:8000 --settings=Chainlink.settings.docker
+    # below was legacy project settings when the files were segregated
+    # command: python manage.py runserver 0.0.0.0:8000 --settings=Chainlink.settings.docker
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     ports:

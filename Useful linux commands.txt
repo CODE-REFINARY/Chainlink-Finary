@@ -41,6 +41,12 @@ To specify the custom settings file we are using for heroku use:
 --settings=Chainlink.settings.heroku
 
 to specify the custom settings file we are using for docker use:
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+--settings=Chainlink.settings.docker
+=======
+=======
+>>>>>>> bf9a8cc019a81b2082d89e08cd50edd0635e4fb8
 --settings=Chainlink.settings.docker
 
 
@@ -55,3 +61,13 @@ sudo docker compose run web python manage.py makemigrations --settings=Chainlink
 
 Migrate
 sudo docker compose run web python manage.py migrate --settings=Chainlink.settings.docker
+<<<<<<< HEAD
+
+
+
+Heroku Commands
+
+heroku run --app=chainlink-finary python manage.py makemigrations --settings=Chainlink.settings.heroku
+>>>>>>> Stashed changes
+=======
+>>>>>>> bf9a8cc019a81b2082d89e08cd50edd0635e4fb8
