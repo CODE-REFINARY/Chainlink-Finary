@@ -10,7 +10,6 @@
 		let newChainlink = document.getElementById("add-cl-btn");
 		let newCode = document.getElementById("add-code-btn");
 		let newBreak = document.getElementById("add-br-btn");
-
 		var list = document.getElementById('chainlink-display');
 
 		// fields to populate in the table
@@ -37,51 +36,89 @@
 			}
 		}
 
-		// Paragraph creation logic
-		newParagraph.addEventListener("click", function() {
-			const chainlink = document.getElementById("chainlink-display").lastElementChild
-			const order = chainlink.childElementCount - 1;
-			const url = chainlink.firstElementChild.getAttribute('id');
-			const form = document.createElement('form');
-			const input = document.createElement('textarea');
-			const submit = document.createElement('button');
-			const textNode = document.createTextNode("submit");
-
-
-			input.setAttribute('rows', '10');
-			input.setAttribute('cols', '100');
-			input.setAttribute('type', 'text');
-			input.setAttribute('placeholder', 'enter paragraph body');
-			submit.setAttribute('id', 'paragraph-submit');
-			submit.setAttribute('type', 'submit');
-
-			submit.appendChild(textNode);
-			form.appendChild(input);
-			form.appendChild(submit);
-			chainlink.appendChild(form);
-			form.addEventListener("submit", function(event) {
-				event.preventDefault();
-				addElement('paragraph', input.value, url, order);
-			});
-		});
-
-		// H3 creation logic
-		newHeader.addEventListener("click", function() {
+		// Create form elements and invoke addElement
+		function makeForm(type) {
+			window.removeEventListener("keyup", parseKey);
+			window.addEventListener("keydown", escape);
+			const section = document.createElement('section');
 			const chainlink = document.getElementById("chainlink-display").lastElementChild;
-			const order = chainlink.childElementCount - 1;
-			const url = chainlink.firstElementChild.getAttribute('id');
 			const form = document.createElement('form');
 			const input = document.createElement('input');
 			input.setAttribute('type', 'text');
-			input.setAttribute('placeholder', 'enter header title');
+			input.setAttribute('id', 'input');
 			form.appendChild(input);
-			chainlink.appendChild(form);
+
+			if (type == "header2") {
+				const order = document.getElementById("chainlink-display").childElementCount - 1;
+				input.setAttribute('placeholder', 'enter chainlink name');
+				section.appendChild(form);
+				list.appendChild(section);
+				var url = ''
+			}
+
+			else if (type == 'linebreak') {
+				const chainlink = document.getElementById("chainlink-display").lastElementChild;
+				const order = chainlink.childElementCount - 1;
+				const url = chainlink.firstElementChild.getAttribute('id');
+				addElement('linebreak', '', url, order);
+				return;
+			}
+
+			else {
+				if (type == "header3") {
+					input.setAttribute('placeholder', 'enter header title');
+				} else if (type == "paragraph") {
+					input.setAttribute('placeholder', 'enter text');
+				} else if (type == "code") {
+					input.setAttribute('placeholder', 'enter code block');
+				} else {
+					input.setAttribute('placeholder', 'enter value');
+				}
+
+				var url = chainlink.firstElementChild.getAttribute('id');
+				const order = chainlink.childElementCount - 1;
+				form.appendChild(input);
+				chainlink.appendChild(form);
+			}
+
+			document.getElementById('input').focus({ focusVisible: true });
 			form.addEventListener("submit", function(event) {
 				event.preventDefault();
-				addElement('header3', input.value, url, order);
+				addElement(type, input.value, url);
+				window.addEventListener("keyup", parseKey);
 			});
-		});
+		}
 
+		function parseKey(e) {
+			var keyCode = e.which;
+			if (keyCode == 80) {
+				makeForm('paragraph');
+			} else if (keyCode == 67) {
+				makeForm('code');
+			} else if (keyCode == 78) {
+				makeForm('header2');
+			} else if (keyCode == 72) {
+				makeForm('header3');
+			} else if (keyCode == 66) {
+				makeForm('linebreak');
+			}
+		}
+
+		function escape(e) {
+			var keyCode = e.which;
+			if (keyCode == 27) {
+				window.location.reload();
+			}
+		}
+
+		newChainlink.addEventListener("click", function() { makeForm('header2'); });
+		newHeader.addEventListener("click", function() { makeForm('header3'); });
+		newParagraph.addEventListener("click", function() { makeForm('paragraph'); });
+		newCode.addEventListener("click", function() { makeForm('code'); });
+		newBreak.addEventListener("click", function() { makeForm('linebreak'); });
+		window.addEventListener("keyup", parseKey);
+	});
+/*
 		// Chainlink creation logic
 		newChainlink.addEventListener("click", function() {
 			const section = document.createElement('section');
@@ -99,26 +136,52 @@
 			});
 		});
 
-		// Code block creation logic
+		// H3 creation logic
+		newHeader.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('id', 'input');
+			input.setAttribute('placeholder', 'enter header title');
+			form.appendChild(input);
+			chainlink.appendChild(form);
+			document.getElementById('input').focus({ focusVisible: true });
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('header3', input.value, url, order);
+			});
+		});
+
+		// Paragraph creation logic 
+		newParagraph.addEventListener("click", function() {
+			const chainlink = document.getElementById("chainlink-display").lastElementChild;
+			const order = chainlink.childElementCount - 1;
+			const url = chainlink.firstElementChild.getAttribute('id');
+			const form = document.createElement('form');
+			const input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('placeholder', 'enter text');
+			form.appendChild(input);
+			chainlink.appendChild(form);
+			form.addEventListener("submit", function(event) {
+				event.preventDefault();
+				addElement('paragraph', input.value, url, order);
+			});
+		});
+
+		// Code creation logic 
 		newCode.addEventListener("click", function() {
 			const chainlink = document.getElementById("chainlink-display").lastElementChild;
 			const order = chainlink.childElementCount - 1;
 			const url = chainlink.firstElementChild.getAttribute('id');
 			const form = document.createElement('form');
-			const input = document.createElement('textarea');
-			const submit = document.createElement('button');
-			const textNode = document.createTextNode("submit");
-
-			input.setAttribute('rows', '10');
-			input.setAttribute('cols', '100');
+			const input = document.createElement('input');
 			input.setAttribute('type', 'text');
 			input.setAttribute('placeholder', 'enter code block');
-			submit.setAttribute('id', 'code-submit');
-			submit.setAttribute('type', 'submit');
-
-			submit.appendChild(textNode);
 			form.appendChild(input);
-			form.appendChild(submit);
 			chainlink.appendChild(form);
 			form.addEventListener("submit", function(event) {
 				event.preventDefault();
@@ -134,6 +197,7 @@
 			addElement('linebreak', '', url, order);
 		});
 	});
+	*/
 </script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
@@ -161,9 +225,9 @@
 		{% elif content.tag == 'code' %}
 		<code>{{ content.content }}</code>
 		{% elif content.tag == 'header3' %}
-		<h3>{{ content.content }}</h3>
+		<h3><div class="h3">{{ content.content }}</div></h3>
 		{% elif content.tag == 'linebreak' %}
-		<br>
+		<span class="br"></span>
 		{% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}
@@ -171,10 +235,10 @@
 
 </div>
 	<div id="add-buttons">
-		<button type="button" id="add-p-btn" class="add-buttons">paragraph &#60;p&#62;</button>
-		<button type="button" id="add-h3-btn" class="add-buttons">header &#60;h3&#62;</button>
-		<button type="button" id="add-cl-btn" class="add-buttons">New Chainlink</button>
-		<button type="button" id="add-code-btn" class="add-buttons">code &#60;code&#62;</button>
-		<button type="button" id="add-br-btn" class="add-buttons">linebreak &#60;br&#62;</button>
+		<button type="button" id="add-p-btn" class="add-buttons">&#60;p&#62; paragraph</button>
+		<button type="button" id="add-h3-btn" class="add-buttons">&#60;h&#62; header</button>
+		<button type="button" id="add-cl-btn" class="add-buttons">&#60;n&#62 New Chainlink</button>
+		<button type="button" id="add-code-btn" class="add-buttons">&#60;c&#62 code</button>
+		<button type="button" id="add-br-btn" class="add-buttons">&#60;b&#62; linebreak</button>
 	</div>
 {% endblock %}
