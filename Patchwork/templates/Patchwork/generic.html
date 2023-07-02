@@ -2,202 +2,31 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/generic.css' %}">
-<script>
-	document.addEventListener("DOMContentLoaded", function() {								// await full DOM load before adding DB items
+<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
+<script type="module">
+
+	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape } from "{% static 'scripts/chainlink-utilities.js' %}";
+
+	// await full DOM load before adding DB items
+	document.addEventListener("DOMContentLoaded", function() {
 		// Prompt Buttons
 		let newParagraph = document.getElementById("add-p-btn");
 		let newHeader = document.getElementById("add-h3-btn");
 		let newChainlink = document.getElementById("add-cl-btn");
 		let newCode = document.getElementById("add-code-btn");
 		let newBreak = document.getElementById("add-br-btn");
-		var list = document.getElementById('chainlink-display');
 
-		// fields to populate in the table
-		var title;
-		var is_public;
+		// Register event listeners for content creation elements
+		newChainlink.addEventListener("click", function() { makeForm('header2', csrftoken); });
+		newHeader.addEventListener("click", function() { makeForm('header3', csrftoken); });
+		newParagraph.addEventListener("click", function() { makeForm('paragraph', csrftoken); });
+		newCode.addEventListener("click", function() { makeForm('code', csrftoken); });
+		newBreak.addEventListener("click", function() { makeForm('linebreak', csrftoken); });
 
-		// csrf protection token for making ajax requests
-		const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-		// add items to database
-		function addElement(type, title, url, order) {
-			if (type == 'header2') {
-				is_public = "True";
-			}
-			let xhr = new XMLHttpRequest();
-			xhr.open("POST", window.location.href, true);
-			xhr.setRequestHeader('Content-Type', 'application/json');
-			xhr.setRequestHeader('X-CSRFToken', csrftoken);
-			xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
-			xhr.onreadystatechange = function() {
-				if (this.readyState == 4 && this.status == 200) {
-					window.location.reload()
-				}
-			}
-		}
-
-		// Create form elements and invoke addElement
-		function makeForm(type) {
-			window.removeEventListener("keyup", parseKey);
-			window.addEventListener("keydown", escape);
-			const section = document.createElement('section');
-			const chainlink = document.getElementById("chainlink-display").lastElementChild;
-			const form = document.createElement('form');
-			const input = document.createElement('input');
-			input.setAttribute('type', 'text');
-			input.setAttribute('id', 'input');
-			form.appendChild(input);
-
-			if (type == "header2") {
-				const order = document.getElementById("chainlink-display").childElementCount - 1;
-				input.setAttribute('placeholder', 'enter chainlink name');
-				section.appendChild(form);
-				list.appendChild(section);
-				var url = ''
-			}
-
-			else if (type == 'linebreak') {
-				const chainlink = document.getElementById("chainlink-display").lastElementChild;
-				const order = chainlink.childElementCount - 1;
-				const url = chainlink.firstElementChild.getAttribute('id');
-				addElement('linebreak', '', url, order);
-				return;
-			}
-
-			else {
-				if (type == "header3") {
-					input.setAttribute('placeholder', 'enter header title');
-				} else if (type == "paragraph") {
-					input.setAttribute('placeholder', 'enter text');
-				} else if (type == "code") {
-					input.setAttribute('placeholder', 'enter code block');
-				} else {
-					input.setAttribute('placeholder', 'enter value');
-				}
-
-				var url = chainlink.firstElementChild.getAttribute('id');
-				const order = chainlink.childElementCount - 1;
-				form.appendChild(input);
-				chainlink.appendChild(form);
-			}
-
-			document.getElementById('input').focus({ focusVisible: true });
-			form.addEventListener("submit", function(event) {
-				event.preventDefault();
-				addElement(type, input.value, url);
-				window.addEventListener("keyup", parseKey);
-			});
-		}
-
-		function parseKey(e) {
-			var keyCode = e.which;
-			if (keyCode == 80) {
-				makeForm('paragraph');
-			} else if (keyCode == 67) {
-				makeForm('code');
-			} else if (keyCode == 78) {
-				makeForm('header2');
-			} else if (keyCode == 72) {
-				makeForm('header3');
-			} else if (keyCode == 66) {
-				makeForm('linebreak');
-			}
-		}
-
-		function escape(e) {
-			var keyCode = e.which;
-			if (keyCode == 27) {
-				window.location.reload();
-			}
-		}
-
-		newChainlink.addEventListener("click", function() { makeForm('header2'); });
-		newHeader.addEventListener("click", function() { makeForm('header3'); });
-		newParagraph.addEventListener("click", function() { makeForm('paragraph'); });
-		newCode.addEventListener("click", function() { makeForm('code'); });
-		newBreak.addEventListener("click", function() { makeForm('linebreak'); });
-		window.addEventListener("keyup", parseKey);
+		// Add the event listeners above for keystrokes
+		window.addEventListener("keyup", parseKeyUp);
+		window.addEventListener("keydown", parseKeyDown);
 	});
-/*
-		// Chainlink creation logic
-		newChainlink.addEventListener("click", function() {
-			const section = document.createElement('section');
-			const order = document.getElementById("chainlink-display").childElementCount - 1;
-			const form = document.createElement('form');
-			const input = document.createElement('input');
-			input.setAttribute('type', 'text');
-			input.setAttribute('placeholder', 'enter chainlink name');
-			form.appendChild(input);
-			section.appendChild(form);
-			list.appendChild(section);
-			form.addEventListener("submit", function(event) {
-				event.preventDefault();
-				addElement('header2', input.value, '');
-			});
-		});
-
-		// H3 creation logic
-		newHeader.addEventListener("click", function() {
-			const chainlink = document.getElementById("chainlink-display").lastElementChild;
-			const order = chainlink.childElementCount - 1;
-			const url = chainlink.firstElementChild.getAttribute('id');
-			const form = document.createElement('form');
-			const input = document.createElement('input');
-			input.setAttribute('type', 'text');
-			input.setAttribute('id', 'input');
-			input.setAttribute('placeholder', 'enter header title');
-			form.appendChild(input);
-			chainlink.appendChild(form);
-			document.getElementById('input').focus({ focusVisible: true });
-			form.addEventListener("submit", function(event) {
-				event.preventDefault();
-				addElement('header3', input.value, url, order);
-			});
-		});
-
-		// Paragraph creation logic 
-		newParagraph.addEventListener("click", function() {
-			const chainlink = document.getElementById("chainlink-display").lastElementChild;
-			const order = chainlink.childElementCount - 1;
-			const url = chainlink.firstElementChild.getAttribute('id');
-			const form = document.createElement('form');
-			const input = document.createElement('input');
-			input.setAttribute('type', 'text');
-			input.setAttribute('placeholder', 'enter text');
-			form.appendChild(input);
-			chainlink.appendChild(form);
-			form.addEventListener("submit", function(event) {
-				event.preventDefault();
-				addElement('paragraph', input.value, url, order);
-			});
-		});
-
-		// Code creation logic 
-		newCode.addEventListener("click", function() {
-			const chainlink = document.getElementById("chainlink-display").lastElementChild;
-			const order = chainlink.childElementCount - 1;
-			const url = chainlink.firstElementChild.getAttribute('id');
-			const form = document.createElement('form');
-			const input = document.createElement('input');
-			input.setAttribute('type', 'text');
-			input.setAttribute('placeholder', 'enter code block');
-			form.appendChild(input);
-			chainlink.appendChild(form);
-			form.addEventListener("submit", function(event) {
-				event.preventDefault();
-				addElement('code', input.value, url, order);
-			});
-		});
-
-		// Linebreak logic
-		newBreak.addEventListener("click", function() {
-			const chainlink = document.getElementById("chainlink-display").lastElementChild;
-			const order = chainlink.childElementCount - 1;
-			const url = chainlink.firstElementChild.getAttribute('id');
-			addElement('linebreak', '', url, order);
-		});
-	});
-	*/
 </script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
@@ -208,7 +37,7 @@
 <h1>{{ document.title|linebreaksbr }}</h1>
 <div id="chainlink-display">
 <ul id="chainlink-manifest">
-<h2>Chainlink Manifest</h2>
+	<h2>Chainlink Manifest</h2>
 	{% if chainlinks %}
 	{% for chainlink in chainlinks %}
 	<li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
@@ -216,6 +45,16 @@
 	{% else %}
 	<li><i>&#60;list empty&#62;</i></li>
 	{% endif %}
+</ul>
+<ul id="keybindings-legend">
+	<h2>Keybindings Legend</h2>
+	<li>j - scroll down</li>
+	<li>k - scroll up</li>
+	<li>n - create chainlink</li>
+	<li>p - create text element</li>
+	<li>h - create header element</li>
+	<li>c - create code block</li>
+	<li>b - insert linebreak</li>
 </ul>
 {% for content in contents %}
 		{% if content.tag == 'header2' %}
@@ -232,7 +71,6 @@
 		</section>
 		{% endif %}
 {% endfor %}
-
 </div>
 	<div id="add-buttons">
 		<button type="button" id="add-p-btn" class="add-buttons">&#60;p&#62; paragraph</button>
