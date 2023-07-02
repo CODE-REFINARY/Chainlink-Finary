@@ -1,4 +1,5 @@
-## [Heroku Version]
+## Chainlink Finary
+
 This project is the Python/Django implementation of the Chainlink Finary concept. This web application is containerized and runs out-of-the box on localhost:8000 with a simple `sudo docker compose up`.
 
 In order to run the server a .env file must be created in the root folder with the `SECRET_KEY` variable set along with `DB_PASSWORD=postgres`.
