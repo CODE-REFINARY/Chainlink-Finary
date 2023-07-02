@@ -7,8 +7,10 @@ import json
 import hashlib
 
 
-def generic(request, key):
-    document = get_object_or_404(Doc, url=key)
+def generic(request, key=''):
+    if key:
+        document = get_object_or_404(Doc, url=key)
+
     if request.method == 'POST':
         # get POST request json payload
         json_data = json.loads(request.body)
@@ -136,7 +138,7 @@ def chainlink(request, key):
     contents = []
     for cont in Content.objects.filter(chainlink=target).order_by('order'):
         contents.append(cont)
-    return render(request, 'Patchwork/chainlink.html', {'docs': docs, 'target': target, 'contents': contents})
+    return render(request, 'Patchwork/chainlink.html', {'docs': docs, 'target': target, 'contents': contents, 'url': key})
 
 
 def generate(request):

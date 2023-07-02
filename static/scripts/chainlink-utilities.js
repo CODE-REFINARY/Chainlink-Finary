@@ -1,13 +1,15 @@
+import { target };
+
 // add items to database
-export function addElement(type, title, url, csrftoken, order) {
+export function addElement(type, title, url, order) {
         var is_public;
         var title;
         if (type == 'header2') {
                 is_public = "True";
         }
-		var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", window.location.href, true);
+        xhr.open("POST", target, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
@@ -19,7 +21,7 @@ export function addElement(type, title, url, csrftoken, order) {
 }
 
 // Create form elements and invoke addElement
-export function makeForm(type, csrf) {
+export function makeForm(type) {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
         window.addEventListener("keydown", escape);
@@ -44,7 +46,7 @@ export function makeForm(type, csrf) {
                 const chainlink = document.getElementById("chainlink-display").lastElementChild;
                 var order = chainlink.childElementCount - 1;
                 const url = chainlink.firstElementChild.getAttribute('id');
-                addElement('linebreak', '', url, csrf, order);
+                addElement('linebreak', '', url, order);
                 return;
         }
 
@@ -68,9 +70,9 @@ export function makeForm(type, csrf) {
         document.getElementById('input').focus({ focusVisible: true });
         form.addEventListener("submit", function(event) {
                 event.preventDefault();
-                addElement(type, input.value, url, csrf, order);
-                window.addEventListener("keyup", parseKeyUp);
+                addElement(type, input.value, url, order);
                 window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
         });
 }
 
@@ -81,7 +83,7 @@ export function parseKeyUp(e) {
                 makeForm('paragraph');
         } else if (keyCode == 67) {
                 makeForm('code');
-        } else if (keyCode == 78) {
+        } else if (keyCode == 78 && e.currentTarget.in == "doc") {
                 makeForm('header2');
         } else if (keyCode == 72) {
                 makeForm('header3');

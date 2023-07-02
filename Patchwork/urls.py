@@ -12,4 +12,5 @@ urlpatterns = [
     path('pckb.html', views.pckb),                          # parent cases knowledge base
     path('doc<str:key>.html', views.generic, name='generic'),  # regularly generated blog pages match here
     path('chainlink<str:key>.html', views.chainlink, name='chainlink'),
+    path('generic.html', views.generic),                    # used for POSTs to generate dynamic content
 ]

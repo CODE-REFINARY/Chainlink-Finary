@@ -17,15 +17,18 @@
 		let newBreak = document.getElementById("add-br-btn");
 
 		// Register event listeners for content creation elements
-		newChainlink.addEventListener("click", function() { makeForm('header2', csrftoken); });
-		newHeader.addEventListener("click", function() { makeForm('header3', csrftoken); });
-		newParagraph.addEventListener("click", function() { makeForm('paragraph', csrftoken); });
-		newCode.addEventListener("click", function() { makeForm('code', csrftoken); });
-		newBreak.addEventListener("click", function() { makeForm('linebreak', csrftoken); });
+		newChainlink.addEventListener("click", function() { makeForm('header2'); });
+		newHeader.addEventListener("click", function() { makeForm('header3'); });
+		newParagraph.addEventListener("click", function() { makeForm('paragraph'); });
+		newCode.addEventListener("click", function() { makeForm('code'); });
+		newBreak.addEventListener("click", function() { makeForm('linebreak'); });
 
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
+		window.in = "doc";
 		window.addEventListener("keydown", parseKeyDown);
+
+		export var target = window.location.href;
 	});
 </script>
 <nav id="tabbed-buttons">
@@ -72,11 +75,11 @@
 		{% endif %}
 {% endfor %}
 </div>
-	<div id="add-buttons">
-		<button type="button" id="add-p-btn" class="add-buttons">&#60;p&#62; paragraph</button>
-		<button type="button" id="add-h3-btn" class="add-buttons">&#60;h&#62; header</button>
-		<button type="button" id="add-cl-btn" class="add-buttons">&#60;n&#62 New Chainlink</button>
-		<button type="button" id="add-code-btn" class="add-buttons">&#60;c&#62 code</button>
-		<button type="button" id="add-br-btn" class="add-buttons">&#60;b&#62; linebreak</button>
-	</div>
+<div id="add-buttons">
+	<button type="button" id="add-p-btn" class="add-buttons">&#60;p&#62; paragraph</button>
+	<button type="button" id="add-h3-btn" class="add-buttons">&#60;h&#62; header</button>
+	<button type="button" id="add-cl-btn" class="add-buttons">&#60;n&#62 New Chainlink</button>
+	<button type="button" id="add-code-btn" class="add-buttons">&#60;c&#62 code</button>
+	<button type="button" id="add-br-btn" class="add-buttons">&#60;b&#62; linebreak</button>
+</div>
 {% endblock %}
