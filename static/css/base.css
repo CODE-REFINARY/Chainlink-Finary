@@ -175,17 +175,6 @@ h2 {
 	-margin: 6px 0px 6px 0px;
 }
 
-h3 {
-	display: inline-block;
-	font-family: 'Courier';
-	font-weight: 300;
-	font-size: var(--x-large-for-courier);
-	color: #959595;
-	margin: 4px 2rem 4px 2rem;
-	background-color: #000000;
-	border-radius: 0.4em;
-}
-
 h6 {
     font-family: 'Courier New', Courier, monospace;
     font-size: large;
@@ -201,18 +190,6 @@ h1, section > p, section > h2, section > ul, section > code, .text-section > p, 
     border-width: 5px;
     border-color: transparent;
     border-radius: 12px;
-}
-
-section > p, .text-section > p, section > ul {
-	display: block;
-    font-family: Audiowide;
-	background-color: #2C394B;
-    margin: 4px 2rem 4px 2rem;
-    color: whitesmoke;
-    line-height: 160%;
-    letter-spacing: .00em;
-    -padding-bottom: 15px;
-    font-size: 12px;
 }
 
 section > div {
@@ -340,6 +317,21 @@ div.combination {
 	color: #2c2e43;
 }
 
+section > h3 {
+	display: block;
+	font-family: 'Courier';
+	font-weight: 300;
+	font-size: var(--x-large-for-courier);
+	color: #959595;
+	margin: 4px 2rem 4px 2rem;
+}
+
+section > h3 > .h3 {
+	display: inline-block;
+	background-color: #000000;
+	border-radius: 0.4em;
+}
+
 section > code {
 	font-family: monospace;
 	display: block;
@@ -347,12 +339,31 @@ section > code {
 	color: #8ecd95;
 	background-color: #0d0208;
 	margin: 4px 2rem 4px 2rem;
-	
 	border-width: 5px !important;
 	border-radius: 3px !important;
 	line-height: 1.2em;
 }
 
+section > .br {
+	display: block;
+	padding: 15px;
+}
+
+section > p {
+	display: block;
+	font-family: Audiowide;
+	background-color: #2C394B;
+	margin: 4px 2rem 4px 2rem;
+	color: whitesmoke;
+	line-height: 160%;
+	letter-spacing: .00em;
+	-padding-bottom: 15px;
+	font-size: 12px;
+}
+
+section > form {
+	margin: 4px 2rem 4px 2rem;	
+}
 /* /////////////// Specific IDs /////////////// */
 
 #add-page-btn {

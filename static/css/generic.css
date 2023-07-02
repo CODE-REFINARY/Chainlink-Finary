@@ -66,8 +66,9 @@ h4 {
     margin-left: 10px;
 }
 
-#chainlink-manifest {
+#chainlink-manifest, #keybindings-legend {
     display: inline-block;
+    vertical-align:top;
     background-color: #2C394B;
     list-style-type: none;
 
@@ -83,13 +84,23 @@ h4 {
 #chainlink-manifest > li {
     color: whitesmoke;
     font-family: monospace;
+    margin-top: 1px;
+    margin-bototm: 1px;
 }
 
-#chainlink-manifest > li > a {
+#keybindings-legend > li {
+    color: whitesmoke;
+    font-family: monospace;
+    margin-top: 3px;
+    margin-bototm: 3px;
+}
+
+#chainlink-manifest > li > a, #keybindings-legend > li > a {
     text-decoration: none;
+    font-size: medium;
 }
 
-#chainlink-manifest > h2 {
+#chainlink-manifest > h2, #keybindings-legend > h2 {
     color: whitesmoke;
     background-color: #2C394B;
     font-family: Audiowide;
