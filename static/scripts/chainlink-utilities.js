@@ -1,5 +1,3 @@
-import { target };
-
 // add items to database
 export function addElement(type, title, url, order) {
         var is_public;
@@ -9,7 +7,7 @@ export function addElement(type, title, url, order) {
         }
 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", target, true);
+        xhr.open("POST", window.target, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
@@ -37,8 +35,9 @@ export function makeForm(type) {
         if (type == "header2") {
                 var order = document.getElementById("chainlink-display").childElementCount - 1;
                 input.setAttribute('placeholder', 'enter chainlink name');
-                section.appendChild(form);
-                list.appendChild(section);
+                //section.appendChild(form);
+                //list.appendChild(section);
+                list.appendChild(form);
                 var url = ''
         }
 

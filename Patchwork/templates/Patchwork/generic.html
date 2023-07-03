@@ -23,12 +23,13 @@
 		newCode.addEventListener("click", function() { makeForm('code'); });
 		newBreak.addEventListener("click", function() { makeForm('linebreak'); });
 
+		// Globals
+		window.in = "doc";
+		window.target = window.location.href;
+
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
-		window.in = "doc";
 		window.addEventListener("keydown", parseKeyDown);
-
-		export var target = window.location.href;
 	});
 </script>
 <nav id="tabbed-buttons">

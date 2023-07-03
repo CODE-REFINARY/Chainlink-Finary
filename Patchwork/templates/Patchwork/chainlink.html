@@ -20,13 +20,14 @@
 		newParagraph.addEventListener("click", function() { makeForm('paragraph'); });
 		newCode.addEventListener("click", function() { makeForm('code'); });
 		newBreak.addEventListener("click", function() { makeForm('linebreak'); });
+		
+		// Globals
+		window.in = "chainlink";
+		window.target = "generic.html";
 
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
-		window.in = "chainlink";
 		window.addEventListener("keydown", parseKeyDown);
-
-		export var target = "generic.html";
 	});
 </script>
 <nav id="tabbed-buttons">
@@ -49,16 +50,14 @@
 <section>
 	<input type="hidden" name="chainlink-id" id="{{ url }}">
 	{% for content in contents %}
-		{% if content.tag == 'header2' %}
-		<section><h2>{{ content.title }}</h2>
-		{% elif content.tag == 'paragraph' %}
+		{% if content.tag == 'paragraph' %}
 		<p>{{ content.content }}</p>
 		{% elif content.tag == 'code' %}
 		<code>{{ content.content }}</code>
 		{% elif content.tag == 'header3' %}
-		<h3>{{ content.content }}</h3>
+		<h3><div class="h3">{{ content.content }}</div></h3>
 		{% elif content.tag == 'linebreak' %}
-		<br>
+		<span class="br"></span>
 		{% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}
