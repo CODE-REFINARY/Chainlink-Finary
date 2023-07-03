@@ -1,14 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Chainlink, Doc, Content, TagType
+from django.views.decorators.cache import cache_control
 from django.utils import timezone
 import random
 import json
 import hashlib
 
 
-def generic(request, key):
-    document = get_object_or_404(Doc, url=key)
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  # force doc list page to not get cached so that changes from chainlink pages show up on browser back button
+def generic(request, key=''):
+    if key:
+        document = get_object_or_404(Doc, url=key)
+
     if request.method == 'POST':
         # get POST request json payload
         json_data = json.loads(request.body)
@@ -130,13 +134,14 @@ def generic(request, key):
     return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  # force chainlink view to get force reloaded so that form view edits appear
 def chainlink(request, key):
     target = get_object_or_404(Chainlink, url=key)
     docs = Doc.objects.all()
     contents = []
     for cont in Content.objects.filter(chainlink=target).order_by('order'):
         contents.append(cont)
-    return render(request, 'Patchwork/chainlink.html', {'docs': docs, 'target': target, 'contents': contents})
+    return render(request, 'Patchwork/chainlink.html', {'docs': docs, 'target': target, 'contents': contents, 'url': key})
 
 
 def generate(request):

@@ -2,28 +2,72 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/generic.css' %}">
+<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
+<script type="module">
+
+	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape } from "{% static 'scripts/chainlink-utilities.js' %}";
+
+	// await full DOM load before adding DB items
+	document.addEventListener("DOMContentLoaded", function() {
+		// Prompt Buttons
+		let newParagraph = document.getElementById("add-p-btn");
+		let newHeader = document.getElementById("add-h3-btn");
+		let newCode = document.getElementById("add-code-btn");
+		let newBreak = document.getElementById("add-br-btn");
+
+		// Register event listeners for content creation elements
+		newHeader.addEventListener("click", function() { makeForm('header3'); });
+		newParagraph.addEventListener("click", function() { makeForm('paragraph'); });
+		newCode.addEventListener("click", function() { makeForm('code'); });
+		newBreak.addEventListener("click", function() { makeForm('linebreak'); });
+		
+		// Globals
+		window.in = "chainlink";
+		window.target = "generic.html";
+
+		// Add the event listeners above for keystrokes
+		window.addEventListener("keyup", parseKeyUp);
+		window.addEventListener("keydown", parseKeyDown);
+	});
+</script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
 </nav>
+<ul id="keybindings-legend">
+	<h2>Keybindings Legend</h2>
+	<li>j - scroll down</li>
+	<li>k - scroll up</li>
+	<li>p - create text element</li>
+	<li>h - create header element</li>
+	<li>c - create code block</li>
+	<li>b - insert linebreak</li>
+</ul>
 <h1>{{ target.title|linebreaksbr }}</h1>
 <div id="chainlink-display">
-{% for content in contents %}
-	{% if content.tag == 'header2' %}
-	<section><h2>{{ content.title }}</h2>
-	{% elif content.tag == 'paragraph' %}
-	<p>{{ content.content }}</p>
-	{% elif content.tag == 'code' %}
-	<code>{{ content.content }}</code>
-	{% elif content.tag == 'header3' %}
-	<h3>{{ content.content }}</h3>
-	{% elif content.tag == 'linebreak' %}
-	<br>
-	{% elif content.tag == 'delimiter' %}
-	</section>
-	{% endif %}
-{% endfor %}
+<section>
+	<input type="hidden" name="chainlink-id" id="{{ url }}">
+	{% for content in contents %}
+		{% if content.tag == 'paragraph' %}
+		<p>{{ content.content }}</p>
+		{% elif content.tag == 'code' %}
+		<code>{{ content.content }}</code>
+		{% elif content.tag == 'header3' %}
+		<h3><div class="h3">{{ content.content }}</div></h3>
+		{% elif content.tag == 'linebreak' %}
+		<span class="br"></span>
+		{% elif content.tag == 'delimiter' %}
+		</section>
+		{% endif %}
+	{% endfor %}
+</section>
+</div>
+<div id="add-buttons">
+	<button type="button" id="add-p-btn" class="add-buttons">&#60;p&#62; paragraph</button>
+	<button type="button" id="add-h3-btn" class="add-buttons">&#60;h&#62; header</button>
+	<button type="button" id="add-code-btn" class="add-buttons">&#60;c&#62 code</button>
+	<button type="button" id="add-br-btn" class="add-buttons">&#60;b&#62; linebreak</button>
 </div>
 {% endblock %}
