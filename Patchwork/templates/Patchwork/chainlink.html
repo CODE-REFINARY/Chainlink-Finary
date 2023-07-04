@@ -5,7 +5,7 @@
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape, addButtonsChainlinkView } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
@@ -28,51 +28,17 @@
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
 		window.addEventListener("keydown", parseKeyDown);*/
-		var chainlinkDisplay = document.getElementById("chainlink-display");
-		var mainElement = document.querySelector("main");
-		var div = document.createElement("div");
-		var button1 = document.createElement("button");
-		var button2 = document.createElement("button");
-		var button4 = document.createElement("button");
-		var button5 = document.createElement("button");
-
-		window.in = "chainlink";
-
-		div.id = "add-buttons";
-		button1.id = "add-p-btn";
-		button2.id = "add-h3-btn";
-		button4.id = "add-code-btn";
-		button5.id = "add-br-btn";
-		
-		button1.className = "add-buttons";
-		button2.className = "add-buttons";
-		button4.className = "add-buttons";
-		button5.className = "add-buttons";
-
-		button1.innerHTML = "&#60;p&#62; paragraph";
-		button2.innerHTML = "&#60;h&#62; header";
-		button4.innerHTML = "&#60;c&#62 code"
-		button5.innerHTML = "&#60;b&#62; linebreak";
-
-		div.appendChild(button1);
-		div.appendChild(button2);
-		div.appendChild(button4);
-		div.appendChild(button5);
-
-		// Register event listeners for content creation elements
-		button1.addEventListener("click", function() { makeForm('paragraph'); });
-		button2.addEventListener("click", function() { makeForm('header3'); });
-		button4.addEventListener("click", function() { makeForm('code'); });
-		button5.addEventListener("click", function() { makeForm('linebreak'); });
 
 		// Globals
 		window.target = "generic.html";
+		window.in = "chainlink";
+
+		addButtonsChainlinkView();
 
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
 		window.addEventListener("keydown", parseKeyDown);
 
-		mainElement.appendChild(div);
 	});
 </script>
 <nav id="tabbed-buttons">
