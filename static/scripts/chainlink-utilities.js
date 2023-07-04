@@ -78,15 +78,16 @@ export function makeForm(type) {
 // Keypress parsing function for creating chainlinks and form elements
 export function parseKeyUp(e) {
         var keyCode = e.which;
-        if (keyCode == 80) {
+        var loc = e.currentTarget.in;
+        if (keyCode == 80 && loc != "doc-empty") {
                 makeForm('paragraph');
-        } else if (keyCode == 67) {
+        } else if (keyCode == 67 && loc != "doc-empty") {
                 makeForm('code');
-        } else if (keyCode == 78 && e.currentTarget.in == "doc") {
+        } else if (keyCode == 78 && (loc == "doc" || loc == "doc-empty")) {      // disable chainlink creation for chainlink view (only enabled in doc view)
                 makeForm('header2');
-        } else if (keyCode == 72) {
+        } else if (keyCode == 72 && loc != "doc-empty") {
                 makeForm('header3');
-        } else if (keyCode == 66) {
+        } else if (keyCode == 66 && loc != "doc-empty") {
                 makeForm('linebreak');
         }
 }
