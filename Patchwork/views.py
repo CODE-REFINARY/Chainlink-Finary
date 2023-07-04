@@ -19,6 +19,7 @@ def generic(request, key=''):
 
         type = json_data["type"]
         try_title = json_data["title"]
+        url = json_data["url"]
 
         if type == "header2":
             # Create a new chainlink
@@ -54,74 +55,39 @@ def generic(request, key=''):
             delimiter.content = ''
             delimiter.save()
 
-        elif type == 'header3':
-            # Create header content
-            url = json_data["url"]
+        elif type == 'header3' or type == 'paragraph' or type == 'code' or type == 'linebreak':
             chainlink = Chainlink.objects.filter(url=url).first()
+
+            # Shift the delimiter up so that it remains the last content item even after we attach new element
             delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
             delimiter.order += 1
             delimiter.save()
-            header = Content()
-            header.url = url
-            header.chainlink = chainlink
-            header.tag = TagType.HEADER3
-            header.order = chainlink.count
+
+            # Instantiate content and attach it to it's chainlink
+            content = Content()
+            content.url = url
+            content.chainlink = chainlink
+
+            # Assign the order of this content to be second-to-last (only delimeter is after it) and then update total number of content items attached to this chainlink
+            content.order = chainlink.count
             chainlink.count += 1
             chainlink.save()
-            header.content = json_data["title"]
-            header.save()
 
-        elif type == 'paragraph':
-            # Create header content
-            url = json_data["url"]
-            chainlink = Chainlink.objects.filter(url=url).first()
-            delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
-            delimiter.order += 1
-            delimiter.save()
-            header = Content()
-            header.url = url
-            header.chainlink = chainlink
-            header.tag = TagType.PARAGRAPH
-            header.order = chainlink.count
-            chainlink.count += 1
-            chainlink.save()
-            header.content = json_data["title"]
-            header.save()
+            # Assign the type of content depending on the type passed in via http headers
+            match type:
+                case 'header3':
+                    content.tag = TagType.HEADER3
+                case 'paragraph':
+                    content.tag = TagType.PARAGRAPH
+                case 'code':
+                    content.tag = TagType.CODE
+                case 'linebreak':
+                    content.tag = TagType.LINEBREAK
 
-        elif type == 'code':
-            # Create header content
-            url = json_data["url"]
-            chainlink = Chainlink.objects.filter(url=url).first()
-            delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
-            delimiter.order += 1
-            delimiter.save()
-            header = Content()
-            header.url = url
-            header.chainlink = chainlink
-            header.tag = TagType.CODE
-            header.order = chainlink.count
-            chainlink.count += 1
-            chainlink.save()
-            header.content = json_data["title"]
-            header.save()
-
-        elif type == 'linebreak':
-            # Create header content
-            url = json_data["url"]
-            chainlink = Chainlink.objects.filter(url=url).first()
-            delimiter = Content.objects.filter(url=url, tag=TagType.DELIMITER).first()
-            delimiter.order += 1
-            delimiter.save()
-            header = Content()
-            header.url = url
-            header.chainlink = chainlink
-            header.tag = TagType.LINEBREAK
-            header.order = chainlink.count
-            chainlink.count += 1
-            chainlink.save()
-            header.content = json_data["title"]
-            header.save()
-
+            # Finally assign the actual contents of the new object and save it
+            content.content = try_title
+            content.save()
+ 
         return render(request, 'Patchwork/success.html', {})
 
     docs = Doc.objects.all()
