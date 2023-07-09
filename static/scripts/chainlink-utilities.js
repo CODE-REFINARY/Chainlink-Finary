@@ -23,7 +23,7 @@ export function makeForm(type) {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
         window.addEventListener("keydown", escape);
-	const list = document.getElementById('chainlink-display');
+        const list = document.getElementById('chainlink-display');
         const section = document.createElement('section');
         const chainlink = document.getElementById("chainlink-display").lastElementChild;
         const form = document.createElement('form');
@@ -66,12 +66,15 @@ export function makeForm(type) {
                 chainlink.appendChild(form);
         }
 
+        deleteButtons();        // remove buttons temporarily while user input prompt is active 
+
         document.getElementById('input').focus({ focusVisible: true });
         form.addEventListener("submit", function(event) {
                 event.preventDefault();
                 addElement(type, input.value, url, order);
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
+                addButtons();
         });
 }
 
@@ -106,6 +109,147 @@ export function parseKeyDown(e) {
 export function escape(e) {
         var keyCode = e.which;
         if (keyCode == 27) {
-                window.location.reload();
+                var form = document.getElementById('input').parentNode;
+                const listForm = document.getElementById('chainlink-display').querySelector("form");
+                const chainlinkForm = document.getElementById("chainlink-display").lastElementChild.querySelector("form");
+
+                if (listForm) {
+                        listForm.remove();
+                        window.addEventListener("keydown", parseKeyDown);
+                        window.addEventListener("keyup", parseKeyUp);
+                } else if (chainlinkForm) {
+                        chainlinkForm.remove();
+                        window.addEventListener("keydown", parseKeyDown);
+                        window.addEventListener("keyup", parseKeyUp);
+                }
+
+                addButtons();
         }
+}
+
+// Construct the content buttons for doc view. All buttons are available. This should be called for docs that have 
+// one or more chainlinks attached to them.
+export function addButtonsDocView() {
+
+	var chainlinkDisplay = document.getElementById("chainlink-display");
+	var mainElement = document.querySelector("main");        
+        var div = document.createElement("div");
+
+        var button1 = document.createElement("button");
+        var button2 = document.createElement("button");
+        var button3 = document.createElement("button");
+        var button4 = document.createElement("button");
+        var button5 = document.createElement("button");
+
+        div.id = "add-buttons";
+        button1.id = "add-p-btn";
+        button2.id = "add-h3-btn";
+        button3.id = "add-cl-btn";
+        button4.id = "add-code-btn";
+        button5.id = "add-br-btn";
+        
+        button1.className = "add-buttons";
+        button2.className = "add-buttons";
+        button3.className = "add-buttons";
+        button4.className = "add-buttons";
+        button5.className = "add-buttons";
+
+        button1.innerHTML = "&#60;p&#62; paragraph";
+        button2.innerHTML = "&#60;h&#62; header";
+        button3.innerHTML = "&#60;n&#62 New Chainlink";
+        button4.innerHTML = "&#60;c&#62 code";
+        button5.innerHTML = "&#60;b&#62; linebreak";
+
+        div.appendChild(button1);
+        div.appendChild(button2);
+        div.appendChild(button3);
+        div.appendChild(button4);
+        div.appendChild(button5);
+
+        // Register event listeners for content creation elements
+        button1.addEventListener("click", function() { makeForm('paragraph'); });
+        button2.addEventListener("click", function() { makeForm('header3'); });
+        button3.addEventListener("click", function() { makeForm('header2'); });
+        button4.addEventListener("click", function() { makeForm('code'); });
+        button5.addEventListener("click", function() { makeForm('linebreak'); });
+
+        mainElement.appendChild(div);
+}
+
+// Create just the chainlink button. Empty docs should only be able to have a chainlink (header 2) added to them
+export function addButtonsDocEmptyView() {
+
+	var mainElement = document.querySelector("main");        
+        var div = document.createElement("div");
+        var button3 = document.createElement("button");
+        div.id = "add-buttons";
+        button3.id = "add-cl-btn";
+        button3.className = "add-buttons";
+        button3.innerHTML = "&#60;n&#62 New Chainlink";
+        div.appendChild(button3);
+        button3.addEventListener("click", function() { makeForm('header2'); });
+        mainElement.appendChild(div);
+}
+
+// Chainlinks cannot instantiate other chainlinks. This function instantiates buttons to create content that isn't 
+// another chainlink.
+export function addButtonsChainlinkView() {
+
+        var chainlinkDisplay = document.getElementById("chainlink-display");
+        var mainElement = document.querySelector("main");
+        var div = document.createElement("div");
+        var button1 = document.createElement("button");
+        var button2 = document.createElement("button");
+        var button4 = document.createElement("button");
+        var button5 = document.createElement("button");
+
+        div.id = "add-buttons";
+        button1.id = "add-p-btn";
+        button2.id = "add-h3-btn";
+        button4.id = "add-code-btn";
+        button5.id = "add-br-btn";
+        
+        button1.className = "add-buttons";
+        button2.className = "add-buttons";
+        button4.className = "add-buttons";
+        button5.className = "add-buttons";
+
+        button1.innerHTML = "&#60;p&#62; paragraph";
+        button2.innerHTML = "&#60;h&#62; header";
+        button4.innerHTML = "&#60;c&#62 code"
+        button5.innerHTML = "&#60;b&#62; linebreak";
+
+        div.appendChild(button1);
+        div.appendChild(button2);
+        div.appendChild(button4);
+        div.appendChild(button5);
+
+        // Register event listeners for content creation elements
+        button1.addEventListener("click", function() { makeForm('paragraph'); });
+        button2.addEventListener("click", function() { makeForm('header3'); });
+        button4.addEventListener("click", function() { makeForm('code'); });
+        button5.addEventListener("click", function() { makeForm('linebreak'); });
+
+        mainElement.appendChild(div);
+}
+
+// Add buttons. The buttons to add is indicated by window.in
+export function addButtons() {
+        switch(window.in) {
+                case 'doc': 
+                        addButtonsDocView();
+                        break;
+                case 'doc-empty':
+                        addButtonsDocEmptyView();
+                        break;
+                case 'chainlink':
+                        addButtonsChainlinkView();
+                        break;
+                default:
+                        console.log("doc type for buttons not specified");
+        }
+}
+
+export function deleteButtons() {
+        document.getElementById('add-buttons').remove();
 }
