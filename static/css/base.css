@@ -126,10 +126,10 @@ body {
 main {
 	border-radius: 12px;
 	background-color: #2C2E43;
-	padding-left: 1cm;
-	padding-right: 1cm;
-	padding-top: 1.3rem;
-	padding-bottom: 1.3rem;
+	-padding-left: 1cm;
+	-padding-right: 1cm;
+	-padding-top: 1.3rem;
+	-padding-bottom: 1.3rem;
 	-padding-top: 0.3cm;
 	-padding-bottom: 1cm;
 }
@@ -155,14 +155,15 @@ header > h1 {
 }
 
 main > h1 {
-    font-family: Audiowide;
-    font-weight: 100;
+	font-family: Audiowide;
+	font-weight: 100;
 	background-color: #334756;
 	text-align: center;
 	color: whitesmoke;
 	font-size: xx-large;
 	padding: 10px;
-	margin: 1.3rem 0 1.3rem 0;
+	-margin: 2rem 0 2rem 0;
+	margin: 1rem 1% 1rem 1%;
 }
 
 h2 {
@@ -171,8 +172,7 @@ h2 {
 	font-size: x-large;
 	color: whitesmoke;
 	background-color: #334756;
-	margin: 1.3rem 0 1.3rem 0;
-	-margin: 6px 0px 6px 0px;
+	margin: 1rem 0 1rem 0;
 }
 
 h6 {

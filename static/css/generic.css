@@ -1,6 +1,6 @@
 #tabbed-buttons {
-	margin-top: 12px;
-	margin-bottom: 12px;
+	padding-top: 2rem;
+	padding-bottom: 1rem;
 }
 
 .tabbed-buttons {
@@ -10,7 +10,7 @@
 	background-color: #334756;
 	color: #f5f5f5;
 	height: 30px;
-    margin-top: 1px;
+	margin-top: 1px;
 	cursor: pointer;
 	border-radius: 10px;
 	-border: solid;
@@ -66,12 +66,43 @@ h4 {
     margin-left: 10px;
 }
 
-#chainlink-manifest, #keybindings-legend {
+
+/* Document Settings and Option Boxes */
+
+#decoration-display {
+    display: block;
+    text-align: center;
+    padding: 1rem 0 1rem 0;
+}
+
+#decoration-display > pre {
+    display: inline-block;
+    color: rgb(208, 68, 35);
+    border-style: double;
+    border-width: 3px;
+
+}
+
+#config-display {
+    padding: 1rem 1% 1rem 1%;
+}
+
+#chainlink-display {
+    padding: 0rem 1% 1rem 1%; /* padding-top is 0 because the chainlink (header2) already has a 1rem margin-top */
+}
+
+#config-display {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#config-display > ul {
     display: inline-block;
     vertical-align:top;
     background-color: #2C394B;
     list-style-type: none;
-
+    -width: calc(100% / 3);
+    height: min-content;
     border-style: solid;
     border-left-width: 5px;
     border-right-width: 5px;
@@ -79,6 +110,16 @@ h4 {
     border-bottom-width: 10px;
     border-color: transparent;
     border-radius: 12px;
+}
+
+#config-display > ul > h2 {
+    color: whitesmoke;
+    background-color: #2C394B;
+    font-family: Audiowide;
+    background-color:
+    font-weight: 100;
+    margin-bottom: 5px;
+    margin-top: 0px;
 }
 
 #chainlink-manifest > li {
@@ -95,20 +136,29 @@ h4 {
     margin-bototm: 3px;
 }
 
-#chainlink-manifest > li > a, #keybindings-legend > li > a {
+#chainlink-manifest > li > a {
     text-decoration: none;
     font-size: medium;
 }
 
-#chainlink-manifest > h2, #keybindings-legend > h2 {
-    color: whitesmoke;
-    background-color: #2C394B;
-    font-family: Audiowide;
-    background-color:
-    font-weight: 100;
-    margin-bottom: 5px;
-    margin-top: 0px;
+#chainlink-manifest > li > a:hover {
+    text-decoration: underline;
+    color: #959595;
 }
+
+#options-settings > li > button {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    /*optional*/
+    font-family: arial, sans-serif;
+    /*input has OS specific font-family*/
+    color: rgb(208, 68, 35);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Document Settings and Option Boxes */
 
 input {
     width: 35%;

@@ -253,3 +253,22 @@ export function addButtons() {
 export function deleteButtons() {
         document.getElementById('add-buttons').remove();
 }
+
+export function deleteDoc() {
+
+        var confirm = window.confirm("Delete this document record?");
+        if( confirm == false ) {
+                return
+        }
+
+ 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", window.target, true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.send();
+        xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        window.location.href = "index.html";
+                }
+        }
+}

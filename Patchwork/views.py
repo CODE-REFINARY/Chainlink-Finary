@@ -89,6 +89,12 @@ def generic(request, key=''):
             content.save()
  
         return render(request, 'Patchwork/success.html', {})
+    
+    elif request.method == 'DELETE':
+        target = get_object_or_404(Doc, url=key)
+        target.delete()
+        return render(request, 'Patchwork/success.html', {});
+
 
     docs = Doc.objects.all()
     chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')
