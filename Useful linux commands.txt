@@ -1,5 +1,8 @@
 Linux Commands that I use:
 
+# Rebuild a docker container with changes made to files in the container
+sudo docker compose up --build
+
 This command runs the manage.py server with settings file specified:
 python manage.py runserver --settings=Chainlink.settings.docker
 python manage.py runserver --settings=Chainlink.settings.heroku
