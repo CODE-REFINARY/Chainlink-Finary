@@ -1,4 +1,4 @@
 Django>=3.0,<4.0
 psycopg2>=2.8
 python-decouple>=3.6,<4.0
-whitenoise==6.5.0
+WhiteNoise>=6.5.0
