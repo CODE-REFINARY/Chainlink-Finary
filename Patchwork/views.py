@@ -91,10 +91,20 @@ def generic(request, key=''):
         return render(request, 'Patchwork/success.html', {})
     
     elif request.method == 'DELETE':
-        target = get_object_or_404(Doc, url=key)
-        target.delete()
-        return render(request, 'Patchwork/success.html', {});
+        # get json payload
+        #json_data = json.loads(request.body)
+        targetType = request.headers["type"]
 
+        if targetType == "doc":
+            #target = get_object_or_404(Doc, url=key)
+            document.delete()
+            return render(request, 'Patchwork/success.html', {});
+
+        elif targetType == "chainlink":
+            targetChainlink = request.headers["target"]
+            target = get_object_or_404(Chainlink, url=targetChainlink)
+            target.delete()
+            return render(request, 'Patchwork/success.html', {});
 
     docs = Doc.objects.all()
     chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')

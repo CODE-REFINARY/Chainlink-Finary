@@ -5,13 +5,14 @@
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape, addButtonsDocView, addButtonsDocEmptyView, deleteDoc } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, deleteChainlink } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
 
 		// Globals
-		window.target = window.location.href;
+		window.target = window.location.href;	// This is where AJAX requests should be sent
+		window.ctrl = false;			// This flag inidicates whether the "ctrl" key is being held down
 
 		var chainlinkDisplay = document.getElementById("chainlink-display");
 
@@ -35,6 +36,10 @@
 
 		deleteDocBtn.addEventListener("click", deleteDoc);
 
+		const deleteClBtns = document.getElementsByClassName("cl-del-btn"); 
+		for (let i = 0; i < deleteClBtns.length; i++) {
+			deleteClBtns[i].addEventListener("click", function() { deleteChainlink(deleteClBtns[i].id) });	
+		}
 	});
 </script>
 <nav id="tabbed-buttons">
@@ -90,9 +95,16 @@
 <div id="chainlink-display">
 {% for content in contents %}
 		{% if content.tag == 'header2' %}
-		<section><h2 id="{{ content.url }}">{{ content.title }}<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a></h2>
+		<section>
+			<h2 id="{{ content.url }}">{{ content.title }}
+				<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
+				<button id="{{ content.url }}" class="cl-del-btn">delete</button>
+			</h2>
 		{% elif content.tag == 'paragraph' %}
-		<p>{{ content.content }}</p>
+		<p>
+			{{ content.content }}
+			<button class="cont-del-btn">delete</button>
+		</p>
 		{% elif content.tag == 'code' %}
 		<code>{{ content.content }}</code>
 		{% elif content.tag == 'header3' %}

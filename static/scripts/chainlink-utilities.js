@@ -81,7 +81,15 @@ export function makeForm(type) {
 // Keypress parsing function for creating chainlinks and form elements
 export function parseKeyUp(e) {
         var keyCode = e.which;
-        var loc = e.currentTarget.in;
+        //alert(keyCode);
+        var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
+
+        if (keyCode == 17) {            // ctrl
+                window.ctrl = false;    // flag that the ctrl key has been released
+        } else if (window.ctrl) {       // exit if the ctrl key is currently being held down
+                return;
+        }
+
         if (keyCode == 80 && loc != "doc-empty") {
                 makeForm('paragraph');
         } else if (keyCode == 67 && loc != "doc-empty") {
@@ -98,11 +106,17 @@ export function parseKeyUp(e) {
 // Keypress parsing function for moving the page up and down
 export function parseKeyDown(e) {
         var keyCode = e.which;
+        if (keyCode == 17) {     // ctrl
+                window.ctrl = true;     // flag that the ctrl key is currently being pressed
+        } else if (window.ctrl) {       // exit if the ctrl key is currently being pressed
+                return;
+        }
+        //alert(keyCode);
         if (keyCode == 75) {
             window.scrollBy(0, -70);
         } else if (keyCode == 74) {
             window.scrollBy(0, 70);
-        }
+        } 
 }
 
 // Keypress parsing function for capturing the Escape key to reload the page
@@ -265,10 +279,32 @@ export function deleteDoc() {
         let xhr = new XMLHttpRequest();
         xhr.open("DELETE", window.target, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('type', 'doc');
         xhr.send();
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                         window.location.href = "index.html";
+                }
+        }
+}
+
+export function deleteChainlink(target) {
+
+        var confirm = window.confirm("Delete this chainlink?");
+        if( confirm == false ) {
+                return
+        }
+
+ 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", window.target, true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('type', 'chainlink');
+        xhr.setRequestHeader('target', target);
+        xhr.send();
+        xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        window.location.reload();
                 }
         }
 }
