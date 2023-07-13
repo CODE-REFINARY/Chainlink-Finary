@@ -5,7 +5,7 @@
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, deleteChainlink } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { addElement, makeForm, parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, deleteChainlink, deleteContent, renameDoc } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
@@ -36,10 +36,21 @@
 
 		deleteDocBtn.addEventListener("click", deleteDoc);
 
-		const deleteClBtns = document.getElementsByClassName("cl-del-btn"); 
+		const deleteClBtns = document.getElementsByClassName("cl-del-btn");
+		const deleteContBtns = document.getElementsByClassName("cont-del-btn");
+		const editContBtns = document.getElementsByClassName("cont-edit-btn");
+
+		const editDocBtn = document.getElementById('doc-action-edit-title');
+
 		for (let i = 0; i < deleteClBtns.length; i++) {
 			deleteClBtns[i].addEventListener("click", function() { deleteChainlink(deleteClBtns[i].id) });	
 		}
+
+		for (let i = 0; i < deleteContBtns.length; i++) {
+			deleteContBtns[i].addEventListener("click", function() { deleteContent(deleteContBtns[i].closest('.content-wrapper').id) });
+		}
+
+		editDocBtn.addEventListener("click", function() { renameDoc(); });
 	});
 </script>
 <nav id="tabbed-buttons">
@@ -48,7 +59,9 @@
 {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
 </nav>
-<h1>{{ document.title|linebreaksbr }}</h1>
+<div id="doc-title-wrapper">
+	<h1 id="doc-title">{{ document.title|linebreaksbr }}</h1>
+</div>
 <div id="config-display">
 <ul id="keybindings-legend">
 	<h2>Keybindings Legend</h2>
@@ -75,6 +88,7 @@
 	<li><button id="doc-action-copy-link">Copy link to this doc</button></li>
 	<li><button id="doc-action-change-theme">Change theme</button></li>
 	<li><button id="doc-action-find-references">Find references</button></li>
+	<li><button id="doc-action-edit-title">Rename doc</button></li>
 	<li><button id="doc-action-delete">Delete this doc</button></li>
 </ul>
 </div>
@@ -98,19 +112,40 @@
 		<section>
 			<h2 id="{{ content.url }}">{{ content.title }}
 				<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
+				<button id="{{ content.url }}" class="cl-edit-btn">edit</button>
 				<button id="{{ content.url }}" class="cl-del-btn">delete</button>
 			</h2>
 		{% elif content.tag == 'paragraph' %}
-		<p>
-			{{ content.content }}
-			<button class="cont-del-btn">delete</button>
-		</p>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<p>
+				{{ content.content }}
+				<button class="cont-edit-btn">edit</button>
+				<button class="cont-del-btn">delete</button>
+			</p>
+		</div>
 		{% elif content.tag == 'code' %}
-		<code>{{ content.content }}</code>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<code>
+				{{ content.content }}
+				<button class="cont-edit-btn">edit</button>
+				<button class="cont-del-btn">delete</button>
+			</code>
+		</div>
 		{% elif content.tag == 'header3' %}
-		<h3><div class="h3">{{ content.content }}</div></h3>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<h3>
+				<div class="h3">
+					{{ content.content }}
+					<button class="cont-edit-btn">edit</button>
+					<button class="cont-del-btn">delete</button>
+				</div>
+			</h3>
+		</div>
 		{% elif content.tag == 'linebreak' %}
-		<span class="br"></span>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<span class="br">
+			</span>
+		</div>
 		{% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}

@@ -98,22 +98,41 @@ def generic(request, key=''):
         if targetType == "doc":
             #target = get_object_or_404(Doc, url=key)
             document.delete()
-            return render(request, 'Patchwork/success.html', {});
+            return render(request, 'Patchwork/success.html', {})
 
         elif targetType == "chainlink":
             targetChainlink = request.headers["target"]
             target = get_object_or_404(Chainlink, url=targetChainlink)
             target.delete()
-            return render(request, 'Patchwork/success.html', {});
+            return render(request, 'Patchwork/success.html', {})
 
-    docs = Doc.objects.all()
-    chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')
-    contents = []
-    for link in chainlinks:
-        contents.append(link)
-        for cont in Content.objects.filter(chainlink=link.pk).order_by('order'):
-            contents.append(cont)
-    return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
+        elif targetType == "content":
+            targetContent = request.headers["target"]
+            targetChainlink = targetContent.split('-')[0]
+            targetOrder = targetContent.split('-')[1]
+            target = get_object_or_404(Content, url=targetChainlink, order=targetOrder)
+            target.delete()
+            return render(request, 'Patchwork/success.html', {})
+
+    elif request.method == 'PUT':
+        type = request.headers["type"]
+        title = request.headers["title"]
+        
+        if type == "doc":
+            document.title = title
+            document.save()
+
+        return render(request, 'Patchwork/success.html', {}) 
+    
+    elif request.method == 'GET':
+        docs = Doc.objects.all()
+        chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')
+        contents = []
+        for link in chainlinks:
+            contents.append(link)
+            for cont in Content.objects.filter(chainlink=link.pk).order_by('order'):
+                contents.append(cont)
+        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  # force chainlink view to get force reloaded so that form view edits appear

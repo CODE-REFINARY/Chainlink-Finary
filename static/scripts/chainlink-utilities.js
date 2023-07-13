@@ -67,13 +67,13 @@ export function makeForm(type) {
         }
 
         deleteButtons();        // remove buttons temporarily while user input prompt is active 
-
         document.getElementById('input').focus({ focusVisible: true });
         form.addEventListener("submit", function(event) {
                 event.preventDefault();
                 addElement(type, input.value, url, order);
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", escape);
                 addButtons();
         });
 }
@@ -89,22 +89,11 @@ export function parseKeyUp(e) {
         } else if (window.ctrl) {       // exit if the ctrl key is currently being held down
                 return;
         }
-
-        if (keyCode == 80 && loc != "doc-empty") {
-                makeForm('paragraph');
-        } else if (keyCode == 67 && loc != "doc-empty") {
-                makeForm('code');
-        } else if (keyCode == 78 && (loc == "doc" || loc == "doc-empty")) {      // disable chainlink creation for chainlink view (only enabled in doc view)
-                makeForm('header2');
-        } else if (keyCode == 72 && loc != "doc-empty") {
-                makeForm('header3');
-        } else if (keyCode == 66 && loc != "doc-empty") {
-                makeForm('linebreak');
-        }
 }
 
 // Keypress parsing function for moving the page up and down
 export function parseKeyDown(e) {
+        var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
         var keyCode = e.which;
         if (keyCode == 17) {     // ctrl
                 window.ctrl = true;     // flag that the ctrl key is currently being pressed
@@ -117,10 +106,26 @@ export function parseKeyDown(e) {
         } else if (keyCode == 74) {
             window.scrollBy(0, 70);
         } 
+        else if (keyCode == 80 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('paragraph');
+        } else if (keyCode == 67 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('code');
+        } else if (keyCode == 78 && (loc == "doc" || loc == "doc-empty")) {      // disable chainlink creation for chainlink view (only enabled in doc view)
+                e.preventDefault();
+                makeForm('header2');
+        } else if (keyCode == 72 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('header3');
+        } else if (keyCode == 66 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('linebreak');
+        }
 }
 
-// Keypress parsing function for capturing the Escape key to reload the page
-export function escape(e) {
+// Callback function used for when the user presses the Esc key while an input dialogue is open
+function escape(e) {
         var keyCode = e.which;
         if (keyCode == 27) {
                 var form = document.getElementById('input').parentNode;
@@ -270,7 +275,7 @@ export function deleteButtons() {
 
 export function deleteDoc() {
 
-        var confirm = window.confirm("Delete this document record?");
+        var confirm = window.confirm("Delete document record?");
         if( confirm == false ) {
                 return
         }
@@ -290,7 +295,7 @@ export function deleteDoc() {
 
 export function deleteChainlink(target) {
 
-        var confirm = window.confirm("Delete this chainlink?");
+        var confirm = window.confirm("Delete chainlink?");
         if( confirm == false ) {
                 return
         }
@@ -307,4 +312,69 @@ export function deleteChainlink(target) {
                         window.location.reload();
                 }
         }
+}
+
+export function deleteContent(target) {
+        var confirm = window.confirm("Delete element?");
+        if( confirm == false ) {
+                return
+        }
+
+ 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", window.target, true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('type', 'content');
+        xhr.setRequestHeader('target', target);
+        xhr.send(); 
+        xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        window.location.reload();
+                }
+        }
+}
+
+export function renameDoc() {
+
+        const header = document.getElementById('doc-title');
+        const wrapper = document.getElementById('doc-title-wrapper');
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        const title = header.innerHTML;
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+        window.addEventListener("keydown", escape);
+
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'input');
+        input.value = title;
+        form.appendChild(input);
+        wrapper.appendChild(form);
+        input.focus({ focusVisible: true });
+
+        deleteButtons();         
+        form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.target, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'doc');
+                xhr.setRequestHeader('title', input.value);
+                xhr.send(); 
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", escape);
+                addButtons();
+        });
+
+        header.remove();
 }
