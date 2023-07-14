@@ -22,7 +22,10 @@ export function addElement(type, title, url, order) {
 export function makeForm(type) {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
-        window.addEventListener("keydown", escape);
+
+        var _listener = function (e) { escape(e, _listener, "") };
+        window.addEventListener("keydown", _listener);
+
         const list = document.getElementById('chainlink-display');
         const section = document.createElement('section');
         const chainlink = document.getElementById("chainlink-display").lastElementChild;
@@ -73,7 +76,6 @@ export function makeForm(type) {
                 addElement(type, input.value, url, order);
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                window.removeEventListener("keydown", escape);
                 addButtons();
         });
 }
@@ -125,34 +127,40 @@ export function parseKeyDown(e) {
 }
 
 // Callback function used for when the user presses the Esc key while an input dialogue is open
-function escape(e, fallback, targetId) {
+function escape(e, ref, fallback) {
         var keyCode = e.which;
         if (keyCode == 27) {
+                var formParent = document.getElementById('input').parentNode.parentNode;
                 var form = document.getElementById('input').parentNode;
-                const listForm = document.getElementById('chainlink-display').querySelector("form");
-                const chainlinkForm = document.getElementById("chainlink-display").lastElementChild.querySelector("form");
-                const docTitleForm = document.getElementById("doc-title-wrapper").querySelector("form");
-                const chainlinkEditForm = document.getElementById(targetId).querySelector("form");
+                var input = document.getElementById('input');
+                const chainlinkCreateForm = (formParent.matches('#chainlink-display'));
+                const chainlinkEditForm = (formParent.matches('.chainlink-wrapper'));
+                const contentCreateForm = (formParent.matches('.chainlink'));
+                const contentEditForm = (formParent.matches('.content-wrapper'));
+                const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
 
-                if (listForm) {
-                        listForm.remove();
-                } else if (docTitleForm) {
-                        docTitleForm.remove();
+                if (fenceEditForm) {
+                        form.remove();
                         var h1 = document.createElement("h1");
                         h1.id = "doc-title";
                         h1.innerHTML = fallback;
-                        document.getElementById("doc-title-wrapper").appendChild(h1);
+                        formParent.prepend(h1);
                 } else if (chainlinkEditForm) {
-                        chainlinkEditForm.remove();
+                        form.remove();
                         var h2 = document.createElement("h2");
                         h2.innerHTML = fallback;
-                        document.getElementById("chainlink-wrapper").append(h2);
-                } else if (chainlinkForm) {
-                        chainlinkForm.remove();
+                        formParent.prepend(h2);
+                } else if (chainlinkCreateForm) {
+                        form.remove();
+                } else if (contentCreateForm) {
+                        form.remove();
+                } else if (contentEditForm) {
+
                 }
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", ref);
                 addButtons();
         }
 }
@@ -355,7 +363,9 @@ export function renameDoc() {
 
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
-        window.addEventListener("keydown", (e) => (escape(e, title)));
+        
+        var _listener = function (e) { escape(e, _listener, title) };
+        window.addEventListener("keydown", _listener);
 
         input.setAttribute('type', 'text');
         input.setAttribute('id', 'input');
@@ -383,7 +393,6 @@ export function renameDoc() {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                window.removeEventListener("keydown", escape);
                 addButtons();
         });
 
@@ -400,7 +409,9 @@ export function editChainlink(target) {
 
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
-        window.addEventListener("keydown", (e) => escape(e, title, target));
+
+        var _listener = function (e) { escape(e, _listener, title) };
+        window.addEventListener("keydown", _listener);
 
         input.setAttribute('type', 'text');
         input.setAttribute('id', 'input');
@@ -428,7 +439,6 @@ export function editChainlink(target) {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                window.removeEventListener("keydown", escape);
                 addButtons();
         });
 
