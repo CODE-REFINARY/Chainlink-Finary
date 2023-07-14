@@ -23,7 +23,7 @@ export function makeForm(type) {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
 
-        var _listener = function (e) { escape(e, _listener, "") };
+        var _listener = function (e) { escape(e, _listener, "", "") };
         window.addEventListener("keydown", _listener);
 
         const list = document.getElementById('chainlink-display');
@@ -127,7 +127,7 @@ export function parseKeyDown(e) {
 }
 
 // Callback function used for when the user presses the Esc key while an input dialogue is open
-function escape(e, ref, fallback) {
+function escape(e, ref, fallback, element) {
         var keyCode = e.which;
         if (keyCode == 27) {
                 var formParent = document.getElementById('input').parentNode.parentNode;
@@ -155,7 +155,11 @@ function escape(e, ref, fallback) {
                 } else if (contentCreateForm) {
                         form.remove();
                 } else if (contentEditForm) {
-
+                        form.remove();
+                        var el = document.createElement(element);
+                        el.className = "inner-content";
+                        el.innerHTML = fallback;
+                        formParent.prepend(el);
                 }
 
                 window.addEventListener("keydown", parseKeyDown);
@@ -364,7 +368,7 @@ export function renameDoc() {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
         
-        var _listener = function (e) { escape(e, _listener, title) };
+        var _listener = function (e) { escape(e, _listener, title, "h1") };
         window.addEventListener("keydown", _listener);
 
         input.setAttribute('type', 'text');
@@ -384,6 +388,7 @@ export function renameDoc() {
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'doc');
                 xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('target', 'null');
                 xhr.send(); 
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
@@ -410,7 +415,7 @@ export function editChainlink(target) {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
 
-        var _listener = function (e) { escape(e, _listener, title) };
+        var _listener = function (e) { escape(e, _listener, title, "h2") };
         window.addEventListener("keydown", _listener);
 
         input.setAttribute('type', 'text');
@@ -430,6 +435,7 @@ export function editChainlink(target) {
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'chainlink');
                 xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('target', target);
                 xhr.send(); 
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
@@ -445,23 +451,25 @@ export function editChainlink(target) {
         header.remove();
 }
 
-export function editContent() {
+export function editContent(target) {
 
-        const header = document.getElementById('doc-title');
-        const wrapper = document.getElementById('doc-title-wrapper');
+        const wrapper = document.getElementById(target);
+        const content = wrapper.getElementsByClassName("inner-content")[0];
         const form = document.createElement('form');
         const input = document.createElement('input');
-        const title = header.innerHTML;
+        const title = content.innerHTML;
 
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
-        window.addEventListener("keydown", escape);
+
+        var _listener = function (e) { escape(e, _listener, title, content.tagName) };
+        window.addEventListener("keydown", _listener);
 
         input.setAttribute('type', 'text');
         input.setAttribute('id', 'input');
         input.value = title;
         form.appendChild(input);
-        wrapper.appendChild(form);
+        wrapper.prepend(form);
         input.focus({ focusVisible: true });
 
         deleteButtons();         
@@ -472,8 +480,9 @@ export function editContent() {
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.target, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'doc');
+                xhr.setRequestHeader('type', 'content');
                 xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('target', target);
                 xhr.send(); 
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
@@ -483,9 +492,8 @@ export function editContent() {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                window.removeEventListener("keydown", escape);
                 addButtons();
         });
 
-        header.remove();
+        content.remove();
 }

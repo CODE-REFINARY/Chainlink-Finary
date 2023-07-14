@@ -127,29 +127,27 @@
 			</div>
 		{% elif content.tag == 'paragraph' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<p>{{ content.content }}</p>	
+			<p class="inner-content">{{ content.content }}</p>	
 			<button class="cont-edit-btn">edit</button>
 			<button class="cont-del-btn">delete</button>
 			
 		</div>
 		{% elif content.tag == 'code' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<code>{{ content.content }}</code>
+			<code class="inner-content">{{ content.content }}</code>
 			<button class="cont-edit-btn">edit</button>
 			<button class="cont-del-btn">delete</button>
 			
 		</div>
 		{% elif content.tag == 'header3' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<h3>
-				<div class="h3">{{ content.content }}</div>
-			</h3>	
+			<h3 class="inner-content">{{ content.content }}</h3>	
 			<button class="cont-edit-btn">edit</button>
 			<button class="cont-del-btn">delete</button>
 		</div>
 		{% elif content.tag == 'linebreak' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<span class="br"></span>
+			<span class="inner-content br"></span>
 			<button class="cont-edit-btn">edit</button>
 			<button class="cont-del-btn">delete</button>
 		</div>

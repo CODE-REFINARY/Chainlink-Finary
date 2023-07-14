@@ -98,13 +98,11 @@ def generic(request, key=''):
         if targetType == "doc":
             #target = get_object_or_404(Doc, url=key)
             document.delete()
-            return render(request, 'Patchwork/success.html', {})
 
         elif targetType == "chainlink":
             targetChainlink = request.headers["target"]
             target = get_object_or_404(Chainlink, url=targetChainlink)
             target.delete()
-            return render(request, 'Patchwork/success.html', {})
 
         elif targetType == "content":
             targetContent = request.headers["target"]
@@ -112,15 +110,27 @@ def generic(request, key=''):
             targetOrder = targetContent.split('-')[1]
             target = get_object_or_404(Content, url=targetChainlink, order=targetOrder)
             target.delete()
-            return render(request, 'Patchwork/success.html', {})
+
+        return render(request, 'Patchwork/success.html', {}) 
 
     elif request.method == 'PUT':
         type = request.headers["type"]
         title = request.headers["title"]
+        target = request.headers["target"]
         
         if type == "doc":
             document.title = title
             document.save()
+        elif type == "chainlink":
+            chainlink = get_object_or_404(Chainlink, url=target)
+            chainlink.title = title
+            chainlink.save()
+        elif type == "content":
+            targetChainlink = target.split('-')[0]
+            targetOrder = target.split('-')[1]
+            content = get_object_or_404(Content, url=targetChainlink, order=targetOrder)
+            content.content = title
+            content.save()
 
         return render(request, 'Patchwork/success.html', {}) 
     
