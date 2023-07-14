@@ -167,12 +167,10 @@ main h1 {
 }
 
 h2 {
-    font-family: Audiowide;
+	font-family: Audiowide;
 	font-weight: 100;
 	font-size: x-large;
 	color: whitesmoke;
-	background-color: #334756;
-	margin: 1rem 0 1rem 0;
 }
 
 h6 {

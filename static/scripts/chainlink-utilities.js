@@ -125,23 +125,34 @@ export function parseKeyDown(e) {
 }
 
 // Callback function used for when the user presses the Esc key while an input dialogue is open
-function escape(e) {
+function escape(e, fallback, targetId) {
         var keyCode = e.which;
         if (keyCode == 27) {
                 var form = document.getElementById('input').parentNode;
                 const listForm = document.getElementById('chainlink-display').querySelector("form");
                 const chainlinkForm = document.getElementById("chainlink-display").lastElementChild.querySelector("form");
+                const docTitleForm = document.getElementById("doc-title-wrapper").querySelector("form");
+                const chainlinkEditForm = document.getElementById(targetId).querySelector("form");
 
                 if (listForm) {
                         listForm.remove();
-                        window.addEventListener("keydown", parseKeyDown);
-                        window.addEventListener("keyup", parseKeyUp);
+                } else if (docTitleForm) {
+                        docTitleForm.remove();
+                        var h1 = document.createElement("h1");
+                        h1.id = "doc-title";
+                        h1.innerHTML = fallback;
+                        document.getElementById("doc-title-wrapper").appendChild(h1);
+                } else if (chainlinkEditForm) {
+                        chainlinkEditForm.remove();
+                        var h2 = document.createElement("h2");
+                        h2.innerHTML = fallback;
+                        document.getElementById("chainlink-wrapper").append(h2);
                 } else if (chainlinkForm) {
                         chainlinkForm.remove();
-                        window.addEventListener("keydown", parseKeyDown);
-                        window.addEventListener("keyup", parseKeyUp);
                 }
 
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
                 addButtons();
         }
 }
@@ -335,6 +346,96 @@ export function deleteContent(target) {
 }
 
 export function renameDoc() {
+
+        const header = document.getElementById('doc-title');
+        const wrapper = document.getElementById('doc-title-wrapper');
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        const title = header.innerHTML;
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+        window.addEventListener("keydown", (e) => (escape(e, title)));
+
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'input');
+        input.value = title;
+        form.appendChild(input);
+        wrapper.appendChild(form);
+        input.focus({ focusVisible: true });
+
+        deleteButtons();         
+        form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.target, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'doc');
+                xhr.setRequestHeader('title', input.value);
+                xhr.send(); 
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", escape);
+                addButtons();
+        });
+
+        header.remove();
+}
+
+export function editChainlink(target) {
+
+        const chainlink = document.getElementById(target);
+        const header = chainlink.getElementsByTagName("h2")[0];
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        const title = header.innerHTML;
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+        window.addEventListener("keydown", (e) => escape(e, title, target));
+
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'input');
+        input.value = title;
+        form.appendChild(input);
+        chainlink.prepend(form);
+        input.focus({ focusVisible: true });
+
+        deleteButtons();         
+        form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.target, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'chainlink');
+                xhr.setRequestHeader('title', input.value);
+                xhr.send(); 
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", escape);
+                addButtons();
+        });
+
+        header.remove();
+}
+
+export function editContent() {
 
         const header = document.getElementById('doc-title');
         const wrapper = document.getElementById('doc-title-wrapper');

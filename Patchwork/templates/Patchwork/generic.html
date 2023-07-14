@@ -5,7 +5,7 @@
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, deleteChainlink, deleteContent, renameDoc } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { addElement, makeForm, parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, deleteChainlink, deleteContent, renameDoc, editChainlink, editContent } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
@@ -37,17 +37,26 @@
 		deleteDocBtn.addEventListener("click", deleteDoc);
 
 		const deleteClBtns = document.getElementsByClassName("cl-del-btn");
+		const editClBtns = document.getElementsByClassName("cl-edit-btn");
 		const deleteContBtns = document.getElementsByClassName("cont-del-btn");
 		const editContBtns = document.getElementsByClassName("cont-edit-btn");
 
 		const editDocBtn = document.getElementById('doc-action-edit-title');
 
-		for (let i = 0; i < deleteClBtns.length; i++) {
-			deleteClBtns[i].addEventListener("click", function() { deleteChainlink(deleteClBtns[i].id) });	
+		const numChainlinks = document.getElementsByClassName("chainlink").length;
+		const numContents = document.getElementsByClassName("content-wrapper").length;
+
+		for (let i = 0; i < numChainlinks; i++) {
+			deleteClBtns[i].addEventListener("click", function() { deleteChainlink(deleteClBtns[i].getAttribute('target')) });
+			editClBtns[i].addEventListener("click", function() { editChainlink(editClBtns[i].getAttribute('target')) });
 		}
 
 		for (let i = 0; i < deleteContBtns.length; i++) {
 			deleteContBtns[i].addEventListener("click", function() { deleteContent(deleteContBtns[i].closest('.content-wrapper').id) });
+		}
+
+		for (let i = 0; i < editContBtns.length; i++) {
+			editContBtns[i].addEventListener("click", function() { editContent(editContBtns[i].closest('.content-wrapper').id) });
 		}
 
 		editDocBtn.addEventListener("click", function() { renameDoc(); });
@@ -109,44 +118,42 @@
 <div id="chainlink-display">
 {% for content in contents %}
 		{% if content.tag == 'header2' %}
-		<section>
-			<h2 id="{{ content.url }}">{{ content.title }}
+		<section class="chainlink">
+			<div id="{{ content.url }}" class="chainlink-wrapper">
+				<h2>{{ content.title }}</h2>
 				<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
-				<button id="{{ content.url }}" class="cl-edit-btn">edit</button>
-				<button id="{{ content.url }}" class="cl-del-btn">delete</button>
-			</h2>
+				<button target="{{ content.url }}" class="cl-edit-btn">edit</button>
+				<button target="{{ content.url }}" class="cl-del-btn">delete</button>
+			</div>
 		{% elif content.tag == 'paragraph' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<p>
-				{{ content.content }}
-				<button class="cont-edit-btn">edit</button>
-				<button class="cont-del-btn">delete</button>
-			</p>
+			<p>{{ content.content }}</p>	
+			<button class="cont-edit-btn">edit</button>
+			<button class="cont-del-btn">delete</button>
+			
 		</div>
 		{% elif content.tag == 'code' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<code>
-				{{ content.content }}
-				<button class="cont-edit-btn">edit</button>
-				<button class="cont-del-btn">delete</button>
-			</code>
+			<code>{{ content.content }}</code>
+			<button class="cont-edit-btn">edit</button>
+			<button class="cont-del-btn">delete</button>
+			
 		</div>
 		{% elif content.tag == 'header3' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<h3>
-				<div class="h3">
-					{{ content.content }}
-					<button class="cont-edit-btn">edit</button>
-					<button class="cont-del-btn">delete</button>
-				</div>
-			</h3>
+				<div class="h3">{{ content.content }}</div>
+			</h3>	
+			<button class="cont-edit-btn">edit</button>
+			<button class="cont-del-btn">delete</button>
 		</div>
 		{% elif content.tag == 'linebreak' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<span class="br">
-			</span>
+			<span class="br"></span>
+			<button class="cont-edit-btn">edit</button>
+			<button class="cont-del-btn">delete</button>
 		</div>
-		{% elif content.tag == 'delimiter' %}
+			{% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}
 {% endfor %}
