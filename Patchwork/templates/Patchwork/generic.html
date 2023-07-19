@@ -5,7 +5,7 @@
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, deleteChainlink, deleteContent, renameDoc, editChainlink, editContent } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
@@ -33,33 +33,17 @@
 
 		// Add event listeners for the "Options & Settings" section
 		let deleteDocBtn = document.getElementById('doc-action-delete');
-
-		deleteDocBtn.addEventListener("click", deleteDoc);
-
-		const deleteClBtns = document.getElementsByClassName("cl-del-btn");
-		const editClBtns = document.getElementsByClassName("cl-edit-btn");
-		const deleteContBtns = document.getElementsByClassName("cont-del-btn");
-		const editContBtns = document.getElementsByClassName("cont-edit-btn");
-
 		const editDocBtn = document.getElementById('doc-action-edit-title');
+		deleteDocBtn.addEventListener("click", deleteDoc);
+		//editDocBtn.addEventListener("click", function() { renameDoc(); });
+		editDocBtn.addEventListener("click", function() { deleteContentEditButtons(); });
 
-		const numChainlinks = document.getElementsByClassName("chainlink").length;
-		const numContents = document.getElementsByClassName("content-wrapper").length;
+		instChainlinkEditButtons();
+		instContentEditButtons();
 
-		for (let i = 0; i < numChainlinks; i++) {
-			deleteClBtns[i].addEventListener("click", function() { deleteChainlink(deleteClBtns[i].getAttribute('target')) });
-			editClBtns[i].addEventListener("click", function() { editChainlink(editClBtns[i].getAttribute('target')) });
-		}
+		//deleteChainlinkEditButtons();
+		//deleteContentEditButtons();
 
-		for (let i = 0; i < deleteContBtns.length; i++) {
-			deleteContBtns[i].addEventListener("click", function() { deleteContent(deleteContBtns[i].closest('.content-wrapper').id) });
-		}
-
-		for (let i = 0; i < editContBtns.length; i++) {
-			editContBtns[i].addEventListener("click", function() { editContent(editContBtns[i].closest('.content-wrapper').id) });
-		}
-
-		editDocBtn.addEventListener("click", function() { renameDoc(); });
 	});
 </script>
 <nav id="tabbed-buttons">
@@ -122,34 +106,25 @@
 			<div id="{{ content.url }}" class="chainlink-wrapper">
 				<h2>{{ content.title }}</h2>
 				<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
-				<button target="{{ content.url }}" class="cl-edit-btn">edit</button>
-				<button target="{{ content.url }}" class="cl-del-btn">delete</button>
 			</div>
 		{% elif content.tag == 'paragraph' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<p class="inner-content">{{ content.content }}</p>	
-			<button class="cont-edit-btn">edit</button>
-			<button class="cont-del-btn">delete</button>
 			
 		</div>
 		{% elif content.tag == 'code' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<code class="inner-content">{{ content.content }}</code>
-			<button class="cont-edit-btn">edit</button>
-			<button class="cont-del-btn">delete</button>
 			
 		</div>
 		{% elif content.tag == 'header3' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<h3 class="inner-content">{{ content.content }}</h3>	
-			<button class="cont-edit-btn">edit</button>
-			<button class="cont-del-btn">delete</button>
+			<h3 class="inner-content">
+				{{ content.content }}</h3>	
 		</div>
 		{% elif content.tag == 'linebreak' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<span class="inner-content br"></span>
-			<button class="cont-edit-btn">edit</button>
-			<button class="cont-del-btn">delete</button>
 		</div>
 			{% elif content.tag == 'delimiter' %}
 		</section>

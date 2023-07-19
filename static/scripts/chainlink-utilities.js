@@ -1,3 +1,8 @@
+var chainlinkEditButtonsEventHandlers = [];
+var chainlinkDeleteButtonsEventHandlers = [];
+var contentEditButtonsEventHandlers = [];
+var contentDeleteButtonsEventHandlers = [];
+
 // add items to database
 export function addElement(type, title, url, order) {
         var is_public;
@@ -85,7 +90,6 @@ export function parseKeyUp(e) {
         var keyCode = e.which;
         //alert(keyCode);
         var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
-
         if (keyCode == 17) {            // ctrl
                 window.ctrl = false;    // flag that the ctrl key has been released
         } else if (window.ctrl) {       // exit if the ctrl key is currently being held down
@@ -294,6 +298,71 @@ export function addButtons() {
 
 export function deleteButtons() {
         document.getElementById('add-buttons').remove();
+}
+
+export function instChainlinkEditButtons() {
+        const numChainlinks = document.getElementsByClassName("chainlink").length;
+        const chainlinks = document.getElementsByClassName("chainlink");
+        const chainlinkHeaders = document.getElementsByClassName("chainlink-wrapper");
+        for (let i = 0; i < numChainlinks; i++) {
+                let chainlinkEditButton = document.createElement("button");
+                let chainlinkDeleteButton = document.createElement("button");
+                chainlinkEditButton.innerHTML = "edit";
+                chainlinkDeleteButton.innerHTML = "delete";
+                chainlinkEditButton.className = "cl-edit-btn";
+                chainlinkDeleteButton.className = "cl-del-btn";
+                chainlinkEditButton.setAttribute("target", chainlinkHeaders[i].id);
+                chainlinkDeleteButton.setAttribute("target", chainlinkHeaders[i].id);
+                chainlinkHeaders[i].appendChild(chainlinkEditButton);
+                chainlinkHeaders[i].appendChild(chainlinkDeleteButton);
+                chainlinkEditButtonsEventHandlers.push(function() { editChainlink(chainlinkEditButton.getAttribute('target')) });
+                chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(chainlinkDeleteButton.getAttribute('target')) });
+                chainlinkEditButton.addEventListener("click", chainlinkEditButtonsEventHandlers[chainlinkEditButtonsEventHandlers.length - 1]);
+                chainlinkDeleteButton.addEventListener("click", chainlinkDeleteButtonsEventHandlers[chainlinkDeleteButtonsEventHandlers.length - 1]);
+        }
+}
+
+export function instContentEditButtons () {
+        const numContents = document.getElementsByClassName("content-wrapper").length;
+        const contents = document.getElementsByClassName("content-wrapper");
+        for (let i = 0; i < numContents; i++) {
+                let contentEditButton = document.createElement("button");
+                let contentDeleteButton = document.createElement("button");
+                contentEditButton.innerHTML = "edit";
+                contentDeleteButton.innerHTML = "delete";
+                contentEditButton.className = "cont-edit-btn";
+                contentDeleteButton.className = "cont-del-btn";
+                contents[i].appendChild(contentEditButton);
+                contents[i].appendChild(contentDeleteButton);
+                contentEditButtonsEventHandlers.push(function() { editContent(contentEditButton.closest('.content-wrapper').id) });
+                contentDeleteButtonsEventHandlers.push(function() { deleteContent(contentDeleteButton.closest('.content-wrapper').id) });
+                contentEditButton.addEventListener("click", contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]);
+                contentDeleteButton.addEventListener("click", contentDeleteButtonsEventHandlers[contentDeleteButtonsEventHandlers.length - 1]);
+        }
+}
+
+export function deleteChainlinkEditButtons () {
+        const numChainlinks = document.getElementsByClassName("chainlink").length;
+        var editButtons = Array.from(document.getElementsByClassName("cl-edit-btn"));
+        var deleteButtons = Array.from(document.getElementsByClassName("cl-del-btn"));
+        for (let i = 0; i < numChainlinks; i++) {
+                editButtons[i].remove();
+                deleteButtons[i].remove();
+                editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
+                deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
+        }
+}
+
+export function deleteContentEditButtons() {
+        const numContents = document.getElementsByClassName("content-wrapper").length;
+        var editButtons = Array.from(document.getElementsByClassName("cont-edit-btn"));
+        var deleteButtons = Array.from(document.getElementsByClassName("cont-del-btn"));
+        for (let i = 0; i < numContents; i++) {
+                editButtons[i].remove();
+                deleteButtons[i].remove();
+                editButtons[i].removeEventListener("click", contentEditButtonsEventHandlers[i]);
+                deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
+        }
 }
 
 export function deleteDoc() {
