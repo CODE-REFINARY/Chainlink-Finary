@@ -5,7 +5,7 @@
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
@@ -30,16 +30,12 @@
 		window.addEventListener("keyup", parseKeyUp);
 		window.addEventListener("keydown", parseKeyDown);
 
-
-		// Add event listeners for the "Options & Settings" section
-		let deleteDocBtn = document.getElementById('doc-action-delete');
-		const editDocBtn = document.getElementById('doc-action-edit-title');
-		deleteDocBtn.addEventListener("click", deleteDoc);
-		//editDocBtn.addEventListener("click", function() { renameDoc(); });
-		editDocBtn.addEventListener("click", function() { deleteContentEditButtons(); });
-
+		
+		instFenceEditButtons();
 		instChainlinkEditButtons();
 		instContentEditButtons();
+
+		deleteFenceEditButtons();
 
 		//deleteChainlinkEditButtons();
 		//deleteContentEditButtons();
@@ -81,24 +77,142 @@
 	<li><button id="doc-action-copy-link">Copy link to this doc</button></li>
 	<li><button id="doc-action-change-theme">Change theme</button></li>
 	<li><button id="doc-action-find-references">Find references</button></li>
-	<li><button id="doc-action-edit-title">Rename doc</button></li>
-	<li><button id="doc-action-delete">Delete this doc</button></li>
 </ul>
 </div>
-<div id="decoration-display"><pre> 
-      ___           ___           ___           ___           ___           ___           ___                       ___           ___     
-     /\  \         /\  \         /\  \         /\__\         /\  \         /\  \         /\  \          ___        /\  \         /\  \    
-     \:\  \       /::\  \       /::\  \       /::|  |       /::\  \       /::\  \       /::\  \        /\  \      /::\  \        \:\  \   
-      \:\  \     /:/\:\  \     /:/\:\  \     /:|:|  |      /:/\ \  \     /:/\:\  \     /:/\:\  \       \:\  \    /:/\:\  \        \:\  \  
-      /::\  \   /::\~\:\  \   /::\~\:\  \   /:/|:|  |__   _\:\~\ \  \   /:/  \:\  \   /::\~\:\  \      /::\__\  /::\~\:\  \       /::\  \ 
-     /:/\:\__\ /:/\:\ \:\__\ /:/\:\ \:\__\ /:/ |:| /\__\ /\ \:\ \ \__\ /:/__/ \:\__\ /:/\:\ \:\__\  __/:/\/__/ /:/\:\ \:\__\     /:/\:\__\
-    /:/  \/__/ \/_|::\/:/  / \/__\:\/:/  / \/__|:|/:/  / \:\ \:\ \/__/ \:\  \  \/__/ \/_|::\/:/  / /\/:/  /    \/__\:\/:/  /    /:/  \/__/
-   /:/  /         |:|::/  /       \::/  /      |:/:/  /   \:\ \:\__\    \:\  \          |:|::/  /  \::/__/          \::/  /    /:/  /     
-   \/__/          |:|\/__/        /:/  /       |::/  /     \:\/:/  /     \:\  \         |:|\/__/    \:\__\           \/__/     \/__/      
-                  |:|  |         /:/  /        /:/  /       \::/  /       \:\__\        |:|  |       \/__/                                
-                   \|__|         \/__/         \/__/         \/__/         \/__/         \|__|                                            
+<div id="decoration-display">
+<pre>      ___     
+     /\  \    
+     \:\  \   
+      \:\  \  
+      /::\  \ 
+     /:/\:\__\
+    /:/  \/__/
+   /:/  /     
+   \/__/      
 
-</pre></div>
+
+</pre>              
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /::\~\:\  \ 
+ /:/\:\ \:\__\
+ \/_|::\/:/  /
+    |:|::/  / 
+    |:|\/__/  
+    |:|  |    
+     \|__|    
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /::\~\:\  \ 
+ /:/\:\ \:\__\
+ \/__\:\/:/  /
+      \::/  / 
+      /:/  /  
+     /:/  /   
+     \/__/    
+</pre>
+<pre>
+      ___     
+     /\__\    
+    /::|  |   
+   /:|:|  |   
+  /:/|:|  |__ 
+ /:/ |:| /\__\
+ \/__|:|/:/  /
+     |:/:/  / 
+     |::/  /  
+     /:/  /   
+     \/__/    
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\ \  \  
+  _\:\~\ \  \ 
+ /\ \:\ \ \__\
+ \:\ \:\ \/__/
+  \:\ \:\__\  
+   \:\/:/  /  
+    \::/  /   
+     \/__/    
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /:/  \:\  \ 
+ /:/__/ \:\__\
+ \:\  \  \/__/
+  \:\  \      
+   \:\  \     
+    \:\__\    
+     \/__/    
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /::\~\:\  \ 
+ /:/\:\ \:\__\
+ \/_|::\/:/  /
+    |:|::/  / 
+    |:|\/__/  
+    |:|  |    
+     \|__|    
+</pre>
+<pre>
+      ___   
+     /\  \  
+     \:\  \ 
+     /::\__\
+  __/:/\/__/
+ /\/:/  /   
+ \::/__/    
+  \:\__\    
+   \/__/    
+
+
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /::\~\:\  \ 
+ /:/\:\ \:\__\
+ \/__\:\/:/  /
+      \::/  / 
+       \/__/  
+
+
+</pre>          
+<pre>
+      ___     
+     /\  \    
+     \:\  \   
+      \:\  \  
+      /::\  \ 
+     /:/\:\__\
+    /:/  \/__/
+   /:/  /     
+   \/__/      
+
+
+</pre>             
+              
+
+
+</div>
 <div id="chainlink-display">
 {% for content in contents %}
 		{% if content.tag == 'header2' %}

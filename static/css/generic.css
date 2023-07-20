@@ -78,8 +78,8 @@ h4 {
 #decoration-display > pre {
     display: inline-block;
     color: rgb(208, 68, 35);
-    border-style: double;
-    border-width: 3px;
+    -border-style: double;
+    -border-width: 3px;
 
 }
 

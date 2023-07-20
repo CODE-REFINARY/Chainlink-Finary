@@ -1,3 +1,5 @@
+var fenceEditButtonEventHandler;
+var fenceDeleteButtonEventHandler;
 var chainlinkEditButtonsEventHandlers = [];
 var chainlinkDeleteButtonsEventHandlers = [];
 var contentEditButtonsEventHandlers = [];
@@ -300,6 +302,22 @@ export function deleteButtons() {
         document.getElementById('add-buttons').remove();
 }
 
+export function instFenceEditButtons() {
+        const wrapper = document.getElementById('doc-title-wrapper');
+        let fenceEditButton = document.createElement("button");
+        let fenceDeleteButton = document.createElement("button");
+        fenceEditButton.innerHTML = "edit";
+        fenceDeleteButton.innerHTML = "delete";
+        fenceEditButton.id = "doc-action-edit-title";
+        fenceDeleteButton.id = "doc-action-delete-title";
+        wrapper.appendChild(fenceEditButton);
+        wrapper.appendChild(fenceDeleteButton);
+        fenceEditButtonEventHandler = function() { renameDoc(); };
+        fenceDeleteButtonEventHandler = function() { deleteDoc(); };
+        fenceEditButton.addEventListener("click", fenceEditButtonEventHandler);
+        fenceDeleteButton.addEventListener("click", fenceDeleteButtonEventHandler);
+}
+
 export function instChainlinkEditButtons() {
         const numChainlinks = document.getElementsByClassName("chainlink").length;
         const chainlinks = document.getElementsByClassName("chainlink");
@@ -339,6 +357,15 @@ export function instContentEditButtons () {
                 contentEditButton.addEventListener("click", contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]);
                 contentDeleteButton.addEventListener("click", contentDeleteButtonsEventHandlers[contentDeleteButtonsEventHandlers.length - 1]);
         }
+}
+
+export function deleteFenceEditButtons () {
+        var editButton = document.getElementById("doc-action-edit-title");
+        var deleteButton = document.getElementById("doc-action-delete-title");
+        editButton.remove();
+        deleteButton.remove();
+        editButton.removeEventListener("click", fenceEditButtonEventHandler);
+        deleteButton.removeEventListener("click", fenceDeleteButtonEventHandler);
 }
 
 export function deleteChainlinkEditButtons () {
