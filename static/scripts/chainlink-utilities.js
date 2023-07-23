@@ -7,14 +7,10 @@ var contentDeleteButtonsEventHandlers = [];
 
 // add items to database
 export function addElement(type, title, url, order) {
-        var is_public;
-        var title;
-        if (type == 'header2') {
-                is_public = "True";
-        }
+    var is_public = "True";
 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", window.target, true);
+        xhr.open("POST", window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
@@ -401,7 +397,7 @@ export function deleteDoc() {
 
  	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("DELETE", window.target, true);
+        xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.setRequestHeader('type', 'doc');
         xhr.send();
@@ -421,7 +417,7 @@ export function deleteChainlink(target) {
 
  	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("DELETE", window.target, true);
+        xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.setRequestHeader('type', 'chainlink');
         xhr.setRequestHeader('target', target);
@@ -441,7 +437,7 @@ export function deleteContent(target) {
 
  	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("DELETE", window.target, true);
+        xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.setRequestHeader('type', 'content');
         xhr.setRequestHeader('target', target);
@@ -480,7 +476,7 @@ export function renameDoc() {
                 //addElement(type, input.value, url, order);
                 var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 let xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.target, true);
+                xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'doc');
                 xhr.setRequestHeader('title', input.value);
@@ -527,7 +523,7 @@ export function editChainlink(target) {
                 //addElement(type, input.value, url, order);
                 var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 let xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.target, true);
+                xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'chainlink');
                 xhr.setRequestHeader('title', input.value);
@@ -574,7 +570,7 @@ export function editContent(target) {
                 //addElement(type, input.value, url, order);
                 var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 let xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.target, true);
+                xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'content');
                 xhr.setRequestHeader('title', input.value);

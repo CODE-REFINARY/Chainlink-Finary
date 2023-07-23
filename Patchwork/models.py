@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class TagType(models.TextChoices):                                      # Define available tag that content can be wrapped in
+    HEADER1 = 'header1', _('header1')                                   # define a fence type
     HEADER2 = 'header2', _('header2')                                   # define new chainlink, wrap in <section> and create <h2>
     PARAGRAPH = 'paragraph', _('paragraph')                             # wrap content in <p>
     CODE = 'code', _('code')                                            # wrap content in <code>

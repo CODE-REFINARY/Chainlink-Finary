@@ -11,17 +11,13 @@
 	document.addEventListener("DOMContentLoaded", function() {
 
 		// Globals
-		window.target = window.location.href;	// This is where AJAX requests should be sent
-		window.ctrl = false;			// This flag inidicates whether the "ctrl" key is being held down
+		window.ctrl = false;			// This flag indicates whether the "ctrl" key is being held down
 
-		var chainlinkDisplay = document.getElementById("chainlink-display");
-
-		if (chainlinkDisplay.querySelector(":scope > section") == null) {
+        // Handle empty document case where only chainlink add button should be present
+		if (document.getElementById("chainlink-display").querySelector(":scope > section") == null) {
 			window.in = "doc-empty";	// signal to key parser to disable all hotkeys except "c"
 			addButtonsDocEmptyView();
-		}
-
-		else {
+		} else {
 			window.in = "doc";
 			addButtonsDocView();
 		}
@@ -30,13 +26,12 @@
 		window.addEventListener("keyup", parseKeyUp);
 		window.addEventListener("keydown", parseKeyDown);
 
-		
+		// Add CRUD buttons for page content
 		instFenceEditButtons();
 		instChainlinkEditButtons();
 		instContentEditButtons();
 
-		deleteFenceEditButtons();
-
+		//deleteFenceEditButtons();
 		//deleteChainlinkEditButtons();
 		//deleteContentEditButtons();
 
@@ -240,7 +235,7 @@
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<span class="inner-content br"></span>
 		</div>
-			{% elif content.tag == 'delimiter' %}
+        {% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}
 {% endfor %}
