@@ -21,6 +21,32 @@ export function addElement(type, title, url, order) {
         }
 }
 
+export function createFence() {
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "generate.html", true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+    xhr.send(JSON.stringify({ "title": "fence", "is_public": false }));
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            const url = xhr.getResponseHeader('url');
+            var url_substring = url.substring(0, 10);
+            let nxhr = new XMLHttpRequest();
+            nxhr.open("PUT", "doc" + url + ".html", true);
+            nxhr.setRequestHeader('X-CSRFToken', csrftoken);
+            nxhr.setRequestHeader('type', 'doc');
+            nxhr.setRequestHeader('title', "fence" + url_substring);
+            nxhr.setRequestHeader('target', 'null');
+            nxhr.send();
+            nxhr.onreadystatechange = function() {
+                window.location.replace("doc" + url + ".html");
+            }
+        }
+    }
+}
+
 // Create form elements and invoke addElement
 export function makeForm(type) {
         window.removeEventListener("keyup", parseKeyUp);
@@ -200,7 +226,7 @@ export function addButtonsDocView() {
 
         button1.innerHTML = "&#60;p&#62; paragraph";
         button2.innerHTML = "&#60;h&#62; header";
-        button3.innerHTML = "&#60;n&#62 New Chainlink";
+        button3.innerHTML = "&#60;n&#62 chainlink";
         button4.innerHTML = "&#60;c&#62 code";
         button5.innerHTML = "&#60;b&#62; linebreak";
 
@@ -229,7 +255,7 @@ export function addButtonsDocEmptyView() {
         div.id = "add-buttons";
         button3.id = "add-cl-btn";
         button3.className = "add-buttons";
-        button3.innerHTML = "&#60;n&#62 New Chainlink";
+        button3.innerHTML = "&#60;n&#62 chainlink";
         div.appendChild(button3);
         button3.addEventListener("click", function() { makeForm('header2'); });
         mainElement.appendChild(div);
@@ -410,23 +436,23 @@ export function deleteDoc() {
 
 export function deleteChainlink(target) {
 
-        var confirm = window.confirm("Delete chainlink?");
-        if( confirm == false ) {
-                return
-        }
+    var confirm = window.confirm("Delete chainlink?");
+    if( confirm == false ) {
+            return
+    }
 
  	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        let xhr = new XMLHttpRequest();
-        xhr.open("DELETE", window.location.href, true);
-        xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.setRequestHeader('type', 'chainlink');
-        xhr.setRequestHeader('target', target);
-        xhr.send();
-        xhr.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                        window.location.reload();
-                }
+    let xhr = new XMLHttpRequest();
+    xhr.open("DELETE", window.location.href, true);
+    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+    xhr.setRequestHeader('type', 'chainlink');
+    xhr.setRequestHeader('target', target);
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+                window.location.replace("index.html");
         }
+    }
 }
 
 export function deleteContent(target) {
@@ -481,7 +507,7 @@ export function renameDoc() {
                 xhr.setRequestHeader('type', 'doc');
                 xhr.setRequestHeader('title', input.value);
                 xhr.setRequestHeader('target', 'null');
-                xhr.send(); 
+                xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                                 window.location.reload();

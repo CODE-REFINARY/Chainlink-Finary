@@ -4,6 +4,10 @@
 
 :root {
 	--x-large-for-courier: 1.6rem;
+	--main-body-inner-content-padding-horizontal: 1rem;
+	--main-body-inner-content-padding-vertical: 1rem;
+	--chainlink-display-inner-content-padding-horizontal: 5%;
+	--chainlink-display-inner-content-padding-vertical: 3px;
 }
 
 /* /////////////// Media Queries /////////////// */
@@ -137,7 +141,6 @@ main {
 p {
 	color: #f5f5f5;
 	background-color: #2C394B;
-	margin: 2rem;
 }
 
 a:active {
@@ -162,8 +165,6 @@ main h1 {
 	color: whitesmoke;
 	font-size: xx-large;
 	padding: 10px;
-	-margin: 2rem 0 2rem 0;
-	margin: 1rem 1% 1rem 1%;
 }
 
 h2 {
@@ -188,10 +189,6 @@ h1, section > p, section > h2, section > ul, section > code, .text-section > p, 
     border-width: 5px;
     border-color: transparent;
     border-radius: 12px;
-}
-
-section > div {
-    -margin: 2rem;	
 }
 
 .text-section {
@@ -272,10 +269,36 @@ div.combination {
 	margin: 0 2rem 0 2rem;
 }
 
+#doc-title-wrapper {
+    padding-top: var(--main-body-inner-content-padding-vertical);
+	padding-bottom: var(--main-body-inner-content-padding-vertical);
+	padding-left: var(--main-body-inner-content-padding-horizontal);
+	padding-right: var(--main-body-inner-content-padding-horizontal);
+}
+
 #tabbed-buttons {
+	padding-top: calc(var(--main-body-inner-content-padding-vertical) * 2);
+	padding-bottom: var(--main-body-inner-content-padding-vertical);
+	padding-left: var(--main-body-inner-content-padding-horizontal);
+	padding-right: var(--main-body-inner-content-padding-horizontal);
+	border-radius: 12px;
 	background-image: linear-gradient(180deg, #b4000000 0%, #2c2e43 0%);
     font-size: 0;
 	text-align: right;
+}
+
+section form {
+    padding-top: var(--main-body-inner-content-padding-vertical);
+	padding-bottom: var(--main-body-inner-content-padding-vertical);
+	padding-left: var(--main-body-inner-content-padding-horizontal);
+	padding-right: var(--main-body-inner-content-padding-horizontal);
+}
+
+.content-wrapper {
+    margin-left: var(--chainlink-display-inner-content-padding-horizontal);
+    margin-right: var(--chainlink-display-inner-content-padding-horizontal);
+    margin-top: var(--chainlink-display-inner-content-padding-vertical);
+    margin-bottom: var(--chainlink-display-inner-content-padding-vertical);
 }
 
 .tabbed-buttons:hover {
@@ -315,53 +338,49 @@ div.combination {
 	color: #2c2e43;
 }
 
-section h3 {
+
+/* content elements */
+.content-wrapper h3 {
 	display: block;
 	font-family: 'Courier';
 	font-weight: 300;
 	font-size: var(--x-large-for-courier);
 	color: #959595;
-	margin: 4px 2rem 4px 2rem;
-}
-
-section .h3 {
+	border-radius: 12px;
 	display: inline-block;
 	background-color: #000000;
 	border-radius: 0.4em;
 }
 
-section code {
+.content-wrapper code {
 	font-family: monospace;
 	display: block;
 	overflow-wrap: break-word;
 	color: #8ecd95;
 	background-color: #0d0208;
-	margin: 4px 2rem 4px 2rem;
 	border-width: 5px !important;
 	border-radius: 3px !important;
 	line-height: 1.2em;
+	border-radius: 12px;
 }
 
-section .br {
+.content-wrapper .br {
 	display: block;
-	padding: 15px;
+	padding-top: calc(var(--chainlink-display-inner-content-padding-vertical) * 5);
 }
 
-section p {
+.content-wrapper p {
 	display: block;
 	font-family: Audiowide;
 	background-color: #2C394B;
-	margin: 4px 2rem 4px 2rem;
 	color: whitesmoke;
 	line-height: 160%;
 	letter-spacing: .00em;
-	-padding-bottom: 15px;
 	font-size: 12px;
+	border-radius: 12px;
 }
 
-section form {
-	margin: 4px 2rem 4px 2rem;	
-}
+
 /* /////////////// Specific IDs /////////////// */
 
 #add-page-btn {

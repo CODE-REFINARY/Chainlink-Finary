@@ -1,11 +1,11 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/generic.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	document.addEventListener("DOMContentLoaded", function() {
 		// Globals
@@ -15,6 +15,7 @@
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
 		window.addEventListener("keydown", parseKeyDown);
+		document.getElementById("add-page-btn").addEventListener("click", createFence);
 
 		// Add CRUD buttons for page content
 		instChainlinkEditButtons();
@@ -27,7 +28,7 @@
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
+	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
 <div id="config-display">
 	<ul id="keybindings-legend">
@@ -47,7 +48,6 @@
 	</ul>
 </div>
 <div id="chainlink-display">
-	<!--<input type="hidden" name="chainlink-id" id="{{ url }}">-->
 	<section class="chainlink">
 		<div id="{{ target.url }}" class="chainlink-wrapper">
 			<h2>{{ target.title|linebreaksbr }}</h2>
