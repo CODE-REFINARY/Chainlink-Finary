@@ -174,14 +174,20 @@ h2 {
 	color: whitesmoke;
 }
 
-h6 {
+/* Construction Banner */
+h6.under-construction {
     font-family: 'Courier New', Courier, monospace;
     font-size: large;
 	font-weight: 600;
     display: block;
     text-align: center;
-	padding: 3em 5% 3em 5%;
+	padding: 3em 5% 1rem 5%;
 	color: rgb(208, 68, 35)
+}
+img.under-construction {
+    display: block;
+    margin: 0 auto;
+    padding: 0 5% 3em 5%;
 }
 
 h1, section > p, section > h2, section > ul, section > code, .text-section > p, .media-section, #upper-navigation > ul {
@@ -269,11 +275,22 @@ div.combination {
 	margin: 0 2rem 0 2rem;
 }
 
+/* Fence Header */
 #doc-title-wrapper {
+    -text-align: center;
     padding-top: var(--main-body-inner-content-padding-vertical);
 	padding-bottom: var(--main-body-inner-content-padding-vertical);
 	padding-left: var(--main-body-inner-content-padding-horizontal);
 	padding-right: var(--main-body-inner-content-padding-horizontal);
+}
+#doc-title {
+    -display: block;
+}
+.fence-context-buttons {
+    text-align: right;
+}
+#doc-action-edit-title, #doc-action-delete-title {
+
 }
 
 #tabbed-buttons {
@@ -287,18 +304,29 @@ div.combination {
 	text-align: right;
 }
 
+/* chainlink display elements */
 section form {
     padding-top: var(--main-body-inner-content-padding-vertical);
 	padding-bottom: var(--main-body-inner-content-padding-vertical);
 	padding-left: var(--main-body-inner-content-padding-horizontal);
 	padding-right: var(--main-body-inner-content-padding-horizontal);
 }
-
 .content-wrapper {
     margin-left: var(--chainlink-display-inner-content-padding-horizontal);
     margin-right: var(--chainlink-display-inner-content-padding-horizontal);
     margin-top: var(--chainlink-display-inner-content-padding-vertical);
     margin-bottom: var(--chainlink-display-inner-content-padding-vertical);
+}
+.context-buttons-wrapper {
+    text-align: right;
+}
+.chainlink-buttons-wrapper {
+    text-align: right;
+}
+.chainlink-buttons-wrapper button {
+}
+.chainlink-wrapper h2, .chainlink-wrapper a {
+    display: inline;
 }
 
 .tabbed-buttons:hover {

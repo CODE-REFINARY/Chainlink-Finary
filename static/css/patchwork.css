@@ -140,9 +140,6 @@
     margin-bottom: 0px;
 }
 
-.chainlink-wrapper * {
-    display: inline;
-}
 .chainlink-wrapper {
     margin: 1rem 0 1rem 0;
     background-color: #334756;

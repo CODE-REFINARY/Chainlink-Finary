@@ -330,10 +330,13 @@ export function instFenceEditButtons() {
         let fenceDeleteButton = document.createElement("button");
         fenceEditButton.innerHTML = "edit";
         fenceDeleteButton.innerHTML = "delete";
+        var fenceButtonsWrapper = document.createElement("div");
+        fenceButtonsWrapper.className = "fence-context-buttons";
         fenceEditButton.id = "doc-action-edit-title";
         fenceDeleteButton.id = "doc-action-delete-title";
-        wrapper.appendChild(fenceEditButton);
-        wrapper.appendChild(fenceDeleteButton);
+        fenceButtonsWrapper.appendChild(fenceEditButton);
+        fenceButtonsWrapper.appendChild(fenceDeleteButton);
+        wrapper.appendChild(fenceButtonsWrapper);
         fenceEditButtonEventHandler = function() { renameDoc(); };
         fenceDeleteButtonEventHandler = function() { deleteDoc(); };
         fenceEditButton.addEventListener("click", fenceEditButtonEventHandler);
@@ -345,16 +348,19 @@ export function instChainlinkEditButtons() {
         const chainlinks = document.getElementsByClassName("chainlink");
         const chainlinkHeaders = document.getElementsByClassName("chainlink-wrapper");
         for (let i = 0; i < numChainlinks; i++) {
+                let buttons_wrapper = document.createElement("div");
                 let chainlinkEditButton = document.createElement("button");
                 let chainlinkDeleteButton = document.createElement("button");
                 chainlinkEditButton.innerHTML = "edit";
                 chainlinkDeleteButton.innerHTML = "delete";
                 chainlinkEditButton.className = "cl-edit-btn";
                 chainlinkDeleteButton.className = "cl-del-btn";
+                buttons_wrapper.className = "chainlink-buttons-wrapper";
                 chainlinkEditButton.setAttribute("target", chainlinkHeaders[i].id);
                 chainlinkDeleteButton.setAttribute("target", chainlinkHeaders[i].id);
-                chainlinkHeaders[i].appendChild(chainlinkEditButton);
-                chainlinkHeaders[i].appendChild(chainlinkDeleteButton);
+                buttons_wrapper.appendChild(chainlinkEditButton);
+                buttons_wrapper.appendChild(chainlinkDeleteButton);
+                chainlinkHeaders[i].appendChild(buttons_wrapper);
                 chainlinkEditButtonsEventHandlers.push(function() { editChainlink(chainlinkEditButton.getAttribute('target')) });
                 chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(chainlinkDeleteButton.getAttribute('target')) });
                 chainlinkEditButton.addEventListener("click", chainlinkEditButtonsEventHandlers[chainlinkEditButtonsEventHandlers.length - 1]);
@@ -366,14 +372,17 @@ export function instContentEditButtons () {
         const numContents = document.getElementsByClassName("content-wrapper").length;
         const contents = document.getElementsByClassName("content-wrapper");
         for (let i = 0; i < numContents; i++) {
+                let buttons_wrapper = document.createElement("div");
                 let contentEditButton = document.createElement("button");
                 let contentDeleteButton = document.createElement("button");
                 contentEditButton.innerHTML = "edit";
                 contentDeleteButton.innerHTML = "delete";
                 contentEditButton.className = "cont-edit-btn";
                 contentDeleteButton.className = "cont-del-btn";
-                contents[i].appendChild(contentEditButton);
-                contents[i].appendChild(contentDeleteButton);
+                buttons_wrapper.className = "context-buttons-wrapper";
+                buttons_wrapper.appendChild(contentEditButton);
+                buttons_wrapper.appendChild(contentDeleteButton);
+                contents[i].appendChild(buttons_wrapper);
                 contentEditButtonsEventHandlers.push(function() { editContent(contentEditButton.closest('.content-wrapper').id) });
                 contentDeleteButtonsEventHandlers.push(function() { deleteContent(contentDeleteButton.closest('.content-wrapper').id) });
                 contentEditButton.addEventListener("click", contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]);
@@ -392,11 +401,11 @@ export function deleteFenceEditButtons () {
 
 export function deleteChainlinkEditButtons () {
         const numChainlinks = document.getElementsByClassName("chainlink").length;
+        var chainlinkButtonsWrapper = document.getElementsByClassName("chainlink-buttons-wrapper");
         var editButtons = Array.from(document.getElementsByClassName("cl-edit-btn"));
         var deleteButtons = Array.from(document.getElementsByClassName("cl-del-btn"));
         for (let i = 0; i < numChainlinks; i++) {
-                editButtons[i].remove();
-                deleteButtons[i].remove();
+                chainlinkButtonsWrapper.remove();
                 editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
                 deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
         }
@@ -405,10 +414,12 @@ export function deleteChainlinkEditButtons () {
 export function deleteContentEditButtons() {
         const numContents = document.getElementsByClassName("content-wrapper").length;
         var editButtons = Array.from(document.getElementsByClassName("cont-edit-btn"));
+        var contextButtonsWrapper = document.getElementsByClassName("context-buttons-wrapper");
         var deleteButtons = Array.from(document.getElementsByClassName("cont-del-btn"));
         for (let i = 0; i < numContents; i++) {
-                editButtons[i].remove();
-                deleteButtons[i].remove();
+                //editButtons[i].remove();
+                //deleteButtons[i].remove();
+                contextButtonsWrapper.remove();
                 editButtons[i].removeEventListener("click", contentEditButtonsEventHandlers[i]);
                 deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
         }
