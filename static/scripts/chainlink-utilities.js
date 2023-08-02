@@ -325,15 +325,19 @@ export function deleteButtons() {
 }
 
 export function instFenceEditButtons() {
-        const wrapper = document.getElementById('doc-title-wrapper');
-        let fenceEditButton = document.createElement("button");
-        let fenceDeleteButton = document.createElement("button");
+        var wrapper = document.getElementById('doc-title-wrapper');
+        var fenceEditButton = document.createElement("button");
+        var fenceDeleteButton = document.createElement("button");
+        var spanMessage = document.createElement("i");
+        var fenceButtonsWrapper = document.createElement("div");
         fenceEditButton.innerHTML = "edit";
         fenceDeleteButton.innerHTML = "delete";
-        var fenceButtonsWrapper = document.createElement("div");
-        fenceButtonsWrapper.className = "fence-context-buttons";
+        spanMessage.innerHTML = "context action &#60; - - - - - - ";
+        fenceButtonsWrapper.id = "fence-context-buttons";
         fenceEditButton.id = "doc-action-edit-title";
         fenceDeleteButton.id = "doc-action-delete-title";
+        spanMessage.className = "context-span-message";
+        fenceButtonsWrapper.appendChild(spanMessage);
         fenceButtonsWrapper.appendChild(fenceEditButton);
         fenceButtonsWrapper.appendChild(fenceDeleteButton);
         wrapper.appendChild(fenceButtonsWrapper);
@@ -344,13 +348,16 @@ export function instFenceEditButtons() {
 }
 
 export function instChainlinkEditButtons() {
-        const numChainlinks = document.getElementsByClassName("chainlink").length;
-        const chainlinks = document.getElementsByClassName("chainlink");
-        const chainlinkHeaders = document.getElementsByClassName("chainlink-wrapper");
+        var numChainlinks = document.getElementsByClassName("chainlink").length;
+        var chainlinks = document.getElementsByClassName("chainlink");
+        var chainlinkHeaders = document.getElementsByClassName("chainlink-wrapper");
         for (let i = 0; i < numChainlinks; i++) {
                 let buttons_wrapper = document.createElement("div");
                 let chainlinkEditButton = document.createElement("button");
                 let chainlinkDeleteButton = document.createElement("button");
+                let spanMessage = document.createElement("i");
+                spanMessage.innerHTML = "context action &#60; - - - - - - ";
+                spanMessage.className = "context-span-message";
                 chainlinkEditButton.innerHTML = "edit";
                 chainlinkDeleteButton.innerHTML = "delete";
                 chainlinkEditButton.className = "cl-edit-btn";
@@ -358,6 +365,7 @@ export function instChainlinkEditButtons() {
                 buttons_wrapper.className = "chainlink-buttons-wrapper";
                 chainlinkEditButton.setAttribute("target", chainlinkHeaders[i].id);
                 chainlinkDeleteButton.setAttribute("target", chainlinkHeaders[i].id);
+                buttons_wrapper.appendChild(spanMessage);
                 buttons_wrapper.appendChild(chainlinkEditButton);
                 buttons_wrapper.appendChild(chainlinkDeleteButton);
                 chainlinkHeaders[i].appendChild(buttons_wrapper);
@@ -372,14 +380,18 @@ export function instContentEditButtons () {
         const numContents = document.getElementsByClassName("content-wrapper").length;
         const contents = document.getElementsByClassName("content-wrapper");
         for (let i = 0; i < numContents; i++) {
+                let spanMessage = document.createElement("i");
                 let buttons_wrapper = document.createElement("div");
                 let contentEditButton = document.createElement("button");
                 let contentDeleteButton = document.createElement("button");
+                spanMessage.innerHTML = "context action &#60; - - - - - - ";
+                spanMessage.className = "context-span-message";
                 contentEditButton.innerHTML = "edit";
                 contentDeleteButton.innerHTML = "delete";
                 contentEditButton.className = "cont-edit-btn";
                 contentDeleteButton.className = "cont-del-btn";
                 buttons_wrapper.className = "context-buttons-wrapper";
+                buttons_wrapper.appendChild(spanMessage);
                 buttons_wrapper.appendChild(contentEditButton);
                 buttons_wrapper.appendChild(contentDeleteButton);
                 contents[i].appendChild(buttons_wrapper);

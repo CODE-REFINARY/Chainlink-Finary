@@ -88,7 +88,7 @@
     color: whitesmoke;
     font-family: monospace;
     margin-top: 3px;
-    margin-bototm: 3px;
+    margin-bottom: 3px;
 }
 #chainlink-manifest > li > a {
     text-decoration: none;
@@ -110,7 +110,13 @@
 
 /* ascii art decoration section */
 #decoration-display {
-    display: block;
+    -max-width: 100px;
+    margin-left: 10%;
+    margin-right: 10%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
     text-align: center;
     padding-top: var(--main-body-inner-content-padding-vertical);
 	padding-bottom: var(--main-body-inner-content-padding-vertical);
@@ -141,9 +147,7 @@
 }
 
 .chainlink-wrapper {
-    margin: 1rem 0 1rem 0;
-    background-color: #334756;
-    padding: 10px;
+
 }
 
 /* popup form creation */

@@ -50,8 +50,10 @@
 <div id="chainlink-display">
 	<section class="chainlink">
 		<div id="{{ target.url }}" class="chainlink-wrapper">
-			<h2>{{ target.title|linebreaksbr }}</h2>
-			<span>>>>{{ target.url|slice:"0:9" }}</span>
+			<h2>
+				{{ target.title|linebreaksbr }}
+				<a class="inline-url header-url" href="chainlink{{ target.url }}.html">>>>{{ target.url|slice:"0:9" }}</a>
+			</h2>
 		</div>
 	{% for content in contents %}
 		{% if content.tag == 'paragraph' %}
