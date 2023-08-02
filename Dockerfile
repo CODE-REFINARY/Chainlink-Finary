@@ -1,6 +1,3 @@
-#Initialize the working directory
-RUN mkdir /code
-
 # Static
 FROM node:14 as static-stage
 WORKDIR /code
@@ -22,6 +19,3 @@ ENV PYTHONUNBUFFERED=1
 # Install dependencies
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
-
-# Copy Source Files
-COPY ./Chainlink /code/
