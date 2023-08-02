@@ -551,7 +551,7 @@ export function editChainlink(target) {
         const header = chainlink.getElementsByTagName("h2")[0];
         const form = document.createElement('form');
         const input = document.createElement('input');
-        const title = header.innerHTML;
+        const title = header.querySelector(".chainlink-inner-text").textContent;
 
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
@@ -566,7 +566,7 @@ export function editChainlink(target) {
         chainlink.prepend(form);
         input.focus({ focusVisible: true });
 
-        deleteButtons();         
+        deleteButtons();
         form.addEventListener("submit", function(event) {
                 event.preventDefault();
                 //addElement(type, input.value, url, order);
