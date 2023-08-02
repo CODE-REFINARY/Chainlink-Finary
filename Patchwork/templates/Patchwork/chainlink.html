@@ -1,84 +1,83 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/generic.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape, addButtonsChainlinkView } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
 
-	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
-		/*// Prompt Buttons
-		let newParagraph = document.getElementById("add-p-btn");
-		let newHeader = document.getElementById("add-h3-btn");
-		let newCode = document.getElementById("add-code-btn");
-		let newBreak = document.getElementById("add-br-btn");
-
-		// Register event listeners for content creation elements
-		newHeader.addEventListener("click", function() { makeForm('header3'); });
-		newParagraph.addEventListener("click", function() { makeForm('paragraph'); });
-		newCode.addEventListener("click", function() { makeForm('code'); });
-		newBreak.addEventListener("click", function() { makeForm('linebreak'); });
-		
 		// Globals
-		window.in = "chainlink";
-		window.target = "generic.html";
-
-		// Add the event listeners above for keystrokes
-		window.addEventListener("keyup", parseKeyUp);
-		window.addEventListener("keydown", parseKeyDown);*/
-
-		// Globals
-		window.target = "generic.html";
-		window.in = "chainlink";
-
-		addButtonsChainlinkView();
+		window.ctrl = false;			// This flag indicates whether the "ctrl" key is being held down
+		window.in = "chainlink";		// This setting is used for parsing keystrokes
 
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
 		window.addEventListener("keydown", parseKeyDown);
+		document.getElementById("add-page-btn").addEventListener("click", createFence);
 
+		// Add CRUD buttons for page content
+		instChainlinkEditButtons();
+		instContentEditButtons();
+
+		addButtonsChainlinkView();
 	});
 </script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
+	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
-<ul id="keybindings-legend">
-	<h2>Keybindings Legend</h2>
-	<li>j - scroll down</li>
-	<li>k - scroll up</li>
-	<li>p - create text element</li>
-	<li>h - create header element</li>
-	<li>c - create code block</li>
-	<li>b - insert linebreak</li>
-</ul>
-<h1>{{ target.title|linebreaksbr }}</h1>
+<div id="config-display">
+	<ul id="keybindings-legend">
+		<h2>Keybindings Legend</h2>
+		<li>j - scroll down</li>
+		<li>k - scroll up</li>
+		<li>p - create text element</li>
+		<li>h - create header element</li>
+		<li>c - create code block</li>
+		<li>b - insert linebreak</li>
+	</ul>
+	<ul id="options-settings">
+	<h2>Options & Settings</h2>
+		<li><button id="doc-action-copy-link">Copy link to this doc</button></li>
+		<li><button id="doc-action-change-theme">Change theme</button></li>
+		<li><button id="doc-action-find-references">Find references</button></li>
+	</ul>
+</div>
 <div id="chainlink-display">
-<section>
-	<input type="hidden" name="chainlink-id" id="{{ url }}">
+	<section class="chainlink">
+		<div id="{{ target.url }}" class="chainlink-wrapper">
+			<h2>
+				{{ target.title|linebreaksbr }}
+				<a class="inline-url header-url" href="chainlink{{ target.url }}.html">>>>{{ target.url|slice:"0:9" }}</a>
+			</h2>
+		</div>
 	{% for content in contents %}
 		{% if content.tag == 'paragraph' %}
-		<p>{{ content.content }}</p>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<p class="inner-content">{{ content.content }}</p>
+
+		</div>
 		{% elif content.tag == 'code' %}
-		<code>{{ content.content }}</code>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<code class="inner-content">{{ content.content }}</code>
+
+		</div>
 		{% elif content.tag == 'header3' %}
-		<h3><div class="h3">{{ content.content }}</div></h3>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<h3 class="inner-content">
+				{{ content.content }}</h3>
+		</div>
 		{% elif content.tag == 'linebreak' %}
-		<span class="br"></span>
-		{% elif content.tag == 'delimiter' %}
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<span class="inner-content br"></span>
+		</div>
+        {% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}
 	{% endfor %}
-</section>
 </div>
-<!--<div id="add-buttons">
-	<button type="button" id="add-p-btn" class="add-buttons">&#60;p&#62; paragraph</button>
-	<button type="button" id="add-h3-btn" class="add-buttons">&#60;h&#62; header</button>
-	<button type="button" id="add-code-btn" class="add-buttons">&#60;c&#62 code</button>
-	<button type="button" id="add-br-btn" class="add-buttons">&#60;b&#62; linebreak</button>
-</div>-->
 {% endblock %}

@@ -1,13 +1,16 @@
+var fenceEditButtonEventHandler;
+var fenceDeleteButtonEventHandler;
+var chainlinkEditButtonsEventHandlers = [];
+var chainlinkDeleteButtonsEventHandlers = [];
+var contentEditButtonsEventHandlers = [];
+var contentDeleteButtonsEventHandlers = [];
+
 // add items to database
 export function addElement(type, title, url, order) {
-        var is_public;
-        var title;
-        if (type == 'header2') {
-                is_public = "True";
-        }
+    var is_public = "True";
 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", window.target, true);
+        xhr.open("POST", window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
@@ -18,11 +21,40 @@ export function addElement(type, title, url, order) {
         }
 }
 
+export function createFence() {
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "generate.html", true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+    xhr.send(JSON.stringify({ "title": "fence", "is_public": false }));
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            const url = xhr.getResponseHeader('url');
+            var url_substring = url.substring(0, 10);
+            let nxhr = new XMLHttpRequest();
+            nxhr.open("PUT", "doc" + url + ".html", true);
+            nxhr.setRequestHeader('X-CSRFToken', csrftoken);
+            nxhr.setRequestHeader('type', 'doc');
+            nxhr.setRequestHeader('title', "fence" + url_substring);
+            nxhr.setRequestHeader('target', 'null');
+            nxhr.send();
+            nxhr.onreadystatechange = function() {
+                window.location.replace("doc" + url + ".html");
+            }
+        }
+    }
+}
+
 // Create form elements and invoke addElement
 export function makeForm(type) {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
-        window.addEventListener("keydown", escape);
+
+        var _listener = function (e) { escape(e, _listener, "", "") };
+        window.addEventListener("keydown", _listener);
+
         const list = document.getElementById('chainlink-display');
         const section = document.createElement('section');
         const chainlink = document.getElementById("chainlink-display").lastElementChild;
@@ -67,7 +99,6 @@ export function makeForm(type) {
         }
 
         deleteButtons();        // remove buttons temporarily while user input prompt is active 
-
         document.getElementById('input').focus({ focusVisible: true });
         form.addEventListener("submit", function(event) {
                 event.preventDefault();
@@ -81,48 +112,87 @@ export function makeForm(type) {
 // Keypress parsing function for creating chainlinks and form elements
 export function parseKeyUp(e) {
         var keyCode = e.which;
-        var loc = e.currentTarget.in;
-        if (keyCode == 80 && loc != "doc-empty") {
-                makeForm('paragraph');
-        } else if (keyCode == 67 && loc != "doc-empty") {
-                makeForm('code');
-        } else if (keyCode == 78 && (loc == "doc" || loc == "doc-empty")) {      // disable chainlink creation for chainlink view (only enabled in doc view)
-                makeForm('header2');
-        } else if (keyCode == 72 && loc != "doc-empty") {
-                makeForm('header3');
-        } else if (keyCode == 66 && loc != "doc-empty") {
-                makeForm('linebreak');
+        //alert(keyCode);
+        var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
+        if (keyCode == 17) {            // ctrl
+                window.ctrl = false;    // flag that the ctrl key has been released
+        } else if (window.ctrl) {       // exit if the ctrl key is currently being held down
+                return;
         }
 }
 
 // Keypress parsing function for moving the page up and down
 export function parseKeyDown(e) {
+        var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
         var keyCode = e.which;
+        if (keyCode == 17) {     // ctrl
+                window.ctrl = true;     // flag that the ctrl key is currently being pressed
+        } else if (window.ctrl) {       // exit if the ctrl key is currently being pressed
+                return;
+        }
+        //alert(keyCode);
         if (keyCode == 75) {
             window.scrollBy(0, -70);
         } else if (keyCode == 74) {
             window.scrollBy(0, 70);
+        } 
+        else if (keyCode == 80 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('paragraph');
+        } else if (keyCode == 67 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('code');
+        } else if (keyCode == 78 && (loc == "doc" || loc == "doc-empty")) {      // disable chainlink creation for chainlink view (only enabled in doc view)
+                e.preventDefault();
+                makeForm('header2');
+        } else if (keyCode == 72 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('header3');
+        } else if (keyCode == 66 && loc != "doc-empty") {
+                e.preventDefault();
+                makeForm('linebreak');
         }
 }
 
-// Keypress parsing function for capturing the Escape key to reload the page
-export function escape(e) {
+// Callback function used for when the user presses the Esc key while an input dialogue is open
+function escape(e, ref, fallback, element) {
         var keyCode = e.which;
         if (keyCode == 27) {
+                var formParent = document.getElementById('input').parentNode.parentNode;
                 var form = document.getElementById('input').parentNode;
-                const listForm = document.getElementById('chainlink-display').querySelector("form");
-                const chainlinkForm = document.getElementById("chainlink-display").lastElementChild.querySelector("form");
+                var input = document.getElementById('input');
+                const chainlinkCreateForm = (formParent.matches('#chainlink-display'));
+                const chainlinkEditForm = (formParent.matches('.chainlink-wrapper'));
+                const contentCreateForm = (formParent.matches('.chainlink'));
+                const contentEditForm = (formParent.matches('.content-wrapper'));
+                const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
 
-                if (listForm) {
-                        listForm.remove();
-                        window.addEventListener("keydown", parseKeyDown);
-                        window.addEventListener("keyup", parseKeyUp);
-                } else if (chainlinkForm) {
-                        chainlinkForm.remove();
-                        window.addEventListener("keydown", parseKeyDown);
-                        window.addEventListener("keyup", parseKeyUp);
+                if (fenceEditForm) {
+                        form.remove();
+                        var h1 = document.createElement("h1");
+                        h1.id = "doc-title";
+                        h1.innerHTML = fallback;
+                        formParent.prepend(h1);
+                } else if (chainlinkEditForm) {
+                        form.remove();
+                        var h2 = document.createElement("h2");
+                        h2.innerHTML = fallback;
+                        formParent.prepend(h2);
+                } else if (chainlinkCreateForm) {
+                        form.remove();
+                } else if (contentCreateForm) {
+                        form.remove();
+                } else if (contentEditForm) {
+                        form.remove();
+                        var el = document.createElement(element);
+                        el.className = "inner-content";
+                        el.innerHTML = fallback;
+                        formParent.prepend(el);
                 }
 
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", ref);
                 addButtons();
         }
 }
@@ -156,7 +226,7 @@ export function addButtonsDocView() {
 
         button1.innerHTML = "&#60;p&#62; paragraph";
         button2.innerHTML = "&#60;h&#62; header";
-        button3.innerHTML = "&#60;n&#62 New Chainlink";
+        button3.innerHTML = "&#60;n&#62 chainlink";
         button4.innerHTML = "&#60;c&#62 code";
         button5.innerHTML = "&#60;b&#62; linebreak";
 
@@ -185,7 +255,7 @@ export function addButtonsDocEmptyView() {
         div.id = "add-buttons";
         button3.id = "add-cl-btn";
         button3.className = "add-buttons";
-        button3.innerHTML = "&#60;n&#62 New Chainlink";
+        button3.innerHTML = "&#60;n&#62 chainlink";
         div.appendChild(button3);
         button3.addEventListener("click", function() { makeForm('header2'); });
         mainElement.appendChild(div);
@@ -254,21 +324,317 @@ export function deleteButtons() {
         document.getElementById('add-buttons').remove();
 }
 
+export function instFenceEditButtons() {
+        var wrapper = document.getElementById('doc-title-wrapper');
+        var fenceEditButton = document.createElement("button");
+        var fenceDeleteButton = document.createElement("button");
+        var spanMessage = document.createElement("i");
+        var fenceButtonsWrapper = document.createElement("div");
+        fenceEditButton.innerHTML = "edit";
+        fenceDeleteButton.innerHTML = "delete";
+        spanMessage.innerHTML = "context action &#60; - - - - - - ";
+        fenceButtonsWrapper.id = "fence-context-buttons";
+        fenceEditButton.id = "doc-action-edit-title";
+        fenceDeleteButton.id = "doc-action-delete-title";
+        spanMessage.className = "context-span-message";
+        fenceButtonsWrapper.appendChild(spanMessage);
+        fenceButtonsWrapper.appendChild(fenceEditButton);
+        fenceButtonsWrapper.appendChild(fenceDeleteButton);
+        wrapper.appendChild(fenceButtonsWrapper);
+        fenceEditButtonEventHandler = function() { renameDoc(); };
+        fenceDeleteButtonEventHandler = function() { deleteDoc(); };
+        fenceEditButton.addEventListener("click", fenceEditButtonEventHandler);
+        fenceDeleteButton.addEventListener("click", fenceDeleteButtonEventHandler);
+}
+
+export function instChainlinkEditButtons() {
+        var numChainlinks = document.getElementsByClassName("chainlink").length;
+        var chainlinks = document.getElementsByClassName("chainlink");
+        var chainlinkHeaders = document.getElementsByClassName("chainlink-wrapper");
+        for (let i = 0; i < numChainlinks; i++) {
+                let buttons_wrapper = document.createElement("div");
+                let chainlinkEditButton = document.createElement("button");
+                let chainlinkDeleteButton = document.createElement("button");
+                let spanMessage = document.createElement("i");
+                spanMessage.innerHTML = "context action &#60; - - - - - - ";
+                spanMessage.className = "context-span-message";
+                chainlinkEditButton.innerHTML = "edit";
+                chainlinkDeleteButton.innerHTML = "delete";
+                chainlinkEditButton.className = "cl-edit-btn";
+                chainlinkDeleteButton.className = "cl-del-btn";
+                buttons_wrapper.className = "chainlink-buttons-wrapper";
+                chainlinkEditButton.setAttribute("target", chainlinkHeaders[i].id);
+                chainlinkDeleteButton.setAttribute("target", chainlinkHeaders[i].id);
+                buttons_wrapper.appendChild(spanMessage);
+                buttons_wrapper.appendChild(chainlinkEditButton);
+                buttons_wrapper.appendChild(chainlinkDeleteButton);
+                chainlinkHeaders[i].appendChild(buttons_wrapper);
+                chainlinkEditButtonsEventHandlers.push(function() { editChainlink(chainlinkEditButton.getAttribute('target')) });
+                chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(chainlinkDeleteButton.getAttribute('target')) });
+                chainlinkEditButton.addEventListener("click", chainlinkEditButtonsEventHandlers[chainlinkEditButtonsEventHandlers.length - 1]);
+                chainlinkDeleteButton.addEventListener("click", chainlinkDeleteButtonsEventHandlers[chainlinkDeleteButtonsEventHandlers.length - 1]);
+        }
+}
+
+export function instContentEditButtons () {
+        const numContents = document.getElementsByClassName("content-wrapper").length;
+        const contents = document.getElementsByClassName("content-wrapper");
+        for (let i = 0; i < numContents; i++) {
+                let spanMessage = document.createElement("i");
+                let buttons_wrapper = document.createElement("div");
+                let contentEditButton = document.createElement("button");
+                let contentDeleteButton = document.createElement("button");
+                spanMessage.innerHTML = "context action &#60; - - - - - - ";
+                spanMessage.className = "context-span-message";
+                contentEditButton.innerHTML = "edit";
+                contentDeleteButton.innerHTML = "delete";
+                contentEditButton.className = "cont-edit-btn";
+                contentDeleteButton.className = "cont-del-btn";
+                buttons_wrapper.className = "context-buttons-wrapper";
+                buttons_wrapper.appendChild(spanMessage);
+                buttons_wrapper.appendChild(contentEditButton);
+                buttons_wrapper.appendChild(contentDeleteButton);
+                contents[i].appendChild(buttons_wrapper);
+                contentEditButtonsEventHandlers.push(function() { editContent(contentEditButton.closest('.content-wrapper').id) });
+                contentDeleteButtonsEventHandlers.push(function() { deleteContent(contentDeleteButton.closest('.content-wrapper').id) });
+                contentEditButton.addEventListener("click", contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]);
+                contentDeleteButton.addEventListener("click", contentDeleteButtonsEventHandlers[contentDeleteButtonsEventHandlers.length - 1]);
+        }
+}
+
+export function deleteFenceEditButtons () {
+        var editButton = document.getElementById("doc-action-edit-title");
+        var deleteButton = document.getElementById("doc-action-delete-title");
+        editButton.remove();
+        deleteButton.remove();
+        editButton.removeEventListener("click", fenceEditButtonEventHandler);
+        deleteButton.removeEventListener("click", fenceDeleteButtonEventHandler);
+}
+
+export function deleteChainlinkEditButtons () {
+        const numChainlinks = document.getElementsByClassName("chainlink").length;
+        var chainlinkButtonsWrapper = document.getElementsByClassName("chainlink-buttons-wrapper");
+        var editButtons = Array.from(document.getElementsByClassName("cl-edit-btn"));
+        var deleteButtons = Array.from(document.getElementsByClassName("cl-del-btn"));
+        for (let i = 0; i < numChainlinks; i++) {
+                chainlinkButtonsWrapper.remove();
+                editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
+                deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
+        }
+}
+
+export function deleteContentEditButtons() {
+        const numContents = document.getElementsByClassName("content-wrapper").length;
+        var editButtons = Array.from(document.getElementsByClassName("cont-edit-btn"));
+        var contextButtonsWrapper = document.getElementsByClassName("context-buttons-wrapper");
+        var deleteButtons = Array.from(document.getElementsByClassName("cont-del-btn"));
+        for (let i = 0; i < numContents; i++) {
+                //editButtons[i].remove();
+                //deleteButtons[i].remove();
+                contextButtonsWrapper.remove();
+                editButtons[i].removeEventListener("click", contentEditButtonsEventHandlers[i]);
+                deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
+        }
+}
+
 export function deleteDoc() {
 
-        var confirm = window.confirm("Delete this document record?");
+        var confirm = window.confirm("Delete document record?");
         if( confirm == false ) {
                 return
         }
 
  	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
-        xhr.open("DELETE", window.target, true);
+        xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('type', 'doc');
         xhr.send();
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                         window.location.href = "index.html";
                 }
         }
+}
+
+export function deleteChainlink(target) {
+
+    var confirm = window.confirm("Delete chainlink?");
+    if( confirm == false ) {
+            return
+    }
+
+ 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let xhr = new XMLHttpRequest();
+    xhr.open("DELETE", window.location.href, true);
+    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+    xhr.setRequestHeader('type', 'chainlink');
+    xhr.setRequestHeader('target', target);
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+                window.location.replace("index.html");
+        }
+    }
+}
+
+export function deleteContent(target) {
+        var confirm = window.confirm("Delete element?");
+        if( confirm == false ) {
+                return
+        }
+
+ 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", window.location.href, true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('type', 'content');
+        xhr.setRequestHeader('target', target);
+        xhr.send(); 
+        xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        window.location.reload();
+                }
+        }
+}
+
+export function renameDoc() {
+
+        const header = document.getElementById('doc-title');
+        const wrapper = document.getElementById('doc-title-wrapper');
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        const title = header.innerHTML;
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+        
+        var _listener = function (e) { escape(e, _listener, title, "h1") };
+        window.addEventListener("keydown", _listener);
+
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'input');
+        input.value = title;
+        form.appendChild(input);
+        wrapper.appendChild(form);
+        input.focus({ focusVisible: true });
+
+        deleteButtons();         
+        form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'doc');
+                xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('target', 'null');
+                xhr.send();
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                addButtons();
+        });
+
+        header.remove();
+}
+
+export function editChainlink(target) {
+
+        const chainlink = document.getElementById(target);
+        const header = chainlink.getElementsByTagName("h2")[0];
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        const title = header.innerHTML;
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+
+        var _listener = function (e) { escape(e, _listener, title, "h2") };
+        window.addEventListener("keydown", _listener);
+
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'input');
+        input.value = title;
+        form.appendChild(input);
+        chainlink.prepend(form);
+        input.focus({ focusVisible: true });
+
+        deleteButtons();         
+        form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'chainlink');
+                xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('target', target);
+                xhr.send(); 
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                addButtons();
+        });
+
+        header.remove();
+}
+
+export function editContent(target) {
+
+        const wrapper = document.getElementById(target);
+        const content = wrapper.getElementsByClassName("inner-content")[0];
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        const title = content.innerHTML;
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+
+        var _listener = function (e) { escape(e, _listener, title, content.tagName) };
+        window.addEventListener("keydown", _listener);
+
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'input');
+        input.value = title;
+        form.appendChild(input);
+        wrapper.prepend(form);
+        input.focus({ focusVisible: true });
+
+        deleteButtons();         
+        form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'content');
+                xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('target', target);
+                xhr.send(); 
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                addButtons();
+        });
+
+        content.remove();
 }

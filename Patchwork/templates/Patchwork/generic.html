@@ -2,25 +2,23 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 <script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape, addButtonsDocView, addButtonsDocEmptyView, deleteDoc } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
 
 	// await full DOM load before adding DB items
 	document.addEventListener("DOMContentLoaded", function() {
 
 		// Globals
-		window.target = window.location.href;
+		window.ctrl = false;			// This flag indicates whether the "ctrl" key is being held down
 
-		var chainlinkDisplay = document.getElementById("chainlink-display");
-
-		if (chainlinkDisplay.querySelector(":scope > section") == null) {
+        // Handle empty document case where only chainlink add button should be present
+		if (document.getElementById("chainlink-display").querySelector(":scope > section") == null) {
 			window.in = "doc-empty";	// signal to key parser to disable all hotkeys except "c"
 			addButtonsDocEmptyView();
-		}
-
-		else {
+		} else {
 			window.in = "doc";
 			addButtonsDocView();
 		}
@@ -28,12 +26,16 @@
 		// Add the event listeners above for keystrokes
 		window.addEventListener("keyup", parseKeyUp);
 		window.addEventListener("keydown", parseKeyDown);
+		document.getElementById("add-page-btn").addEventListener("click", createFence);
 
+		// Add CRUD buttons for page content
+		instFenceEditButtons();
+		instChainlinkEditButtons();
+		instContentEditButtons();
 
-		// Add event listeners for the "Options & Settings" section
-		let deleteDocBtn = document.getElementById('doc-action-delete');
-
-		deleteDocBtn.addEventListener("click", deleteDoc);
+		//deleteFenceEditButtons();
+		//deleteChainlinkEditButtons();
+		//deleteContentEditButtons();
 
 	});
 </script>
@@ -41,9 +43,11 @@
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
+	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
-<h1>{{ document.title|linebreaksbr }}</h1>
+<div id="doc-title-wrapper">
+	<h1 id="doc-title">{{ document.title|linebreaksbr }}</h1>
+</div>
 <div id="config-display">
 <ul id="keybindings-legend">
 	<h2>Keybindings Legend</h2>
@@ -70,36 +74,120 @@
 	<li><button id="doc-action-copy-link">Copy link to this doc</button></li>
 	<li><button id="doc-action-change-theme">Change theme</button></li>
 	<li><button id="doc-action-find-references">Find references</button></li>
-	<li><button id="doc-action-delete">Delete this doc</button></li>
 </ul>
 </div>
-<div id="decoration-display"><pre> 
-      ___           ___           ___           ___           ___           ___           ___                       ___           ___     
-     /\  \         /\  \         /\  \         /\__\         /\  \         /\  \         /\  \          ___        /\  \         /\  \    
-     \:\  \       /::\  \       /::\  \       /::|  |       /::\  \       /::\  \       /::\  \        /\  \      /::\  \        \:\  \   
-      \:\  \     /:/\:\  \     /:/\:\  \     /:|:|  |      /:/\ \  \     /:/\:\  \     /:/\:\  \       \:\  \    /:/\:\  \        \:\  \  
-      /::\  \   /::\~\:\  \   /::\~\:\  \   /:/|:|  |__   _\:\~\ \  \   /:/  \:\  \   /::\~\:\  \      /::\__\  /::\~\:\  \       /::\  \ 
-     /:/\:\__\ /:/\:\ \:\__\ /:/\:\ \:\__\ /:/ |:| /\__\ /\ \:\ \ \__\ /:/__/ \:\__\ /:/\:\ \:\__\  __/:/\/__/ /:/\:\ \:\__\     /:/\:\__\
-    /:/  \/__/ \/_|::\/:/  / \/__\:\/:/  / \/__|:|/:/  / \:\ \:\ \/__/ \:\  \  \/__/ \/_|::\/:/  / /\/:/  /    \/__\:\/:/  /    /:/  \/__/
-   /:/  /         |:|::/  /       \::/  /      |:/:/  /   \:\ \:\__\    \:\  \          |:|::/  /  \::/__/          \::/  /    /:/  /     
-   \/__/          |:|\/__/        /:/  /       |::/  /     \:\/:/  /     \:\  \         |:|\/__/    \:\__\           \/__/     \/__/      
-                  |:|  |         /:/  /        /:/  /       \::/  /       \:\__\        |:|  |       \/__/                                
-                   \|__|         \/__/         \/__/         \/__/         \/__/         \|__|                                            
+<div id="decoration-display">
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /:/  \:\  \ 
+ /:/__/ \:\__\
+ \:\  \  \/__/
+  \:\  \      
+   \:\  \     
+    \:\__\    
+     \/__/    
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /::\~\:\  \ 
+ /:/\:\ \:\__\
+ \/__\:\/:/  /
+      \::/  / 
+      /:/  /  
+     /:/  /   
+     \/__/    
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /::\~\:\  \ 
+ /:/\:\ \:\__\
+ \/_|::\/:/  /
+    |:|::/  / 
+    |:|\/__/  
+    |:|  |    
+     \|__|    
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /::\~\:\__\ 
+ /:/\:\ \:|__|
+ \:\~\:\/:/  /
+  \:\ \::/  / 
+   \:\/:/  /  
+    \::/__/   
+     ~~       
+</pre>
+<pre>
+      ___     
+     /\  \    
+    /::\  \   
+   /:/\:\  \  
+  /:/  \:\  \ 
+ /:/__/ \:\__\
+ \:\  \ /:/  /
+  \:\  /:/  / 
+   \:\/:/  /  
+    \::/  /   
+     \/__/    
+</pre>
+<pre>
+      ___     
+     /\__\    
+    /::|  |   
+   /:|:|  |   
+  /:/|:|  |__ 
+ /:/ |:| /\__\
+ \/__|:|/:/  /
+     |:/:/  / 
+     |::/  /  
+     /:/  /   
+     \/__/    
+</pre>
 
-</pre></div>
+
+</div>
 <div id="chainlink-display">
 {% for content in contents %}
 		{% if content.tag == 'header2' %}
-		<section><h2 id="{{ content.url }}">{{ content.title }}<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a></h2>
+		<section class="chainlink">
+			<div id="{{ content.url }}" class="chainlink-wrapper">
+				<h2>
+                    {{ content.title }}
+				    <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
+                </h2>
+			</div>
 		{% elif content.tag == 'paragraph' %}
-		<p>{{ content.content }}</p>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<p class="inner-content">{{ content.content }}</p>	
+			
+		</div>
 		{% elif content.tag == 'code' %}
-		<code>{{ content.content }}</code>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<code class="inner-content">{{ content.content }}</code>
+			
+		</div>
 		{% elif content.tag == 'header3' %}
-		<h3><div class="h3">{{ content.content }}</div></h3>
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<h3 class="inner-content">
+				{{ content.content }}</h3>	
+		</div>
 		{% elif content.tag == 'linebreak' %}
-		<span class="br"></span>
-		{% elif content.tag == 'delimiter' %}
+		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+			<span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
+		</div>
+        {% elif content.tag == 'delimiter' %}
 		</section>
 		{% endif %}
 {% endfor %}

@@ -19,6 +19,6 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index),
+    path('', include('Patchwork.urls')),
     path('patchwork/', include('Patchwork.urls')),
 ]

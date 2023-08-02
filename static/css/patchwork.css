@@ -1,0 +1,175 @@
+/* fence buttons */
+#add-buttons {
+	text-align: center;
+    padding-top: var(--main-body-inner-content-padding-vertical);
+	padding-bottom: calc(var(--main-body-inner-content-padding-vertical) * 2);
+	padding-left: var(--main-body-inner-content-padding-horizontal);
+	padding-right: var(--main-body-inner-content-padding-horizontal);
+}
+.add-buttons {
+	-font-family: 'Courier New', Courier, monospace;
+	font-family: Audiowide;
+	position: static;
+	background-color: #334756;
+	color: #f5f5f5;
+	height: 30px;
+	cursor: pointer;
+	border-radius: 10px;
+	border-color: #b0b0b057;
+	width: 20%;
+	font-size: 12px;
+	white-space: nowrap;
+    word-break: keep-all;
+}
+.add-buttons:hover {
+	background-color: #2a3946;
+	text-decoration: underline;
+}
+
+/* create chainlink/content button list */
+.tabbed-buttons {
+	font-family: 'Courier New', Courier, monospace;
+	font-weight:bolder;
+	position: static;
+	background-color: #334756;
+	color: #f5f5f5;
+	height: 30px;
+	margin-top: 1px;
+	cursor: pointer;
+	border-radius: 10px;
+	-border: solid;
+	border-color: #b0b0b057;
+	-width: 16.6666666%;
+	font-size: 12px;
+	white-space: nowrap;
+    word-break: keep-all;
+}
+
+/* config display section */
+#config-display {
+    padding-top: var(--main-body-inner-content-padding-vertical);
+	padding-bottom: var(--main-body-inner-content-padding-vertical);
+	padding-right: var(--main-body-inner-content-padding-horizontal);
+	padding-left: var(--main-body-inner-content-padding-horizontal);
+    display: flex;
+    justify-content: space-evenly;
+}
+#config-display > ul {
+    display: inline-block;
+    vertical-align:top;
+    background-color: #2C394B;
+    list-style-type: none;
+    -width: calc(100% / 3);
+    height: min-content;
+    border-style: solid;
+    border-left-width: 5px;
+    border-right-width: 5px;
+    border-top-width: 10px;
+    border-bottom-width: 10px;
+    border-color: transparent;
+    border-radius: 12px;
+}
+#config-display > ul > h2 {
+    color: whitesmoke;
+    background-color: #2C394B;
+    font-family: Audiowide;
+    background-color:
+    font-weight: 100;
+    margin-bottom: 5px;
+    margin-top: 0px;
+}
+#chainlink-manifest > li {
+    color: whitesmoke;
+    font-family: monospace;
+    margin-top: 1px;
+    margin-bototm: 1px;
+}
+#keybindings-legend > li {
+    color: whitesmoke;
+    font-family: monospace;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+#chainlink-manifest > li > a {
+    text-decoration: none;
+    font-size: medium;
+}
+#chainlink-manifest > li > a:hover {
+    text-decoration: underline;
+    color: #959595;
+}
+#options-settings > li > button {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    font-family: arial, sans-serif;
+    color: rgb(208, 68, 35);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* ascii art decoration section */
+#decoration-display {
+    -max-width: 100px;
+    margin-left: 10%;
+    margin-right: 10%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    text-align: center;
+    padding-top: var(--main-body-inner-content-padding-vertical);
+	padding-bottom: var(--main-body-inner-content-padding-vertical);
+	padding-right: var(--main-body-inner-content-padding-horizontal);
+	padding-left: var(--main-body-inner-content-padding-horizontal);
+}
+
+#decoration-display > pre {
+    display: inline-block;
+    color: rgb(208, 68, 35);
+    -border-style: double;
+    -border-width: 3px;
+}
+
+/* chainlink display section */
+#chainlink-display {
+    padding-top: var(--main-body-inner-content-padding-vertical);
+	padding-bottom: var(--main-body-inner-content-padding-vertical);
+	padding-right: var(--main-body-inner-content-padding-horizontal);
+	padding-left: var(--main-body-inner-content-padding-horizontal);
+}
+.chainlink:first-child .chainlink-wrapper:first-child {
+    margin-top: 0px;
+}
+
+.chainlink:last-child .chainlink-wrapper:last-child, .chainlink:last-child .content-wrapper:last-child {
+    margin-bottom: 0px;
+}
+
+.chainlink-wrapper {
+
+}
+
+/* popup form creation */
+input {
+    width: 35%;
+    color: #2e2a43FF;
+    border-width: 5px;
+    border-radius: 12px;
+    font-size: large;
+    border-style: solid;
+    border-color: transparent;
+}
+
+/* recurrent elements */
+.header-url {
+    margin-left: 10px;
+}
+.inline-url {
+    font-size: small;
+    color: cadetblue;
+}
+.inline-url:hover {
+    font-size: small;
+    color: purple;
+}
