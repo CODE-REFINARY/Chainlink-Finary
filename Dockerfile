@@ -1,13 +1,13 @@
 #Initialize the working directory
 RUN mkdir /code
 
-# REACT: Build React app
-FROM node:14 as node-stage
-WORKDIR /code/react
-COPY react/package.json react/package-lock.json ./
+# Static
+FROM node:14 as static-stage
+WORKDIR /code
+COPY ./static ./
+WORKDIR /code/static/react
 RUN npm install
-COPY react/ .
-RUN npm run build
+RUN npm run dev
 
 # PYTHON: Pull Base Image
 FROM python:3
@@ -24,9 +24,4 @@ COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 
 # Copy Source Files
-COPY . /code/
-
-RUN mkdir /react
-
-# Copy React build from the previous stage
-COPY --from=node-stage /code/react/build /code/static/react
+COPY ./Chainlink /code/

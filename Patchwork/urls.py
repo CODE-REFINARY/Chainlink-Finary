@@ -11,4 +11,5 @@ urlpatterns = [
     path('doc<str:key>.html', views.generic, name='generic'),  # regularly generated blog pages match here
     path('chainlink<str:key>.html', views.chainlink, name='chainlink'),
     path('generic.html', views.generic),                    # used for POSTs to generate dynamic content
+    path('react.html', views.react),
 ]

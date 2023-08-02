@@ -271,3 +271,6 @@ def beat_the_clock(request):
 def gsdocs(request):
     docs = Doc.objects.all()
     return render(request, 'Patchwork/gsdocs.html', {'docs': docs})
+
+def react(request):
+    return render(request, 'Patchwork/react.html', {})
