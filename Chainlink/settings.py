@@ -28,12 +28,11 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    '*'
+    "https://chainlink-finary.herokuapp.com",
+    "https://www.chainlinkfinary.com",
 ]
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -133,12 +132,16 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
-
-STATIC_ROOT  = os.path.join(BASE_DIR, 'staticfiles')        # This is where collectstatic will place static files for serving
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')        # This is where collectstatic will place static files for serving
 STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]     # This is where static files are located in the project
+REACT_ROOT = os.path.join(BASE_DIR, "staticfiles", "react", "build")
+REACT_STATIC_ROOT = os.path.join(STATIC_URL, "react", "static")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LANDING_PAGE_URL = "ace79b72faa11a92b2f6fd4cec93695e6d660627762a63cb22ab14528804c6ce"
