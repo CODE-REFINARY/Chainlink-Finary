@@ -139,7 +139,7 @@
 	padding-left: var(--main-body-inner-content-padding-horizontal);
 }
 .chainlink:first-child .chainlink-wrapper:first-child {
-    margin-top: 0px;
+    padding-top: 0px;
 }
 
 .chainlink:last-child .chainlink-wrapper:last-child, .chainlink:last-child .content-wrapper:last-child {

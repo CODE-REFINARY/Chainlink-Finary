@@ -73,7 +73,7 @@
 		</div>
 		{% elif content.tag == 'linebreak' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<span class="inner-content br"></span>
+			<span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
 		</div>
         {% elif content.tag == 'delimiter' %}
 		</section>
