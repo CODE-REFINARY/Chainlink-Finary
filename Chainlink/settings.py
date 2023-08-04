@@ -28,8 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    "https://chainlink-finary.herokuapp.com",
-    "https://www.chainlinkfinary.com",
+    '*'
 ]
 
 # Application definition
