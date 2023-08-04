@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "Patchwork.context_processors.react_static",
             ],
         },
     },
@@ -138,8 +139,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')        # This is where colle
 STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]     # This is where static files are located in the project
 REACT_ROOT = os.path.join(BASE_DIR, "staticfiles", "react", "build")
+REACT_STATIC_ROOT = os.path.join(STATIC_URL, "react", "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LANDING_PAGE_URL = "2b2a0f681bcd57dcf2fbd668a39dd1f51c238b480437a7ef1ac193271a9bd510"
+#SITE_ANNOUNCEMENTS_URL = ""

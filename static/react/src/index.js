@@ -9,7 +9,7 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        <h1>This is the OC CULT</h1>
+        <i>test popp</i>
       </div>
     );
   }
