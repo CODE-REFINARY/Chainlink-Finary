@@ -164,7 +164,7 @@
 		<section class="chainlink">
 			<div id="{{ content.url }}" class="chainlink-wrapper">
 				<h2>
-                    {{ content.title }}
+                    <span class="chainlink-inner-text">{{ content.title }}</span>
 				    <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
                 </h2>
 			</div>
@@ -180,8 +180,7 @@
 		</div>
 		{% elif content.tag == 'header3' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<h3 class="inner-content">
-				{{ content.content }}</h3>	
+			<h3 class="inner-content">{{ content.content }}</h3>
 		</div>
 		{% elif content.tag == 'linebreak' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">

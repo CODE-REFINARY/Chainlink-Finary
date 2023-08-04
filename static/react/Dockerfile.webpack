@@ -1,0 +1,4 @@
+FROM node:14
+WORKDIR /code/static/react
+COPY ./package.json ./package-lock.json ./
+RUN npm install

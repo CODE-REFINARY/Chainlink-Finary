@@ -290,6 +290,12 @@ div.combination {
 #doc-title-wrapper:hover #fence-context-buttons {
     display: block;
 }
+#doc-title-wrapper:hover h1 {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(208, 68, 35);
+    color: rgb(208, 68, 35);
+}
 .context-span-message {
     margin-right: 5px;
     font-family: sans-serif;
@@ -365,8 +371,8 @@ section form {
     border-style: solid;
     color: rgb(208, 68, 35);
 }
-.context-buttons-wrapper button {
-    width: 10%;
+.context-buttons-wrapper button, .chainlink-buttons-wrapper button, #fence-context-buttons button {
+    width: 7.5%;
 }
 
 

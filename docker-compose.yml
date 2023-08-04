@@ -11,12 +11,14 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
-  web:
-    build: .
+  django:
+    build:
+      dockerfile: Dockerfile.django
+      context: .
     # The server will run on localhost:8000
     # below was legacy project settings when the files were segregated
     # command: python manage.py runserver 0.0.0.0:8000 --settings=Chainlink.settings.docker
-    command: python manage.py runserver 0.0.0.0:8000 && python manage.py collectstatic
+    command: bash -c "python manage.py collectstatic --no-input && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
@@ -27,3 +29,12 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+      - webpack
+  webpack:
+    build:
+      dockerfile: Dockerfile.webpack
+      context: ./static/react
+    working_dir: /code/static/react
+    command: npm run dev
+    volumes:
+      - ./static/react:/code/static/react

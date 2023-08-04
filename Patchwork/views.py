@@ -7,6 +7,7 @@ from .models import TagType  # enum type for types content/chainlink type(s)
 import random  # use this to generate unique titles for fence and/or chainlink
 import json  # use this to parse JSON payloads in HTTP requests
 import hashlib  # use this to generate hashes for urls
+from django.conf import settings
 
 
 def db_store(tag_type, parent_url, title, public):
@@ -140,8 +141,7 @@ def generic(request, key=''):
             contents.append(link)
             for cont in Content.objects.filter(chainlink=link.pk).order_by('order'):
                 contents.append(cont)
-        return render(request, 'Patchwork/generic.html',
-                      {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
+        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
 
     elif request.method == 'POST':
         # get POST request json payload
@@ -252,8 +252,7 @@ def generate(request):
 
 
 def index(request):
-    docs = Doc.objects.all()
-    return render(request, 'Patchwork/index.html', {'docs': docs})
+    return generic(request, key=settings.LANDING_PAGE_URL)
 
 
 def transfer_email(request):
@@ -271,3 +270,6 @@ def beat_the_clock(request):
 def gsdocs(request):
     docs = Doc.objects.all()
     return render(request, 'Patchwork/gsdocs.html', {'docs': docs})
+
+def react(request):
+    return render(request, 'Patchwork/react.html', {})
