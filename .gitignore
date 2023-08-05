@@ -14,6 +14,8 @@ node_modules/
 lib/
 bin/
 
+migrations/
+
 # Database
 db.sqlite3
 *.exe
