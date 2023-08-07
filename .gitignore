@@ -38,4 +38,4 @@ lib64
 pyvenv.cfg
 
 # exclude the output of webpack
-static/react/static/*
+static/react/static
