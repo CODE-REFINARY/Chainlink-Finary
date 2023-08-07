@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack --mode development --watch",
-    "heroku-postbuild": "webpack --mode production"
+    "install": "webpack --mode production"
   },
   "license": "MIT",
   "dependencies": {
