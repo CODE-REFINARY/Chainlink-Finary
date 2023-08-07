@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development --watch",
+    "heroku-postbuild": "webpack --mode development --watch",
     "build": "webpack --mode production"
   },
   "license": "MIT",
