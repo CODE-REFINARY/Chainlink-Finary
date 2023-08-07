@@ -9,7 +9,7 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        <i>This is a test of the react integration</i>
+        <i>This is a new!!!! test of the react integration</i>
       </div>
     );
   }
