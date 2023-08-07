@@ -137,7 +137,7 @@ USE_TZ = True       # Make dates timezone aware
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')        # This is where collectstatic will place static files for serving
 STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in production
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]     # This is where static files are located in the project
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'static', 'react', 'static')]
 REACT_ROOT = os.path.join(BASE_DIR, "staticfiles", "react", "build")
 REACT_STATIC_ROOT = os.path.join(STATIC_URL, "react", "static")
 
