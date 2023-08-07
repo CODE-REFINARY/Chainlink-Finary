@@ -1,4 +1,5 @@
 FROM node:14
 WORKDIR /code/static/react
 COPY ./package.json ./package-lock.json ./
+COPY ./webpack.config.js ./babel.config.json ./
 RUN npm install

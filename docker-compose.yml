@@ -33,8 +33,8 @@ services:
   webpack:
     build:
       dockerfile: Dockerfile.webpack
-      context: ./static/react
+      context: .
     working_dir: /code/static/react
     command: npm run dev
     volumes:
-      - ./static/react:/code/static/react
+      - .:/code
