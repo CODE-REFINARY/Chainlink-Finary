@@ -3,7 +3,8 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
-<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
+<script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
+<!--<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
 <script type="module">
 
 	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
@@ -38,7 +39,7 @@
 		//deleteContentEditButtons();
 
 	});
-</script>
+</script>-->
 <nav id="tabbed-buttons">
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
