@@ -3,7 +3,7 @@
  * @param: Object selection: a subset of the img-manifest.json properties to display on the gallery
  * @param: String element: the name of the div object within which to place the gallery
  */
-function synthesizeGalleryBasic(selection, element) {
+export function synthesizeGalleryBasic(selection, element) {
     // Counter and Constants for determining how many loops to display how many images in a row
     let vg = document.getElementById(element);
     let outerLoopCounter = 0;
@@ -28,7 +28,7 @@ function synthesizeGalleryBasic(selection, element) {
  * traditional flex methods so in the case of changing viewport use synthesizeGalleryBasic.
  * @param: Object selection: a subset of the img-manifest.json properties to display on the gallery
  */
-function synthesizeGallery(selection) {
+export function synthesizeGallery(selection) {
     const imgFolder = "{% static 'images/' %}";
     // Transparent placeholder images
     let transImg = document.createElement("img"); 
