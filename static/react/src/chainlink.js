@@ -1,4 +1,4 @@
-import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView, createFence } from "./chainlink-utilities.js";
+import { parseKeyUp, parseKeyDown, addContentButtons, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence } from "./chainlink-utilities.js";
 
 document.addEventListener("DOMContentLoaded", function() {
         // Globals
@@ -14,5 +14,5 @@ document.addEventListener("DOMContentLoaded", function() {
         instChainlinkEditButtons();
         instContentEditButtons();
 
-        addButtonsChainlinkView();
+        addContentButtons(4);
 });

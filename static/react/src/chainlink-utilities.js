@@ -1,9 +1,78 @@
+/* React imports */
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+
+
+/* Variables that store 1 or more event listeners so that they be referenced and de-registered later */
 var fenceEditButtonEventHandler;
 var fenceDeleteButtonEventHandler;
 var chainlinkEditButtonsEventHandlers = [];
 var chainlinkDeleteButtonsEventHandlers = [];
 var contentEditButtonsEventHandlers = [];
 var contentDeleteButtonsEventHandlers = [];
+
+
+/* React components */
+function ContentCreationButtonsFive() {
+        return (
+                <React.Fragment>
+                        <button id="add-p-btn" className="add-buttons" onClick={() => makeForm('paragraph')}>&lt;p&gt; paragraph</button>
+                        <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('header3')}>&lt;h&gt; header</button>
+                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm('header2')}>&lt;n&gt; chainlink</button>
+                        <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('code')}>&lt;c&gt; code</button>
+                        <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('linebreak')}>&lt;b&gt; linebreak</button>
+                </React.Fragment>
+        );
+}
+function ContentCreationButtonsFour() {
+        return (
+                <React.Fragment>
+                        <button id="add-p-btn" className="add-buttons" onClick={() => makeForm('paragraph')}>&lt;p&gt; paragraph</button>
+                        <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('header3')}>&lt;h&gt; header</button>
+                        <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('code')}>&lt;c&gt; code</button>
+                        <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('linebreak')}>&lt;b&gt; linebreak</button>
+                </React.Fragment>
+        );
+}
+function ContentCreationButtonsOne() {
+        return (
+                <React.Fragment>
+                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm('header2')}>&lt;n&gt; chainlink</button>
+                </React.Fragment>
+        );
+}
+function FenceEditButtons() {
+        fenceEditButtonEventHandler = function() { renameDoc(); };
+        fenceDeleteButtonEventHandler = function() { deleteDoc(); };
+        return (
+                <React.Fragment>
+                        <i className="context-span-message">context action &lt; - - - - - -</i>
+                        <button id="doc-action-edit-title" onClick={fenceEditButtonEventHandler}>edit</button>
+                        <button id="doc-action-delete-title" onClick={fenceDeleteButtonEventHandler}>delete</button>
+                </React.Fragment>
+        );
+}
+
+
+/* JS utility functions (private) */
+
+/**
+ * Create the correct number of content buttons depending on current page
+ *
+ * @returns {null}
+ */
+export function _addButtons() {
+        if (window.in === 'doc') {
+                addContentButtons(5);
+        } else if (window.in === 'doc-empty') {
+                addContentButtons(1);
+        } else if (window.in === 'chainlink') {
+                addContentButtons(4);
+        }
+}
+
+
+/*  JS public functions */
 
 // add items to database
 export function addElement(type, title, url, order) {
@@ -105,7 +174,7 @@ export function makeForm(type) {
                 addElement(type, input.value, url, order);
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                addButtons();
+                _addButtons();
         });
 }
 
@@ -193,130 +262,28 @@ function escape(e, ref, fallback, element) {
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
                 window.removeEventListener("keydown", ref);
-                addButtons();
+                _addButtons();
         }
 }
 
-// Construct the content buttons for doc view. All buttons are available. This should be called for docs that have 
-// one or more chainlinks attached to them.
-export function addButtonsDocView() {
-
-	var chainlinkDisplay = document.getElementById("chainlink-display");
-	var mainElement = document.querySelector("main");        
-        var div = document.createElement("div");
-
-        var button1 = document.createElement("button");
-        var button2 = document.createElement("button");
-        var button3 = document.createElement("button");
-        var button4 = document.createElement("button");
-        var button5 = document.createElement("button");
-
-        div.id = "add-buttons";
-        button1.id = "add-p-btn";
-        button2.id = "add-h3-btn";
-        button3.id = "add-cl-btn";
-        button4.id = "add-code-btn";
-        button5.id = "add-br-btn";
-        
-        button1.className = "add-buttons";
-        button2.className = "add-buttons";
-        button3.className = "add-buttons";
-        button4.className = "add-buttons";
-        button5.className = "add-buttons";
-
-        button1.innerHTML = "&#60;p&#62; paragraph";
-        button2.innerHTML = "&#60;h&#62; header";
-        button3.innerHTML = "&#60;n&#62 chainlink";
-        button4.innerHTML = "&#60;c&#62 code";
-        button5.innerHTML = "&#60;b&#62; linebreak";
-
-        div.appendChild(button1);
-        div.appendChild(button2);
-        div.appendChild(button3);
-        div.appendChild(button4);
-        div.appendChild(button5);
-
-        // Register event listeners for content creation elements
-        button1.addEventListener("click", function() { makeForm('paragraph'); });
-        button2.addEventListener("click", function() { makeForm('header3'); });
-        button3.addEventListener("click", function() { makeForm('header2'); });
-        button4.addEventListener("click", function() { makeForm('code'); });
-        button5.addEventListener("click", function() { makeForm('linebreak'); });
-
-        mainElement.appendChild(div);
-}
-
-// Create just the chainlink button. Empty docs should only be able to have a chainlink (header 2) added to them
-export function addButtonsDocEmptyView() {
-
-	var mainElement = document.querySelector("main");        
-        var div = document.createElement("div");
-        var button3 = document.createElement("button");
-        div.id = "add-buttons";
-        button3.id = "add-cl-btn";
-        button3.className = "add-buttons";
-        button3.innerHTML = "&#60;n&#62 chainlink";
-        div.appendChild(button3);
-        button3.addEventListener("click", function() { makeForm('header2'); });
-        mainElement.appendChild(div);
-}
-
-// Chainlinks cannot instantiate other chainlinks. This function instantiates buttons to create content that isn't 
-// another chainlink.
-export function addButtonsChainlinkView() {
-
-        var chainlinkDisplay = document.getElementById("chainlink-display");
-        var mainElement = document.querySelector("main");
-        var div = document.createElement("div");
-        var button1 = document.createElement("button");
-        var button2 = document.createElement("button");
-        var button4 = document.createElement("button");
-        var button5 = document.createElement("button");
-
-        div.id = "add-buttons";
-        button1.id = "add-p-btn";
-        button2.id = "add-h3-btn";
-        button4.id = "add-code-btn";
-        button5.id = "add-br-btn";
-        
-        button1.className = "add-buttons";
-        button2.className = "add-buttons";
-        button4.className = "add-buttons";
-        button5.className = "add-buttons";
-
-        button1.innerHTML = "&#60;p&#62; paragraph";
-        button2.innerHTML = "&#60;h&#62; header";
-        button4.innerHTML = "&#60;c&#62 code"
-        button5.innerHTML = "&#60;b&#62; linebreak";
-
-        div.appendChild(button1);
-        div.appendChild(button2);
-        div.appendChild(button4);
-        div.appendChild(button5);
-
-        // Register event listeners for content creation elements
-        button1.addEventListener("click", function() { makeForm('paragraph'); });
-        button2.addEventListener("click", function() { makeForm('header3'); });
-        button4.addEventListener("click", function() { makeForm('code'); });
-        button5.addEventListener("click", function() { makeForm('linebreak'); });
-
-        mainElement.appendChild(div);
-}
-
-// Add buttons. The buttons to add is indicated by window.in
-export function addButtons() {
-        switch(window.in) {
-                case 'doc': 
-                        addButtonsDocView();
-                        break;
-                case 'doc-empty':
-                        addButtonsDocEmptyView();
-                        break;
-                case 'chainlink':
-                        addButtonsChainlinkView();
-                        break;
-                default:
-                        console.log("doc type for buttons not specified");
+/**
+ * Create the buttons that appear in #chainlink-display toward the bottom of the fence
+ *
+ * @param {number} quantity - the number of buttons to create. 1 button is chainlink. 5 buttons is everything. 4 buttons is everything but chainlink
+ * @returns {null}
+ */
+export function addContentButtons(quantity) {
+	var mainElement = document.querySelector("main");     
+        var container = document.createElement("div");
+        container.id = "add-buttons";
+        mainElement.appendChild(container);
+        var root = createRoot(container);
+        if (quantity == 1) {
+                root.render(<ContentCreationButtonsOne />);
+        } else if (quantity == 4) {
+                root.render(<ContentCreationButtonsFour />);
+        } else if (quantity == 5) {
+                root.render(<ContentCreationButtonsFive />);
         }
 }
 
@@ -326,25 +293,11 @@ export function deleteButtons() {
 
 export function instFenceEditButtons() {
         var wrapper = document.getElementById('doc-title-wrapper');
-        var fenceEditButton = document.createElement("button");
-        var fenceDeleteButton = document.createElement("button");
-        var spanMessage = document.createElement("i");
-        var fenceButtonsWrapper = document.createElement("div");
-        fenceEditButton.innerHTML = "edit";
-        fenceDeleteButton.innerHTML = "delete";
-        spanMessage.innerHTML = "context action &#60; - - - - - - ";
-        fenceButtonsWrapper.id = "fence-context-buttons";
-        fenceEditButton.id = "doc-action-edit-title";
-        fenceDeleteButton.id = "doc-action-delete-title";
-        spanMessage.className = "context-span-message";
-        fenceButtonsWrapper.appendChild(spanMessage);
-        fenceButtonsWrapper.appendChild(fenceEditButton);
-        fenceButtonsWrapper.appendChild(fenceDeleteButton);
-        wrapper.appendChild(fenceButtonsWrapper);
-        fenceEditButtonEventHandler = function() { renameDoc(); };
-        fenceDeleteButtonEventHandler = function() { deleteDoc(); };
-        fenceEditButton.addEventListener("click", fenceEditButtonEventHandler);
-        fenceDeleteButton.addEventListener("click", fenceDeleteButtonEventHandler);
+        var container = document.createElement("div");
+        container.id = "fence-context-buttons";
+        wrapper.appendChild(container);
+        var root = createRoot(container);
+        root.render(<FenceEditButtons />);
 }
 
 export function instChainlinkEditButtons() {
@@ -539,7 +492,7 @@ export function renameDoc() {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                addButtons();
+                _addButtons();
         });
 
         header.remove();
@@ -586,7 +539,7 @@ export function editChainlink(target) {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                addButtons();
+                _addButtons();
         });
 
         header.remove();
@@ -633,7 +586,7 @@ export function editContent(target) {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                addButtons();
+                _addButtons();
         });
 
         content.remove();
