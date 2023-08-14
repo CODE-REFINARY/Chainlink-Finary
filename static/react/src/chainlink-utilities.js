@@ -52,6 +52,24 @@ function FenceEditButtons() {
                 </React.Fragment>
         );
 }
+function ChainlinkEditButtons(props) {
+        chainlinkEditButtonsEventHandlers.push(function() { editChainlink(props.wrappers[props.i].id) });
+        chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(props.wrappers[props.i].id) });
+        return (
+                <React.Fragment>
+                        <i className="context-span-message">context action &lt; - - - - - -</i>
+                        <button className="cl-edit-btn" target={props.wrappers[props.i].id} onClick={chainlinkEditButtonsEventHandlers[chainlinkEditButtonsEventHandlers.length - 1]}>edit</button>
+                        <button className="cl-del-btn" target={props.wrappers[props.i].id} onClick={chainlinkDeleteButtonsEventHandlers[chainlinkDeleteButtonsEventHandlers.length - 1]}>delete</button>
+                </React.Fragment>
+        );
+}
+function ChainlinkHeader(props) {
+        return (
+               <React.Fragment>
+                        <span className="chainlink-inner-text">{props.title}</span>
+               </React.Fragment>
+        );
+}
 
 
 /* JS utility functions (private) */
@@ -223,7 +241,15 @@ export function parseKeyDown(e) {
         }
 }
 
-// Callback function used for when the user presses the Esc key while an input dialogue is open
+/**
+ * Callback function used for when the user presses the Esc key while an input dialogue is open
+ *
+ * @param {event} e - the keyboard press event used to verify that the key that was pressed was the escape key
+ * @param {reference} ref - a reference to the callback function specified for 
+ * @param {string} fallback - the original value of the field that we are editing
+ * @param {string} element - the type of content that is being edited.
+ * @returns {null}
+ */
 function escape(e, ref, fallback, element) {
         var keyCode = e.which;
         if (keyCode == 27) {
@@ -244,9 +270,10 @@ function escape(e, ref, fallback, element) {
                         formParent.prepend(h1);
                 } else if (chainlinkEditForm) {
                         form.remove();
-                        var h2 = document.createElement("h2");
-                        h2.innerHTML = fallback;
-                        formParent.prepend(h2);
+                        let container = document.createElement("h2");
+                        let root = createRoot(container);
+                        formParent.prepend(container);
+                        root.render(<ChainlinkHeader title={fallback}/>);
                 } else if (chainlinkCreateForm) {
                         form.remove();
                 } else if (contentCreateForm) {
@@ -302,30 +329,13 @@ export function instFenceEditButtons() {
 
 export function instChainlinkEditButtons() {
         var numChainlinks = document.getElementsByClassName("chainlink").length;
-        var chainlinks = document.getElementsByClassName("chainlink");
-        var chainlinkHeaders = document.getElementsByClassName("chainlink-wrapper");
+        var wrappers = document.getElementsByClassName("chainlink-wrapper");
         for (let i = 0; i < numChainlinks; i++) {
-                let buttons_wrapper = document.createElement("div");
-                let chainlinkEditButton = document.createElement("button");
-                let chainlinkDeleteButton = document.createElement("button");
-                let spanMessage = document.createElement("i");
-                spanMessage.innerHTML = "context action &#60; - - - - - - ";
-                spanMessage.className = "context-span-message";
-                chainlinkEditButton.innerHTML = "edit";
-                chainlinkDeleteButton.innerHTML = "delete";
-                chainlinkEditButton.className = "cl-edit-btn";
-                chainlinkDeleteButton.className = "cl-del-btn";
-                buttons_wrapper.className = "chainlink-buttons-wrapper";
-                chainlinkEditButton.setAttribute("target", chainlinkHeaders[i].id);
-                chainlinkDeleteButton.setAttribute("target", chainlinkHeaders[i].id);
-                buttons_wrapper.appendChild(spanMessage);
-                buttons_wrapper.appendChild(chainlinkEditButton);
-                buttons_wrapper.appendChild(chainlinkDeleteButton);
-                chainlinkHeaders[i].appendChild(buttons_wrapper);
-                chainlinkEditButtonsEventHandlers.push(function() { editChainlink(chainlinkEditButton.getAttribute('target')) });
-                chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(chainlinkDeleteButton.getAttribute('target')) });
-                chainlinkEditButton.addEventListener("click", chainlinkEditButtonsEventHandlers[chainlinkEditButtonsEventHandlers.length - 1]);
-                chainlinkDeleteButton.addEventListener("click", chainlinkDeleteButtonsEventHandlers[chainlinkDeleteButtonsEventHandlers.length - 1]);
+                let container = document.createElement("div");
+                let root = createRoot(container);
+                container.className = "chainlink-buttons-wrapper";
+                wrappers[i].appendChild(container);
+                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
         }
 }
 
@@ -412,23 +422,23 @@ export function deleteDoc() {
 
 export function deleteChainlink(target) {
 
-    var confirm = window.confirm("Delete chainlink?");
-    if( confirm == false ) {
-            return
-    }
-
- 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    let xhr = new XMLHttpRequest();
-    xhr.open("DELETE", window.location.href, true);
-    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-    xhr.setRequestHeader('type', 'chainlink');
-    xhr.setRequestHeader('target', target);
-    xhr.send();
-    xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-                window.location.replace("index.html");
+        var confirm = window.confirm("Delete chainlink?");
+        if( confirm == false ) {
+                return
         }
-    }
+
+        var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", window.location.href, true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('type', 'chainlink');
+        xhr.setRequestHeader('target', target);
+        xhr.send();
+        xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        window.location.replace("index.html");
+                }
+        }
 }
 
 export function deleteContent(target) {
