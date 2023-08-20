@@ -1,7 +1,7 @@
 /* React imports */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Element, Fence, Chainlink, Content } from './classes.js'
+import { Element, Article, Chainlink, Content } from './classes.js'
 
 
 /* Variables that store 1 or more event listeners so that they be referenced and de-registered later */
@@ -71,6 +71,20 @@ function ChainlinkHeader(props) {
                </React.Fragment>
         );
 }
+function ChainlinkCreationForm(props) {
+        return (
+                <React.Fragment>
+                        <input autoFocus type="text" id="input" placeholder="enter chainlink name" />
+                </React.Fragment>
+        );
+}
+function ContentCreationForm(props) {
+        return (
+                <React.Fragment>
+                        <input autoFocus type="text" id="input" placeholder={props.placeholder} />
+                </React.Fragment>
+        );
+}
 
 
 /* JS utility functions (private) */
@@ -105,11 +119,11 @@ function _addElement(element) {
 
         // dispatch an AJAX post
         if (element instanceof Article) {
-                xhr.send(JSON.stringify({ "type": "header2", "title": element.title, "is_public": element.public, "url": element.url, "count": element.count, "date": element.date }));
+                xhr.send(JSON.stringify({ "type": "header1", "title": element.title, "is_public": element.public, "url": element.url, "date": element.date, "count": element.count, "order": element.order }));
         } else if (element instanceof Chainlink) {
-
+                xhr.send(JSON.stringify({ "type": "header2", "title": element.title, "is_public": element.public, "url": element.url, "count": element.count, "date": element.date, "order": element.order }));
         } else if (element instanceof Content) {
-
+                xhr.send(JSON.stringify({ "type": element.tag, "title": element.content, "is_public": element.public, "url": element.url, "count": element.count, "date": element.date, "order": element.order }));
         }
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -118,8 +132,154 @@ function _addElement(element) {
         }
 }
 
+/**
+ * Create a representation of a Chainlink in #chainlink-display from either an AJAX response object or Chainlink object
+ *
+ * @param {Object} xhr - XMLHttpRequest object for a Chainlink creation request that's already returned
+ * @param {Element} element - Chainlink object to create a chainlink object of
+ * @returns {null}
+ */
+function instantiateChainlinkElement() {
+
+}
 
 /*  JS public functions */
+
+/**
+ * Create a form for editing an element (specified by type) and call addElement to update the database with the form contents
+ * 
+ * @param {string} type - string representation of the type of element that the edit form will be created for
+ * @returns {null}
+ */
+export function makeForm(type) {
+        const currentDateTime = new Date().toISOString();
+        const _listener = function (e) { escape(e, _listener, "", "") };
+
+        const list = document.getElementById('chainlink-display');
+        const section = document.createElement('section');
+        const chainlink = document.getElementById("chainlink-display").lastElementChild;
+
+        // html elements to create
+        const container = document.createElement("form");
+        const root = createRoot(container);
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+        window.addEventListener("keydown", _listener);
+
+        // fields to pass to addElement for Element creation
+        var url = undefined;
+        var order = undefined;
+        var isPublic = undefined;
+        var count = undefined;
+
+        // This switch statement determines what Element type user is editing/creating based on the argument
+        if (type == "header2") {
+                order = document.getElementById("chainlink-display").childElementCount - 1;
+                container.id = "chainlink-creation-form";
+                root.render(<ChainlinkCreationForm />);
+                list.appendChild(container);
+        }
+        else if (type == "header3") {
+                url = chainlink.firstElementChild.getAttribute('id');
+                order = chainlink.childElementCount - 1;
+                container.id = "content-creation-form";
+                root.render(<ContentCreationForm placeholder="enter header content" />);
+                chainlink.appendChild(container);
+        }
+        else if (type == "paragraph") {
+                url = chainlink.firstElementChild.getAttribute('id');
+                order = chainlink.childElementCount - 1;
+                container.id = "content-creation-form";
+                root.render(<ContentCreationForm placeholder="enter paragraph content" />);
+                chainlink.appendChild(container);
+        } 
+        else if (type == "code") {
+                url = chainlink.firstElementChild.getAttribute('id');
+                order = chainlink.childElementCount - 1;
+                container.id = "content-creation-form";
+                root.render(<ContentCreationForm placeholder="enter code block" />);
+                chainlink.appendChild(container);
+        }
+        else if (type == 'linebreak') {
+                const chainlink = document.getElementById("chainlink-display").lastElementChild;
+                order = chainlink.childElementCount - 1;
+                url = chainlink.firstElementChild.getAttribute('id');
+                const element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
+                _addElement(element);
+                return;
+        }
+
+        deleteButtons();        // remove buttons temporarily while user input prompt is active 
+        container.addEventListener("submit", function(event) {
+                event.preventDefault();
+                if (type == "header2") {
+                        var element = new Chainlink(input.value, url, currentDateTime, isPublic, count, order);
+                } else {
+                        var element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
+                }
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                _addElement(element);
+                _addButtons();
+        });
+}
+
+
+
+/**
+ * Callback function used for when the user presses the Esc key while an input dialogue is open
+ *
+ * @param {event} e - the keyboard press event used to verify that the key that was pressed was the escape key
+ * @param {reference} ref - a reference to the callback function specified for 
+ * @param {string} fallback - the original value of the field that we are editing
+ * @param {string} element - the type of content that is being edited.
+ * @returns {null}
+ */
+function escape(e, ref, fallback, element) {
+        var keyCode = e.which;
+        if (keyCode == 27) {
+                var formParent = document.getElementById('input').parentNode.parentNode;
+                var form = document.getElementById('input').parentNode;
+                var input = document.getElementById('input');
+                const display = document.getElementById("chainlink-display");
+                const chainlinkCreateForm = display.querySelector("#chainlink-creation-form");
+                const contentCreateForm = display.querySelector("#content-creation-form"); 
+                const chainlinkEditForm = (formParent.matches('.chainlink-wrapper'));
+                const contentEditForm = (formParent.matches('.content-wrapper'));
+                const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
+
+                if (fenceEditForm) {
+                        form.remove();
+                        var h1 = document.createElement("h1");
+                        h1.id = "doc-title";
+                        h1.innerHTML = fallback;
+                        formParent.prepend(h1);
+                } else if (chainlinkEditForm) {
+                        form.remove();
+                        let container = document.createElement("h2");
+                        let root = createRoot(container);
+                        formParent.prepend(container);
+                        window.location.reload();
+                        root.render(<ChainlinkHeader title={fallback}/>);
+                } else if (chainlinkCreateForm) {
+                        form.remove();
+                } else if (contentCreateForm) {
+                        form.remove();
+                } else if (contentEditForm) {
+                        form.remove();
+                        var el = document.createElement(element);
+                        el.className = "inner-content";
+                        el.innerHTML = fallback;
+                        formParent.prepend(el);
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", ref);
+                _addButtons();
+        }
+}
 
 export function createFence() {
     var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -145,73 +305,6 @@ export function createFence() {
             }
         }
     }
-}
-
-/**
- * Create a form for editing an element (specified by type) and call addElement to update the database with the form contents
- * 
- * @param {string} type - string representation of the type of element that the edit form will be created for
- * @returns {null}
- */
-export function makeForm(type) {
-        window.removeEventListener("keyup", parseKeyUp);
-        window.removeEventListener("keydown", parseKeyDown);
-
-        var _listener = function (e) { escape(e, _listener, "", "") };
-        window.addEventListener("keydown", _listener);
-
-        const list = document.getElementById('chainlink-display');
-        const section = document.createElement('section');
-        const chainlink = document.getElementById("chainlink-display").lastElementChild;
-        const form = document.createElement('form');
-        const input = document.createElement('input');
-        input.setAttribute('type', 'text');
-        input.setAttribute('id', 'input');
-        form.appendChild(input);
-
-        if (type == "header2") {
-                var order = document.getElementById("chainlink-display").childElementCount - 1;
-                input.setAttribute('placeholder', 'enter chainlink name');
-                //section.appendChild(form);
-                //list.appendChild(section);
-                list.appendChild(form);
-                var url = '';
-        }
-
-        else if (type == 'linebreak') {
-                const chainlink = document.getElementById("chainlink-display").lastElementChild;
-                var order = chainlink.childElementCount - 1;
-                const url = chainlink.firstElementChild.getAttribute('id');
-                _addElement('linebreak', '', url, order);
-                return;
-        }
-
-        else {
-                if (type == "header3") {
-                        input.setAttribute('placeholder', 'enter header title');
-                } else if (type == "paragraph") {
-                        input.setAttribute('placeholder', 'enter text');
-                } else if (type == "code") {
-                        input.setAttribute('placeholder', 'enter code block');
-                } else {
-                        input.setAttribute('placeholder', 'enter value');
-                }
-
-                var url = chainlink.firstElementChild.getAttribute('id');
-                var order = chainlink.childElementCount - 1;
-                form.appendChild(input);
-                chainlink.appendChild(form);
-        }
-
-        deleteButtons();        // remove buttons temporarily while user input prompt is active 
-        document.getElementById('input').focus({ focusVisible: true });
-        form.addEventListener("submit", function(event) {
-                event.preventDefault();
-                _addElement(type, input.value, url, order);
-                window.addEventListener("keydown", parseKeyDown);
-                window.addEventListener("keyup", parseKeyUp);
-                _addButtons();
-        });
 }
 
 // Keypress parsing function for creating chainlinks and form elements
@@ -256,59 +349,6 @@ export function parseKeyDown(e) {
         } else if (keyCode == 66 && loc != "doc-empty") {
                 e.preventDefault();
                 makeForm('linebreak');
-        }
-}
-
-/**
- * Callback function used for when the user presses the Esc key while an input dialogue is open
- *
- * @param {event} e - the keyboard press event used to verify that the key that was pressed was the escape key
- * @param {reference} ref - a reference to the callback function specified for 
- * @param {string} fallback - the original value of the field that we are editing
- * @param {string} element - the type of content that is being edited.
- * @returns {null}
- */
-function escape(e, ref, fallback, element) {
-        var keyCode = e.which;
-        if (keyCode == 27) {
-                var formParent = document.getElementById('input').parentNode.parentNode;
-                var form = document.getElementById('input').parentNode;
-                var input = document.getElementById('input');
-                const chainlinkCreateForm = (formParent.matches('#chainlink-display'));
-                const chainlinkEditForm = (formParent.matches('.chainlink-wrapper'));
-                const contentCreateForm = (formParent.matches('.chainlink'));
-                const contentEditForm = (formParent.matches('.content-wrapper'));
-                const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
-
-                if (fenceEditForm) {
-                        form.remove();
-                        var h1 = document.createElement("h1");
-                        h1.id = "doc-title";
-                        h1.innerHTML = fallback;
-                        formParent.prepend(h1);
-                } else if (chainlinkEditForm) {
-                        form.remove();
-                        let container = document.createElement("h2");
-                        let root = createRoot(container);
-                        formParent.prepend(container);
-                        window.location.reload();
-                        root.render(<ChainlinkHeader title={fallback}/>);
-                } else if (chainlinkCreateForm) {
-                        form.remove();
-                } else if (contentCreateForm) {
-                        form.remove();
-                } else if (contentEditForm) {
-                        form.remove();
-                        var el = document.createElement(element);
-                        el.className = "inner-content";
-                        el.innerHTML = fallback;
-                        formParent.prepend(el);
-                }
-
-                window.addEventListener("keydown", parseKeyDown);
-                window.addEventListener("keyup", parseKeyUp);
-                window.removeEventListener("keydown", ref);
-                _addButtons();
         }
 }
 

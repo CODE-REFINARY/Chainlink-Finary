@@ -20,20 +20,21 @@ class Doc(models.Model):
     date = models.DateTimeField(default=timezone.now)                   # Creation date for this doc
     url = models.CharField(max_length=75)                               # relative url for this doc
     count = models.BigIntegerField(default=0)
+    order = models.BigIntegerField(default=0)                           # The Article order field will typically be used in an Article query to sort Articles by relevance
     
     def __str__(self):
         return self.title
 
 
 class Chainlink(models.Model):
-    key = models.BigAutoField(primary_key=True)                         # primary key
-    tag = TagType.HEADER2                                               # all chainlinks are displayed in <h2>
-    doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)   # identifer for which doc this chainlink belongs
-    title = models.CharField(max_length=200)                            # Header element for this chainlink
-    url = models.CharField(max_length=75)                               # relative url for the chainlink
-    order = models.BigIntegerField(default=0)                           # integer value specifying which order on the doc this chainlink appears
-    public = models.BooleanField(default=False)                         # Indicate whether this chainlink will be shareable
-    date = models.DateTimeField(default=timezone.now)                   # Creation date for this chainlink. May or may not be visible
+    key = models.BigAutoField(primary_key=True)                                         # primary key
+    tag = TagType.HEADER2                                                               # all chainlinks are displayed in <h2>
+    doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)                   # identifer for which doc this chainlink belongs
+    title = models.CharField(max_length=200)                                            # Header element for this chainlink
+    url = models.CharField(max_length=75)                                               # relative url for the chainlink
+    order = models.BigIntegerField(default=0)                                           # integer value specifying which order on the doc this chainlink appears
+    public = models.BooleanField(default=False)                                         # Indicate whether this chainlink will be shareable
+    date = models.DateTimeField(default=timezone.now)                                   # Creation date for this chainlink. May or may not be visible
     count = models.BigIntegerField(default=0)
   
     def __str__(self):
@@ -48,8 +49,8 @@ class Content(models.Model):
         choices=TagType.choices,
         default=TagType.PARAGRAPH,
     )
-    order = models.BigIntegerField(default=0)                           # indicate the position of this content within the chainlink
-    content = models.CharField(max_length=3000)                         # specify content to place between tags specified by tag
-    
+    order = models.BigIntegerField(default=0)                                           # indicate the position of this content within the chainlink
+    content = models.CharField(max_length=10000)                                         # specify content to place between tags specified by tag
+    public = models.BooleanField(default=True)                                          # Content can be marked to be visibly redacted from an Article. Redactions are visible to all users and labelled as such (although the content itself cannot be accessed). Redacted content can be made visible by setting the public flag to True.
     def __str__(self):
         return str(self.order) + " " + self.chainlink.title + " - " + self.tag

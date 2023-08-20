@@ -1,32 +1,39 @@
-class Element {}
+class Element {
+        constructor() {}
+}
 
 export class Article extends Element {
-        constructor(title="", isPublic=false, date=null, url="", count=0) {
+        constructor(title="", url="", date=null, isPublic=false, count=0, order=0) {
+                super();
                 this.title = title;
-                this.public = isPublic;
-                this.date = date;
                 this.url = url;
+                this.date = date;
+                this.public = isPublic;
                 this.count = count;
+                this.order = order;
         }
 }
 
 export class Chainlink extends Element {
-        constructor(article="", title="", isPublic=false, date=null, url="", count=0, order=0) {
-                this.article = fence;
+        constructor(title="", url="", date=null, isPublic=true, count=0, order=0) {
+                super();
                 this.title = title;
-                this.public = isPublic;
-                this.date = date;
                 this.url = url;
+                this.date = date;
+                this.public = isPublic;
                 this.count = count;
                 this.order = order;
         }
 }
 
 export class Content extends Element {
-        constructor(tag="", chainlink="", url="", count=0, order=0) {
+        constructor(tag="", content="", url="", date=null, isPublic=true, count=0, order=0) {
+                super();
                 this.tag = tag;
-                this.chainlink = chainlink;
+                this.content = content;
                 this.url = url;
+                this.date = date;
+                this.public = isPublic;
                 this.count = count;
                 this.order = order;
         }
