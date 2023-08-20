@@ -29,7 +29,7 @@ class Chainlink(models.Model):
     key = models.BigAutoField(primary_key=True)                         # primary key
     tag = TagType.HEADER2                                               # all chainlinks are displayed in <h2>
     doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)   # identifer for which doc this chainlink belongs
-    title = models.CharField(max_length=200)                             # Header element for this chainlink
+    title = models.CharField(max_length=200)                            # Header element for this chainlink
     url = models.CharField(max_length=75)                               # relative url for the chainlink
     order = models.BigIntegerField(default=0)                           # integer value specifying which order on the doc this chainlink appears
     public = models.BooleanField(default=False)                         # Indicate whether this chainlink will be shareable

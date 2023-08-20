@@ -1,6 +1,7 @@
 /* React imports */
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { Element, Fence, Chainlink, Content } from './classes.js'
 
 
 /* Variables that store 1 or more event listeners so that they be referenced and de-registered later */
@@ -89,24 +90,36 @@ export function _addButtons() {
         }
 }
 
-
-/*  JS public functions */
-
-// add items to database
-export function addElement(type, title, url, order) {
-    var is_public = "True";
-	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+/**
+ * Write javascript object parameter to database
+ *
+ * @param {Element} element - a descendent class of Element to be written to the database
+ * @returns {null}
+ */
+function _addElement(element) {
+        var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open("POST", window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.send(JSON.stringify({ "type": type, "title": title, "is_public": is_public, "url": url }));
+
+        // dispatch an AJAX post
+        if (element instanceof Article) {
+                xhr.send(JSON.stringify({ "type": "header2", "title": element.title, "is_public": element.public, "url": element.url, "count": element.count, "date": element.date }));
+        } else if (element instanceof Chainlink) {
+
+        } else if (element instanceof Content) {
+
+        }
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                         window.location.reload()
                 }
         }
 }
+
+
+/*  JS public functions */
 
 export function createFence() {
     var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -134,7 +147,12 @@ export function createFence() {
     }
 }
 
-// Create form elements and invoke addElement
+/**
+ * Create a form for editing an element (specified by type) and call addElement to update the database with the form contents
+ * 
+ * @param {string} type - string representation of the type of element that the edit form will be created for
+ * @returns {null}
+ */
 export function makeForm(type) {
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
@@ -157,14 +175,14 @@ export function makeForm(type) {
                 //section.appendChild(form);
                 //list.appendChild(section);
                 list.appendChild(form);
-                var url = ''
+                var url = '';
         }
 
         else if (type == 'linebreak') {
                 const chainlink = document.getElementById("chainlink-display").lastElementChild;
                 var order = chainlink.childElementCount - 1;
                 const url = chainlink.firstElementChild.getAttribute('id');
-                addElement('linebreak', '', url, order);
+                _addElement('linebreak', '', url, order);
                 return;
         }
 
@@ -189,7 +207,7 @@ export function makeForm(type) {
         document.getElementById('input').focus({ focusVisible: true });
         form.addEventListener("submit", function(event) {
                 event.preventDefault();
-                addElement(type, input.value, url, order);
+                _addElement(type, input.value, url, order);
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
                 _addButtons();
@@ -273,6 +291,7 @@ function escape(e, ref, fallback, element) {
                         let container = document.createElement("h2");
                         let root = createRoot(container);
                         formParent.prepend(container);
+                        window.location.reload();
                         root.render(<ChainlinkHeader title={fallback}/>);
                 } else if (chainlinkCreateForm) {
                         form.remove();
