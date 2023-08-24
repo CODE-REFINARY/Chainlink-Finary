@@ -85,6 +85,13 @@ function ContentCreationForm(props) {
                 </React.Fragment>
         );
 }
+function Chainlink(props) {
+        return (
+                <React.Fragment>
+                       <div id={props.url} class="chainlink-wrapper"></div> 
+                </React.Fragment>
+        );
+}
 
 
 /* JS utility functions (private) */
@@ -118,16 +125,13 @@ function _addElement(element) {
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
 
         // dispatch an AJAX post
-        if (element instanceof Article) {
-                xhr.send(JSON.stringify({ "type": "header1", "title": element.title, "is_public": element.public, "url": element.url, "date": element.date, "count": element.count, "order": element.order }));
-        } else if (element instanceof Chainlink) {
-                xhr.send(JSON.stringify({ "type": "header2", "title": element.title, "is_public": element.public, "url": element.url, "count": element.count, "date": element.date, "order": element.order }));
-        } else if (element instanceof Content) {
-                xhr.send(JSON.stringify({ "type": element.tag, "title": element.content, "is_public": element.public, "url": element.url, "count": element.count, "date": element.date, "order": element.order }));
-        }
+        xhr.send(JSON.stringify(element));
+
+        // instantiate element once AJAX Post comes back successful
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                         window.location.reload()
+                        // instantiateElement(element);
                 }
         }
 }
@@ -135,12 +139,15 @@ function _addElement(element) {
 /**
  * Create a representation of a Chainlink in #chainlink-display from either an AJAX response object or Chainlink object
  *
- * @param {Object} xhr - XMLHttpRequest object for a Chainlink creation request that's already returned
- * @param {Element} element - Chainlink object to create a chainlink object of
+ * @param {Object} element - XMLHttpRequest or Element object to instantiate on the screen
  * @returns {null}
  */
-function instantiateChainlinkElement() {
+function instantiateElement(element) {
+        if (element instanceof Chainlink) {
+                
+        } else if (element instanceof Content) {
 
+        }
 }
 
 /*  JS public functions */
