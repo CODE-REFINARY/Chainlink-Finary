@@ -85,10 +85,24 @@ function ContentCreationForm(props) {
                 </React.Fragment>
         );
 }
-function Chainlink(props) {
+function ChainlinkElement(props) {
         return (
                 <React.Fragment>
-                       <div id={props.url} class="chainlink-wrapper"></div> 
+                        <div id={props.url} className="chainlink-wrapper">
+                                <h2>
+                                        <span className="chainlink-inner-text">
+                                                {props.title}
+                                        </span>
+                                        <a className="inline-url header-url" href={"chainlink" + props.url + ".html"}>
+                                                {">>>" + props.url.substring(0, 10)}
+                                        </a>
+                                </h2>
+                                <div className="chainlink-buttons-wrapper">
+                                        <i class="context-span-message">context action &lt; - - - - - -</i>
+                                        <button class="cl-edit-btn" target={props.url}>edit</button>
+                                        <button class="cl-del-btn" target={props.url}>delete</button>
+                                </div>
+                        </div>
                 </React.Fragment>
         );
 }
@@ -130,21 +144,27 @@ function _addElement(element) {
         // instantiate element once AJAX Post comes back successful
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        window.location.reload()
-                        // instantiateElement(element);
+                        //window.location.reload()
+                        instantiateElement(element);
                 }
         }
 }
 
 /**
- * Create a representation of a Chainlink in #chainlink-display from either an AJAX response object or Chainlink object
+ * Create a representation of a Chainlink in #chainlink-display from either an Element
  *
  * @param {Object} element - XMLHttpRequest or Element object to instantiate on the screen
  * @returns {null}
  */
 function instantiateElement(element) {
         if (element instanceof Chainlink) {
-                
+                const display = document.getElementById("chainlink-display");
+                const container = document.createElement("section");
+                const root = createRoot(container);
+                container.className = "chainlink";
+                display.appendChild(container);
+                root.render(<ChainlinkElement title={element.title} url={element.url} />);
+
         } else if (element instanceof Content) {
 
         }

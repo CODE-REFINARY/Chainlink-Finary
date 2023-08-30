@@ -10,59 +10,98 @@ import hashlib  # use this to generate hashes for urls
 from django.conf import settings
 
 
-def db_store(tag_type, parent_url, title, public):
+def db_store(request, parent):
     """
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
 
-    :param tag_type: tag that this item will be stored as
-    :param parent_url: url string to identify the parent of this item
-    :param title: the desired title for the database item
-    :param public: flag is true if item to be marked public
+    :param <DEPRECATED> tag_type: tag that this item will be stored as
+    :param <DEPRECATED> parent_url: url string to identify the parent of this item
+    :param <DEPRECATED> title: the desired title for the database item
+    :param <DEPRECATED> public: flag is true if item to be marked public
+    :param request: Django request object containing Element data to be stored
+    :param parent: String indicating the url of the parent object of the Element to store
     """
-    tag = TagType(tag_type)
+    json_data = json.loads(request.body)
+
+    # Read the type of Element to store
+    tag = TagType(json_data["type"])
+
+    # Read the rest of the data from the http POST containing the Element object to store
+    title = json_data["title"]
+    url = json_data["url"]
+    public = json_data["is_public"]
+
     if tag == TagType.HEADER2:
-        parent_fence = get_object_or_404(Doc, url=parent_url)
+
+        # Update the parent object to indicate that it has a new child
+        article = get_object_or_404(Doc, url=parent)
+        article.count += 1
+
+        # Create a representation of the Chainlink object to write to the database
         cl = Chainlink()
-        cl.doc = parent_fence
-        cl.title = db_try_title(Chainlink, title)
-        cl.order = parent_fence.count
-        parent_fence.count += 1
+        cl.doc = article
+        cl.title = db_try_title(Chainlink, json_data["title"])
+        cl.order = article.count
         cl.url = db_try_url(TagType.HEADER2)
-        cl.public = public
+        cl.public = json_data["is_public"]
         cl.date = timezone.now()
         cl.count = 0
+
+        # Create a delimiter Content object as is required for Chainlink objects to indicate the end of the chain
         delimiter = Content()
         delimiter.chainlink = cl
         delimiter.tag = TagType.DELIMITER
         delimiter.url = cl.url
         delimiter.order = 0
         delimiter.content = ''
-        parent_fence.save()
+
+        # write objects to the database
+        article.save()
         cl.save()
         delimiter.save()
+
+        # return the request with the url updated with the url assigned to this chainlink
+        json_data["url"] = cl.url
+        return true
+
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
-        parent_chainlink = get_object_or_404(Chainlink, url=parent_url)
+
+        # Update the chainlink object that's a parent of the element to be written to the database
+        chainlink = get_object_or_404(Chainlink, url=parent)
+        chainlink.count += 1
+
+        # Update the position of the delimeter to make space for the new Content
         delimiter = Content.objects.filter(url=parent_url, tag=TagType.DELIMITER).first()
         delimiter.order += 1
-        delimiter.save()
+
+        # Create a representation of the Content object to write to database
         content = Content()
-        content.url = parent_url
-        content.chainlink = parent_chainlink
-        content.order = parent_chainlink.count
-        parent_chainlink.count += 1
-        parent_chainlink.save()
+        content.url = parent
+        content.chainlink = chainlink
+        content.order = chainlink.count
         content.tag = tag
-        content.content = title
+        content.content = json_data["content"]
+        content.public = json_data["is_public"]
+
+        # Write changes to the database
+        chainlink.save()
+        delimeter.save()
         content.save()
+        return true
     elif tag == TagType.HEADER1:
-        fence = Doc()
-        fence.title = db_try_title(Doc, title)
-        fence.url = db_try_url(TagType.HEADER1)
-        fence.public = public
-        fence.date = timezone.now()
-        fence.save()
-        return fence.url
-    return True
+        # Create a representation of the Article as a python object
+        article = Doc()
+        article.title = db_try_title(Doc, json_data["title"])
+        article.url = db_try_url(TagType.HEADER1)
+        article.public = json_data["is_public"]
+        article.date = json_data["date"]
+       
+        # Write Python Article object to database
+        article.save()
+
+        json_data["url"] = article.url
+        return True
+    return False
 
 
 def db_remove(table, url, order):
