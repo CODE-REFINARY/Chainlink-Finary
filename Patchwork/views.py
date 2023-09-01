@@ -10,7 +10,7 @@ import hashlib  # use this to generate hashes for urls
 from django.conf import settings
 
 
-def db_store(request, parent):
+def db_store(properties, parent=""):
     """
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
 
@@ -18,18 +18,13 @@ def db_store(request, parent):
     :param <DEPRECATED> parent_url: url string to identify the parent of this item
     :param <DEPRECATED> title: the desired title for the database item
     :param <DEPRECATED> public: flag is true if item to be marked public
-    :param request: Django request object containing Element data to be stored
-    :param parent: String indicating the url of the parent object of the Element to store
+    :param request: JSON payload specifying the properties of the Element to write to the database
+    :param parent (optional): String indicating the url of the parent object of the Element to store. Content uses the url of its Chainlink and thus this parameter is not needed for elements of type Content. In this case, this parameter is only used if no URL is specified in the JSON payload.
     """
-    json_data = json.loads(request.body)
-
+    # Parse the stringified json in the argument so that the payload can be read and written to the database
+    json_data = json.loads(properties)
     # Read the type of Element to store
     tag = TagType(json_data["type"])
-
-    # Read the rest of the data from the http POST containing the Element object to store
-    title = json_data["title"]
-    url = json_data["url"]
-    public = json_data["is_public"]
 
     if tag == TagType.HEADER2:
 
@@ -62,8 +57,7 @@ def db_store(request, parent):
 
         # return the request with the url updated with the url assigned to this chainlink
         json_data["url"] = cl.url
-        return true
-
+        return json.dumps(json_data)
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
 
         # Update the chainlink object that's a parent of the element to be written to the database
@@ -71,12 +65,15 @@ def db_store(request, parent):
         chainlink.count += 1
 
         # Update the position of the delimeter to make space for the new Content
-        delimiter = Content.objects.filter(url=parent_url, tag=TagType.DELIMITER).first()
+        delimiter = Content.objects.filter(url=parent, tag=TagType.DELIMITER).first()
         delimiter.order += 1
 
         # Create a representation of the Content object to write to database
         content = Content()
-        content.url = parent
+        if (json_data["url"] == ""):
+            content.url = parent
+        else:
+            content.url = json_data["url"]
         content.chainlink = chainlink
         content.order = chainlink.count
         content.tag = tag
@@ -87,7 +84,7 @@ def db_store(request, parent):
         chainlink.save()
         delimeter.save()
         content.save()
-        return true
+        return json.dumps(json_data)
     elif tag == TagType.HEADER1:
         # Create a representation of the Article as a python object
         article = Doc()
@@ -100,7 +97,7 @@ def db_store(request, parent):
         article.save()
 
         json_data["url"] = article.url
-        return True
+        return json.dumps(json_data)
     return False
 
 
@@ -183,20 +180,13 @@ def generic(request, key=''):
         return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
 
     elif request.method == 'POST':
-        # get POST request json payload
-        json_data = json.loads(request.body)
-
-        type = json_data["type"]
-        try_title = json_data["title"]
-        url = json_data["url"]
-        public = json_data["is_public"]
-
-        if type == "header2":
-            if db_store(type, key, try_title, public):
-                return render(request, 'Patchwork/success.html', {})
-        elif type == 'header3' or type == 'paragraph' or type == 'code' or type == 'linebreak':
-            if db_store(type, url, try_title, public):
-                return render(request, 'Patchwork/success.html', {})
+        # Call auxiliary function to write the Element specified as JSON in the request object
+        # The request payload contains JSON specifying the properties of the Element to write to the database
+        payload = request.body
+        # db_store returns this payload argument back with any modifications that were made (such as a url being updated for example)
+        payload = db_store(payload, key)
+        # The server response is the payload itself
+        return HttpResponse(payload, content_type='application/json')
 
     elif request.method == 'DELETE':
         match request.headers["type"]:

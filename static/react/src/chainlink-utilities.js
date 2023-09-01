@@ -94,13 +94,13 @@ function ChainlinkElement(props) {
                                                 {props.title}
                                         </span>
                                         <a className="inline-url header-url" href={"chainlink" + props.url + ".html"}>
-                                                {">>>" + props.url.substring(0, 10)}
+                                                {">>>" + props.url.substring(0, 9)}
                                         </a>
                                 </h2>
                                 <div className="chainlink-buttons-wrapper">
-                                        <i class="context-span-message">context action &lt; - - - - - -</i>
-                                        <button class="cl-edit-btn" target={props.url}>edit</button>
-                                        <button class="cl-del-btn" target={props.url}>delete</button>
+                                        <i className="context-span-message">context action &lt; - - - - - -</i>
+                                        <button className="cl-edit-btn" target={props.url}>edit</button>
+                                        <button className="cl-del-btn" target={props.url}>delete</button>
                                 </div>
                         </div>
                 </React.Fragment>
@@ -137,6 +137,7 @@ function _addElement(element) {
         xhr.open("POST", window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
 
         // dispatch an AJAX post
         xhr.send(JSON.stringify(element));
@@ -144,8 +145,7 @@ function _addElement(element) {
         // instantiate element once AJAX Post comes back successful
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        //window.location.reload()
-                        instantiateElement(element);
+                        instantiateElement(xhr.response);
                 }
         }
 }
@@ -157,7 +157,7 @@ function _addElement(element) {
  * @returns {null}
  */
 function instantiateElement(element) {
-        if (element instanceof Chainlink) {
+        if (element instanceof Chainlink || element.type == "header2") {
                 const display = document.getElementById("chainlink-display");
                 const container = document.createElement("section");
                 const root = createRoot(container);
