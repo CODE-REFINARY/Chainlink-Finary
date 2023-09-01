@@ -208,7 +208,7 @@ function instantiateElement(element) {
                 root.render(<ChainlinkElement title={element.title} url={element.url} />);
 
         } else if (element instanceof Content || element.type == "header3" || element.type == "code" || element.type == "paragraph" || element.type == "linebreak") {
-                const parent = document.getElementById("chainlink-display").lastChild;
+                const parent = document.getElementById("chainlink-display").lastElementChild;
                 const container = document.createElement("div");
                 const root = createRoot(container);
                 container.className = "content-wrapper";
@@ -282,6 +282,8 @@ export function makeForm(type) {
                 url = chainlink.firstElementChild.getAttribute('id');
                 const element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
                 _addElement(element);
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
                 return;
         }
 
@@ -418,7 +420,8 @@ export function parseKeyDown(e) {
             window.scrollBy(0, -70);
         } else if (keyCode == 74) {
             window.scrollBy(0, 70);
-        } 
+        }
+
         else if (keyCode == 80 && loc != "doc-empty") {
                 e.preventDefault();
                 makeForm('paragraph');

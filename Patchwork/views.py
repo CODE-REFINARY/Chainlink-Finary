@@ -75,7 +75,7 @@ def db_store(properties, parent=""):
         else:
             content.url = json_data["url"]
         content.chainlink = chainlink
-        content.order = chainlink.count
+        content.order = chainlink.count - 1     # content orderings are 0-indexed
         content.tag = tag
         content.content = json_data["content"]
         content.public = json_data["is_public"]
