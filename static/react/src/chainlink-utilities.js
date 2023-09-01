@@ -106,7 +106,49 @@ function ChainlinkElement(props) {
                 </React.Fragment>
         );
 }
+function ContentElement(props) {
+        let Tag = "";
+        if (props.type === 'header3') {
+                Tag = 'h3';
+        } else if (props.type === 'code') {
+                Tag = 'code';
+        } else if (props.type === 'paragraph') {
+                Tag = 'p';
+        } else if (props.type === 'linebreak') {
+                Tag = 'br';
+        } else {
+                Tag = 'div';
+        }
 
+        if (Tag === 'br') {
+                return (
+                        <React.Fragment>
+                                <span className="inner-content br">
+                                        <i>&lt;!-- linebreak insert --&gt;</i>
+                                </span>
+                                <div className="context-buttons-wrapper">
+                                        <i className="context-span-message">context action &lt; - - - - - - </i>
+                                        <button className="cont-edit-btn">edit</button>
+                                        <button className="cont-del-btn">delete</button>
+                                </div>
+                        </React.Fragment>
+                );
+        }
+        else {
+                return (
+                        <React.Fragment>
+                                <Tag className="inner-content">
+                                        {props.content}
+                                </Tag>
+                                <div className="context-buttons-wrapper">
+                                        <i className="context-span-message">context action &lt; - - - - - - </i>
+                                        <button className="cont-edit-btn">edit</button>
+                                        <button className="cont-del-btn">delete</button>
+                                </div>
+                        </React.Fragment>
+                );
+        }
+}
 
 /* JS utility functions (private) */
 
@@ -151,7 +193,7 @@ function _addElement(element) {
 }
 
 /**
- * Create a representation of a Chainlink in #chainlink-display from either an Element
+ * Create a representation of an element of type Chainlink or Content. Display this element under #chainlink-display
  *
  * @param {Object} element - XMLHttpRequest or Element object to instantiate on the screen
  * @returns {null}
@@ -165,8 +207,14 @@ function instantiateElement(element) {
                 display.appendChild(container);
                 root.render(<ChainlinkElement title={element.title} url={element.url} />);
 
-        } else if (element instanceof Content) {
-
+        } else if (element instanceof Content || element.type == "header3" || element.type == "code" || element.type == "paragraph" || element.type == "linebreak") {
+                const parent = document.getElementById("chainlink-display").lastChild;
+                const container = document.createElement("div");
+                const root = createRoot(container);
+                container.className = "content-wrapper";
+                container.id = element.url + "-" + element.order;
+                parent.appendChild(container);
+                root.render(<ContentElement type={element.type} content={element.content} url={element.url} />);
         }
 }
 
@@ -249,9 +297,44 @@ export function makeForm(type) {
                 window.addEventListener("keyup", parseKeyUp);
                 _addElement(element);
                 _addButtons();
+                container.remove();
         });
 }
 
+
+/**
+ * Create a new Article object and write it to the database via AJAX. Then reload the page if the page write was successful
+ *
+ * @returns {null}
+ */
+export function createFence() {
+        const currentDateTime = new Date().toISOString();
+        const article = new Article("article", "", currentDateTime, false, 0, 0);
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "generate.html", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(article));
+
+        xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        const url = xhr.response.url;
+                        var url_substring = url.substring(0, 10);
+                        let nxhr = new XMLHttpRequest();
+                        nxhr.open("PUT", "doc" + url + ".html", true);
+                        nxhr.setRequestHeader('X-CSRFToken', csrftoken);
+                        nxhr.setRequestHeader('type', 'doc');
+                        nxhr.setRequestHeader('title', "fence" + url_substring);
+                        nxhr.setRequestHeader('target', 'null');
+                        nxhr.send();
+                        nxhr.onreadystatechange = function() {
+                                window.location.replace("doc" + url + ".html");
+                        }
+                }
+        }
+}
 
 
 /**
@@ -308,31 +391,6 @@ function escape(e, ref, fallback, element) {
         }
 }
 
-export function createFence() {
-    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "generate.html", true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-    xhr.send(JSON.stringify({ "title": "fence", "is_public": false }));
-
-    xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            const url = xhr.getResponseHeader('url');
-            var url_substring = url.substring(0, 10);
-            let nxhr = new XMLHttpRequest();
-            nxhr.open("PUT", "doc" + url + ".html", true);
-            nxhr.setRequestHeader('X-CSRFToken', csrftoken);
-            nxhr.setRequestHeader('type', 'doc');
-            nxhr.setRequestHeader('title', "fence" + url_substring);
-            nxhr.setRequestHeader('target', 'null');
-            nxhr.send();
-            nxhr.onreadystatechange = function() {
-                window.location.replace("doc" + url + ".html");
-            }
-        }
-    }
-}
 
 // Keypress parsing function for creating chainlinks and form elements
 export function parseKeyUp(e) {

@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from .models import Chainlink, Doc, Content, TagType
 from django.views.decorators.cache import cache_control
@@ -61,11 +61,11 @@ def db_store(properties, parent=""):
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
 
         # Update the chainlink object that's a parent of the element to be written to the database
-        chainlink = get_object_or_404(Chainlink, url=parent)
+        chainlink = get_object_or_404(Chainlink, url=json_data["url"])
         chainlink.count += 1
 
         # Update the position of the delimeter to make space for the new Content
-        delimiter = Content.objects.filter(url=parent, tag=TagType.DELIMITER).first()
+        delimiter = Content.objects.filter(url=json_data["url"], tag=TagType.DELIMITER).first()
         delimiter.order += 1
 
         # Create a representation of the Content object to write to database
@@ -82,7 +82,7 @@ def db_store(properties, parent=""):
 
         # Write changes to the database
         chainlink.save()
-        delimeter.save()
+        delimiter.save()
         content.save()
         return json.dumps(json_data)
     elif tag == TagType.HEADER1:
@@ -256,28 +256,18 @@ def chainlink(request, key):
 
 
 def generate(request):
-    # generate.html is just a standard form for creating a new doc entry in the database once generic.html is loaded
-    # user enters a title for the new doc submit button on generic.html causes a POST which sends date, title,
-    # public field info to the server. Server creates a doc with a primary key server hashes primary key (key field)
-    # using HashId, appends ".html" onto it and stores value in the url field
-    if request.method == 'POST':
-        # get POST request json payload
-        json_data = json.loads(request.body)
-        title = json_data['title']
-        public = json_data['is_public']
-        url = db_store(TagType.HEADER1, None, title, public)
-        if url:
-            response = render(request, 'Patchwork/success.html', {})
-            response['url'] = url
-            return response
-        else:
-            return render(request, 'Patchwork/failure.html', {})
+    """
+    Create an Article. Write the article to the database and communicate back any updates to the specified article properties by returning the updated properties as JSON.
 
-        response = render(request, 'Patchwork/success.html', {})
-        response['url'] = doc.url
-        return response
-    docs = Doc.objects.all()
-    return render(request, 'Patchwork/generate.html', {'docs': docs})
+    :param request: http request object. The payload is the set of poperties for the Article.
+    """
+    if request.method == 'POST':
+        payload = request.body
+        payload = db_store(payload)
+        return HttpResponse(payload, content_type='application/json')
+
+    else:
+        return Http404("Only POST is supported for this url")
 
 
 def index(request):
