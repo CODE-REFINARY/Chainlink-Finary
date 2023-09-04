@@ -159,37 +159,45 @@
 
 
 </div>
-<div id="chainlink-display">
-{% for content in contents %}
-		{% if content.tag == 'header2' %}
-		<section class="chainlink">
-			<div id="{{ content.url }}" class="chainlink-wrapper">
-				<h2>
-                    <span class="chainlink-inner-text">{{ content.title }}</span>
-				    <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
-                </h2>
-			</div>
-		{% elif content.tag == 'paragraph' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<p class="inner-content">{{ content.content }}</p>	
-			
+
+<!-- Article content is always displayed in #chainlink-display -->
+<div id="chainlink-display" template="article">{% for content in contents %}
+	{% if content.tag == 'header2' %}
+	<section class="chainlink">
+		<div id="{{ content.url }}" class="chainlink-wrapper">
+			<h2>
+	    <span class="chainlink-inner-text">{{ content.title }}</span>
+			    <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
+	</h2>
 		</div>
-		{% elif content.tag == 'code' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<code class="inner-content">{{ content.content }}</code>
-			
-		</div>
-		{% elif content.tag == 'header3' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<h3 class="inner-content">{{ content.content }}</h3>
-		</div>
-		{% elif content.tag == 'linebreak' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
-		</div>
-        {% elif content.tag == 'delimiter' %}
-		</section>
-		{% endif %}
-{% endfor %}
-{% endblock %}
+	{% elif content.tag == 'paragraph' %}
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+		<p class="inner-content">{{ content.content }}</p>	
+		
+	</div>
+	{% elif content.tag == 'code' %}
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+		<code class="inner-content">{{ content.content }}</code>
+		
+	</div>
+	{% elif content.tag == 'header3' %}
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+		<h3 class="inner-content">{{ content.content }}</h3>
+	</div>
+	{% elif content.tag == 'linebreak' %}
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+		<span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
+	</div>
+{% elif content.tag == 'delimiter' %}
+	</section>
+	{% endif %}
+{% endfor %}</div>
+
+<!-- Elements under the add-buttons element are buttons used to create content on the page -->
+<div id="react-add-buttons">
+	<!-- The chainlink add button is placed under this div -->
+	<div id="chainlink-placeholder"></div>
+	<!-- All buttons used to create content is stored under this parent div -->
+	<div id="content-placeholder"></div>
 </div>
+{% endblock %}
