@@ -12,86 +12,100 @@ var chainlinkDeleteButtonsEventHandlers = [];
 var contentEditButtonsEventHandlers = [];
 var contentDeleteButtonsEventHandlers = [];
 
-/* Read-Only flag variables */
-
-/* DOM variables */
-
-/* Boolean flags */
-
-/* Javascript objects that update alongside the page and modify it */
-
-// this flag indicates that Article view is current
-const isArticle = {
-        get value() {
-                return (document.getElementById("chainlink-display").getAttribute("template") === "article"); 
-        }
-};
-// flag indicates that Chainlink view is current
-const isChainlink = {
-        get value() {
-                return (document.getElementById("chainlink-display").getAttribute("template") === "chainlink"); 
-        }
-};
-
-// flag indicates that the article has no chainlinks (and thus no content). This flag is only set in Article view
-const articleIsEmpty = {
-        get value() {
-                return (document.getElementById("chainlink-display").childElementCount === 0 && isArticle.value);
-        }
-};
-
-// flag indicates that the chainlink has no content display. This flag is only set in Chainlink view
-const chainlinkIsEmpty = {
-        get value() {
-                return (document.getElementById("chainlink-display").firstElementChild.childElementCount === 1 && isChainlink.value);
-        }
-};
+// State variables to describe the state of the page
+var isArticle;
+var isChainlink;
+var articleIsEmpty;
+var chainlinkIsEmpty;
+var chainlinkButton;
+var contentButtons;
 
 
-/* Javascript objects with setters that alter contents of the page when called */
+// Set up state variables after DOM is ready to be read
+document.addEventListener("DOMContentLoaded", function() {
 
-// chainlinkButton is a boolean that indicates the presence of the button that creates Chainlinks
-const chainlinkButton = {
-        _value: false,
-        get value() {
-                return this._value;
-        },
-        set value(newValue) {
-                if (newValue !== this._value) {
-                        this._value = newValue;
-                        const container = document.getElementById("chainlink-placeholder");
-                        const root = createRoot(container);
-                        if (newValue === true) {
-                                root.render(<CreateChainlinkButton />);
-                        }
-                        else {
-                                root.unmount();
+        /* Read-Only flag variables */
+
+        /* DOM variables */
+
+        /* Boolean flags */
+
+        /* Javascript objects that update alongside the page and modify it */
+
+        // this flag indicates that Article view is current
+        isArticle = {
+                get value() {
+                        return (document.getElementById("chainlink-display").getAttribute("template") === "article"); 
+                }
+        };
+        // flag indicates that Chainlink view is current
+        isChainlink = {
+                get value() {
+                        return (document.getElementById("chainlink-display").getAttribute("template") === "chainlink"); 
+                }
+        };
+
+        // flag indicates that the article has no chainlinks (and thus no content). This flag is only set in Article view
+        articleIsEmpty = {
+                get value() {
+                        return (document.getElementById("chainlink-display").childElementCount === 0 && isArticle.value);
+                }
+        };
+
+        // flag indicates that the chainlink has no content display. This flag is only set in Chainlink view
+        chainlinkIsEmpty = {
+                get value() {
+                        return (document.getElementById("chainlink-display").firstElementChild.childElementCount === 1 && isChainlink.value);
+                }
+        };
+
+
+        /* Javascript objects with setters that alter contents of the page when called */
+
+        // chainlinkButton is a boolean that indicates the presence of the button that creates Chainlinks
+        chainlinkButton = {
+                _value: false,
+                root: createRoot(document.getElementById("chainlink-placeholder")),
+                get value() {
+                        return this._value;
+                },
+                set value(newValue) {
+                        if (newValue !== this._value) {
+                                this._value = newValue;
+                                //const container = document.getElementById("chainlink-placeholder");
+                                //const root = createRoot(container);
+                                if (newValue === true) {
+                                        this.root.render(<CreateChainlinkButton active={true}/>);
+                                }
+                                else {
+                                        this.root.render(<CreateChainlinkButton active={false}/>);
+                                }
                         }
                 }
-        }
-};
-// contentButtons indicates the existence of buttons that create content on the page
-const contentButtons = {
-        _value: false,
-        get value() {
-                return this._value;
-        },
-        set value(newValue) {
-                if (newValue !== this._value) {
-                        this._value = newValue;
-                        const container = document.getElementById("content-placeholder");
-                        const root = createRoot(container);
-                        if (newValue === true) {
-                                root.render(<CreateContentButtons />);
-                        }
-                        else {
-                                root.unmount();
+        };
+        // contentButtons indicates the existence of buttons that create content on the page
+        contentButtons = {
+                _value: false,
+                root: createRoot(document.getElementById("content-placeholder")),
+                get value() {
+                        return this._value;
+                },
+                set value(newValue) {
+                        if (newValue !== this._value) {
+                                this._value = newValue;
+                                //const root = createRoot(container);
+                                if (newValue === true) {
+                                        this.root.render(<CreateContentButtons active={true}/>);
+                                }
+                                else {
+                                        this.root.render(<CreateContentButtons active={false}/>);
+                                }
                         }
                 }
-        }
-};
+        };
 
 
+});
 
 /* React components */
 function ContentCreationButtonsFive() {
@@ -105,7 +119,10 @@ function ContentCreationButtonsFive() {
                 </React.Fragment>
         );
 }
-function CreateContentButtons() {
+function CreateContentButtons(props) {
+        if (!props.active) {
+                return null;
+        }
         return (
                 <React.Fragment>
                         <button id="add-p-btn" className="add-buttons" onClick={() => makeForm('paragraph')}>&lt;p&gt; paragraph</button>
@@ -115,7 +132,10 @@ function CreateContentButtons() {
                 </React.Fragment>
         );
 }
-function CreateChainlinkButton() {
+function CreateChainlinkButton(props) {
+        if (!props.active) {
+                return null;
+        }
         return (
                 <React.Fragment>
                         <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm('header2')}>&lt;n&gt; chainlink</button>
@@ -237,7 +257,7 @@ function ContentElement(props) {
  *
  * @returns {null}
  */
-export function _addButtons() {
+/*export function _addButtons() {
         if (window.in === 'doc') {
                 addContentButtons(5);
         } else if (window.in === 'doc-empty') {
@@ -245,7 +265,7 @@ export function _addButtons() {
         } else if (window.in === 'chainlink') {
                 addContentButtons(4);
         }
-}
+}*/
 
 /**
  * Write javascript object parameter to database
@@ -369,7 +389,9 @@ export function makeForm(type) {
                 return;
         }
 
-        deleteButtons();        // remove buttons temporarily while user input prompt is active 
+        //deleteButtons();        // remove buttons temporarily while user input prompt is active
+        chainlinkButton.value = false;
+        contentButtons.value = false;
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
                 if (type == "header2") {
@@ -380,44 +402,11 @@ export function makeForm(type) {
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
                 _addElement(element);
-                _addButtons();
+                // _addButtons();
+                chainlinkButton.value = true;
+                contentButtons.value = true;
                 container.remove();
         });
-}
-
-
-/**
- * Create a new Article object and write it to the database via AJAX. Then reload the page if the page write was successful
- *
- * @returns {null}
- */
-export function createFence() {
-        const currentDateTime = new Date().toISOString();
-        const article = new Article("article", "", currentDateTime, false, 0, 0);
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "generate.html", true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.responseType = "json";
-        xhr.send(JSON.stringify(article));
-
-        xhr.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                        const url = xhr.response.url;
-                        var url_substring = url.substring(0, 10);
-                        let nxhr = new XMLHttpRequest();
-                        nxhr.open("PUT", "doc" + url + ".html", true);
-                        nxhr.setRequestHeader('X-CSRFToken', csrftoken);
-                        nxhr.setRequestHeader('type', 'doc');
-                        nxhr.setRequestHeader('title', "fence" + url_substring);
-                        nxhr.setRequestHeader('target', 'null');
-                        nxhr.send();
-                        nxhr.onreadystatechange = function() {
-                                window.location.replace("doc" + url + ".html");
-                        }
-                }
-        }
 }
 
 
@@ -475,26 +464,54 @@ function escape(e, ref, fallback, element) {
         }
 }
 
+/**
+ * Create a new Article object and write it to the database via AJAX. Then reload the page if the page write was successful
+ *
+ * @returns {null}
+ */
+export function createFence() {
+        const currentDateTime = new Date().toISOString();
+        const article = new Article("article", "", currentDateTime, false, 0, 0);
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "generate.html", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(article));
+
+        xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        const url = xhr.response.url;
+                        var url_substring = url.substring(0, 10);
+                        let nxhr = new XMLHttpRequest();
+                        nxhr.open("PUT", "doc" + url + ".html", true);
+                        nxhr.setRequestHeader('X-CSRFToken', csrftoken);
+                        nxhr.setRequestHeader('type', 'doc');
+                        nxhr.setRequestHeader('title', "fence" + url_substring);
+                        nxhr.setRequestHeader('target', 'null');
+                        nxhr.send();
+                        nxhr.onreadystatechange = function() {
+                                window.location.replace("doc" + url + ".html");
+                        }
+                }
+        }
+}
+
+
+
+
 
 // Keypress parsing function for creating chainlinks and form elements
 export function parseKeyUp(e) {
         var keyCode = e.which;
-        //alert(keyCode);
-        var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
-        if (keyCode == 17) {            // ctrl
-                window.ctrl = false;    // flag that the ctrl key has been released
-        } else if (window.ctrl) {       // exit if the ctrl key is currently being held down
-                return;
-        }
 }
 
 // Keypress parsing function for moving the page up and down
 export function parseKeyDown(e) {
         var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
         var keyCode = e.which;
-        if (keyCode == 17) {     // ctrl
-                window.ctrl = true;     // flag that the ctrl key is currently being pressed
-        } else if (window.ctrl) {       // exit if the ctrl key is currently being pressed
+        if (e.ctrlKey) {       // exit if the ctrl key is currently being pressed
                 return;
         }
         //alert(keyCode);
@@ -528,8 +545,8 @@ export function parseKeyDown(e) {
  * @param {number} quantity - the number of buttons to create. 1 button is chainlink. 5 buttons is everything. 4 buttons is everything but chainlink
  * @returns {null}
  */
-export function addContentButtons(quantity) {
-	var mainElement = document.querySelector("main");     
+export function initialize() {
+	/*var mainElement = document.querySelector("main");     
         var container = document.createElement("div");
         container.id = "add-buttons";
         mainElement.appendChild(container);
@@ -540,15 +557,23 @@ export function addContentButtons(quantity) {
                 root.render(<CreateContentButtons />);
         } else if (quantity == 5) {
                 root.render(<ContentCreationButtonsFive />);
+        }*/
+
+        if (isArticle.value) {
+                contentButtons.value = true;
+                chainlinkButton.value = true;
+        } else if (isChainlink.value) {
+                contentButtons.value = true;
+        } else if (articleIsEmpty.value) {
+                chainlinkButton.value = true;
+        } else if (chainlinkIsEmpty.value) {
+                contentButtons.value = true;
         }
 
-        console.log("isarticle: " + isArticle.value); 
-        console.log("ischainilnk: " + isChainlink.value);
-        console.log("chainlnkIsEmpty: " + chainlinkIsEmpty.value);
+        console.log("isArticle: " + isArticle.value); 
+        console.log("isChainlink: " + isChainlink.value);
+        console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
         console.log("articleIsEmpty: " + articleIsEmpty.value);
-
-        contentButtons.value = true;
-        chainlinkButton.value = true;
 
 }
 

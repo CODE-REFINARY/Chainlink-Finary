@@ -1,19 +1,9 @@
-import { parseKeyUp, parseKeyDown, addContentButtons, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence } from "./chainlink-utilities.js";
+import { parseKeyUp, parseKeyDown, addContentButtons, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence, initialize } from "./chainlink-utilities.js";
 
 // await full DOM load before adding DB items
 document.addEventListener("DOMContentLoaded", function() {
 
-        // Globals
-        window.ctrl = false;			// This flag indicates whether the "ctrl" key is being held down
-
-        // Handle empty document case where only chainlink add button should be present
-        if (document.getElementById("chainlink-display").querySelector(":scope > section") == null) {
-                window.in = "doc-empty";	// signal to key parser to disable all hotkeys except "c"
-                addContentButtons(1);
-        } else {
-                window.in = "doc";
-                addContentButtons(5);
-        }
+        initialize();
 
         // Add the event listeners above for keystrokes
         window.addEventListener("keyup", parseKeyUp);
