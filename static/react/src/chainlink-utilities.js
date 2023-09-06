@@ -19,14 +19,16 @@ var articleIsEmpty;
 var chainlinkIsEmpty;
 var chainlinkButton;
 var contentButtons;
+var numElements;
+
+/* Static Variables */
+const elementClassNames = ["article-wrapper", "chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify Elements
 
 
 // Set up state variables after DOM is ready to be read
 document.addEventListener("DOMContentLoaded", function() {
 
         /* Read-Only flag variables */
-
-        /* DOM variables */
 
         /* Boolean flags */
 
@@ -55,7 +57,19 @@ document.addEventListener("DOMContentLoaded", function() {
         // flag indicates that the chainlink has no content display. This flag is only set in Chainlink view
         chainlinkIsEmpty = {
                 get value() {
+                        if (!document.getElementById("chainlink-display").firstElementChild) {
+                                return false;
+                        }
                         return (document.getElementById("chainlink-display").firstElementChild.childElementCount === 1 && isChainlink.value);
+                }
+        };
+
+        // variable indicates the number of elements currently rendered on the screen
+        numElements = {
+                get value() {
+                        const selector = elementClassNames.map(className => `.${className}`).join(', ');
+                        const elements = document.querySelectorAll(selector);
+                        return (Array.from(elements).length);
                 }
         };
 
@@ -188,7 +202,7 @@ function ContentCreationForm(props) {
 function ChainlinkElement(props) {
         return (
                 <React.Fragment>
-                        <div id={props.url} className="chainlink-wrapper">
+                        <div id={props.url} className="chainlink-wrapper" index={props.index}>
                                 <h2>
                                         <span className="chainlink-inner-text">
                                                 {props.title}
@@ -253,6 +267,56 @@ function ContentElement(props) {
 /* JS utility functions (private) */
 
 /**
+ * Create the buttons that appear in #chainlink-display toward the bottom of the fence
+ *
+ * @param {number} quantity - the number of buttons to create. 1 button is chainlink. 5 buttons is everything. 4 buttons is everything but chainlink
+ * @returns {null}
+ */
+export function initialize() {
+	/*var mainElement = document.querySelector("main");
+        var container = document.createElement("div");
+        container.id = "add-buttons";
+        mainElement.appendChild(container);
+        var root = createRoot(container);
+        if (quantity == 1) {
+                root.render(<CreateChainlinkButton />);
+        } else if (quantity == 4) {
+                root.render(<CreateContentButtons />);
+        } else if (quantity == 5) {
+                root.render(<ContentCreationButtonsFive />);
+        }*/
+
+        // Render chainlink/content creation buttons
+        if (isArticle.value) {
+                contentButtons.value = true;
+                chainlinkButton.value = true;
+        } else if (isChainlink.value) {
+                contentButtons.value = true;
+        } else if (articleIsEmpty.value) {
+                chainlinkButton.value = true;
+        } else if (chainlinkIsEmpty.value) {
+                contentButtons.value = true;
+        }
+
+        // Assign indices to Elements
+        var index = 0;
+        const allElements = document.querySelectorAll('*');
+        for (let i = 0; i < allElements.length; i++) {
+                const element = allElements[i];
+                for (let j = 0; j < elementClassNames.length; j++) {
+                        if (element.classList.contains(elementClassNames[j])) {
+                                element.setAttribute("index", index);
+                                index++;
+                                break;
+                        }
+                }
+        }
+
+        showDiagnostics();
+}
+
+
+/**
  * Create the correct number of content buttons depending on current page
  *
  * @returns {null}
@@ -266,6 +330,14 @@ function ContentElement(props) {
                 addContentButtons(4);
         }
 }*/
+
+function showDiagnostics() {
+        console.log("isArticle: " + isArticle.value); 
+        console.log("isChainlink: " + isChainlink.value);
+        console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
+        console.log("articleIsEmpty: " + articleIsEmpty.value);
+        console.log("numElements: " + numElements.value);
+}
 
 /**
  * Write javascript object parameter to database
@@ -305,19 +377,21 @@ function instantiateElement(element) {
                 const root = createRoot(container);
                 container.className = "chainlink";
                 display.appendChild(container);
-                root.render(<ChainlinkElement title={element.title} url={element.url} />);
+                root.render(<ChainlinkElement title={element.title} url={element.url} index={numElements.value} />);
 
         } else if (element instanceof Content || element.type == "header3" || element.type == "code" || element.type == "paragraph" || element.type == "linebreak") {
                 const parent = document.getElementById("chainlink-display").lastElementChild;
                 const container = document.createElement("div");
                 const root = createRoot(container);
                 container.className = "content-wrapper";
+                container.setAttribute("index", numElements.value);
                 container.id = element.url + "-" + element.order;
                 parent.appendChild(container);
                 root.render(<ContentElement type={element.type} content={element.content} url={element.url} />);
 
 
         }
+        showDiagnostics();
 }
 
 /*  JS public functions */
@@ -539,43 +613,6 @@ export function parseKeyDown(e) {
         }
 }
 
-/**
- * Create the buttons that appear in #chainlink-display toward the bottom of the fence
- *
- * @param {number} quantity - the number of buttons to create. 1 button is chainlink. 5 buttons is everything. 4 buttons is everything but chainlink
- * @returns {null}
- */
-export function initialize() {
-	/*var mainElement = document.querySelector("main");     
-        var container = document.createElement("div");
-        container.id = "add-buttons";
-        mainElement.appendChild(container);
-        var root = createRoot(container);
-        if (quantity == 1) {
-                root.render(<CreateChainlinkButton />);
-        } else if (quantity == 4) {
-                root.render(<CreateContentButtons />);
-        } else if (quantity == 5) {
-                root.render(<ContentCreationButtonsFive />);
-        }*/
-
-        if (isArticle.value) {
-                contentButtons.value = true;
-                chainlinkButton.value = true;
-        } else if (isChainlink.value) {
-                contentButtons.value = true;
-        } else if (articleIsEmpty.value) {
-                chainlinkButton.value = true;
-        } else if (chainlinkIsEmpty.value) {
-                contentButtons.value = true;
-        }
-
-        console.log("isArticle: " + isArticle.value); 
-        console.log("isChainlink: " + isChainlink.value);
-        console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
-        console.log("articleIsEmpty: " + articleIsEmpty.value);
-
-}
 
 export function deleteButtons() {
         document.getElementById('add-buttons').remove();
