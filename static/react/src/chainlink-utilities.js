@@ -12,14 +12,15 @@ var chainlinkDeleteButtonsEventHandlers = [];
 var contentEditButtonsEventHandlers = [];
 var contentDeleteButtonsEventHandlers = [];
 
-// State variables to describe the state of the page
+// State variables to describe the state of the page. These can be called to reliable determine something about the current page
 var isArticle;
 var isChainlink;
 var articleIsEmpty;
 var chainlinkIsEmpty;
 var chainlinkButton;
 var contentButtons;
-var numElements;
+var numElements;        // the number of Elements rendered on the page
+var cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
 
 /* Static Variables */
 const elementClassNames = ["article-wrapper", "chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify Elements
@@ -75,6 +76,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         /* Javascript objects with setters that alter contents of the page when called */
+
+        // cursor
+        cursor = {}
 
         // chainlinkButton is a boolean that indicates the presence of the button that creates Chainlinks
         chainlinkButton = {
@@ -200,9 +204,14 @@ function ContentCreationForm(props) {
         );
 }
 function ChainlinkElement(props) {
+
+        useEffect(() => {
+                _enumerateElements();
+        }, []);
+
         return (
                 <React.Fragment>
-                        <div id={props.url} className="chainlink-wrapper" index={props.index}>
+                        <div id={props.url} className="chainlink-wrapper">
                                 <h2>
                                         <span className="chainlink-inner-text">
                                                 {props.title}
@@ -221,6 +230,11 @@ function ChainlinkElement(props) {
         );
 }
 function ContentElement(props) {
+
+        useEffect(() => {
+                _enumerateElements();
+        }, []);
+
         let Tag = "";
         if (props.type === 'header3') {
                 Tag = 'h3';
@@ -298,7 +312,17 @@ export function initialize() {
                 contentButtons.value = true;
         }
 
-        // Assign indices to Elements
+        _enumerateElements();
+        showDiagnostics();
+}
+
+
+/**
+ * Assign indices to Elements. The title element is always index 0. 
+ *
+ * @returns {null}
+ */
+function _enumerateElements() {
         var index = 0;
         const allElements = document.querySelectorAll('*');
         for (let i = 0; i < allElements.length; i++) {
@@ -311,8 +335,6 @@ export function initialize() {
                         }
                 }
         }
-
-        showDiagnostics();
 }
 
 
@@ -359,7 +381,7 @@ function _addElement(element) {
         // instantiate element once AJAX Post comes back successful
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        instantiateElement(xhr.response);
+                        instantiateElement(xhr.response, numElements.value);
                 }
         }
 }
@@ -370,28 +392,26 @@ function _addElement(element) {
  * @param {Object} element - XMLHttpRequest or Element object to instantiate on the screen
  * @returns {null}
  */
-function instantiateElement(element) {
+function instantiateElement(element, index) {
+        const previousElementIndex = index - 1;                                                            // the index of the Element directly before the Element to be created
+        const previousElement = document.querySelector(`[index="${previousElementIndex}"]`);            // the Element directly before the Element that will be created
+        console.log(index);
         if (element instanceof Chainlink || element.type == "header2") {
-                const display = document.getElementById("chainlink-display");
                 const container = document.createElement("section");
                 const root = createRoot(container);
                 container.className = "chainlink";
-                display.appendChild(container);
-                root.render(<ChainlinkElement title={element.title} url={element.url} index={numElements.value} />);
+                previousElement.insertAdjacentElement("afterend", container);
+                root.render(<ChainlinkElement title={element.title} url={element.url} />);
 
         } else if (element instanceof Content || element.type == "header3" || element.type == "code" || element.type == "paragraph" || element.type == "linebreak") {
-                const parent = document.getElementById("chainlink-display").lastElementChild;
                 const container = document.createElement("div");
                 const root = createRoot(container);
                 container.className = "content-wrapper";
-                container.setAttribute("index", numElements.value);
+                //container.setAttribute("index", numElements.value);
                 container.id = element.url + "-" + element.order;
-                parent.appendChild(container);
+                previousElement.insertAdjacentElement("afterend", container);
                 root.render(<ContentElement type={element.type} content={element.content} url={element.url} />);
-
-
         }
-        showDiagnostics();
 }
 
 /*  JS public functions */
