@@ -1,7 +1,12 @@
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
 from .models import Chainlink, Doc, Content, TagType
 from django.views.decorators.cache import cache_control
+
+from decouple import Config # This library parses .env files
+import dotenv               # This library writes to .env files
+from pathlib import Path    # This function defines a file path
+
 from django.utils import timezone
 from .models import TagType  # enum type for types content/chainlink type(s)
 import random  # use this to generate unique titles for fence and/or chainlink
@@ -9,8 +14,19 @@ import json  # use this to parse JSON payloads in HTTP requests
 import hashlib  # use this to generate hashes for urls
 from django.conf import settings
 
+ENV_PATH = Path(".env")
 
-def db_store(properties, parent=""):
+class HttpRequestWrapper(HttpRequest):
+    def __init__(self, body_data, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._body_data = body_data
+
+    @property
+    def body(self):
+        return self._body_data
+
+
+def db_store(properties, is_landing_page=False, parent=""):
     """
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
 
@@ -19,6 +35,7 @@ def db_store(properties, parent=""):
     :param <DEPRECATED> title: the desired title for the database item
     :param <DEPRECATED> public: flag is true if item to be marked public
     :param request: JSON payload specifying the properties of the Element to write to the database
+    :param is_landing_page: This boolean flag indicates whether this page should be set as the landing page for the site. If this flag is set then the LANDING_PAGE_URL global variable is set equal to the generated url for the page
     :param parent (optional): String indicating the url of the parent object of the Element to store. Content uses the url of its Chainlink and thus this parameter is not needed for elements of type Content. In this case, this parameter is only used if no URL is specified in the JSON payload.
     """
     # Parse the stringified json in the argument so that the payload can be read and written to the database
@@ -96,6 +113,11 @@ def db_store(properties, parent=""):
         # Write Python Article object to database
         article.save()
 
+        # If the landing page flag is set then also write the generated url to the LANDING_PAGE_URL field of the .env file
+        if is_landing_page:
+            ENV_PATH.touch(mode=0o600, exist_ok=True)
+            dotenv.set_key(ENV_PATH, "LANDING_PAGE_URL", article.url)
+
         json_data["url"] = article.url
         return json.dumps(json_data)
     return False
@@ -150,13 +172,17 @@ def db_try_title(table, try_title):
     return try_title
 
 
-def db_try_url(tag_type):
+def db_try_url(tag_type, try_url=""):
     """
     Generate a unique url for specified record type
 
     :param tag_type: type of record this url will be used for
+    :param check_url: This string is a url that's checked. If the url is tied to a record then a new url is generated and returned. Otherwise this argument is returned.
     """
-    try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
+    print("inside try url")
+    print(try_url)
+    if not try_url:
+        try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     if TagType.HEADER1:
         while Doc.objects.filter(url=try_url).exists():
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
@@ -165,8 +191,8 @@ def db_try_url(tag_type):
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     return try_url
 
-@cache_control(no_cache=True, must_revalidate=True,
-               no_store=True)  # force doc list page to not get cached so that changes from chainlink pages show up on browser back button
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  # force doc list page to not get cached so that changes from chainlink pages show up on browser back button
 def generic(request, key=''):
     if request.method == 'GET':
         document = get_object_or_404(Doc, url=key)
@@ -255,24 +281,46 @@ def chainlink(request, key):
 
 
 
-def generate(request):
+def generate(request, is_landing_page):
     """
     Create an Article. Write the article to the database and communicate back any updates to the specified article properties by returning the updated properties as JSON.
 
     :param request: http request object. The payload is the set of poperties for the Article.
+    :is_landing_page: this boolean flag indicates that the created Doc should be set as the landing page for the website
     """
     if request.method == 'POST':
         payload = request.body
-        payload = db_store(payload)
-        return HttpResponse(payload, content_type='application/json')
-
+        payload = db_store(payload, is_landing_page)
+        if not is_landing_page:
+            return HttpResponse(payload, content_type='application/json')
+        else:
+            return render(request, 'Patchwork/new_landing_page.html', {})
     else:
         return Http404("Only POST is supported for this url")
 
 
 def index(request):
-    return generic(request, key=settings.LANDING_PAGE_URL)
-
+    """
+    Take the user to the configured landing page for the application. If no such page exists the generate a new one and display
+    an explanatory welcome page for the user.
+    """
+    # Use the db_try_url database accessor to check if the currently set LANDING_PAGE_URL is attached to an existing record. If so then simply return this record
+    print("inside index")
+    print(db_try_url(TagType.HEADER1, settings.LANDING_PAGE_URL))
+    if (db_try_url(TagType.HEADER1, settings.LANDING_PAGE_URL) != settings.LANDING_PAGE_URL):
+        return generic(request, key=settings.LANDING_PAGE_URL)
+    # Otherwise generate a new landing page for the site
+    else:
+        post_request_payload = {
+            "type": "header1",
+            "title": "Landing Page",
+            "is_public": True,
+            "date": str(timezone.now())
+        }
+        post_request = HttpRequestWrapper(json.dumps(post_request_payload))
+        post_request.method = "POST"
+        return generate(post_request, True)
+        
 
 def transfer_email(request):
     return render(request, 'Patchwork/transfer-email.html', {})

@@ -146,5 +146,5 @@ REACT_STATIC_ROOT = os.path.join(STATIC_URL, "react", "static")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LANDING_PAGE_URL = "2b2a0f681bcd57dcf2fbd668a39dd1f51c238b480437a7ef1ac193271a9bd510"
+LANDING_PAGE_URL = config('LANDING_PAGE_URL')
 #SITE_ANNOUNCEMENTS_URL = ""
