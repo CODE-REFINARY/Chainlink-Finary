@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.auth.models import User
 
 class TagType(models.TextChoices):                                      # Define available tag that content can be wrapped in
     HEADER1 = 'header1', _('header1')                                   # define a fence type
@@ -20,8 +20,7 @@ class Doc(models.Model):
     date = models.DateTimeField(default=timezone.now)                   # Creation date for this doc
     url = models.CharField(max_length=75)                               # relative url for this doc
     count = models.BigIntegerField(default=0)
-    order = models.BigIntegerField(default=0)                           # The Article order field will typically be used in an Article query to sort Articles by relevance
-    
+    order = models.BigIntegerField(default=0)                           # The Article order field will typically be used in an Article query to sort Articles by relevance 
     def __str__(self):
         return self.title
 
@@ -36,7 +35,6 @@ class Chainlink(models.Model):
     public = models.BooleanField(default=False)                                         # Indicate whether this chainlink will be shareable
     date = models.DateTimeField(default=timezone.now)                                   # Creation date for this chainlink. May or may not be visible
     count = models.BigIntegerField(default=0)
-  
     def __str__(self):
         return self.title
 
@@ -54,3 +52,9 @@ class Content(models.Model):
     public = models.BooleanField(default=True)                                          # Content can be marked to be visibly redacted from an Article. Redactions are visible to all users and labelled as such (although the content itself cannot be accessed). Redacted content can be made visible by setting the public flag to True.
     def __str__(self):
         return str(self.order) + " " + self.chainlink.title + " - " + self.tag
+
+class Account(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    landing_page_url = models.CharField(max_length=128, default="null")
+    def __str__(self):
+        return str(self.user.username)

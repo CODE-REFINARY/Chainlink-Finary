@@ -605,29 +605,29 @@ export function parseKeyUp(e) {
 export function parseKeyDown(e) {
         var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
         var keyCode = e.which;
+        console.log(articleIsEmpty.value);
         if (e.ctrlKey) {       // exit if the ctrl key is currently being pressed
                 return;
         }
-        //alert(keyCode);
         if (keyCode == 75) {
             window.scrollBy(0, -70);
         } else if (keyCode == 74) {
             window.scrollBy(0, 70);
         }
 
-        else if (keyCode == 80 && loc != "doc-empty") {
+        else if (keyCode == 80 && !articleIsEmpty.value) {
                 e.preventDefault();
                 makeForm('paragraph');
-        } else if (keyCode == 67 && loc != "doc-empty") {
+        } else if (keyCode == 67 && !articleIsEmpty.value) {
                 e.preventDefault();
                 makeForm('code');
-        } else if (keyCode == 78 && (loc == "doc" || loc == "doc-empty")) {      // disable chainlink creation for chainlink view (only enabled in doc view)
+        } else if (keyCode == 78 && isArticle.value) {      // disable chainlink creation for chainlink view (only enabled in doc view)
                 e.preventDefault();
                 makeForm('header2');
-        } else if (keyCode == 72 && loc != "doc-empty") {
+        } else if (keyCode == 72 && !articleIsEmpty.value) {
                 e.preventDefault();
                 makeForm('header3');
-        } else if (keyCode == 66 && loc != "doc-empty") {
+        } else if (keyCode == 66 && !articleIsEmpty.value) {
                 e.preventDefault();
                 makeForm('linebreak');
         }

@@ -12,4 +12,5 @@ urlpatterns = [
     path('chainlink<str:key>.html', views.chainlink, name='chainlink'),
     path('generic.html', views.generic),                    # used for POSTs to generate dynamic content
     path('react.html', views.react),
+    path('login.html', views.login),
 ]
