@@ -182,6 +182,17 @@ function ChainlinkEditButtons(props) {
                 </React.Fragment>
         );
 }
+function ContentEditButtons(props) {
+        contentEditButtonsEventHandlers.push(function() { editContent(props.wrappers[props.i].id) });
+        contentDeleteButtonsEventHandlers.push(function() { deleteContent(props.wrappers[props.i].id) });
+        return (
+                <React.Fragment>
+                        <i className="context-span-message">context action &lt; - - - - - -</i>
+                        <button className="cont-edit-btn" onClick={contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]}>edit</button>
+                        <button className="cont-del-btn" onClick={contentDeleteButtonsEventHandlers[contentDeleteButtonsEventHandlers.length - 1]}>delete</button>
+                </React.Fragment>
+        );
+}
 function ChainlinkHeader(props) {
         return (
                <React.Fragment>
@@ -207,6 +218,8 @@ function ChainlinkElement(props) {
 
         useEffect(() => {
                 _enumerateElements();
+                _deleteChainlinkButtons();
+                instChainlinkEditButtons();
         }, []);
 
         return (
@@ -220,11 +233,6 @@ function ChainlinkElement(props) {
                                                 {">>>" + props.url.substring(0, 9)}
                                         </a>
                                 </h2>
-                                <div className="chainlink-buttons-wrapper">
-                                        <i className="context-span-message">context action &lt; - - - - - -</i>
-                                        <button className="cl-edit-btn" target={props.url}>edit</button>
-                                        <button className="cl-del-btn" target={props.url}>delete</button>
-                                </div>
                         </div>
                 </React.Fragment>
         );
@@ -233,6 +241,8 @@ function ContentElement(props) {
 
         useEffect(() => {
                 _enumerateElements();
+                removeEditButtons();
+                instantiateEditButtons();
         }, []);
 
         let Tag = "";
@@ -393,23 +403,41 @@ function _addElement(element) {
  * @returns {null}
  */
 function instantiateElement(element, index) {
-        const previousElementIndex = index - 1;                                                            // the index of the Element directly before the Element to be created
-        const previousElement = document.querySelector(`[index="${previousElementIndex}"]`);            // the Element directly before the Element that will be created
-        console.log(index);
+        var previousElementIndex = index - 1;                                 // the index of the Element directly before the Element to be created
+        var previousElement = null;                                             // the Element directly before the Element that will be created
+        var parentElement = null;                                               // the parent html element
+        var adjacentElement = null;                                             // the element right before the element to be inserted
+
+        if (previousElementIndex > 0) {                                         // if there are Elements in #chainlink-display then specify the element to insert the new element next to
+        }
+
         if (element instanceof Chainlink || element.type == "header2") {
+                parentElement = document.getElementById("chainlink-display");
                 const container = document.createElement("section");
                 const root = createRoot(container);
                 container.className = "chainlink";
-                previousElement.insertAdjacentElement("afterend", container);
+                if (previousElementIndex > 0) {
+                        previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
+                        previousElement.insertAdjacentElement("afterend", container);
+                } else
+                        parentElement.appendChild(container);
                 root.render(<ChainlinkElement title={element.title} url={element.url} />);
 
-        } else if (element instanceof Content || element.type == "header3" || element.type == "code" || element.type == "paragraph" || element.type == "linebreak") {
+        } else {
+                adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
                 const container = document.createElement("div");
                 const root = createRoot(container);
+                container.id = element.url + "-" + element.order;
                 container.className = "content-wrapper";
                 //container.setAttribute("index", numElements.value);
-                container.id = element.url + "-" + element.order;
-                previousElement.insertAdjacentElement("afterend", container);
+                /*if (adjacentElement.className == "chainlink-wrapper") {                 // if we are inserting a content Element at the start of a Chainlink...
+                        parentElement = adjacentElement;                                // the chainlink will be the parent of this new Element
+                        firstChild = parentElement.firstChild;                          // get the original first child of the Chainlink
+                        parentElement.insertBefore(container, firstChild);              // insert the 
+                }*/
+                adjacentElement.insertAdjacentElement("afterend", container);
+                /*else
+                        parentElement.appendChild(container);*/
                 root.render(<ContentElement type={element.type} content={element.content} url={element.url} />);
         }
 }
@@ -638,6 +666,75 @@ export function deleteButtons() {
         document.getElementById('add-buttons').remove();
 }
 
+export function instantiateEditButtons() {
+        var wrapper = document.getElementById('doc-title-wrapper');
+        var container = document.createElement("div");
+        container.id = "fence-context-buttons";
+        wrapper.appendChild(container);
+        var root = createRoot(container);
+        root.render(<FenceEditButtons />);
+
+        var numChainlinks = document.getElementsByClassName("chainlink").length;
+        var wrappers = document.getElementsByClassName("chainlink-wrapper");
+        for (let i = 0; i < numChainlinks; i++) {
+                let container = document.createElement("div");
+                let root = createRoot(container);
+                container.className = "chainlink-buttons-wrapper";
+                wrappers[i].appendChild(container);
+                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
+        }
+
+        var numContents = document.getElementsByClassName("content-wrapper").length;
+        var wrappers = document.getElementsByClassName("content-wrapper");
+        for (let i = 0; i < numContents; i++) {
+                let container = document.createElement("div");
+                let root = createRoot(container);
+                container.className = "context-buttons-wrapper";
+                wrappers[i].appendChild(container);
+                root.render(<ContentEditButtons i={i} wrappers={wrappers}/>);
+        }
+}
+
+export function removeEditButtons() {
+        var editButton = document.getElementById("doc-action-edit-title");
+        var deleteButton = document.getElementById("doc-action-delete-title");
+        editButton.remove();
+        deleteButton.remove();
+        editButton.removeEventListener("click", fenceEditButtonEventHandler);
+        deleteButton.removeEventListener("click", fenceDeleteButtonEventHandler);
+
+        //const numChainlinks = document.getElementsByClassName("chainlink").length;
+        var chainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper");
+        var numChainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper").length;
+        var editButtons = Array.from(document.getElementsByClassName("cl-edit-btn"));
+        var deleteButtons = Array.from(document.getElementsByClassName("cl-del-btn"));
+        for (let i = 0; i < numChainlinkButtons; i++) {
+                //chainlinkButtonsWrapper.remove();
+                editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
+                deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
+                chainlinkButtons[0].remove();     
+        }
+        chainlinkEditButtonsEventHandlers.length = 0;
+        chainlinkDeleteButtonsEventHandlers.length = 0;
+
+        //var numContents = document.getElementsByClassName("content-wrapper").length;
+        var contentButtons = document.getElementsByClassName("context-buttons-wrapper");
+        var numContentButtons = document.getElementsByClassName("context-buttons-wrapper").length;
+        var editButtons = Array.from(document.getElementsByClassName("cont-edit-btn"));
+        var deleteButtons = Array.from(document.getElementsByClassName("cont-del-btn"));
+        //var contextButtonsWrapper = document.getElementsByClassName("context-buttons-wrapper");
+        for (let i = 0; i < numContentButtons; i++) {
+                //editButtons[i].remove();
+                //deleteButtons[i].remove();
+                editButtons[i].removeEventListener("click", contentEditButtonsEventHandlers[i]);
+                deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
+                contentButtons[0].remove();
+        }
+        contentEditButtonsEventHandlers.length = 0;
+        contentDeleteButtonsEventHandlers.length = 0;
+}
+
+/*
 export function instFenceEditButtons() {
         var wrapper = document.getElementById('doc-title-wrapper');
         var container = document.createElement("div");
@@ -659,6 +756,19 @@ export function instChainlinkEditButtons() {
         }
 }
 
+export function instContentEditButtons () {
+        var numContents = document.getElementsByClassName("content-wrapper").length;
+        var wrappers = document.getElementsByClassName("content-wrapper");
+        for (let i = 0; i < numContents; i++) {
+                let container = document.createElement("div");
+                let root = createRoot(container);
+                container.className = "context-buttons-wrapper";
+                wrappers[i].appendChild(container);
+                root.render(<ContentEditButtons i={i} wrappers={wrappers}/>);
+        }
+}
+*/
+/*
 export function instContentEditButtons () {
         const numContents = document.getElementsByClassName("content-wrapper").length;
         const contents = document.getElementsByClassName("content-wrapper");
@@ -694,32 +804,40 @@ export function deleteFenceEditButtons () {
         deleteButton.removeEventListener("click", fenceDeleteButtonEventHandler);
 }
 
-export function deleteChainlinkEditButtons () {
-        const numChainlinks = document.getElementsByClassName("chainlink").length;
-        var chainlinkButtonsWrapper = document.getElementsByClassName("chainlink-buttons-wrapper");
+export function _deleteChainlinkButtons () {
+        //const numChainlinks = document.getElementsByClassName("chainlink").length;
+        var chainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper");
+        var numChainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper").length;
         var editButtons = Array.from(document.getElementsByClassName("cl-edit-btn"));
         var deleteButtons = Array.from(document.getElementsByClassName("cl-del-btn"));
-        for (let i = 0; i < numChainlinks; i++) {
-                chainlinkButtonsWrapper.remove();
+        for (let i = 0; i < numChainlinkButtons; i++) {
+                //chainlinkButtonsWrapper.remove();
                 editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
                 deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
+                chainlinkButtons[0].remove();     
         }
+        chainlinkEditButtonsEventHandlers.length = 0;
+        chainlinkDeleteButtonsEventHandlers.length = 0;
 }
 
 export function deleteContentEditButtons() {
-        const numContents = document.getElementsByClassName("content-wrapper").length;
+        //var numContents = document.getElementsByClassName("content-wrapper").length;
+        var contentButtons = document.getElementsByClassName("context-buttons-wrapper");
+        var numContentButtons = document.getElementsByClassName("context-buttons-wrapper").length;
         var editButtons = Array.from(document.getElementsByClassName("cont-edit-btn"));
-        var contextButtonsWrapper = document.getElementsByClassName("context-buttons-wrapper");
         var deleteButtons = Array.from(document.getElementsByClassName("cont-del-btn"));
-        for (let i = 0; i < numContents; i++) {
+        //var contextButtonsWrapper = document.getElementsByClassName("context-buttons-wrapper");
+        for (let i = 0; i < numContentButtons; i++) {
                 //editButtons[i].remove();
                 //deleteButtons[i].remove();
-                contextButtonsWrapper.remove();
                 editButtons[i].removeEventListener("click", contentEditButtonsEventHandlers[i]);
                 deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
+                contentButtons[0].remove();
         }
+        contentEditButtonsEventHandlers.length = 0;
+        contentDeleteButtonsEventHandlers.length = 0;
 }
-
+*/
 export function deleteDoc() {
 
         var confirm = window.confirm("Delete document record?");

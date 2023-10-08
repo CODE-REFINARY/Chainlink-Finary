@@ -1,4 +1,4 @@
-import { parseKeyUp, parseKeyDown, addContentButtons, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence, initialize } from "./chainlink-utilities.js";
+import { parseKeyUp, parseKeyDown, addContentButtons, deleteDoc, renameDoc, editChainlink, editContent, instantiateEditButtons, removeEditButtons, createFence, initialize } from "./chainlink-utilities.js";
 
 // await full DOM load before adding DB items
 document.addEventListener("DOMContentLoaded", function() {
@@ -11,12 +11,12 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("add-page-btn").addEventListener("click", createFence);
 
         // Add CRUD buttons for page content
-        instFenceEditButtons();
+        /*instFenceEditButtons();
         instChainlinkEditButtons();
-        instContentEditButtons();
+        instContentEditButtons();*/
 
         //deleteFenceEditButtons();
         //deleteChainlinkEditButtons();
         //deleteContentEditButtons();
-
+        instantiateEditButtons();
 });

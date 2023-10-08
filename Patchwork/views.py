@@ -230,7 +230,7 @@ def db_generate_url(tag_type):
     return try_url
 
 
-###################### Site Views ######################
+###################### View Methods ######################
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  # force doc list page to not get cached so that changes from chainlink pages show up on browser back button
 def generic(request, key=''):
@@ -325,22 +325,24 @@ def chainlink(request, key):
 
 
 
-def generate(request, is_landing_page, user=None):
+#def generate(request, is_landing_page, user=None):
+def generate(request):
     """
     Create an Article. Write the article to the database and communicate back any updates to the specified article properties by returning the updated properties as JSON.
 
     :param request: http request object. The payload is the set of poperties for the Article.
-    :param is_landing_page: this boolean flag indicates that the created Doc should be set as the landing page for the website
+    <DEPRECATED> :param is_landing_page: this boolean flag indicates that the created Doc should be set as the landing page for the website
     """
     if not request.user.is_authenticated:
         return login(request)
     if request.method == 'POST':
-        payload = request.body
-        payload = db_store(payload, None, is_landing_page, user)
-        if not is_landing_page:
-            return HttpResponse(payload, content_type='application/json')
-        else:
-            return render(request, 'Patchwork/new_landing_page.html', {})
+        #payload = request.body
+        #payload = db_store(payload, None, is_landing_page, user)
+        #if not is_landing_page:
+        #    return HttpResponse(payload, content_type='application/json')
+        #else:
+        #    return render(request, 'Patchwork/new_landing_page.html', {})
+        return aux_generate(request, False, None)
     else:
         return Http404("Only POST is supported for this url")
 
@@ -373,7 +375,8 @@ def index(request):
         }
         post_request = HttpRequestWrapper(json.dumps(post_request_payload), request.user)
         post_request.method = "POST"
-        return generate(post_request, True, request.user)
+        #return generate(post_request, True, request.user)
+        return aux_generate(post_request, True, request.user)
         
 
 def transfer_email(request):
@@ -397,3 +400,21 @@ def react(request):
 
 def login(request):
     return render(request, 'Patchwork/login.html', {})
+
+
+###################### Helper Methods ######################
+
+def aux_generate(request, is_landing_page, user=None):
+    """
+    Create a new article. If the newly created article should be a landing page send back a static information page. Otherwise send a simple HttpResponse 
+
+    :param request: http request object. The payload is the set of poperties for the Article.
+    :param is_landing_page: this boolean flag indicates that the created Doc should be set as the landing page for the website.
+    :param user: this is the user object corresponding to the currently logged in user. The landing page will be set for this user.
+    """
+    payload = request.body
+    payload = db_store(payload, None, is_landing_page, user)
+    if not is_landing_page:
+        return HttpResponse(payload, content_type='application/json')
+    else:
+        return render(request, 'Patchwork/new_landing_page.html', {})
