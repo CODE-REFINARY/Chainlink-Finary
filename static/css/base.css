@@ -130,6 +130,7 @@ body {
 main {
 	border-radius: 12px;
 	background-color: #2C2E43;
+	padding-bottom: calc(var(--main-body-inner-content-padding-vertical));
 	-padding-left: 1cm;
 	-padding-right: 1cm;
 	-padding-top: 1.3rem;
@@ -322,12 +323,7 @@ div.combination {
 }
 
 /* chainlink display elements - chainlinks */
-section form {
-    padding-top: var(--main-body-inner-content-padding-vertical);
-	padding-bottom: var(--main-body-inner-content-padding-vertical);
-	padding-left: var(--main-body-inner-content-padding-horizontal);
-	padding-right: var(--main-body-inner-content-padding-horizontal);
-}
+
 .content-wrapper {
     padding-left: var(--chainlink-display-inner-content-padding-horizontal);
     padding-right: var(--chainlink-display-inner-content-padding-horizontal);
