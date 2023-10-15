@@ -112,12 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (newValue !== this._value) {
                                 this._value = newValue;
                                 //const root = createRoot(container);
-                                if (newValue === true) {
-                                        this.root.render(<CreatePageEditButtons active={true}/>);
-                                }
-                                else {
-                                        this.root.render(<CreatePageEditButtons active={false}/>);
-                                }
+                                this.root.render(<CreatePageEditButtons bitmask={this._value}/>);
                         }
                 }
         };
@@ -135,31 +130,57 @@ document.addEventListener("DOMContentLoaded", function() {
                 </React.Fragment>
         );
 }*/
+
+/**
+ * Render the row of Element creation buttons that appear at the bottom of the article
+ *
+ * @param {string} bitmask - indicate which buttons to enable and disable. This is regular string containing
+ * 0s and 1s (bits) indicating which buttons should be active. The first bit sets the Chainlink button active.
+ * The second bit sets the rest of the buttons active.
+ */
 function CreatePageEditButtons(props) {
-        if (!props.active) {
-            return (
-                <React.Fragment>
-                        <button className="inactive-add-buttons">&lt;n&gt; chainlink</button>
+        var chainlinkButton;
+        var restOfButtons;
+
+        if (props.bitmask[0] === "1") {
+                chainlinkButton = (
+                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm('header2')}>&lt;n&gt; chainlink</button>
+                );
+        } else if (props.bitmask[0] === "0") {
+                chainlinkButton = (
                         <button className="inactive-add-buttons">&lt;p&gt; paragraph</button>
-                        <button className="inactive-add-buttons">&lt;h&gt; header</button>
-                        <button className="inactive-add-buttons">&lt;c&gt; code</button>
-                        <button className="inactive-add-buttons">&lt;b&gt; linebreak</button>
-                        <button className="inactive-add-buttons">&lt;inactive&gt; img</button>
-                        <button className="inactive-add-buttons">&lt;inactive&gt; ul</button>
-                        <button className="inactive-add-buttons">&lt;inactive&gt; ol</button>
-                </React.Fragment>
-            );
+                );
         }
+
+        if (props.bitmask[1] === "1") {
+                restOfButtons = (
+                        <React.Fragment>
+                                <button id="add-p-btn" className="add-buttons" onClick={() => makeForm('paragraph')}>&lt;p&gt; paragraph</button>
+                                <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('header3')}>&lt;h&gt; header</button>
+                                <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('code')}>&lt;c&gt; code</button>
+                                <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('linebreak')}>&lt;b&gt; linebreak</button>
+                                <button className="add-buttons">&lt;inactive&gt; img</button>
+                                <button className="add-buttons">&lt;inactive&gt; ul</button>
+                                <button className="add-buttons">&lt;inactive&gt; ol</button>
+                        </React.Fragment>
+                );
+        } else if (props.bitmask[1] === "0") {
+                restOfButtons = (
+                        <React.Fragment>
+                                <button className="inactive-add-buttons">&lt;h&gt; header</button>
+                                <button className="inactive-add-buttons">&lt;c&gt; code</button>
+                                <button className="inactive-add-buttons">&lt;b&gt; linebreak</button>
+                                <button className="inactive-add-buttons">&lt;inactive&gt; img</button>
+                                <button className="inactive-add-buttons">&lt;inactive&gt; ul</button>
+                                <button className="inactive-add-buttons">&lt;inactive&gt; ol</button>
+                        </React.Fragment>
+                );
+        }
+
         return (
                 <React.Fragment>
-                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm('header2')}>&lt;n&gt; chainlink</button>
-                        <button id="add-p-btn" className="add-buttons" onClick={() => makeForm('paragraph')}>&lt;p&gt; paragraph</button>
-                        <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('header3')}>&lt;h&gt; header</button>
-                        <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('code')}>&lt;c&gt; code</button>
-                        <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('linebreak')}>&lt;b&gt; linebreak</button>
-                        <button className="add-buttons">&lt;inactive&gt; img</button>
-                        <button className="add-buttons">&lt;inactive&gt; ul</button>
-                        <button className="add-buttons">&lt;inactive&gt; ol</button>
+                        {chainlinkButton}
+                        {restOfButtons}
                 </React.Fragment>
         );
 }
@@ -230,14 +251,16 @@ function ContentCreationForm(props) {
 }*/
 function ElementCreationForm(props) {
         return (
-                <form>
+                <form id="crud-form">
                         <input autoFocus type="text" id="input" placeholder={props.placeholder} />
-                        <select id="element-creation-select" name="fruit">
-                            <option value="apple">Apple</option>
-                            <option value="banana">Banana</option>
-                            <option value="cherry">Cherry</option>
-                            <option value="grape">Grape</option>
-                            <option value="orange">Orange</option>
+                        <select id="element-creation-select" name="element">
+                                <option value="chainlink">chainlink</option>
+                                <option value="header">header</option>
+                                <option value="paragraph">paragraph</option>
+                                <option value="code">code</option>
+                                <option value="linebreak">linebreak</option>
+                                <option value="unordered list">unordered list</option>
+                                <option value="ordered list">ordered list</option>
                         </select>
                         <div id="element-creation-text-align-right">
                             <button id="element-creation-submit" type="submit">Submit</button>
@@ -343,14 +366,13 @@ export function initialize() {
 
         // Render chainlink/content creation buttons
         if (isArticle.value) {
-                pageEditButtons.value = true;
-                //chainlinkButton.value = true;
+                if (articleIsEmpty.value) {
+                        pageEditButtons.value = "10";
+                } else {
+                        pageEditButtons.value = "11";
+                }
         } else if (isChainlink.value) {
-                pageEditButtons.value = true;
-        } else if (articleIsEmpty.value) {
-                //chainlinkButton.value = true;
-        } else if (chainlinkIsEmpty.value) {
-                pageEditButtons.value = true;
+                pageEditButtons.value = "01";
         }
 
         _enumerateElements();
@@ -491,7 +513,6 @@ export function makeForm(type) {
 
         // html elements to create
         const container = document.createElement("div");
-        container.id = "element-creation-form";
         const root = createRoot(container);
 
         window.removeEventListener("keyup", parseKeyUp);
@@ -506,29 +527,34 @@ export function makeForm(type) {
 
         // This switch statement determines what Element type user is editing/creating based on the argument
         if (type == "header2") {
+                container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
                 root.render(<ElementCreationForm placeholder="enter chainlink content" />);
                 list.appendChild(container);
         }
         else if (type == "header3") {
+                container.id = "content-creation-form";
                 url = chainlink.firstElementChild.getAttribute('id');
                 order = chainlink.childElementCount - 1;
                 root.render(<ElementCreationForm placeholder="enter header content" />);
                 chainlink.appendChild(container);
         }
         else if (type == "paragraph") {
+                container.id = "content-creation-form";
                 url = chainlink.firstElementChild.getAttribute('id');
                 order = chainlink.childElementCount - 1;
                 root.render(<ElementCreationForm placeholder="enter paragraph content" />);
                 chainlink.appendChild(container);
         } 
         else if (type == "code") {
+                container.id = "content-creation-form";
                 url = chainlink.firstElementChild.getAttribute('id');
                 order = chainlink.childElementCount - 1;
                 root.render(<ElementCreationForm placeholder="enter code block" />);
                 chainlink.appendChild(container);
         }
         else if (type == 'linebreak') {
+                container.id = "content-creation-form";
                 const chainlink = document.getElementById("chainlink-display").lastElementChild;
                 order = chainlink.childElementCount - 1;
                 url = chainlink.firstElementChild.getAttribute('id');
@@ -541,7 +567,7 @@ export function makeForm(type) {
 
         //deleteButtons();        // remove buttons temporarily while user input prompt is active
         //chainlinkButton.value = false;
-        pageEditButtons.value = false;
+        pageEditButtons.value = "00";
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
                 if (type == "header2") {
@@ -554,7 +580,8 @@ export function makeForm(type) {
                 _addElement(element);
                 // _addButtons();
                 //chainlinkButton.value = true;
-                pageEditButtons.value = true;
+                //pageEditButtons.value = "11";
+                initialize();
                 container.remove();
         });
 }
@@ -566,18 +593,20 @@ export function makeForm(type) {
  * @param {event} e - the keyboard press event used to verify that the key that was pressed was the escape key
  * @param {reference} ref - a reference to the callback function specified for 
  * @param {string} fallback - the original value of the field that we are editing
- * @param {string} element - the type of content that is being edited.
+ * <DEPRECATED> @param {string} element - the type of content that is being edited.
+ * @param {Element} element - the Element object that was being edit when escape was entered
  * @returns {null}
  */
 function escape(e, ref, fallback, element) {
         var keyCode = e.which;
+        // if the escape key is pressed...
         if (keyCode == 27) {
-                var formParent = document.getElementById('input').parentNode.parentNode;
-                var form = document.getElementById('input').parentNode;
+                var formParent = document.getElementById('crud-form').parentNode.parentNode;
+                var form = document.getElementById('crud-form').parentNode;
                 var input = document.getElementById('input');
                 const display = document.getElementById("chainlink-display");
                 const chainlinkCreateForm = display.querySelector("#chainlink-creation-form");
-                const contentCreateForm = display.querySelector("#element-creation-form");
+                const contentCreateForm = display.querySelector("#content-creation-form");
                 const chainlinkEditForm = (formParent.matches('.chainlink-wrapper'));
                 const contentEditForm = (formParent.matches('.content-wrapper'));
                 const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
@@ -608,9 +637,9 @@ function escape(e, ref, fallback, element) {
                 }
 
                 window.addEventListener("keydown", parseKeyDown);
-                window.addEventListener("keyup", parseKeyUp);
                 window.removeEventListener("keydown", ref);
-                _addButtons();
+                initialize();
+                //pageEditButtons.value = "11";
         }
 }
 
@@ -974,7 +1003,8 @@ export function renameDoc() {
         header.remove();
 }
 
-export function editChainlink(target) {
+
+export function _editChainlink(target) {
 
         const chainlink = document.getElementById(target);
         const header = chainlink.getElementsByTagName("h2")[0];
@@ -1019,6 +1049,61 @@ export function editChainlink(target) {
         });
 
         header.remove();
+}
+
+
+/**
+ * Edit the target chainlink. Instantiate a form to allow the user to change the content of this Chainlink.
+ *
+ * @param {string} target - this string indicates the id of the chainlink element to edit
+ * @returns {null}
+ */
+export function editChainlink(target) {
+        const chainlink = document.getElementById(target);
+        const chainlinkParent = chainlink.parentElement;
+        const title = chainlink.querySelector(".chainlink-inner-text").textContent;
+        const url = chainlink.id;
+        const order = chainlink.index;
+        const element = new Chainlink(title, url, null, true, 0, order);
+        const _listener = function (e) {
+                escape(e, _listener, "", element)
+        };
+
+        // html elements to create
+        const container = document.createElement("div");
+        const root = createRoot(container);
+
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+        window.addEventListener("keydown", _listener);
+
+        container.id = "chainlink-edit-form";
+        root.render(<ElementCreationForm placeholder="enter Chainlink title" />);
+        chainlink.insertAdjacentElement("afterend", container);
+
+        container.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'chainlink');
+                xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('target', target);
+                xhr.send();
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                _addButtons();
+        });
+
+        chainlink.remove();
 }
 
 export function editContent(target) {

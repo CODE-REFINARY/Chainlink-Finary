@@ -4,7 +4,7 @@ from .models import Chainlink, Doc, Content, TagType, Account
 from django.views.decorators.cache import cache_control
 
 from decouple import Config # This library parses .env files
-import dotenv               # This library writes to .env files
+# <DEPRECATED> import dotenv               # This library writes to .env files
 from pathlib import Path    # This function defines a file path
 import os
 
