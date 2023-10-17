@@ -607,7 +607,7 @@ function escape(e, ref, fallback, element) {
                 const display = document.getElementById("chainlink-display");
                 const chainlinkCreateForm = display.querySelector("#chainlink-creation-form");
                 const contentCreateForm = display.querySelector("#content-creation-form");
-                const chainlinkEditForm = (formParent.matches('.chainlink-wrapper'));
+                const chainlinkEditForm = display.querySelector("#chainlink-edit-form");
                 const contentEditForm = (formParent.matches('.content-wrapper'));
                 const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
 
@@ -618,12 +618,14 @@ function escape(e, ref, fallback, element) {
                         h1.innerHTML = fallback;
                         formParent.prepend(h1);
                 } else if (chainlinkEditForm) {
-                        form.remove();
-                        let container = document.createElement("h2");
-                        let root = createRoot(container);
-                        formParent.prepend(container);
-                        window.location.reload();
-                        root.render(<ChainlinkHeader title={fallback}/>);
+                        var index = chainlinkEditForm.getAttribute("index");
+                        form.parentElement.remove();
+                        instantiateElement(element, index);
+                        //let container = document.createElement("h2");
+                        //let root = createRoot(container);
+                        //formParent.prepend(container);
+                        //window.location.reload();
+                        //root.render(<ChainlinkHeader title={fallback}/>);
                 } else if (chainlinkCreateForm) {
                         form.remove();
                 } else if (contentCreateForm) {
@@ -1078,6 +1080,7 @@ export function editChainlink(target) {
         window.addEventListener("keydown", _listener);
 
         container.id = "chainlink-edit-form";
+        container.setAttribute("index", chainlink.getAttribute("index"));
         root.render(<ElementCreationForm placeholder="enter Chainlink title" />);
         chainlink.insertAdjacentElement("afterend", container);
 
