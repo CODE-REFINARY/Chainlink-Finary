@@ -271,9 +271,17 @@ function ElementCreationForm(props) {
 function ChainlinkElement(props) {
 
         useEffect(() => {
-                _enumerateElements();
                 removeEditButtons();
                 instantiateEditButtons();
+                // insert all child elements of this Chainlink now the the Chainlink has been rendered
+                if (props.children != null) {           // if the children parameter is not null then add append them to the Chainlink element
+                        let chainlink = document.getElementById(props.url).parentElement;       // This object represents the Chainlink that was just rendered
+                        for (let i = 0; i < props.children.length; i++) {
+                                chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
+                        }
+                }
+                _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
+
         }, []);
 
         return (
@@ -453,9 +461,13 @@ function _addElement(element) {
  * Create a representation of an element of type Chainlink or Content. Display this element under #chainlink-display
  *
  * @param {Object} element - XMLHttpRequest or Element object to instantiate on the screen
+ * @param {number} index - The index indicates what the index of the new element should have. This index should be made available before
+ * instantiateElement is called.
+ * @param {NodeList} children - This array-like object contains all HTML nodes that are children of the element parameter (of course
+ * assuming that parameter is a Chainlink).
  * @returns {null}
  */
-function instantiateElement(element, index) {
+function instantiateElement(element, index, children) {
         var previousElementIndex = index - 1;                                 // the index of the Element directly before the Element to be created
         var previousElement = null;                                             // the Element directly before the Element that will be created
         var parentElement = null;                                               // the parent html element
@@ -472,9 +484,10 @@ function instantiateElement(element, index) {
                 if (previousElementIndex > 0) {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
-                } else
+                } else {
                         parentElement.appendChild(container);
-                root.render(<ChainlinkElement title={element.title} url={element.url} />);
+                }
+                root.render(<ChainlinkElement title={element.title} url={element.url} children={children} />);
 
         } else {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
@@ -618,9 +631,10 @@ function escape(e, ref, fallback, element) {
                         h1.innerHTML = fallback;
                         formParent.prepend(h1);
                 } else if (chainlinkEditForm) {
-                        var index = chainlinkEditForm.getAttribute("index");
+                        const index = parseInt(chainlinkEditForm.getAttribute("index"));
+                        const children = form.parentElement.querySelectorAll(".content-wrapper");
                         form.parentElement.remove();
-                        instantiateElement(element, index);
+                        instantiateElement(element, index, children);
                         //let container = document.createElement("h2");
                         //let root = createRoot(container);
                         //formParent.prepend(container);
