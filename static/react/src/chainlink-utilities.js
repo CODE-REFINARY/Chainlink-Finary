@@ -645,11 +645,12 @@ function escape(e, ref, fallback, element) {
                 } else if (contentCreateForm) {
                         form.remove();
                 } else if (contentEditForm) {
-                        form.remove();
+                        const index = parseInt(contentEditForm.getAttribute("index"));
+                        /*form.remove();
                         var el = document.createElement(element);
                         el.className = "inner-content";
                         el.innerHTML = fallback;
-                        formParent.prepend(el);
+                        formParent.prepend(el);*/
                 }
 
                 window.addEventListener("keydown", parseKeyDown);
@@ -1020,7 +1021,7 @@ export function renameDoc() {
 }
 
 
-export function _editChainlink(target) {
+/*export function _editChainlink(target) {
 
         const chainlink = document.getElementById(target);
         const header = chainlink.getElementsByTagName("h2")[0];
@@ -1065,7 +1066,7 @@ export function _editChainlink(target) {
         });
 
         header.remove();
-}
+}*/
 
 
 /**
@@ -1106,7 +1107,7 @@ export function editChainlink(target) {
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'chainlink');
-                xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('title', event.target.input.value);
                 xhr.setRequestHeader('target', target);
                 xhr.send();
                 xhr.onreadystatechange = function() {
@@ -1123,7 +1124,7 @@ export function editChainlink(target) {
         chainlink.remove();
 }
 
-export function editContent(target) {
+/*export function _editContent(target) {
 
         const wrapper = document.getElementById(target);
         const content = wrapper.getElementsByClassName("inner-content")[0];
@@ -1168,4 +1169,65 @@ export function editContent(target) {
         });
 
         content.remove();
+}*/
+
+/**
+ * Edit the target Content. Instantiate a form to allow the user to edit this content
+ *
+ * @param {string} target - This string indicates the id of the Content to edit
+ * @returns {null}
+ */
+export function editContent(target) {
+
+        const wrapper = document.getElementById(target);
+        //const content = wrapper.getElementsByClassName("inner-content")[0];
+        const content = wrapper.querySelector(".inner-content");
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        const title = content.textContent;
+
+        var _listener = function (e) { escape(e, _listener, title, content.tagName) };
+        window.removeEventListener("keyup", parseKeyUp);
+        window.removeEventListener("keydown", parseKeyDown);
+        window.addEventListener("keydown", _listener);
+
+        const container = document.createElement("div");
+        const root = createRoot(container);
+
+        container.id = "content-edit-form";
+        container.setAttribute("index", wrapper.getAttribute("index"));
+        root.render(<ElementCreationForm placeholder="enter content title" />);
+        wrapper.insertAdjacentElement("afterend", container);
+
+        /*input.setAttribute('type', 'text');
+        input.setAttribute('id', 'input');
+        input.value = title;
+        form.appendChild(input);
+        wrapper.prepend(form);
+        input.focus({ focusVisible: true });*/
+
+        deleteButtons();
+        container.addEventListener("submit", function(event) {
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.setRequestHeader('type', 'content');
+                xhr.setRequestHeader('title', event.target.input.value);
+                xhr.setRequestHeader('target', target);
+                xhr.send();
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                window.location.reload();
+                        }
+                }
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.addEventListener("keyup", parseKeyUp);
+                _addButtons();
+        });
+
+        wrapper.remove();
 }
