@@ -164,28 +164,28 @@
 <div id="chainlink-display" template="article">{% for content in contents %}
 	{% if content.tag == 'header2' %}
 	<section class="chainlink">
-		<div id="{{ content.url }}" class="chainlink-wrapper">
+		<div id="{{ content.url }}" class="chainlink-wrapper" tag="chainlink">
 			<h2>
 	    <span class="chainlink-inner-text">{{ content.title }}</span>
 			    <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
 	</h2>
 		</div>
 	{% elif content.tag == 'paragraph' %}
-	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
 		<p class="inner-content">{{ content.content }}</p>	
 		
 	</div>
 	{% elif content.tag == 'code' %}
-	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="code">
 		<code class="inner-content">{{ content.content }}</code>
 		
 	</div>
 	{% elif content.tag == 'header3' %}
-	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
 		<h3 class="inner-content">{{ content.content }}</h3>
 	</div>
 	{% elif content.tag == 'linebreak' %}
-	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
+	<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
 		<span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
 	</div>
 {% elif content.tag == 'delimiter' %}

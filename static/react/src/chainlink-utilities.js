@@ -286,7 +286,7 @@ function ChainlinkElement(props) {
 
         return (
                 <React.Fragment>
-                        <div id={props.url} className="chainlink-wrapper">
+                        <div id={props.url} className="chainlink-wrapper" tag="chainlink">
                                 <h2>
                                         <span className="chainlink-inner-text">
                                                 {props.title}
@@ -495,6 +495,7 @@ function instantiateElement(element, index, children) {
                 const root = createRoot(container);
                 container.id = element.url + "-" + element.order;
                 container.className = "content-wrapper";
+                container.setAttribute("tag", element.type);
                 //container.setAttribute("index", numElements.value);
                 /*if (adjacentElement.className == "chainlink-wrapper") {                 // if we are inserting a content Element at the start of a Chainlink...
                         parentElement = adjacentElement;                                // the chainlink will be the parent of this new Element
@@ -621,7 +622,7 @@ function escape(e, ref, fallback, element) {
                 const chainlinkCreateForm = display.querySelector("#chainlink-creation-form");
                 const contentCreateForm = display.querySelector("#content-creation-form");
                 const chainlinkEditForm = display.querySelector("#chainlink-edit-form");
-                const contentEditForm = (formParent.matches('.content-wrapper'));
+                const contentEditForm = display.querySelector("#content-edit-form");
                 const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
 
                 if (fenceEditForm) {
@@ -646,6 +647,8 @@ function escape(e, ref, fallback, element) {
                         form.remove();
                 } else if (contentEditForm) {
                         const index = parseInt(contentEditForm.getAttribute("index"));
+                        form.remove();
+                        instantiateElement(element, index, null);
                         /*form.remove();
                         var el = document.createElement(element);
                         el.className = "inner-content";
@@ -1185,8 +1188,15 @@ export function editContent(target) {
         const form = document.createElement('form');
         const input = document.createElement('input');
         const title = content.textContent;
+        const url = wrapper.id.slice(0, -2);
+        const order = parseInt(wrapper.getAttribute("index"));
+        const tag = wrapper.getAttribute("tag");
+        const element = new Content(tag, title, url, null, true, 0, order);
 
-        var _listener = function (e) { escape(e, _listener, title, content.tagName) };
+        const _listener = function (e) {
+                escape(e, _listener, "", element)
+        };
+
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
         window.addEventListener("keydown", _listener);
@@ -1206,7 +1216,6 @@ export function editContent(target) {
         wrapper.prepend(form);
         input.focus({ focusVisible: true });*/
 
-        deleteButtons();
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
                 //addElement(type, input.value, url, order);
@@ -1223,10 +1232,8 @@ export function editContent(target) {
                                 window.location.reload();
                         }
                 }
-
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                _addButtons();
         });
 
         wrapper.remove();
