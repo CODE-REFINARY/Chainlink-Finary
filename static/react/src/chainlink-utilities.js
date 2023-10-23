@@ -478,14 +478,18 @@ function instantiateElement(element, index, children) {
 
         if (element instanceof Chainlink || element.type == "header2") {
                 parentElement = document.getElementById("chainlink-display");
+
                 const container = document.createElement("section");
                 const root = createRoot(container);
                 container.className = "chainlink";
-                if (previousElementIndex > 0) {
+                if (articleIsEmpty.value) {
+                        parentElement.appendChild(container);
+                } else if (previousElementIndex === 0) {
+                        const firstElement = parentElement.firstElementChild;
+                        parentElement.insertBefore(container, firstElement);
+                } else {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
-                } else {
-                        parentElement.appendChild(container);
                 }
                 root.render(<ChainlinkElement title={element.title} url={element.url} children={children} />);
 
@@ -1189,7 +1193,7 @@ export function editContent(target) {
         const input = document.createElement('input');
         const title = content.textContent;
         const url = wrapper.id.slice(0, -2);
-        const order = parseInt(wrapper.getAttribute("index"));
+        const order = parseInt(wrapper.id.split("-").slice(1).join("-"));
         const tag = wrapper.getAttribute("tag");
         const element = new Content(tag, title, url, null, true, 0, order);
 
