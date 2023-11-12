@@ -11,6 +11,7 @@ var chainlinkEditButtonsEventHandlers = [];
 var chainlinkDeleteButtonsEventHandlers = [];
 var contentEditButtonsEventHandlers = [];
 var contentDeleteButtonsEventHandlers = [];
+var elementsEditButtonEventHandlers = [];
 
 // State variables to describe the state of the page. These can be called to reliable determine something about the current page
 var isArticle;
@@ -195,6 +196,9 @@ function CreatePageEditButtons(props) {
         );
 }*/
 function FenceEditButtons() {
+        const editFunction = function() { renameDoc() };
+        const deleteFunction = function() { deleteDoc() };
+        elementsEditButtonEventHandlers.push([editFunction, deleteFunction]);
         fenceEditButtonEventHandler = function() { renameDoc(); };
         fenceDeleteButtonEventHandler = function() { deleteDoc(); };
         return (
@@ -206,6 +210,9 @@ function FenceEditButtons() {
         );
 }
 function ChainlinkEditButtons(props) {
+        const editFunction = function() { editChainlink(props.wrappers[props.i].id) };
+        const deleteFunction = function() { deleteChainlink(props.wrappers[props.i].id) };
+        elementsEditButtonEventHandlers.push([editFunction, deleteFunction]);
         chainlinkEditButtonsEventHandlers.push(function() { editChainlink(props.wrappers[props.i].id) });
         chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(props.wrappers[props.i].id) });
         return (
@@ -217,6 +224,10 @@ function ChainlinkEditButtons(props) {
         );
 }
 function ContentEditButtons(props) {
+        const editFunction = function() { editContent(props.wrappers[props.i].id) };
+        const deleteFunction = function() { deleteContent(props.wrappers[props.i].id) };
+        elementsEditButtonEventHandlers.push([editFunction, deleteFunction]);
+
         contentEditButtonsEventHandlers.push(function() { editContent(props.wrappers[props.i].id) });
         contentDeleteButtonsEventHandlers.push(function() { deleteContent(props.wrappers[props.i].id) });
         return (
@@ -227,6 +238,17 @@ function ContentEditButtons(props) {
                 </React.Fragment>
         );
 }
+/*function ContentEditButtons(props) {
+        contentEditButtonsEventHandlers.push(function() { editContent(props.wrappers[props.i].id) });
+        contentDeleteButtonsEventHandlers.push(function() { deleteContent(props.wrappers[props.i].id) });
+        return (
+                <React.Fragment>
+                        <i className="context-span-message">context action &lt; - - - - - -</i>
+                        <button className="cont-edit-btn" onClick={() => editContent(props.wrappers[props.i].id)}>edit</button>
+                        <button className="cont-del-btn" onClick={() => deleteContent(props.wrappers[props.i].id)}>delete</button>
+                </React.Fragment>
+        );
+}*/
 function ChainlinkHeader(props) {
         return (
                <React.Fragment>
@@ -252,7 +274,7 @@ function ContentCreationForm(props) {
 function ElementCreationForm(props) {
         return (
                 <form id="crud-form">
-                        <input autoFocus type="text" id="input" placeholder={props.placeholder} />
+                        <input autoFocus type="text" id="input" placeholder={props.placeholder} defaultValue={props.value}/>
                         <select id="element-creation-select" name="element">
                                 <option value="chainlink">chainlink</option>
                                 <option value="header">header</option>
@@ -271,8 +293,6 @@ function ElementCreationForm(props) {
 function ChainlinkElement(props) {
 
         useEffect(() => {
-                removeEditButtons();
-                instantiateEditButtons();
                 // insert all child elements of this Chainlink now the the Chainlink has been rendered
                 if (props.children != null) {           // if the children parameter is not null then add append them to the Chainlink element
                         let chainlink = document.getElementById(props.url).parentElement;       // This object represents the Chainlink that was just rendered
@@ -280,6 +300,8 @@ function ChainlinkElement(props) {
                                 chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
                         }
                 }
+                removeEditButtons();
+                instantiateEditButtons();
                 _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
 
         }, []);
@@ -439,7 +461,7 @@ function showDiagnostics() {
  * @returns {null}
  */
 function _addElement(element) {
-        var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open("POST", window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -452,7 +474,7 @@ function _addElement(element) {
         // instantiate element once AJAX Post comes back successful
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        instantiateElement(xhr.response, numElements.value);
+                        instantiateElement(xhr.response, numElements.value, null);
                 }
         }
 }
@@ -523,7 +545,7 @@ function instantiateElement(element, index, children) {
  */
 export function makeForm(type) {
         const currentDateTime = new Date().toISOString();
-        const _listener = function (e) { escape(e, _listener, "", "") };
+        const _listener = function (e) { escape(e, _listener, "", "", "from make form GLITCH FOUND") };
 
         const list = document.getElementById('chainlink-display');
         const section = document.createElement('section');
@@ -580,7 +602,8 @@ export function makeForm(type) {
                 _addElement(element);
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                return;
+                window.removeEventListener("keydown", _listener);
+                return null;
         }
 
         //deleteButtons();        // remove buttons temporarily while user input prompt is active
@@ -601,6 +624,7 @@ export function makeForm(type) {
                 //pageEditButtons.value = "11";
                 initialize();
                 container.remove();
+                window.removeEventListener("keydown", _listener);
         });
 }
 
@@ -608,14 +632,14 @@ export function makeForm(type) {
 /**
  * Callback function used for when the user presses the Esc key while an input dialogue is open
  *
- * @param {event} e - the keyboard press event used to verify that the key that was pressed was the escape key
- * @param {reference} ref - a reference to the callback function specified for 
+ * @param {KeyboardEvent} e - the keyboard press event used to verify that the key that was pressed was the escape key
+ * @param {Function} ref - a reference to the callback function specified for
  * @param {string} fallback - the original value of the field that we are editing
  * <DEPRECATED> @param {string} element - the type of content that is being edited.
  * @param {Element} element - the Element object that was being edit when escape was entered
  * @returns {null}
  */
-function escape(e, ref, fallback, element) {
+function escape(e, ref, fallback, element, from) {
         var keyCode = e.which;
         // if the escape key is pressed...
         if (keyCode == 27) {
@@ -811,8 +835,14 @@ export function removeEditButtons() {
                 deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
                 contentButtons[0].remove();
         }
+
+        /*for (let i = 0; i < numElements.value; i++) {
+                editButtons[i].removeEventListener("click", elementsEditButtonEventHandlers[i][0]);
+                deleteButton[i].removeEventListener("click", elementsEditButtonEventHandlers[i][1]);
+        }*/
         contentEditButtonsEventHandlers.length = 0;
         contentDeleteButtonsEventHandlers.length = 0;
+        elementsEditButtonEventHandlers.length = 0;
 }
 
 /*
@@ -960,22 +990,26 @@ export function deleteChainlink(target) {
         }
 }
 
+/*
+
+ */
 export function deleteContent(target) {
         var confirm = window.confirm("Delete element?");
         if( confirm == false ) {
                 return
         }
 
- 	var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.setRequestHeader('type', 'content');
         xhr.setRequestHeader('target', target);
-        xhr.send(); 
+        xhr.send();
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        window.location.reload();
+                        //window.location.reload();
+                        deinstantiateElement(target)
                 }
         }
 }
@@ -1021,6 +1055,7 @@ export function renameDoc() {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", _listener)
                 _addButtons();
         });
 
@@ -1125,10 +1160,11 @@ export function editChainlink(target) {
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", _listener)
                 _addButtons();
         });
-
         chainlink.remove();
+        _enumerateElements();
 }
 
 /*export function _editContent(target) {
@@ -1195,22 +1231,23 @@ export function editContent(target) {
         const url = wrapper.id.slice(0, -2);
         const order = parseInt(wrapper.id.split("-").slice(1).join("-"));
         const tag = wrapper.getAttribute("tag");
-        const element = new Content(tag, title, url, null, true, 0, order);
+        var element = new Content(tag, title, url, null, true, 0, order);
 
         const _listener = function (e) {
-                escape(e, _listener, "", element)
+                escape(e, _listener, "", element, "from content edit window")
         };
 
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
         window.addEventListener("keydown", _listener);
+        //window.addEventListener("keydown", function(e){escape(e, null, "", element)});
 
         const container = document.createElement("div");
         const root = createRoot(container);
 
         container.id = "content-edit-form";
         container.setAttribute("index", wrapper.getAttribute("index"));
-        root.render(<ElementCreationForm placeholder="enter content title" />);
+        root.render(<ElementCreationForm placeholder="enter content title" value={title}/>);
         wrapper.insertAdjacentElement("afterend", container);
 
         /*input.setAttribute('type', 'text');
@@ -1238,7 +1275,32 @@ export function editContent(target) {
                 }
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
+                window.removeEventListener("keydown", _listener)
         });
 
         wrapper.remove();
+        _enumerateElements();
+}
+
+function deinstantiateElement(id) {
+
+        let obj_to_remove = document.getElementById(id);
+        let objToRemoveIndex = parseInt(obj_to_remove.getAttribute("index"));
+        if (obj_to_remove.getAttribute("class") === "chainlink-wrapper") {}
+
+        if (obj_to_remove.getAttribute("class") === "content-wrapper") {
+                let nextSibling = obj_to_remove.nextElementSibling;
+                while (nextSibling) {
+                        let oldIdUrl = nextSibling.getAttribute("id").split('-')[0];
+                        let oldIdOrder = nextSibling.getAttribute("id").split('-')[1];
+                        let newOrder = parseInt(oldIdOrder) - 1;
+                        let newId = oldIdUrl + "-" + newOrder;
+                        nextSibling.setAttribute("id", newId)
+                        nextSibling = nextSibling.nextElementSibling;
+                }
+        }
+
+        obj_to_remove.remove();
+        elementsEditButtonEventHandlers.splice(objToRemoveIndex, 1);
+        _enumerateElements();
 }
