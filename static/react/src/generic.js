@@ -1,4 +1,4 @@
-import { parseKeyUp, parseKeyDown, addContentButtons, deleteDoc, renameDoc, editChainlink, editContent, instantiateEditButtons, removeEditButtons, createFence, initialize } from "./chainlink-utilities.js";
+import { parseKeyUp, parseKeyDown, instantiateEditButtons, createFence, initialize } from "./chainlink-utilities.js";
 
 // await full DOM load before adding DB items
 document.addEventListener("DOMContentLoaded", function() {

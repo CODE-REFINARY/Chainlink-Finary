@@ -96,7 +96,11 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         else:
             content.url = json_data["url"]
         content.chainlink = chainlink
-        content.order = chainlink.count - 1     # content orderings are 0-indexed
+        #content.order = chainlink.count - 1     # content orderings are 0-indexed
+        content.order = json_data["order"]
+        for i in range(json_data["order"] + 1, chainlink.count):
+            Content.objects.get(url=json_data["url"], order=i).order += 1  # asynchronously update the order field for
+            # all elements after this one
         content.tag = tag
         content.content = json_data["content"]
         content.public = json_data["is_public"]
@@ -139,12 +143,21 @@ def db_remove(table, url, order):
 
     :param table: identify table holding the target
     :param url: url string identifying target item
-    :param order: item identifier used in tandem with url to identify Content type targets
+    :param order: This is an int identifier used in tandem with url to identify Content type targets. It is this field
+    # that will get updated for all subsequent Content elements so that there is no gap in the element ordering
     """
+
     if order is None:
         target = get_object_or_404(table, url=url)
     else:
         target = get_object_or_404(table, url=url, order=order)
+        if table == Content:
+            parent_chainlink = Chainlink.objects.get(url=target.url)
+            for i in range(order + 1, parent_chainlink.count + 1):
+                print(Content.objects.get(url=target.url, order=i).content)
+                nextContentElement = Content.objects.get(url=target.url, order=i)
+                nextContentElement.order -= 1  # asynchronously update the order field for
+                nextContentElement.save()
     target.delete()
 
 
@@ -263,7 +276,7 @@ def generic(request, key=''):
             case "chainlink":
                 db_remove(Chainlink, request.headers["target"], None)
             case "content":
-                db_remove(Content, request.headers["target"].split('-')[0], request.headers["target"].split('-')[1])
+                db_remove(Content, request.headers["target"].split('-')[0], int(request.headers["target"].split('-')[1]))
 
     elif request.method == 'PUT':
         match request.headers["type"]:
@@ -312,7 +325,7 @@ def chainlink(request, key):
             case "chainlink":
                 db_remove(Chainlink, request.headers["target"], None)
             case "content":
-                db_remove(Content, request.headers["target"].split('-')[0], request.headers["target"].split('-')[1])
+                db_remove(Content, request.headers["target"].split('-')[0], int(request.headers["target"].split('-')[1]))
 
     elif request.method == 'PUT':
         match request.headers["type"]:

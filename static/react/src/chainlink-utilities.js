@@ -204,8 +204,10 @@ function FenceEditButtons() {
         return (
                 <React.Fragment>
                         <i className="context-span-message">context action &lt; - - - - - -</i>
-                        <button id="doc-action-edit-title" onClick={fenceEditButtonEventHandler}>edit</button>
-                        <button id="doc-action-delete-title" onClick={fenceDeleteButtonEventHandler}>delete</button>
+                        {/*<button id="doc-action-edit-title" onClick={fenceEditButtonEventHandler}>edit</button>*/}
+                        {/*<button id="doc-action-delete-title" onClick={fenceDeleteButtonEventHandler}>delete</button>*/}
+                        <button id="doc-action-edit-title" onClick={ elementsEditButtonEventHandlers[0][0] }>edit</button>
+                        <button id="doc-action-delete-title" onClick={ elementsEditButtonEventHandlers[0][1] }>delete</button>
                 </React.Fragment>
         );
 }
@@ -218,8 +220,10 @@ function ChainlinkEditButtons(props) {
         return (
                 <React.Fragment>
                         <i className="context-span-message">context action &lt; - - - - - -</i>
-                        <button className="cl-edit-btn" target={props.wrappers[props.i].id} onClick={chainlinkEditButtonsEventHandlers[chainlinkEditButtonsEventHandlers.length - 1]}>edit</button>
-                        <button className="cl-del-btn" target={props.wrappers[props.i].id} onClick={chainlinkDeleteButtonsEventHandlers[chainlinkDeleteButtonsEventHandlers.length - 1]}>delete</button>
+                        {/*<button className="cl-edit-btn" target={props.wrappers[props.i].id} onClick={chainlinkEditButtonsEventHandlers[chainlinkEditButtonsEventHandlers.length - 1]}>edit</button>*/}
+                        {/*<button className="cl-del-btn" target={props.wrappers[props.i].id} onClick={chainlinkDeleteButtonsEventHandlers[chainlinkDeleteButtonsEventHandlers.length - 1]}>delete</button>*/}
+                        <button className="cl-edit-btn" target={props.wrappers[props.i].id} onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0] }>edit</button>
+                        <button className="cl-del-btn" target={props.wrappers[props.i].id} onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1] }>delete</button>
                 </React.Fragment>
         );
 }
@@ -233,8 +237,10 @@ function ContentEditButtons(props) {
         return (
                 <React.Fragment>
                         <i className="context-span-message">context action &lt; - - - - - -</i>
-                        <button className="cont-edit-btn" onClick={contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]}>edit</button>
-                        <button className="cont-del-btn" onClick={contentDeleteButtonsEventHandlers[contentDeleteButtonsEventHandlers.length - 1]}>delete</button>
+                        {/*<button className="cont-edit-btn" onClick={contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]}>edit</button>*/}
+                        {/*<button className="cont-del-btn" onClick={contentDeleteButtonsEventHandlers[contentDeleteButtonsEventHandlers.length - 1]}>delete</button>*/}
+                        <button className="cont-edit-btn" target={ props.wrappers[props.i].id } onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0] }>edit</button>
+                        <button className="cont-del-btn" target={ props.wrappers[props.i].id } onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1] }>delete</button>
                 </React.Fragment>
         );
 }
@@ -447,7 +453,7 @@ function _enumerateElements() {
 }*/
 
 function showDiagnostics() {
-        console.log("isArticle: " + isArticle.value); 
+        console.log("isArticle: " + isArticle.value);
         console.log("isChainlink: " + isChainlink.value);
         console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
         console.log("articleIsEmpty: " + articleIsEmpty.value);
@@ -523,7 +529,7 @@ function instantiateElement(element, index, children) {
                 container.className = "content-wrapper";
                 container.setAttribute("tag", element.type);
                 //container.setAttribute("index", numElements.value);
-                /*if (adjacentElement.className == "chainlink-wrapper") {                 // if we are inserting a content Element at the start of a Chainlink...
+                /*if (adjacentElement.className == "chainlink-wrapper") {               // if we are inserting a content Element at the start of a Chainlink...
                         parentElement = adjacentElement;                                // the chainlink will be the parent of this new Element
                         firstChild = parentElement.firstChild;                          // get the original first child of the Chainlink
                         parentElement.insertBefore(container, firstChild);              // insert the 
@@ -596,7 +602,8 @@ export function makeForm(type) {
         else if (type == 'linebreak') {
                 container.id = "content-creation-form";
                 const chainlink = document.getElementById("chainlink-display").lastElementChild;
-                order = chainlink.childElementCount - 1;
+                //order = chainlink.childElementCount - 1;
+                order = parseInt(chainlink.lastElementChild.id.split('-')[1]) + 1;
                 url = chainlink.firstElementChild.getAttribute('id');
                 const element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
                 _addElement(element);
@@ -817,7 +824,7 @@ export function removeEditButtons() {
                 //chainlinkButtonsWrapper.remove();
                 editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
                 deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
-                chainlinkButtons[0].remove();     
+                chainlinkButtons[0].remove();
         }
         chainlinkEditButtonsEventHandlers.length = 0;
         chainlinkDeleteButtonsEventHandlers.length = 0;
@@ -1301,6 +1308,8 @@ function deinstantiateElement(id) {
         }
 
         obj_to_remove.remove();
-        elementsEditButtonEventHandlers.splice(objToRemoveIndex, 1);
-        _enumerateElements();
+        //elementsEditButtonEventHandlers.splice(objToRemoveIndex, 1);
+        removeEditButtons();
+        instantiateEditButtons();
+        _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
 }
