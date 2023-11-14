@@ -79,7 +79,11 @@ document.addEventListener("DOMContentLoaded", function() {
         /* Javascript objects with setters that alter contents of the page when called */
 
         // cursor
-        cursor = {}
+        cursor = {
+                get value() {
+                        return (numElements.value - 1);         // Temporary fix cursor at the end position
+                }
+        };
 
         // chainlinkButton is a boolean that indicates the presence of the button that creates Chainlinks
         /*chainlinkButton = {
@@ -571,8 +575,33 @@ export function makeForm(type) {
         var isPublic = undefined;
         var count = undefined;
 
+        if (type !== "header2") {
+
+                const previousElement = document.querySelector(`[index="${cursor.value}"]`);
+                let nextElement = previousElement.nextElementSibling;
+
+                if (cursor.value == numElements.value - 1) {            // If we are submitting a new element to the end
+                        if (previousElement.className === "chainlink-wrapper") {        // The new element will be the first
+                                // element of this chainlink so assign its order to 0 because we are 0-indexed
+                                order = 0;
+                        } else if (previousElement.className === "content-wrapper") {
+                                order = parseInt(previousElement.id.split('-')[1]) + 1;         // The new element's
+                                // order will be the previous element's order plus one
+                        }
+                }
+
+                else {  // Otherwise we are submitting a new element either at the beginning or in the middle
+                        while (nextElement) {
+                                // Get a new Id for the next element over by incrementing the order
+                                let newId = nextElement.id.split('-')[0] + (nextElement.id.split('-')[1] + 1)
+                                nextElement.id = newId;         // Assign the new order
+                                newElement = nextElement.nextElementSibling;    // Repeat this for all subsequent elements
+                        }
+                }
+        }
+
         // This switch statement determines what Element type user is editing/creating based on the argument
-        if (type == "header2") {
+        if (type === "header2") {
                 container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
                 root.render(<ElementCreationForm placeholder="enter chainlink content" />);
@@ -603,7 +632,6 @@ export function makeForm(type) {
                 container.id = "content-creation-form";
                 const chainlink = document.getElementById("chainlink-display").lastElementChild;
                 //order = chainlink.childElementCount - 1;
-                order = parseInt(chainlink.lastElementChild.id.split('-')[1]) + 1;
                 url = chainlink.firstElementChild.getAttribute('id');
                 const element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
                 _addElement(element);

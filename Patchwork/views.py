@@ -83,11 +83,6 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
 
         # Update the chainlink object that's a parent of the element to be written to the database
         chainlink = get_object_or_404(Chainlink, url=json_data["url"])
-        chainlink.count += 1
-
-        # Update the position of the delimeter to make space for the new Content
-        delimiter = Content.objects.filter(url=json_data["url"], tag=TagType.DELIMITER).first()
-        delimiter.order += 1
 
         # Create a representation of the Content object to write to database
         content = Content()
@@ -98,12 +93,20 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         content.chainlink = chainlink
         #content.order = chainlink.count - 1     # content orderings are 0-indexed
         content.order = json_data["order"]
-        for i in range(json_data["order"] + 1, chainlink.count):
-            Content.objects.get(url=json_data["url"], order=i).order += 1  # asynchronously update the order field for
-            # all elements after this one
+        if content.order != chainlink.count - 1:  # If the element we are inserting is not at the end but somewhere in the
+            # beginning or middle of the Chainlink then shift all Content up in the order
+            for i in range(json_data["order"] + 1, chainlink.count):
+                Content.objects.get(url=json_data["url"], order=i).order += 1  # asynchronously update the order field for
+                # all elements after this one
         content.tag = tag
         content.content = json_data["content"]
         content.public = json_data["is_public"]
+
+        # Update the position of the delimeter to make space for the new Content
+        delimiter = Content.objects.filter(url=json_data["url"], tag=TagType.DELIMITER).first()
+        delimiter.order += 1
+
+        chainlink.count += 1
 
         # Write changes to the database
         chainlink.save()
@@ -153,11 +156,13 @@ def db_remove(table, url, order):
         target = get_object_or_404(table, url=url, order=order)
         if table == Content:
             parent_chainlink = Chainlink.objects.get(url=target.url)
-            for i in range(order + 1, parent_chainlink.count + 1):
-                print(Content.objects.get(url=target.url, order=i).content)
-                nextContentElement = Content.objects.get(url=target.url, order=i)
-                nextContentElement.order -= 1  # asynchronously update the order field for
-                nextContentElement.save()
+            if order + 1 != parent_chainlink.count:
+                for i in range(order + 1, parent_chainlink.count):
+                    print(url)
+                    print(i)
+                    nextContentElement = Content.objects.get(url=target.url, order=i)
+                    nextContentElement.order -= 1  # asynchronously update the order field for
+                    nextContentElement.save()
     target.delete()
 
 
