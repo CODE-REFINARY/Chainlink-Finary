@@ -156,13 +156,16 @@ def db_remove(table, url, order):
         target = get_object_or_404(table, url=url, order=order)
         if table == Content:
             parent_chainlink = Chainlink.objects.get(url=target.url)
-            if order + 1 != parent_chainlink.count:
-                for i in range(order + 1, parent_chainlink.count):
-                    print(url)
-                    print(i)
-                    nextContentElement = Content.objects.get(url=target.url, order=i)
-                    nextContentElement.order -= 1  # asynchronously update the order field for
-                    nextContentElement.save()
+            print(order)
+            print(parent_chainlink.count)
+            #if order + 1 != parent_chainlink.count:
+            for i in range(order + 1, parent_chainlink.count + 1):
+                nextContentElement = Content.objects.get(url=target.url, order=i)
+                print(nextContentElement.tag)
+                nextContentElement.order -= 1  # asynchronously update the order field for
+                nextContentElement.save()
+            parent_chainlink.count -= 1
+            parent_chainlink.save()
     target.delete()
 
 
