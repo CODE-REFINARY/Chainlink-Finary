@@ -39,4 +39,12 @@ export class Content extends Element {
                 this.count = count;
                 this.order = order;
         }
+
+        /*get content() {
+                return this.content;
+        }
+
+        set content(newValue) {
+                this.content = newValue;
+        }*/
 }

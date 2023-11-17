@@ -1020,7 +1020,7 @@ export function deleteChainlink(target) {
         xhr.send();
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        window.location.reload();
+                        deinstantiateElement(target)
                 }
         }
 }
@@ -1266,6 +1266,7 @@ export function editContent(target) {
         const url = wrapper.id.slice(0, -2);
         const order = parseInt(wrapper.id.split("-").slice(1).join("-"));
         const tag = wrapper.getAttribute("tag");
+        const index = parseInt(wrapper.getAttribute("index"));
         var element = new Content(tag, title, url, null, true, 0, order);
 
         const _listener = function (e) {
@@ -1305,7 +1306,11 @@ export function editContent(target) {
                 xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                window.location.reload();
+                                //window.location.reload();
+                                container.remove();
+                                const updatedElement = element;
+                                updatedElement.content = event.target.input.value;
+                                instantiateElement(updatedElement, index, null);
                         }
                 }
                 window.addEventListener("keydown", parseKeyDown);
@@ -1321,7 +1326,9 @@ function deinstantiateElement(id) {
 
         let obj_to_remove = document.getElementById(id);
         let objToRemoveIndex = parseInt(obj_to_remove.getAttribute("index"));
-        if (obj_to_remove.getAttribute("class") === "chainlink-wrapper") {}
+        if (obj_to_remove.getAttribute("class") === "chainlink-wrapper") {
+                obj_to_remove.parentElement.remove();
+        }
 
         if (obj_to_remove.getAttribute("class") === "content-wrapper") {
                 let nextSibling = obj_to_remove.nextElementSibling;
@@ -1333,9 +1340,10 @@ function deinstantiateElement(id) {
                         nextSibling.setAttribute("id", newId)
                         nextSibling = nextSibling.nextElementSibling;
                 }
+                obj_to_remove.remove();
         }
 
-        obj_to_remove.remove();
+
         //elementsEditButtonEventHandlers.splice(objToRemoveIndex, 1);
         removeEditButtons();
         instantiateEditButtons();
