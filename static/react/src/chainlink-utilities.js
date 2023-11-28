@@ -216,10 +216,10 @@ function FenceEditButtons() {
         );
 }
 function ChainlinkEditButtons(props) {
-        const editFunction = function() { editChainlink(props.wrappers[props.i].id) };
+        const editFunction = function() { editChainlink(props.wrappers[props.i].id, props.wrappers[props.i].children) };
         const deleteFunction = function() { deleteChainlink(props.wrappers[props.i].id) };
         elementsEditButtonEventHandlers.push([editFunction, deleteFunction]);
-        chainlinkEditButtonsEventHandlers.push(function() { editChainlink(props.wrappers[props.i].id) });
+        chainlinkEditButtonsEventHandlers.push(function() { editChainlink(props.wrappers[props.i].id, props.wrappers[props.i].children) });
         chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(props.wrappers[props.i].id) });
         return (
                 <React.Fragment>
@@ -310,10 +310,9 @@ function ChainlinkElement(props) {
                                 chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
                         }
                 }
+                _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
                 removeEditButtons();
                 instantiateEditButtons();
-                _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
-
         }, []);
 
         return (
@@ -819,9 +818,17 @@ export function instantiateEditButtons() {
         for (let i = 0; i < numChainlinks; i++) {
                 let container = document.createElement("div");
                 let root = createRoot(container);
+                let contents = []
+                let sibling = wrappers[i];
+                while (sibling) {
+                        if (sibling !== wrappers[i]) {
+                                contents.push(sibling)
+                        }
+                        sibling = sibling.nextSibling;
+                }
                 container.className = "chainlink-buttons-wrapper";
                 wrappers[i].appendChild(container);
-                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
+                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers} children={contents}/>);
         }
 
         var numContents = document.getElementsByClassName("content-wrapper").length;
@@ -1152,12 +1159,13 @@ export function renameDoc() {
  * @param {string} target - this string indicates the id of the chainlink element to edit
  * @returns {null}
  */
-export function editChainlink(target) {
+export function editChainlink(target, children) {
         const chainlink = document.getElementById(target);
         const chainlinkParent = chainlink.parentElement;
         const title = chainlink.querySelector(".chainlink-inner-text").textContent;
         const url = chainlink.id;
         const order = chainlink.index;
+        const index = parseInt(chainlink.getAttribute("index"));
         const element = new Chainlink(title, url, null, true, 0, order);
         const _listener = function (e) {
                 escape(e, _listener, "", element)
@@ -1189,65 +1197,22 @@ export function editChainlink(target) {
                 xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                window.location.reload();
+                                //window.location.reload();
+                                container.parentElement.remove();
+                                const updatedElement = element;
+                                updatedElement.title = event.target.input.value;
+                                instantiateElement(updatedElement, index, children);
                         }
                 }
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
                 window.removeEventListener("keydown", _listener)
-                _addButtons();
         });
         chainlink.remove();
         _enumerateElements();
 }
 
-/*export function _editContent(target) {
-
-        const wrapper = document.getElementById(target);
-        const content = wrapper.getElementsByClassName("inner-content")[0];
-        const form = document.createElement('form');
-        const input = document.createElement('input');
-        const title = content.innerHTML;
-
-        window.removeEventListener("keyup", parseKeyUp);
-        window.removeEventListener("keydown", parseKeyDown);
-
-        var _listener = function (e) { escape(e, _listener, title, content.tagName) };
-        window.addEventListener("keydown", _listener);
-
-        input.setAttribute('type', 'text');
-        input.setAttribute('id', 'input');
-        input.value = title;
-        form.appendChild(input);
-        wrapper.prepend(form);
-        input.focus({ focusVisible: true });
-
-        deleteButtons();         
-        form.addEventListener("submit", function(event) {
-                event.preventDefault();
-                //addElement(type, input.value, url, order);
-                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                let xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.location.href, true);
-                xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'content');
-                xhr.setRequestHeader('title', input.value);
-                xhr.setRequestHeader('target', target);
-                xhr.send(); 
-                xhr.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                                window.location.reload();
-                        }
-                }
-
-                window.addEventListener("keydown", parseKeyDown);
-                window.addEventListener("keyup", parseKeyUp);
-                _addButtons();
-        });
-
-        content.remove();
-}*/
 
 /**
  * Edit the target Content. Instantiate a form to allow the user to edit this content
