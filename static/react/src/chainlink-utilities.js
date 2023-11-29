@@ -216,10 +216,10 @@ function FenceEditButtons() {
         );
 }
 function ChainlinkEditButtons(props) {
-        const editFunction = function() { editChainlink(props.wrappers[props.i].id, props.wrappers[props.i].children) };
+        const editFunction = function() { editChainlink(props.wrappers[props.i].id) };
         const deleteFunction = function() { deleteChainlink(props.wrappers[props.i].id) };
         elementsEditButtonEventHandlers.push([editFunction, deleteFunction]);
-        chainlinkEditButtonsEventHandlers.push(function() { editChainlink(props.wrappers[props.i].id, props.wrappers[props.i].children) });
+        chainlinkEditButtonsEventHandlers.push(function() { editChainlink(props.wrappers[props.i].id) });
         chainlinkDeleteButtonsEventHandlers.push(function() { deleteChainlink(props.wrappers[props.i].id) });
         return (
                 <React.Fragment>
@@ -303,8 +303,8 @@ function ElementCreationForm(props) {
 function ChainlinkElement(props) {
 
         useEffect(() => {
-                // insert all child elements of this Chainlink now the the Chainlink has been rendered
-                if (props.children != null) {           // if the children parameter is not null then add append them to the Chainlink element
+                // insert all child elements of this Chainlink now the Chainlink has been rendered
+                if (props.children != null && props.children.length !== 0) {           // if the children parameter is not null then add append them to the Chainlink element
                         let chainlink = document.getElementById(props.url).parentElement;       // This object represents the Chainlink that was just rendered
                         for (let i = 0; i < props.children.length; i++) {
                                 chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
@@ -489,7 +489,9 @@ function _addElement(element) {
 }
 
 /**
- * Create a representation of an element of type Chainlink or Content. Display this element under #chainlink-display
+ * Create an Element and insert it into the display area. The location to insert into is denoted by an argument. This
+ * argument is a number that specifies the exact order that this new element will have in the list. The previous
+ * element occupying this position will be moved "up" i.e. the new element will appear right before the old element.
  *
  * @param {Object} element - XMLHttpRequest or Element object to instantiate on the screen
  * @param {number} index - The index indicates what the index of the new element should have. This index should be made available before
@@ -504,10 +506,11 @@ function instantiateElement(element, index, children) {
         var parentElement = null;                                               // the parent html element
         var adjacentElement = null;                                             // the element right before the element to be inserted
 
-        if (previousElementIndex > 0) {                                         // if there are Elements in #chainlink-display then specify the element to insert the new element next to
+        if (element instanceof Article || element.type == "header1") {
+
         }
 
-        if (element instanceof Chainlink || element.type == "header2") {
+        else if (element instanceof Chainlink || element.type == "header2") {
                 parentElement = document.getElementById("chainlink-display");
 
                 const container = document.createElement("section");
@@ -818,17 +821,9 @@ export function instantiateEditButtons() {
         for (let i = 0; i < numChainlinks; i++) {
                 let container = document.createElement("div");
                 let root = createRoot(container);
-                let contents = []
-                let sibling = wrappers[i];
-                while (sibling) {
-                        if (sibling !== wrappers[i]) {
-                                contents.push(sibling)
-                        }
-                        sibling = sibling.nextSibling;
-                }
                 container.className = "chainlink-buttons-wrapper";
                 wrappers[i].appendChild(container);
-                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers} children={contents}/>);
+                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
         }
 
         var numContents = document.getElementsByClassName("content-wrapper").length;
@@ -1050,7 +1045,6 @@ export function deleteContent(target) {
         xhr.send();
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        //window.location.reload();
                         deinstantiateElement(target)
                 }
         }
@@ -1060,8 +1054,6 @@ export function renameDoc() {
 
         const header = document.getElementById('doc-title');
         const wrapper = document.getElementById('doc-title-wrapper');
-        const form = document.createElement('form');
-        const input = document.createElement('input');
         const title = header.innerHTML;
 
         window.removeEventListener("keyup", parseKeyUp);
@@ -1070,15 +1062,18 @@ export function renameDoc() {
         var _listener = function (e) { escape(e, _listener, title, "h1") };
         window.addEventListener("keydown", _listener);
 
-        input.setAttribute('type', 'text');
-        input.setAttribute('id', 'input');
-        input.value = title;
-        form.appendChild(input);
-        wrapper.appendChild(form);
-        input.focus({ focusVisible: true });
+        const container = document.createElement("div");
+        const root = createRoot(container);
+
+        deinstantiateElement("doc-title-wrapper");
+
+        container.id = "chainlink-edit-form";
+        container.setAttribute("index", "0");
+        root.render(<ElementCreationForm placeholder="enter Article title" />);
+        wrapper.appendChild(container);
 
         deleteButtons();         
-        form.addEventListener("submit", function(event) {
+        container.addEventListener("submit", function(event) {
                 event.preventDefault();
                 //addElement(type, input.value, url, order);
                 var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -1086,12 +1081,12 @@ export function renameDoc() {
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'doc');
-                xhr.setRequestHeader('title', input.value);
+                xhr.setRequestHeader('title', event.target.input.value);
                 xhr.setRequestHeader('target', 'null');
                 xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                window.location.reload();
+                                //window.location.reload();
                         }
                 }
 
@@ -1103,55 +1098,6 @@ export function renameDoc() {
 
         header.remove();
 }
-
-
-/*export function _editChainlink(target) {
-
-        const chainlink = document.getElementById(target);
-        const header = chainlink.getElementsByTagName("h2")[0];
-        const form = document.createElement('form');
-        const input = document.createElement('input');
-        const title = header.querySelector(".chainlink-inner-text").textContent;
-
-        window.removeEventListener("keyup", parseKeyUp);
-        window.removeEventListener("keydown", parseKeyDown);
-
-        var _listener = function (e) { escape(e, _listener, title, "h2") };
-        window.addEventListener("keydown", _listener);
-
-        input.setAttribute('type', 'text');
-        input.setAttribute('id', 'input');
-        input.value = title;
-        form.appendChild(input);
-        chainlink.prepend(form);
-        input.focus({ focusVisible: true });
-
-        deleteButtons();
-        form.addEventListener("submit", function(event) {
-                event.preventDefault();
-                //addElement(type, input.value, url, order);
-                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                let xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.location.href, true);
-                xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'chainlink');
-                xhr.setRequestHeader('title', input.value);
-                xhr.setRequestHeader('target', target);
-                xhr.send(); 
-                xhr.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                                window.location.reload();
-                        }
-                }
-
-                window.addEventListener("keydown", parseKeyDown);
-                window.addEventListener("keyup", parseKeyUp);
-                _addButtons();
-        });
-
-        header.remove();
-}*/
-
 
 /**
  * Edit the target chainlink. Instantiate a form to allow the user to change the content of this Chainlink.
@@ -1170,6 +1116,16 @@ export function editChainlink(target, children) {
         const _listener = function (e) {
                 escape(e, _listener, "", element)
         };
+
+        let contents = []
+        let sibling = chainlink;
+        while (sibling) {
+                if (sibling !== chainlink) {
+                        contents.push(sibling)
+                }
+                sibling = sibling.nextElementSibling;
+        }
+
 
         // html elements to create
         const container = document.createElement("div");
@@ -1201,7 +1157,7 @@ export function editChainlink(target, children) {
                                 container.parentElement.remove();
                                 const updatedElement = element;
                                 updatedElement.title = event.target.input.value;
-                                instantiateElement(updatedElement, index, children);
+                                instantiateElement(updatedElement, index, contents);
                         }
                 }
 
@@ -1291,6 +1247,11 @@ function deinstantiateElement(id) {
 
         let obj_to_remove = document.getElementById(id);
         let objToRemoveIndex = parseInt(obj_to_remove.getAttribute("index"));
+
+        if (obj_to_remove.className === "article-wrapper") {
+                obj_to_remove.firstElementChild.remove();
+        }
+
         if (obj_to_remove.getAttribute("class") === "chainlink-wrapper") {
                 obj_to_remove.parentElement.remove();
         }
