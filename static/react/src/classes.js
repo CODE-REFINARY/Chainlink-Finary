@@ -15,6 +15,14 @@ export class Article extends Element {
         }
 }
 
+export class Header extends Element {
+        constructor(text="", url="") {
+                super();
+                this.text = text;
+                this.url = url;
+        }
+}
+
 export class Chainlink extends Element {
         constructor(title="", url="", date=null, isPublic=true, count=0, order=0) {
                 super();

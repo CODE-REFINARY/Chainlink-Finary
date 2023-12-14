@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Doc, Content, TagType, Account
+from .models import Chainlink, Doc, Content, TagType, Account, Header
 from django.views.decorators.cache import cache_control
 
 from decouple import Config # This library parses .env files
@@ -49,7 +49,6 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
     tag = TagType(json_data["type"])
 
     if tag == TagType.HEADER2:
-
         # Update the parent object to indicate that it has a new child
         article = get_object_or_404(Doc, url=parent)
         article.count += 1
@@ -80,7 +79,6 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         json_data["url"] = cl.url
         return json.dumps(json_data)
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
-
         # Update the chainlink object that's a parent of the element to be written to the database
         chainlink = get_object_or_404(Chainlink, url=json_data["url"])
 
@@ -259,6 +257,10 @@ def generic(request, key=''):
         return login(request)
     if request.method == 'GET':
         document = get_object_or_404(Doc, url=key)
+        if hasattr(document, 'header'):
+            header = document.header
+        else:
+            header = None
         docs = Doc.objects.all()
         chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')
         contents = []
@@ -266,7 +268,7 @@ def generic(request, key=''):
             contents.append(link)
             for cont in Content.objects.filter(chainlink=link.pk).order_by('order'):
                 contents.append(cont)
-        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents})
+        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents, 'header': header})
 
     elif request.method == 'POST':
         # Call auxiliary function to write the Element specified as JSON in the request object

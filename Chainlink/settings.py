@@ -90,7 +90,7 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         #'HOST': 'host.docker.internal', # for Windows/Mac
         'HOST': '172.17.0.1', # static IP
-        'PORT': '5432',
+        'PORT': '5430',
     },
     'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',

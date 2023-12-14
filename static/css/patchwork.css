@@ -1,5 +1,22 @@
+
+/* These are rules for backgrounds that appear behind sections of an article. */
+
+#header-display {
+    background-color: #515262;
+}
+
+#chainlink-display {
+    background-color: #2c2e43;
+}
+
+#footer-display {
+    background-color: #2c3943;
+}
+
+
+
 /* Page Edit Buttons */
-#add-buttons {
+.element-creation-buttons {
 	text-align: left;
 	background-color: #19354b;
     margin-top: var(--main-body-inner-content-padding-vertical);
@@ -10,6 +27,24 @@
 	border: 3px solid #33475640;
 	border-radius: 12px;
 }
+
+#no-header {
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: 500;
+    color: rgb(208, 68, 35);
+    font-size: small;
+}
+
+#no-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: 500;
+    color: rgb(208, 68, 35);
+    font-size: small;
+}
+
 .add-buttons {
     -background-color:
 	-font-family: 'Courier New', Courier, monospace;

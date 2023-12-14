@@ -1,7 +1,7 @@
 /* React imports */
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Element, Article, Chainlink, Content } from './classes.js'
+import { Element, Article, Chainlink, Content, Header } from './classes.js'
 
 
 /* Variables that store 1 or more event listeners so that they be referenced and de-registered later */
@@ -24,7 +24,7 @@ var numElements;        // the number of Elements rendered on the page
 var cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
 
 /* Static Variables */
-const elementClassNames = ["article-wrapper", "chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify Elements
+const elementClassNames = ["chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify Elements
 
 
 // Set up state variables after DOM is ready to be read
@@ -39,20 +39,20 @@ document.addEventListener("DOMContentLoaded", function() {
         // this flag indicates that Article view is current
         isArticle = {
                 get value() {
-                        return (document.getElementById("chainlink-display").getAttribute("template") === "article"); 
+                        return (document.getElementById("element-display").getAttribute("template") === "article");
                 }
         };
         // flag indicates that Chainlink view is current
         isChainlink = {
                 get value() {
-                        return (document.getElementById("chainlink-display").getAttribute("template") === "chainlink"); 
+                        return (document.getElementById("element-display").getAttribute("template") === "chainlink");
                 }
         };
 
         // flag indicates that the article has no chainlinks (and thus no content). This flag is only set in Article view
         articleIsEmpty = {
                 get value() {
-                        return (document.getElementById("chainlink-display").childElementCount === 0 && isArticle.value);
+                        return (document.getElementById("chainlink-display").childElementCount === 1 && isArticle.value);
                 }
         };
 
@@ -426,7 +426,7 @@ export function initialize() {
  */
 function _enumerateElements() {
         var index = 0;
-        const allElements = document.querySelectorAll('*');
+        const allElements = document.querySelectorAll('#chainlink-display *');
         for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
                 for (let j = 0; j < elementClassNames.length; j++) {
@@ -506,21 +506,20 @@ function instantiateElement(element, index, children) {
         var parentElement = null;                                               // the parent html element
         var adjacentElement = null;                                             // the element right before the element to be inserted
 
-        if (element instanceof Article || element.type == "header1") {
+        if (element instanceof Header) {
 
         }
 
         else if (element instanceof Chainlink || element.type == "header2") {
-                parentElement = document.getElementById("chainlink-display");
-
+                parentElement = document.getElementById("chainlink-elements");
+                const firstChild = parentElement.firstChild;
                 const container = document.createElement("section");
                 const root = createRoot(container);
                 container.className = "chainlink";
                 if (articleIsEmpty.value) {
                         parentElement.appendChild(container);
-                } else if (previousElementIndex === 0) {
-                        const firstElement = parentElement.firstElementChild;
-                        parentElement.insertBefore(container, firstElement);
+                } else if (previousElementIndex === -1) {
+                        parentElement.insertBefore(container, firstChild);
                 } else {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
@@ -559,9 +558,9 @@ export function makeForm(type) {
         const currentDateTime = new Date().toISOString();
         const _listener = function (e) { escape(e, _listener, "", "", "from make form GLITCH FOUND") };
 
-        const list = document.getElementById('chainlink-display');
+        const list = document.getElementById('chainlink-elements');
         const section = document.createElement('section');
-        const chainlink = document.getElementById("chainlink-display").lastElementChild;
+        const chainlink = document.getElementById("chainlink-elements").lastElementChild;
 
         // html elements to create
         const container = document.createElement("div");
@@ -572,10 +571,10 @@ export function makeForm(type) {
         window.addEventListener("keydown", _listener);
 
         // fields to pass to addElement for Element creation
-        var url = undefined;
-        var order = undefined;
-        var isPublic = undefined;
-        var count = undefined;
+        let url = undefined;
+        let order = undefined;
+        const isPublic = undefined;
+        const count = undefined;
 
         if (type !== "header2") {
 
@@ -632,8 +631,6 @@ export function makeForm(type) {
         }
         else if (type == 'linebreak') {
                 container.id = "content-creation-form";
-                const chainlink = document.getElementById("chainlink-display").lastElementChild;
-                //order = chainlink.childElementCount - 1;
                 url = chainlink.firstElementChild.getAttribute('id');
                 const element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
                 _addElement(element);
@@ -688,7 +685,7 @@ function escape(e, ref, fallback, element, from) {
                 const contentCreateForm = display.querySelector("#content-creation-form");
                 const chainlinkEditForm = display.querySelector("#chainlink-edit-form");
                 const contentEditForm = display.querySelector("#content-edit-form");
-                const fenceEditForm = (formParent.matches('#doc-title-wrapper'));
+                const fenceEditForm = (formParent.matches('#header-display'));
 
                 if (fenceEditForm) {
                         form.remove();
@@ -809,7 +806,7 @@ export function deleteButtons() {
 }
 
 export function instantiateEditButtons() {
-        var wrapper = document.getElementById('doc-title-wrapper');
+        var wrapper = document.getElementById('header-display');
         var container = document.createElement("div");
         container.id = "fence-context-buttons";
         wrapper.appendChild(container);
@@ -1053,7 +1050,7 @@ export function deleteContent(target) {
 export function renameDoc() {
 
         const header = document.getElementById('doc-title');
-        const wrapper = document.getElementById('doc-title-wrapper');
+        const wrapper = document.getElementById('header-display');
         const title = header.innerHTML;
 
         window.removeEventListener("keyup", parseKeyUp);
@@ -1065,7 +1062,7 @@ export function renameDoc() {
         const container = document.createElement("div");
         const root = createRoot(container);
 
-        deinstantiateElement("doc-title-wrapper");
+        deinstantiateElement("header-display");
 
         container.id = "chainlink-edit-form";
         container.setAttribute("index", "0");

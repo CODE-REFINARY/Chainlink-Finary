@@ -277,7 +277,7 @@ div.combination {
 }
 
 /* Fence Header */
-#doc-title-wrapper {
+#header-display {
     -text-align: center;
     padding-top: var(--main-body-inner-content-padding-vertical);
 	padding-bottom: var(--main-body-inner-content-padding-vertical);
@@ -335,7 +335,8 @@ div.combination {
 }
 .chainlink-wrapper h2 {
     background-color: #334756;
-    padding: 10px;
+    margin: 0% 10%;
+	padding: 10px 15%;
     border-radius: 12px;
 }
 .chainlink-wrapper:hover .chainlink-buttons-wrapper {
