@@ -162,13 +162,13 @@
 <div id="element-display" template="article">
     <div id="header-display">
         {% if header %}
-	    <h1 id="doc-title">{{ header.text }}</h1>
+	    <h1 id="{{ document.url }} doc-title">{{ header.text }}</h1>
         {% else %}
             <div id="no-header">&ltno header&gt</div>
+        {% endif %}
             <div class="element-creation-buttons">
                 <button id="add-h1-btn" class="add-buttons">Add Header</button>
             </div>
-        {% endif %}
     </div>
     <div id="chainlink-display">
         <!-- Chainlink Elements comprise the "meat" of the page. These elements are logically connected to the current

@@ -1134,7 +1134,7 @@ export function editChainlink(target, children) {
 
         container.id = "chainlink-edit-form";
         container.setAttribute("index", chainlink.getAttribute("index"));
-        root.render(<ElementCreationForm placeholder="enter Chainlink title" />);
+        root.render(<ElementCreationForm placeholder="enter Chainlink title" value={title} />);
         chainlink.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {
