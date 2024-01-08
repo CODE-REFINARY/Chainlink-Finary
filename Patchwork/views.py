@@ -261,6 +261,10 @@ def generic(request, key=''):
             header = document.header
         else:
             header = None
+        if hasattr(document, 'footer'):
+            footer = document.footer
+        else:
+            footer = None
         docs = Doc.objects.all()
         chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')
         contents = []
@@ -268,7 +272,7 @@ def generic(request, key=''):
             contents.append(link)
             for cont in Content.objects.filter(chainlink=link.pk).order_by('order'):
                 contents.append(cont)
-        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents, 'header': header})
+        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents, 'header': header, 'footer': footer})
 
     elif request.method == 'POST':
         # Call auxiliary function to write the Element specified as JSON in the request object

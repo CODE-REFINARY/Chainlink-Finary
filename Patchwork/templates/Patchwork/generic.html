@@ -170,40 +170,43 @@
                 <button id="add-h1-btn" class="add-buttons">Add Header</button>
             </div>
     </div>
+    <hr />
     <div id="chainlink-display">
         <!-- Chainlink Elements comprise the "meat" of the page. These elements are logically connected to the current
         host Article or Chainlink. It is in this way (and this way only) that they are related to each other. -->
         <div id="chainlink-elements">
             {% for content in contents %}
-            {% if content.tag == 'header2' %}
-            <section class="chainlink">
-                <div id="{{ content.url }}" class="chainlink-wrapper" tag="chainlink">
-                    <h2>
-                <span class="chainlink-inner-text">{{ content.title }}</span>
-                        <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
-            </h2>
+                {% if content.tag == 'header2' %}
+                <section class="chainlink">
+                    <div id="{{ content.url }}" class="chainlink-wrapper" tag="chainlink">
+                        <h2>
+                    <span class="chainlink-inner-text">{{ content.title }}</span>
+                            <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
+                </h2>
+                    </div>
+                {% elif content.tag == 'paragraph' %}
+                <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
+                    <p class="inner-content">{{ content.content }}</p>
+
                 </div>
-            {% elif content.tag == 'paragraph' %}
-            <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
-                <p class="inner-content">{{ content.content }}</p>
+                {% elif content.tag == 'code' %}
+                <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="code">
+                    <code class="inner-content">{{ content.content }}</code>
 
-            </div>
-            {% elif content.tag == 'code' %}
-            <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="code">
-                <code class="inner-content">{{ content.content }}</code>
-
-            </div>
-            {% elif content.tag == 'header3' %}
-            <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
-                <h3 class="inner-content">{{ content.content }}</h3>
-            </div>
-            {% elif content.tag == 'linebreak' %}
-            <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
-                <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
-            </div>
-            {% elif content.tag == 'delimiter' %}
-            </section>
-            {% endif %}
+                </div>
+                {% elif content.tag == 'header3' %}
+                <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
+                    <h3 class="inner-content">{{ content.content }}</h3>
+                </div>
+                {% elif content.tag == 'linebreak' %}
+                <div id="{{ content.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
+                    <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
+                </div>
+                {% elif content.tag == 'delimiter' %}
+                </section>
+                {% endif %}
+            {% empty %}
+                <div id="no-footer">&ltno content&gt</div>
             {% endfor %}
         </div>
         <!-- Elements under the add-buttons element are buttons used to create content on the page -->
@@ -214,10 +217,15 @@
             <div id="content-placeholder"></div>
         </div>
     </div>
+    <hr />
     <div id="footer-display">
-        <div id="no-footer">&ltno footer&gt</div>
+        {% if header %}
+	        <h1 id="doc-footer">{{ footer.text }}</h1>
+        {% else %}
+            <div id="no-footer">&ltno footer&gt</div>
+        {% endif %}
         <div class="element-creation-buttons">
-        <button id="add-h1-btn" class="add-buttons">Add Footer Text</button>
+            <button id="add-h1-btn" class="add-buttons">Add Footer Text</button>
         </div>
     </div>
 </div>

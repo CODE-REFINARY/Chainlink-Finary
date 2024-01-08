@@ -70,6 +70,15 @@ class Header(models.Model):
         return self.text
 
 
+class Footer(models.Model):
+    doc = models.OneToOneField(Doc, on_delete=models.CASCADE, null=False)  # identifier for which doc this chainlink belongs
+    tag = TagType.HEADER1
+    text = models.CharField(max_length=10000)  # specify content to place between tags specified by tag
+
+    def __str__(self):
+        return self.text
+
+
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     landing_page_url = models.CharField(max_length=128, default="null")
