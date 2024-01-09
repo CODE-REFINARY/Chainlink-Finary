@@ -84,25 +84,28 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
 
         # Create a representation of the Content object to write to database
         content = Content()
-        if (json_data["url"] == ""):
+        """if json_data["url"] == "":
             content.url = parent
         else:
-            content.url = json_data["url"]
+            content.url = json_data["url"]"""
         content.chainlink = chainlink
-        #content.order = chainlink.count - 1     # content orderings are 0-indexed
         content.order = json_data["order"]
-        if content.order != chainlink.count - 1:  # If the element we are inserting is not at the end but somewhere in the
-            # beginning or middle of the Chainlink then shift all Content up in the order
+        if content.order != chainlink.count - 1:  # If the element we are inserting is not at the end but somewhere
+            # in the beginning or middle of the Chainlink then shift all Content up in the order.
             for i in range(json_data["order"] + 1, chainlink.count):
-                Content.objects.get(url=json_data["url"], order=i).order += 1  # asynchronously update the order field for
-                # all elements after this one
+                Content.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
+                # field for all elements after this one
         content.tag = tag
         content.content = json_data["content"]
         content.public = json_data["is_public"]
 
-        # Update the position of the delimeter to make space for the new Content
-        delimiter = Content.objects.filter(url=json_data["url"], tag=TagType.DELIMITER).first()
-        delimiter.order += 1
+        # Update the position of the delimiter to make space for the new Content. This statement will error if there
+        # is not exactly one delimiter associated with this chainlink.
+        try:
+            delimiter = Content.objects.get(chainlink=chainlink, tag=TagType.DELIMITER)
+            delimiter.order += 1
+        except Content.DoesNotExist:
+            raise RuntimeError("A valid delimiter was not found for this chainlink.")
 
         chainlink.count += 1
 
@@ -122,16 +125,12 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         # Write Python Article object to database
         article.save()
 
-        # If the landing page flag is set then also write the generated url to the LANDING_PAGE_URL field of the .env file
+        # If the landing page flag is set then also write the generated url to the LANDING_PAGE_URL field of the .env
+        # file
         if is_landing_page:
             logged_in_user = Account.objects.get(user=user)
             logged_in_user.landing_page_url = article.url
             logged_in_user.save()
-            #ENV_PATH.touch(mode=0o600, exist_ok=True)
-            #print("setting env variable to the following")
-            #print(article.url)
-            #print("----------------")
-            #dotenv.set_key(ENV_PATH, "LANDING_PAGE_URL", article.url)
 
         json_data["url"] = article.url
         return json.dumps(json_data)
@@ -153,7 +152,7 @@ def db_remove(table, url, order):
     else:
         print(url)
         print(order)
-        target = get_object_or_404(table, url=url, order=order)
+        target = table.objects.get(url=url, order=order)
         if table == Content:
             parent_chainlink = Chainlink.objects.get(url=target.url)
             for i in range(order + 1, parent_chainlink.count + 1):
@@ -266,40 +265,44 @@ def generic(request, key=''):
             footer = None
         docs = Doc.objects.all()
         chainlinks = Chainlink.objects.filter(doc=document.pk).order_by('order')
-        contents = []
+        chainlinks_and_contents = []
         for link in chainlinks:
-            contents.append(link)
+            chainlinks_and_contents.append((link, link.url))
             for cont in Content.objects.filter(chainlink=link.pk).order_by('order'):
-                contents.append(cont)
-        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, 'contents': contents, 'header': header, 'footer': footer})
+                chainlinks_and_contents.append((cont, link.url))
+        return render(request, 'Patchwork/generic.html', {'docs': docs, 'chainlinks': chainlinks, 'document': document, "chainlinks_and_contents": chainlinks_and_contents, 'header': header, 'footer': footer})
 
     elif request.method == 'POST':
         # Call auxiliary function to write the Element specified as JSON in the request object
         # The request payload contains JSON specifying the properties of the Element to write to the database
         payload = request.body
-        # db_store returns this payload argument back with any modifications that were made (such as a url being updated for example)
+        # db_store returns this payload argument back with any modifications that were made (such as a url being
+        # updated for example)
         payload = db_store(payload, key)
         # The server response is the payload itself
         return HttpResponse(payload, content_type='application/json')
 
     elif request.method == 'DELETE':
+        target_id = request.headers["target"]
         match request.headers["type"]:
             case "doc":
                 db_remove(Doc, key, None)
             case "chainlink":
                 db_remove(Chainlink, request.headers["target"], None)
             case "content":
-                db_remove(Content, get_prefix_from_id(request.headers["target"]), get_order_from_id(request.headers["target"]))
+                db_remove(Content, get_prefix_from_id(target_id), get_order_from_id(target_id))
 
 
     elif request.method == 'PUT':
+        target_id = request.headers["target"]
+        target_title = request.headers["title"]
         match request.headers["type"]:
             case "doc":
                 db_update(Doc, key, None, request.headers["title"])
             case "chainlink":
                 db_update(Chainlink, request.headers["target"], None, request.headers["title"])
             case "content":
-                db_update(Content, get_prefix_from_id(request.headers["target"]), get_order_from_id(request.headers["target"]), request.headers["title"])
+                db_update(Content, get_prefix_from_id(target_id), get_order_from_id(target_id), target_title)
 
     return render(request, 'Patchwork/success.html', {})
 
