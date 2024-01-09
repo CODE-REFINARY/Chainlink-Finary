@@ -151,12 +151,11 @@ def db_remove(table, url, order):
     if order is None:
         target = get_object_or_404(table, url=url)
     else:
+        print(url)
+        print(order)
         target = get_object_or_404(table, url=url, order=order)
         if table == Content:
             parent_chainlink = Chainlink.objects.get(url=target.url)
-            print(order)
-            print(parent_chainlink.count)
-            #if order + 1 != parent_chainlink.count:
             for i in range(order + 1, parent_chainlink.count + 1):
                 nextContentElement = Content.objects.get(url=target.url, order=i)
                 print(nextContentElement.tag)
@@ -290,7 +289,8 @@ def generic(request, key=''):
             case "chainlink":
                 db_remove(Chainlink, request.headers["target"], None)
             case "content":
-                db_remove(Content, request.headers["target"].split('-')[0], int(request.headers["target"].split('-')[1]))
+                db_remove(Content, get_prefix_from_id(request.headers["target"]), get_order_from_id(request.headers["target"]))
+
 
     elif request.method == 'PUT':
         match request.headers["type"]:
@@ -299,7 +299,7 @@ def generic(request, key=''):
             case "chainlink":
                 db_update(Chainlink, request.headers["target"], None, request.headers["title"])
             case "content":
-                db_update(Content, request.headers["target"].split('-')[0], request.headers["target"].split('-')[1], request.headers["title"])
+                db_update(Content, get_prefix_from_id(request.headers["target"]), get_order_from_id(request.headers["target"]), request.headers["title"])
 
     return render(request, 'Patchwork/success.html', {})
 
@@ -339,14 +339,14 @@ def chainlink(request, key):
             case "chainlink":
                 db_remove(Chainlink, request.headers["target"], None)
             case "content":
-                db_remove(Content, request.headers["target"].split('-')[0], int(request.headers["target"].split('-')[1]))
+                db_remove(Content, get_prefix_from_id(request.headers["target"]), get_order_from_id(request.headers["target"]))
 
     elif request.method == 'PUT':
         match request.headers["type"]:
             case "chainlink":
                 db_update(Chainlink, request.headers["target"], None, request.headers["title"])
             case "content":
-                db_update(Content, request.headers["target"].split('-')[0], request.headers["target"].split('-')[1], request.headers["title"])
+                db_update(Content, get_prefix_from_id(request.headers["target"]), get_order_from_id(request.headers["target"]), request.headers["title"])
 
     return render(request, 'Patchwork/success.html', {})
 
@@ -379,14 +379,7 @@ def index(request):
     Take the user to the configured landing page for the application. If no such page exists the generate a new one and display
     an explanatory welcome page for the user.
     """
-    # Use the db_try_url database accessor to check if the currently set LANDING_PAGE_URL is attached to an existing record. If so then simply return this record
-    #dotenv.load_dotenv(ENV_PATH)
-    #LANDING_PAGE_URL = os.getenv("LANDING_PAGE_URL")
-    #LANDING_PAGE_URL = os.getenv("LANDING_PAGE_URL")
-    #print("Accessing landing page url inside of index")
-    #print(LANDING_PAGE_URL)
-    #print("--------------")
-    #print(db_try_url(TagType.HEADER1, LANDING_PAGE_URL))
+
     # Determine if a landing page exists and send the user to the landing page if it does
     if not request.user.is_authenticated:
         return login(request)
@@ -445,3 +438,56 @@ def aux_generate(request, is_landing_page, user=None):
         return HttpResponse(payload, content_type='application/json')
     else:
         return render(request, 'Patchwork/new_landing_page.html', {})
+
+
+def get_order_from_id(id):
+    """
+    Extracts and returns the order value from a given identifier.
+
+    Parameters:
+    - id (str): The identifier containing a dash-separated value.
+
+    Returns:
+    - int: The extracted order value.
+
+    Raises:
+    - TypeError: If the input is not a string.
+    - ValueError: If the value specified after the dash is not a valid integer or if the identifier format is invalid.
+    """
+    if not isinstance(id, str):
+        raise TypeError("The argument must be a string")
+
+    last_index = id.rfind("-")
+
+    if last_index != -1:
+        order = int(id[last_index + 1:])
+        if not isinstance(order, int):
+            raise ValueError("The value specified after the dash must be an int")
+        return order
+    else:
+        raise ValueError("An invalid id was specified. Make sure the supplied id contains a dash.")
+
+
+def get_prefix_from_id(id):
+    """
+    Extracts and returns the prefix from a given identifier.
+
+    Parameters:
+    - id (str): The identifier containing a dash-separated value.
+
+    Returns:
+    - str: The extracted prefix.
+
+    Raises:
+    - TypeError: If the input is not a string.
+    - ValueError: If the identifier format is invalid (doesn't contain a dash).
+    """
+    if not isinstance(id, str):
+        raise TypeError("The argument must be a string")
+
+    last_index = id.rfind("-")
+
+    if last_index != -1:
+        return id[:last_index]
+    else:
+        raise ValueError("An invalid id was specified. Make sure the supplied id contains a dash.")

@@ -357,8 +357,7 @@ div.combination {
 .chainlink-wrapper {}
 .chainlink-wrapper h2 {
     background-color: #334756;
-    /* margin: 0% 10%; */
-    /* padding: 10px 15%; */
+    padding: 7px;
     border-radius: 12px;
 }
 .chainlink-wrapper:hover .chainlink-buttons-wrapper {

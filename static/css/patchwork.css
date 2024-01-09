@@ -95,11 +95,10 @@
     border-width: 4px;
     border-color: #343537;
     border-style: groove;
-    margin-top: var(--main-body-inner-content-padding-vertical);
     padding-top: var(--main-body-inner-content-padding-vertical);
-	padding-bottom: var(--main-body-inner-content-padding-vertical);
-	padding-left: var(--main-body-inner-content-padding-horizontal);
-	padding-right: var(--main-body-inner-content-padding-horizontal);
+    padding-bottom: var(--main-body-inner-content-padding-vertical);
+    padding-left: var(--main-body-inner-content-padding-horizontal);
+    padding-right: var(--main-body-inner-content-padding-horizontal);
 }
 #content-creation-form > form {
 

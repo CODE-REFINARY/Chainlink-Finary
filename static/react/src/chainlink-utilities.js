@@ -571,6 +571,7 @@ export function makeForm(type) {
         window.addEventListener("keydown", _listener);
 
         // fields to pass to addElement for Element creation
+        let element = undefined;
         let url = undefined;
         let order = undefined;
         const isPublic = undefined;
@@ -579,22 +580,25 @@ export function makeForm(type) {
         if (type !== "header2") {
 
                 const previousElement = document.querySelector(`[index="${cursor.value}"]`);
+                const prevId = previousElement.id
                 let nextElement = previousElement.nextElementSibling;
 
-                if (cursor.value == numElements.value - 1) {            // If we are submitting a new element to the end
-                        if (previousElement.className === "chainlink-wrapper") {        // The new element will be the first
+                // If we are submitting a new element to the end...
+                if (cursor.value == numElements.value - 1) {
+                        // The new element will be the first
+                        if (previousElement.className === "chainlink-wrapper") {
                                 // element of this chainlink so assign its order to 0 because we are 0-indexed
                                 order = 0;
                         } else if (previousElement.className === "content-wrapper") {
-                                order = parseInt(previousElement.id.split('-')[1]) + 1;         // The new element's
-                                // order will be the previous element's order plus one
+                                // The new element's order will be the previous element's order plus one
+                                order = getOrderFromId(prevId);
                         }
                 }
 
                 else {  // Otherwise we are submitting a new element either at the beginning or in the middle
                         while (nextElement) {
                                 // Get a new Id for the next element over by incrementing the order
-                                let newId = nextElement.id.split('-')[0] + (nextElement.id.split('-')[1] + 1)
+                                let newId = getPrefixFromId(prevId) + (getOrderFromId(prevId) + 1);
                                 nextElement.id = newId;         // Assign the new order
                                 newElement = nextElement.nextElementSibling;    // Repeat this for all subsequent elements
                         }
@@ -632,7 +636,8 @@ export function makeForm(type) {
         else if (type == 'linebreak') {
                 container.id = "content-creation-form";
                 url = chainlink.firstElementChild.getAttribute('id');
-                const element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
+                order = chainlink.childElementCount - 1;
+                element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
                 _addElement(element);
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
@@ -640,22 +645,17 @@ export function makeForm(type) {
                 return null;
         }
 
-        //deleteButtons();        // remove buttons temporarily while user input prompt is active
-        //chainlinkButton.value = false;
         pageEditButtons.value = "00";
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
                 if (type == "header2") {
-                        var element = new Chainlink(input.value, url, currentDateTime, isPublic, count, order);
+                        element = new Chainlink(input.value, url, currentDateTime, isPublic, count, order);
                 } else {
-                        var element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
+                        element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
                 }
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
                 _addElement(element);
-                // _addButtons();
-                //chainlinkButton.value = true;
-                //pageEditButtons.value = "11";
                 initialize();
                 container.remove();
                 window.removeEventListener("keydown", _listener);
@@ -1168,7 +1168,7 @@ export function editChainlink(target, children) {
 
 
 /**
- * Edit the target Content. Instantiate a form to allow the user to edit this content
+ * Edit the target Content. Instantiate a form to allow the user to edit this content.
  *
  * @param {string} target - This string indicates the id of the Content to edit
  * @returns {null}
@@ -1182,7 +1182,8 @@ export function editContent(target) {
         const input = document.createElement('input');
         const title = content.textContent;
         const url = wrapper.id.slice(0, -2);
-        const order = parseInt(wrapper.id.split("-").slice(1).join("-"));
+        const order = getOrderFromId(wrapper.id);
+
         const tag = wrapper.getAttribute("tag");
         const index = parseInt(wrapper.getAttribute("index"));
         var element = new Content(tag, title, url, null, true, 0, order);
@@ -1256,9 +1257,10 @@ function deinstantiateElement(id) {
         if (obj_to_remove.getAttribute("class") === "content-wrapper") {
                 let nextSibling = obj_to_remove.nextElementSibling;
                 while (nextSibling) {
-                        let oldIdUrl = nextSibling.getAttribute("id").split('-')[0];
-                        let oldIdOrder = nextSibling.getAttribute("id").split('-')[1];
-                        let newOrder = parseInt(oldIdOrder) - 1;
+                        let oldIdUrl = getPrefixFromId(nextSibling.getAttribute("id"));
+                        let oldIdOrder = getOrderFromId(nextSibling.getAttribute("id"));
+
+                        let newOrder = oldIdOrder - 1;
                         let newId = oldIdUrl + "-" + newOrder;
                         nextSibling.setAttribute("id", newId)
                         nextSibling = nextSibling.nextElementSibling;
@@ -1271,4 +1273,55 @@ function deinstantiateElement(id) {
         removeEditButtons();
         instantiateEditButtons();
         _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
+}
+
+
+/**
+ * Extracts and returns the order value from a given identifier.
+ *
+ * @param {string} id - The identifier containing a dash-separated value.
+ * @returns {number} The extracted order value.
+ * @throws {Error} Throws an error if the specified value after the dash is not a valid integer or if the identifier format is invalid.
+ */
+function getOrderFromId(id) {
+  if (typeof id !== 'string') {
+    throw new TypeError("The argument must be a string");
+  }
+
+  const lastIndex = id.lastIndexOf("-");
+
+
+  if (lastIndex !== -1) {
+    let order = parseInt(id.slice(lastIndex + 1));
+    if (isNaN(order)) {
+        throw new Error("The value specified after the dash must be an int");
+    }
+    return order;
+  } else {
+        throw new Error("An invalid id was specified. Make sure the supplied id contains a dash.")
+  }
+}
+
+
+/**
+ * Extracts and returns the prefix from a given identifier.
+ *
+ * @param {string} id - The identifier containing a dash-separated value.
+ * @returns {string} The extracted prefix.
+ * @throws {TypeError} Throws an error if the input is not a string.
+ * @throws {Error} Throws an error if the identifier format is invalid (doesn't contain a dash).
+ */
+function getPrefixFromId(id) {
+  if (typeof id !== 'string') {
+    throw new TypeError("The argument must be a string");
+  }
+
+  const lastIndex = id.lastIndexOf("-");
+
+  if (lastIndex !== -1) {
+    return id.slice(0, lastIndex);
+
+  } else {
+        throw new Error("An invalid id was specified. Make sure the supplied id contains a dash.")
+  }
 }
