@@ -66,7 +66,6 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         delimiter = Content()
         delimiter.chainlink = cl
         delimiter.tag = TagType.DELIMITER
-        delimiter.url = cl.url
         delimiter.order = 0
         delimiter.content = ''
 
@@ -146,22 +145,22 @@ def db_remove(table, url, order):
     :param order: This is an int identifier used in tandem with url to identify Content type targets. It is this field
     # that will get updated for all subsequent Content elements so that there is no gap in the element ordering
     """
-
-    if order is None:
-        target = get_object_or_404(table, url=url)
-    else:
-        print(url)
-        print(order)
-        target = table.objects.get(url=url, order=order)
-        if table == Content:
-            parent_chainlink = Chainlink.objects.get(url=target.url)
-            for i in range(order + 1, parent_chainlink.count + 1):
-                nextContentElement = Content.objects.get(url=target.url, order=i)
-                print(nextContentElement.tag)
-                nextContentElement.order -= 1  # asynchronously update the order field for
-                nextContentElement.save()
-            parent_chainlink.count -= 1
-            parent_chainlink.save()
+    print(url)
+    print(order)
+    if table == Chainlink:
+        target = table.objects.get(url=url)
+    elif table == Doc:
+        target = table.objects.get(url=url)
+    elif table == Content:
+        parent_chainlink = Chainlink.objects.get(url=url)
+        target = table.objects.get(chainlink=parent_chainlink, order=order)
+        for i in range(order + 1, parent_chainlink.count + 1):
+            nextContentElement = Content.objects.get(chainlink=parent_chainlink, order=i)
+            print(nextContentElement.tag)
+            nextContentElement.order -= 1
+            nextContentElement.save()
+        parent_chainlink.count -= 1
+        parent_chainlink.save()
     target.delete()
 
 
@@ -174,15 +173,18 @@ def db_update(table, url, order, payload):
     :param order: item identifier used in tandem with url to identify Content type targets
     :param payload: string indicating changes to make to target item
     """
-    target_title = payload
-    if order is None:
-        target = get_object_or_404(table, url=url)
-        if target.title != target_title:
-            target_title = db_try_title(table, target_title)
-        target.title = target_title
-    else:
-        target = get_object_or_404(table, url=url, order=order)
-        target.content = target_title
+    new_title = payload
+    if table == Chainlink:
+        target = table.objects.get(url=url)     # Get the record that we want to modify.
+        if target.title != new_title:   # Check if the new title matches the old one. If they're different then make
+            # sure the new title is valid.
+            new_title = db_try_title(table, new_title)  # Validate the new title
+            target.title = new_title
+
+    elif table == Content:
+        parent_chainlink = Chainlink.objects.get(url=url)
+        target = table.objects.get(chainlink=parent_chainlink, order=order)
+        target.content = new_title
 
     target.save()
 

@@ -46,7 +46,6 @@ class Chainlink(models.Model):
 class Content(models.Model):
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE,
                                   null=True)  # identifer for which chainlink this content is for
-    url = models.CharField(max_length=75)  # chainlink's url
     tag = models.CharField(  # specify tag to wrap content in
         max_length=10,
         choices=TagType.choices,
