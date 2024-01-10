@@ -50,7 +50,7 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
 
     if tag == TagType.HEADER2:
         # Update the parent object to indicate that it has a new child
-        article = get_object_or_404(Doc, url=parent)
+        article = Doc.objects.get(url=parent)
         article.count += 1
         # Create a representation of the Chainlink object to write to the database
         cl = Chainlink()
@@ -79,14 +79,10 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         return json.dumps(json_data)
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
         # Update the chainlink object that's a parent of the element to be written to the database
-        chainlink = get_object_or_404(Chainlink, url=json_data["url"])
+        chainlink = Chainlink.objects.get(url=json_data["url"])
 
         # Create a representation of the Content object to write to database
         content = Content()
-        """if json_data["url"] == "":
-            content.url = parent
-        else:
-            content.url = json_data["url"]"""
         content.chainlink = chainlink
         content.order = json_data["order"]
         if content.order != chainlink.count - 1:  # If the element we are inserting is not at the end but somewhere
@@ -98,15 +94,20 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         content.content = json_data["content"]
         content.public = json_data["is_public"]
 
+        chainlink.count += 1
+
         # Update the position of the delimiter to make space for the new Content. This statement will error if there
         # is not exactly one delimiter associated with this chainlink.
         try:
             delimiter = Content.objects.get(chainlink=chainlink, tag=TagType.DELIMITER)
             delimiter.order += 1
-        except Content.DoesNotExist:
-            raise RuntimeError("A valid delimiter was not found for this chainlink.")
-
-        chainlink.count += 1
+        except Content.DoesNotExist:    # Create a delimiter if one does not exist for this chainlink.
+            delimiter = Content()
+            delimiter.tag = TagType.DELIMITER
+            delimiter.chainlink = chainlink
+            # The delimiter order should *always* be the same as the total number of content elements for the chainlink.
+            delimiter.order = chainlink.count
+            delimiter.content = ""
 
         # Write changes to the database
         chainlink.save()

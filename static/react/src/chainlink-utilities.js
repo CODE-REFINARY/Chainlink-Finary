@@ -310,7 +310,7 @@ function ChainlinkElement(props) {
                                 chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
                         }
                 }
-                _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
+                refresh();   // Now that the Chainlink and its children are instantiated assign indices
                 removeEditButtons();
                 instantiateEditButtons();
         }, []);
@@ -333,7 +333,7 @@ function ChainlinkElement(props) {
 function ContentElement(props) {
 
         useEffect(() => {
-                _enumerateElements();
+                refresh();
                 removeEditButtons();
                 instantiateEditButtons();
         }, []);
@@ -414,7 +414,7 @@ export function initialize() {
                 pageEditButtons.value = "01";
         }
 
-        _enumerateElements();
+        refresh();
         showDiagnostics();
 }
 
@@ -424,7 +424,8 @@ export function initialize() {
  *
  * @returns {null}
  */
-function _enumerateElements() {
+function refresh() {
+        // Assign indices to all elements in the article/chainlink body
         var index = 0;
         const allElements = document.querySelectorAll('#chainlink-display *');
         for (let i = 0; i < allElements.length; i++) {
@@ -437,6 +438,26 @@ function _enumerateElements() {
                         }
                 }
         }
+
+        // Update the Chainlink Manifest links with any new chainlinks that were potentially added.
+        let list = document.getElementById("chainlink-manifest-entries");
+        let chainlinks = document.querySelectorAll(".chainlink-wrapper");
+        let chainlinkInfo = []
+        while (list.firstChild) {
+                list.removeChild(list.firstChild);
+        }
+        chainlinks.forEach(function(element) {
+                chainlinkInfo.push([element.querySelector(".chainlink-inner-text").textContent, element.id])
+        });
+
+        chainlinkInfo.forEach(function(element) {
+                let listItem = document.createElement("li");
+                let link = document.createElement("a");
+                link.textContent = element[0];
+                link.setAttribute("href", "#" + element[1]);
+                listItem.appendChild(link);
+                list.appendChild(listItem);
+        });
 }
 
 
@@ -1163,7 +1184,7 @@ export function editChainlink(target, children) {
                 window.removeEventListener("keydown", _listener)
         });
         chainlink.remove();
-        _enumerateElements();
+        refresh();
 }
 
 
@@ -1238,7 +1259,7 @@ export function editContent(target) {
         });
 
         wrapper.remove();
-        _enumerateElements();
+        refresh();
 }
 
 function deinstantiateElement(id) {
@@ -1272,7 +1293,7 @@ function deinstantiateElement(id) {
         //elementsEditButtonEventHandlers.splice(objToRemoveIndex, 1);
         removeEditButtons();
         instantiateEditButtons();
-        _enumerateElements();   // Now that the Chainlink and its children are instantiated assign indices
+        refresh();   // Now that the Chainlink and its children are instantiated assign indices
 }
 
 

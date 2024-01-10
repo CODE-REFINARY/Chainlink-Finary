@@ -161,7 +161,7 @@
     display: flex;
     justify-content: space-evenly;
 }
-#config-display > ul {
+#config-display ul {
     display: inline-block;
     vertical-align:top;
     background-color: #2C394B;
@@ -176,7 +176,7 @@
     border-color: transparent;
     border-radius: 12px;
 }
-#config-display > ul > h2 {
+#config-display h2 {
     color: whitesmoke;
     background-color: #2C394B;
     font-family: Audiowide;

@@ -11,115 +11,38 @@
 	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
 <div id="config-display">
-<ul id="keybindings-legend">
-	<h2>Keybindings Legend</h2>
-	<li>j - scroll down</li>
-	<li>k - scroll up</li>
-	<li>n - create chainlink</li>
-	<li>p - create text element</li>
-	<li>h - create header element</li>
-	<li>c - create code block</li>
-	<li>b - insert linebreak</li>
-</ul>
-<ul id="chainlink-manifest">
-	<h2>Chainlink Manifest</h2>
-	{% if chainlinks %}
-	{% for chainlink in chainlinks %}
-	<li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
-	{% endfor %}
-	{% else %}
-	<li><i>&#60;list empty&#62;</i></li>
-	{% endif %}
-</ul>
-<ul id="options-settings">
-	<h2>Options & Settings</h2>
-	<li><button id="doc-action-copy-link">Copy link to this doc</button></li>
-	<li><button id="doc-action-change-theme">Change theme</button></li>
-	<li><button id="doc-action-find-references">Find references</button></li>
-</ul>
-</div>
-<div id="decoration-display">
-<!--
-    <pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /:/  \:\  \ 
- /:/__/ \:\__\
- \:\  \  \/__/
-  \:\  \      
-   \:\  \     
-    \:\__\    
-     \/__/    
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /::\~\:\  \ 
- /:/\:\ \:\__\
- \/__\:\/:/  /
-      \::/  / 
-      /:/  /  
-     /:/  /   
-     \/__/    
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /::\~\:\  \ 
- /:/\:\ \:\__\
- \/_|::\/:/  /
-    |:|::/  / 
-    |:|\/__/  
-    |:|  |    
-     \|__|    
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /::\~\:\__\ 
- /:/\:\ \:|__|
- \:\~\:\/:/  /
-  \:\ \::/  / 
-   \:\/:/  /  
-    \::/__/   
-     ~~       
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /:/  \:\  \ 
- /:/__/ \:\__\
- \:\  \ /:/  /
-  \:\  /:/  / 
-   \:\/:/  /  
-    \::/  /   
-     \/__/    
-</pre>
-<pre>
-      ___     
-     /\__\    
-    /::|  |   
-   /:|:|  |   
-  /:/|:|  |__ 
- /:/ |:| /\__\
- \/__|:|/:/  /
-     |:/:/  / 
-     |::/  /  
-     /:/  /   
-     \/__/    
-</pre>
--->
-
+    <div id="keybindings-legend">
+        <h2>Keybindings Legend</h2>
+        <ul id="keybindings-legend">
+            <li>j - scroll down</li>
+            <li>k - scroll up</li>
+            <li>n - create chainlink</li>
+            <li>p - create text element</li>
+            <li>h - create header element</li>
+            <li>c - create code block</li>
+            <li>b - insert linebreak</li>
+        </ul>
+    </div>
+    <div id="chainlink-manifest">
+        <h2>Chainlink Manifest</h2>
+        <ul id="chainlink-manifest-entries">
+            {% if chainlinks %}
+                {% for chainlink in chainlinks %}
+                    <li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
+                {% endfor %}
+            {% else %}
+                <li><i>&#60;list empty&#62;</i></li>
+            {% endif %}
+        </ul>
+    </div>
+    <div id="options-settings">
+        <h2>Options & Settings</h2>
+        <ul>
+            <li><button id="doc-action-copy-link">Copy link to this doc</button></li>
+            <li><button id="doc-action-change-theme">Change theme</button></li>
+            <li><button id="doc-action-find-references">Find references</button></li>
+        </ul>
+    </div>
 </div>
 
 <!-- Article content is always displayed in #chainlink-display -->
