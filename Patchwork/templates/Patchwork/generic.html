@@ -4,46 +4,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
-<!--<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
-<script type="module">
-
-	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
-
-	// await full DOM load before adding DB items
-	document.addEventListener("DOMContentLoaded", function() {
-
-		// Globals
-		window.ctrl = false;			// This flag indicates whether the "ctrl" key is being held down
-
-        // Handle empty document case where only chainlink add button should be present
-		if (document.getElementById("chainlink-display").querySelector(":scope > section") == null) {
-			window.in = "doc-empty";	// signal to key parser to disable all hotkeys except "c"
-			addButtonsDocEmptyView();
-		} else {
-			window.in = "doc";
-			addButtonsDocView();
-		}
-
-		// Add the event listeners above for keystrokes
-		window.addEventListener("keyup", parseKeyUp);
-		window.addEventListener("keydown", parseKeyDown);
-		document.getElementById("add-page-btn").addEventListener("click", createFence);
-
-		// Add CRUD buttons for page content
-		instFenceEditButtons();
-		instChainlinkEditButtons();
-		instContentEditButtons();
-
-		//deleteFenceEditButtons();
-		//deleteChainlinkEditButtons();
-		//deleteContentEditButtons();
-
-	});
-</script>-->
 <nav id="tabbed-buttons">
-{% for doc in docs %}
-	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.header.text  }}</button>
-{% endfor %}
+    {% for doc in docs %}
+	    <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">{{ doc.header.text  }}</button>
+    {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
 <div id="config-display">
@@ -180,29 +144,29 @@
                 <section class="chainlink">
                     <div id="{{ content.1 }}" class="chainlink-wrapper" tag="chainlink">
                         <h2>
-                    <span class="chainlink-inner-text">{{ content.0.title }}</span>
-                            <a class="inline-url header-url" href="chainlink{{ content.1 }}.html">>>>{{ content.1|slice:"0:9" }}</a>
-                </h2>
+                            <span class="chainlink-inner-text">{{ content.0.title }}</span>
+                            <a class="inline-url header-url" href={% url "chainlink" key=content.1 %}>>>>{{ content.1|slice:"0:9" }}</a>
+                        </h2>
                     </div>
-                {% elif content.tag == 'paragraph' %}
-                <div id="{{ content.1 }}-{{ content.0.title }}" class="content-wrapper" tag="paragraph">
+                {% elif content.0.tag == 'paragraph' %}
+                <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="paragraph">
                     <p class="inner-content">{{ content.0.content }}</p>
 
                 </div>
-                {% elif content.tag == 'code' %}
+                {% elif content.0.tag == 'code' %}
                 <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="code">
                     <code class="inner-content">{{ content.0.content }}</code>
 
                 </div>
-                {% elif content.tag == 'header3' %}
+                {% elif content.0.tag == 'header3' %}
                 <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="header3">
                     <h3 class="inner-content">{{ content.0.content }}</h3>
                 </div>
-                {% elif content.tag == 'linebreak' %}
+                {% elif content.0.tag == 'linebreak' %}
                 <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="linebreak">
                     <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
                 </div>
-                {% elif content.tag == 'delimiter' %}
+                {% elif content.0.tag == 'delimiter' %}
                 </section>
                 {% endif %}
             {% empty %}

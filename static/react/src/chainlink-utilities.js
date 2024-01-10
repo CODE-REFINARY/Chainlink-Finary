@@ -322,7 +322,7 @@ function ChainlinkElement(props) {
                                         <span className="chainlink-inner-text">
                                                 {props.title}
                                         </span>
-                                        <a className="inline-url header-url" href={"chainlink" + props.url + ".html"}>
+                                        <a className="inline-url header-url" href={"/patchwork/chainlink/" + props.url + ".html"}>
                                                 {">>>" + props.url.substring(0, 9)}
                                         </a>
                                 </h2>
@@ -735,7 +735,7 @@ export function createFence() {
         const article = new Article("article", "", currentDateTime, false, 0, 0);
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "generate.html", true);
+        xhr.open("POST", "/patchwork/article/generate.html", true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.responseType = "json";
@@ -753,7 +753,7 @@ export function createFence() {
                         nxhr.setRequestHeader('target', 'null');
                         nxhr.send();
                         nxhr.onreadystatechange = function() {
-                                window.location.replace("doc" + url + ".html");
+                                window.location.replace("/patchwork/article/" + url + ".html");
                         }
                 }
         }
