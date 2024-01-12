@@ -11,7 +11,6 @@ class TagType(models.TextChoices):  # Define available tag that content can be w
     CODE = 'code', _('code')  # wrap content in <code>
     HEADER3 = 'header3', _('header3')  # wrap content in <h3>
     LINEBREAK = 'linebreak', _('linebreak')  # insert <br>
-    DELIMITER = 'delimiter', _('delimiter')  # indicate end of content for a chainlink
 
 
 class Doc(models.Model):
@@ -21,11 +20,8 @@ class Doc(models.Model):
     date = models.DateTimeField(default=timezone.now)  # Creation date for this doc
     url = models.CharField(max_length=75)  # relative url for this doc
     count = models.BigIntegerField(default=0)
-    order = models.BigIntegerField(
-        default=0)  # The Article order field will typically be used in an Article query to sort Articles by relevance
-
     def __str__(self):
-        return "Article" + self.title
+        return "Article: " + self.title
 
 
 class Chainlink(models.Model):
@@ -53,8 +49,10 @@ class Content(models.Model):
     )
     order = models.BigIntegerField(default=0)  # indicate the position of this content within the chainlink
     content = models.CharField(max_length=10000)  # specify content to place between tags specified by tag
-    public = models.BooleanField(
-        default=True)  # Content can be marked to be visibly redacted from an Article. Redactions are visible to all users and labelled as such (although the content itself cannot be accessed). Redacted content can be made visible by setting the public flag to True.
+    # Content can be marked to be visibly redacted from an Article. Redactions are visible to all users and labelled as
+    # such (although the content itself cannot be accessed). Redacted content can be made visible by setting the public
+    # flag to True.
+    public = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.order) + " " + self.chainlink.title + " - " + self.tag

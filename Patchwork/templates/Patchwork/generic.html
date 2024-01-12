@@ -62,38 +62,37 @@
         <!-- Chainlink Elements comprise the "meat" of the page. These elements are logically connected to the current
         host Article or Chainlink. It is in this way (and this way only) that they are related to each other. -->
         <div id="chainlink-elements">
-            {% for content in chainlinks_and_contents %}
-                {% if content.0.tag == 'header2' %}
+            {% for chainlink in chainlinks %}
                 <section class="chainlink">
-                    <div id="{{ content.1 }}" class="chainlink-wrapper" tag="chainlink">
+                    <div id="{{ chainlink.0.url }}" class="chainlink-wrapper" tag="chainlink">
                         <h2>
-                            <span class="chainlink-inner-text">{{ content.0.title }}</span>
-                            <a class="inline-url header-url" href={% url "chainlink" key=content.1 %}>>>>{{ content.1|slice:"0:9" }}</a>
+                            <span class="chainlink-inner-text">{{ chainlink.0.title }}</span>
+                            <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
                         </h2>
                     </div>
-                {% elif content.0.tag == 'paragraph' %}
-                <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="paragraph">
-                    <p class="inner-content">{{ content.0.content }}</p>
-
-                </div>
-                {% elif content.0.tag == 'code' %}
-                <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="code">
-                    <code class="inner-content">{{ content.0.content }}</code>
-
-                </div>
-                {% elif content.0.tag == 'header3' %}
-                <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="header3">
-                    <h3 class="inner-content">{{ content.0.content }}</h3>
-                </div>
-                {% elif content.0.tag == 'linebreak' %}
-                <div id="{{ content.1 }}-{{ content.0.order }}" class="content-wrapper" tag="linebreak">
-                    <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
-                </div>
-                {% elif content.0.tag == 'delimiter' %}
+                    {% for content in chainlink.1 %}
+                        {% if content.tag == 'paragraph' %}
+                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
+                            <p class="inner-content">{{ content.content }}</p>
+                        </div>
+                        {% elif content.tag == 'code' %}
+                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="code">
+                            <code class="inner-content">{{ content.content }}</code>
+                        </div>
+                        {% elif content.tag == 'header3' %}
+                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
+                            <h3 class="inner-content">{{ content.content }}</h3>
+                        </div>
+                        {% elif content.tag == 'linebreak' %}
+                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
+                            <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
+                        </div>
+                        {% elif content.tag == 'delimiter' %}
+                        {% endif %}
+                        {% empty %}
+                            <div id="no-footer">&ltno content&gt</div>
+                    {% endfor %}
                 </section>
-                {% endif %}
-            {% empty %}
-                <div id="no-footer">&ltno content&gt</div>
             {% endfor %}
         </div>
         <!-- Elements under the add-buttons element are buttons used to create content on the page -->
