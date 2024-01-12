@@ -20,11 +20,15 @@ var articleIsEmpty;
 var chainlinkIsEmpty;
 //var chainlinkButton;
 var pageEditButtons;
-var numElements;        // the number of Elements rendered on the page
+var numBodyElements;        // the number of Elements rendered on the page
+let numFooterElements;
+let numHeaderElements;
 var cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
 
 /* Static Variables */
-const elementClassNames = ["chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify Elements
+const bodyElementClassNames = ["chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify body Elements
+const headerElementClassNames = ["header-element-wrapper"];
+const footerElementClassNames = ["footer-element-wrapper"];
 
 
 // Set up state variables after DOM is ready to be read
@@ -67,9 +71,27 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         // variable indicates the number of elements currently rendered on the screen
-        numElements = {
+        numBodyElements = {
                 get value() {
-                        const selector = elementClassNames.map(className => `.${className}`).join(', ');
+                        const selector = bodyElementClassNames.map(className => `.${className}`).join(', ');
+                        const elements = document.querySelectorAll(selector);
+                        return (Array.from(elements).length);
+                }
+        };
+
+        // variable indicates the number of elements currently rendered on the screen
+        numHeaderElements = {
+                get value() {
+                        const selector = headerElementClassNames.map(className => `.${className}`).join(', ');
+                        const elements = document.querySelectorAll(selector);
+                        return (Array.from(elements).length);
+                }
+        };
+
+        // variable indicates the number of elements currently rendered on the screen
+        numFooterElements = {
+                get value() {
+                        const selector = footerElementClassNames.map(className => `.${className}`).join(', ');
                         const elements = document.querySelectorAll(selector);
                         return (Array.from(elements).length);
                 }
@@ -81,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // cursor
         cursor = {
                 get value() {
-                        return (numElements.value - 1);         // Temporary fix cursor at the end position
+                        return (numBodyElements.value - 1);         // Temporary fix cursor at the end position
                 }
         };
 
@@ -259,6 +281,15 @@ function ContentEditButtons(props) {
                 </React.Fragment>
         );
 }*/
+
+function NoElements(props) {
+        return (
+                <React.Fragment>
+                        <div id="no-chainlinks" className="no-elements">&lt;no content&gt;</div>
+                </React.Fragment>
+        );
+}
+
 function ChainlinkHeader(props) {
         return (
                <React.Fragment>
@@ -430,8 +461,8 @@ function refresh() {
         const allElements = document.querySelectorAll('#chainlink-display *');
         for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
-                for (let j = 0; j < elementClassNames.length; j++) {
-                        if (element.classList.contains(elementClassNames[j])) {
+                for (let j = 0; j < bodyElementClassNames.length; j++) {
+                        if (element.classList.contains(bodyElementClassNames[j])) {
                                 element.setAttribute("index", index);
                                 index++;
                                 break;
@@ -458,6 +489,49 @@ function refresh() {
                 listItem.appendChild(link);
                 list.appendChild(listItem);
         });
+
+        // Remove or add the "no content" markers as appropriate
+        const chainlinkElements = document.getElementById("chainlink-elements");
+        const headerElements = document.getElementById("header-elements");
+        const footerElements = document.getElementById("footer-elements");
+        let noClMarker = document.getElementById("no-chainlinks");
+        let noFtMarker = document.getElementById("no-footer");
+        let noHrMarker = document.getElementById("no-header");
+        if (numBodyElements.value > 0) {
+                if (noClMarker) {
+                        noClMarker.remove()
+                }
+        } else {
+                if (noClMarker === null) {
+                        const root = createRoot(chainlinkElements);
+                        chainlinkElements.append(root);
+                        root.render(<NoElements />);
+                }
+        }
+
+        if (numHeaderElements.value > 0) {
+                if (noHrMarker) {
+                        noHrMarker.remove()
+                }
+        } else {
+                if (noHrMarker === null) {
+                        const root = createRoot();
+                        headerElements.append(root);
+                        root.render(<NoElements />);
+                }
+        }
+
+        if (numFooterElements.value > 0) {
+                if (noFtMarker) {
+                        noFtMarker.remove()
+                }
+        } else {
+                if (noFtMarker === null) {
+                        const root = createRoot();
+                        footerElements.append(root);
+                        root.render(<NoElements />);
+                }
+        }
 }
 
 
@@ -481,7 +555,7 @@ function showDiagnostics() {
         console.log("isChainlink: " + isChainlink.value);
         console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
         console.log("articleIsEmpty: " + articleIsEmpty.value);
-        console.log("numElements: " + numElements.value);
+        console.log("numElements: " + numBodyElements.value);
 }
 
 /**
@@ -504,7 +578,7 @@ function _addElement(element) {
         // instantiate element once AJAX Post comes back successful
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                        instantiateElement(xhr.response, numElements.value, null);
+                        instantiateElement(xhr.response, numBodyElements.value, null);
                 }
         }
 }
@@ -605,7 +679,7 @@ export function makeForm(type) {
                 let nextElement = previousElement.nextElementSibling;
 
                 // If we are submitting a new element to the end...
-                if (cursor.value == numElements.value - 1) {
+                if (cursor.value == numBodyElements.value - 1) {
                         // The new element will be the first
                         if (previousElement.className === "chainlink-wrapper") {
                                 // element of this chainlink so assign its order to 0 because we are 0-indexed

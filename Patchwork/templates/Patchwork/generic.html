@@ -48,11 +48,13 @@
 <!-- Article content is always displayed in #chainlink-display -->
 <div id="element-display" template="article">
     <div id="header-display">
-        {% if header %}
-	    <h1 id="{{ document.url }} doc-title">{{ header.text }}</h1>
-        {% else %}
-            <div id="no-header">&ltno header&gt</div>
-        {% endif %}
+        <div id="header-elements">
+            {% if header %}
+                <h1 class="header-element-wrapper" id="{{ document.url }} doc-title">{{ header.text }}</h1>
+            {% else %}
+                <div id="no-header" class="no-elements">&ltno header&gt</div>
+            {% endif %}
+        </div>
             <div class="element-creation-buttons">
                 <button id="add-h1-btn" class="add-buttons">Add Header</button>
             </div>
@@ -90,9 +92,11 @@
                         {% elif content.tag == 'delimiter' %}
                         {% endif %}
                         {% empty %}
-                            <div id="no-footer">&ltno content&gt</div>
+                            <div id="no-contents" class="no-elements">&ltno content&gt</div>
                     {% endfor %}
                 </section>
+                {% empty %}
+                    <div id="no-chainlinks" class="no-elements">&ltno content&gt</div>
             {% endfor %}
         </div>
         <!-- Elements under the add-buttons element are buttons used to create content on the page -->
@@ -105,11 +109,13 @@
     </div>
     <hr />
     <div id="footer-display">
-        {% if header %}
-	        <h1 id="doc-footer">{{ footer.text }}</h1>
-        {% else %}
-            <div id="no-footer">&ltno footer&gt</div>
-        {% endif %}
+        <div id="footer-elements">
+            {% if header %}
+                <h1 id="doc-footer" class="footer-element-wrapper">{{ footer.text }}</h1>
+            {% else %}
+                <div id="no-footer" class="no-elements">&ltno footer&gt</div>
+            {% endif %}
+        </div>
         <div class="element-creation-buttons">
             <button id="add-h1-btn" class="add-buttons">Add Footer Text</button>
         </div>
