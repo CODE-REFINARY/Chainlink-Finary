@@ -16,13 +16,14 @@ var elementsEditButtonEventHandlers = [];
 // State variables to describe the state of the page. These can be called to reliable determine something about the current page
 var isArticle;
 var isChainlink;
-var articleIsEmpty;
+let articleIsEmpty;
 var chainlinkIsEmpty;
 //var chainlinkButton;
 var pageEditButtons;
 var numBodyElements;        // the number of Elements rendered on the page
 let numFooterElements;
 let numHeaderElements;
+let formIsActive;
 var cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
 
 /* Static Variables */
@@ -53,13 +54,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
         };
 
-        // flag indicates that the article has no chainlinks (and thus no content). This flag is only set in Article view
-        articleIsEmpty = {
-                get value() {
-                        return (document.getElementById("chainlink-display").childElementCount === 1 && isArticle.value);
-                }
-        };
-
         // flag indicates that the chainlink has no content display. This flag is only set in Chainlink view
         chainlinkIsEmpty = {
                 get value() {
@@ -67,6 +61,16 @@ document.addEventListener("DOMContentLoaded", function() {
                                 return false;
                         }
                         return (document.getElementById("chainlink-display").firstElementChild.childElementCount === 1 && isChainlink.value);
+                }
+        };
+
+        formIsActive = {
+                get value() {
+                        if (document.getElementById("crud-form")) {
+                                return true;
+                        } else {
+                                return false;
+                        }
                 }
         };
 
@@ -94,6 +98,12 @@ document.addEventListener("DOMContentLoaded", function() {
                         const selector = footerElementClassNames.map(className => `.${className}`).join(', ');
                         const elements = document.querySelectorAll(selector);
                         return (Array.from(elements).length);
+                }
+        };
+
+        articleIsEmpty = {
+                get value() {
+                        return (numBodyElements.value === 0);
                 }
         };
 
@@ -313,6 +323,10 @@ function ContentCreationForm(props) {
         );
 }*/
 function ElementCreationForm(props) {
+
+        useEffect(() => {
+                refresh();
+        })
         return (
                 <form id="crud-form">
                         <input autoFocus type="text" id="input" placeholder={props.placeholder} defaultValue={props.value}/>
@@ -432,7 +446,7 @@ export function initialize() {
                 root.render(<CreateContentButtons />);
         } else if (quantity == 5) {
                 root.render(<ContentCreationButtonsFive />);
-        }*/
+        }
 
         // Render chainlink/content creation buttons
         if (isArticle.value) {
@@ -444,7 +458,7 @@ export function initialize() {
         } else if (isChainlink.value) {
                 pageEditButtons.value = "01";
         }
-
+*/
         refresh();
         showDiagnostics();
 }
@@ -457,7 +471,7 @@ export function initialize() {
  */
 function refresh() {
         // Assign indices to all elements in the article/chainlink body
-        var index = 0;
+        let index = 0;
         const allElements = document.querySelectorAll('#chainlink-display *');
         for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
@@ -532,6 +546,21 @@ function refresh() {
                         root.render(<NoElements />);
                 }
         }
+
+        // Grey out buttons (or un-grey them) if forms or other factors are active
+        if (formIsActive.value) {
+                pageEditButtons.value = "00";
+        } else {
+                if (isArticle.value) {
+                        if (numBodyElements.value === 0) {
+                                pageEditButtons.value = "10";
+                        } else {
+                                pageEditButtons.value = "11";
+                        }
+                } else if (isChainlink.value) {
+                        pageEditButtons.value = "01";
+                }
+        }
 }
 
 
@@ -554,7 +583,7 @@ function showDiagnostics() {
         console.log("isArticle: " + isArticle.value);
         console.log("isChainlink: " + isChainlink.value);
         console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
-        console.log("articleIsEmpty: " + articleIsEmpty.value);
+        console.log("articleIsEmpty: " + (numBodyElements.value === 0).toString());
         console.log("numElements: " + numBodyElements.value);
 }
 
@@ -611,7 +640,7 @@ function instantiateElement(element, index, children) {
                 const container = document.createElement("section");
                 const root = createRoot(container);
                 container.className = "chainlink";
-                if (articleIsEmpty.value) {
+                if (numBodyElements.value === 0) {
                         parentElement.appendChild(container);
                 } else if (previousElementIndex === -1) {
                         parentElement.insertBefore(container, firstChild);
@@ -740,7 +769,7 @@ export function makeForm(type) {
                 return null;
         }
 
-        pageEditButtons.value = "00";
+        // pageEditButtons.value = "00";
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
                 if (type == "header2") {
@@ -754,6 +783,7 @@ export function makeForm(type) {
                 initialize();
                 container.remove();
                 window.removeEventListener("keydown", _listener);
+                refresh();
         });
 }
 
@@ -867,7 +897,6 @@ export function parseKeyUp(e) {
 export function parseKeyDown(e) {
         var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
         var keyCode = e.which;
-        console.log(articleIsEmpty.value);
         if (e.ctrlKey) {       // exit if the ctrl key is currently being pressed
                 return;
         }
