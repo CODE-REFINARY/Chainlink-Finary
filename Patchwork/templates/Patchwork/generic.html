@@ -6,7 +6,11 @@
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 <nav id="tabbed-buttons">
     {% for doc in docs %}
-	    <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">{{ doc.header.text  }}</button>
+        {% if doc.header.text != "" %}
+	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">{{ doc.header.text }}</button>
+        {% else %}
+            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">untitled&lt{{ doc.url|slice:"0:9" }}&gt</button>
+        {% endif %}
     {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
@@ -38,9 +42,11 @@
     <div id="options-settings">
         <h2>Options & Settings</h2>
         <ul>
-            <li><button id="doc-action-copy-link">Copy link to this doc</button></li>
-            <li><button id="doc-action-change-theme">Change theme</button></li>
-            <li><button id="doc-action-find-references">Find references</button></li>
+            <li><button id="doc-action-copy-link">Share This Article</button></li>
+            <li><button id="doc-action-change-theme">Switch Theme</button></li>
+            <li><button id="doc-action-find-references">Find References</button></li>
+            <li><button id="doc-action-delete">Delete This Article</button></li>
+            <li><button id="doc-action-delete">Enable No Warning Edits</button></li>
         </ul>
     </div>
 </div>
@@ -66,10 +72,12 @@
         <div id="chainlink-elements">
             {% for chainlink in chainlinks %}
                 <section class="chainlink">
-                    <div id="{{ chainlink.0.url }}" class="chainlink-wrapper" tag="chainlink">
+                    <div id="{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
                         <h2>
+                            <span class="chainlink-order">#{{ chainlink.0.order }}</span>
                             <span class="chainlink-inner-text">{{ chainlink.0.title }}</span>
                             <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
+                            <span class="chainlink-date">{{ chainlink.0.date }}</span>
                         </h2>
                     </div>
                     {% for content in chainlink.1 %}
@@ -92,11 +100,11 @@
                         {% elif content.tag == 'delimiter' %}
                         {% endif %}
                         {% empty %}
-                            <div id="no-contents" class="no-elements">&ltno content&gt</div>
+                            <!--<div id="no-contents" class="no-elements">&ltno content&gt</div>-->
                     {% endfor %}
                 </section>
                 {% empty %}
-                    <div id="no-chainlinks" class="no-elements">&ltno content&gt</div>
+                    <!--<div id="no-chainlinks" class="no-elements">&ltno content&gt</div>-->
             {% endfor %}
         </div>
         <!-- Elements under the add-buttons element are buttons used to create content on the page -->

@@ -28,6 +28,7 @@ var cursor;             // the cursor is a positive integer representing the pos
 
 /* Static Variables */
 const bodyElementClassNames = ["chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify body Elements
+const contentElementClassNames = ["content-wrapper"];
 const headerElementClassNames = ["header-element-wrapper"];
 const footerElementClassNames = ["footer-element-wrapper"];
 
@@ -295,7 +296,7 @@ function ContentEditButtons(props) {
 function NoElements(props) {
         return (
                 <React.Fragment>
-                        <div id="no-chainlinks" className="no-elements">&lt;no content&gt;</div>
+                        &lt;no content&gt;
                 </React.Fragment>
         );
 }
@@ -504,11 +505,11 @@ function refresh() {
                 list.appendChild(listItem);
         });
 
-        // Remove or add the "no content" markers as appropriate
+        // Remove or add the "no content" marker for the Article.
         const chainlinkElements = document.getElementById("chainlink-elements");
         const headerElements = document.getElementById("header-elements");
         const footerElements = document.getElementById("footer-elements");
-        let noClMarker = document.getElementById("no-chainlinks");
+        let noClMarker = chainlinkElements.querySelector(".no-elements");
         let noFtMarker = document.getElementById("no-footer");
         let noHrMarker = document.getElementById("no-header");
         if (numBodyElements.value > 0) {
@@ -517,8 +518,10 @@ function refresh() {
                 }
         } else {
                 if (noClMarker === null) {
-                        const root = createRoot(chainlinkElements);
-                        chainlinkElements.append(root);
+                        const container = document.createElement("div");
+                        const root = createRoot(container);
+                        container.className = "no-elements";
+                        chainlinkElements.append(container);
                         root.render(<NoElements />);
                 }
         }
@@ -529,8 +532,10 @@ function refresh() {
                 }
         } else {
                 if (noHrMarker === null) {
-                        const root = createRoot();
-                        headerElements.append(root);
+                        const container = document.createElement("div");
+                        const root = createRoot(container);
+                        container.className = "no-elements";
+                        headerElements.append(container);
                         root.render(<NoElements />);
                 }
         }
@@ -541,9 +546,36 @@ function refresh() {
                 }
         } else {
                 if (noFtMarker === null) {
-                        const root = createRoot();
-                        footerElements.append(root);
+                        const container = document.createElement("div");
+                        const root = createRoot(container);
+                        container.className = "no-elements";
+                        footerElements.append(container);
                         root.render(<NoElements />);
+                }
+        }
+
+        // Remove or add "no content" marker for each Chainlink
+        let cls = document.querySelectorAll(".chainlink");
+        const selector = contentElementClassNames.map(className => `.${className}`).join(', ');
+        for (let i = 0; i < cls.length; i++) {
+                // If the number of content elements that are children of this chainlink is zero then display the
+                // "no content" marker.
+                let numChildElements = Array.from(cls[i].querySelectorAll(selector)).length;
+                let marker = cls[i].querySelector(".no-elements");
+                if (numChildElements === 0) {
+                        if (marker === null) {
+                                const container = document.createElement("div");
+                                const root = createRoot(container);
+                                container.className = "no-elements";
+                                cls[i].append(container);
+                                root.render(<NoElements/>);
+                        }
+                } else {
+                        // If there are elements under this chainlink then find the "no content" marker (if it exists)
+                        // and remove it. Otherwise, just we're done here.
+                        if (marker) {
+                                marker.remove();
+                        }
                 }
         }
 
@@ -648,7 +680,7 @@ function instantiateElement(element, index, children) {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
                 }
-                root.render(<ChainlinkElement title={element.title} url={element.url} children={children} />);
+                root.render(<ChainlinkElement title={element.title} url={element.url + "-" + element.order} children={children} />);
 
         } else {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
@@ -666,7 +698,7 @@ function instantiateElement(element, index, children) {
                 adjacentElement.insertAdjacentElement("afterend", container);
                 /*else
                         parentElement.appendChild(container);*/
-                root.render(<ContentElement type={element.type} content={element.content} url={element.url} />);
+                root.render(<ContentElement type={element.type} content={element.content} />);
         }
 }
 
@@ -733,40 +765,33 @@ export function makeForm(type) {
         if (type === "header2") {
                 container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
-                root.render(<ElementCreationForm placeholder="enter chainlink content" />);
+                root.render(<ElementCreationForm placeholder="enter chainlink content"/>);
                 list.appendChild(container);
-        }
-        else if (type == "header3") {
-                container.id = "content-creation-form";
-                url = chainlink.firstElementChild.getAttribute('id');
-                order = chainlink.childElementCount - 1;
-                root.render(<ElementCreationForm placeholder="enter header content" />);
-                chainlink.appendChild(container);
-        }
-        else if (type == "paragraph") {
-                container.id = "content-creation-form";
-                url = chainlink.firstElementChild.getAttribute('id');
-                order = chainlink.childElementCount - 1;
-                root.render(<ElementCreationForm placeholder="enter paragraph content" />);
-                chainlink.appendChild(container);
-        } 
-        else if (type == "code") {
-                container.id = "content-creation-form";
-                url = chainlink.firstElementChild.getAttribute('id');
-                order = chainlink.childElementCount - 1;
-                root.render(<ElementCreationForm placeholder="enter code block" />);
-                chainlink.appendChild(container);
-        }
-        else if (type == 'linebreak') {
-                container.id = "content-creation-form";
-                url = chainlink.firstElementChild.getAttribute('id');
-                order = chainlink.childElementCount - 1;
-                element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
-                _addElement(element);
-                window.addEventListener("keydown", parseKeyDown);
-                window.addEventListener("keyup", parseKeyUp);
-                window.removeEventListener("keydown", _listener);
-                return null;
+        } else {
+                order = getMatchedChildren(chainlink, contentElementClassNames).length;
+                url = getPrefixFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id'));
+
+                if (type == "header3") {
+                        container.id = "content-creation-form";
+                        root.render(<ElementCreationForm placeholder="enter header content"/>);
+                        chainlink.appendChild(container);
+                } else if (type == "paragraph") {
+                        container.id = "content-creation-form";
+                        root.render(<ElementCreationForm placeholder="enter paragraph content"/>);
+                        chainlink.appendChild(container);
+                } else if (type == "code") {
+                        container.id = "content-creation-form";
+                        root.render(<ElementCreationForm placeholder="enter code block"/>);
+                        chainlink.appendChild(container);
+                } else if (type == 'linebreak') {
+                        container.id = "content-creation-form";
+                        element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
+                        _addElement(element);
+                        window.addEventListener("keydown", parseKeyDown);
+                        window.addEventListener("keyup", parseKeyUp);
+                        window.removeEventListener("keydown", _listener);
+                        return null;
+                }
         }
 
         // pageEditButtons.value = "00";
@@ -1448,4 +1473,10 @@ function getPrefixFromId(id) {
   } else {
         throw new Error("An invalid id was specified. Make sure the supplied id contains a dash.")
   }
+}
+
+
+function getMatchedChildren(parent, matchThis) {
+        const selectors = matchThis.map(className => `.${className}`).join(', ');
+        return(Array.from(parent.querySelectorAll(selectors)));
 }

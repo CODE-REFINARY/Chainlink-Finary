@@ -253,3 +253,11 @@
     font-size: small;
     color: purple;
 }
+.chainlink-date {
+    font-size: small;
+    color: #e35f5f;
+}
+.chainlink-order {
+    font-size: x-small;
+    color: #888888;
+}

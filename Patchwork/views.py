@@ -64,13 +64,14 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         cl.url = db_try_url(TagType.HEADER2)
         cl.public = json_data["is_public"]
         cl.date = timezone.now()
-        cl.count = 0
+        #cl.count = 0
 
         # write objects to the database
         cl.save()
 
         # return the request with the url updated with the url assigned to this chainlink
         json_data["url"] = cl.url
+        json_data["order"] = cl.order
         return json.dumps(json_data)
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
         # Update the chainlink object that's a parent of the element to be written to the database
@@ -83,7 +84,7 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
             # in the beginning or middle of the Chainlink then shift all Content up in the order.
-            print(chainlink.count)
+            #print(chainlink.count)
             print(chainlink.title)
             for i in range(json_data["order"] + 1, numElements):
                 try:
@@ -91,7 +92,7 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
                     # field for all elements after this one
                 except Content.DoesNotExist:
                     print("ERROR: A content element specified after the new element wasn't found. Something is wrong.")
-                    chainlink.count -= 1  # We've discovered a missing element so the count must be off
+                    #chainlink.count -= 1  # We've discovered a missing element so the count must be off
                     # Find the next existing Content after the one to be added.
                     for j in range(i + 1, numElements):
                         try:
@@ -106,11 +107,12 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         content.content = json_data["content"]
         content.public = json_data["is_public"]
 
-        chainlink.count += 1
+        #chainlink.count += 1
 
         # Write changes to the database
         chainlink.save()
         content.save()
+        json_data["order"] = content.order
         return json.dumps(json_data)
     elif tag == TagType.HEADER1:
         # Create a representation of the Article as a python object
@@ -159,7 +161,7 @@ def db_remove(table, url, order):
             for obj in next_pos_els:
                 obj.order -= 1
                 obj.save()
-        parent_chainlink.count -= 1
+        #parent_chainlink.count -= 1
         parent_chainlink.save()
     target.delete()
 
@@ -303,7 +305,7 @@ def generic(request, key=''):
             case "doc":
                 db_remove(Doc, key, None)
             case "chainlink":
-                db_remove(Chainlink, request.headers["target"], None)
+                db_remove(Chainlink, get_prefix_from_id(target_id), None)
             case "content":
                 db_remove(Content, get_prefix_from_id(target_id), get_order_from_id(target_id))
 
@@ -315,7 +317,7 @@ def generic(request, key=''):
             case "doc":
                 db_update(Doc, key, None, request.headers["title"])
             case "chainlink":
-                db_update(Chainlink, request.headers["target"], None, request.headers["title"])
+                db_update(Chainlink, get_prefix_from_id(target_id), None, target_title)
             case "content":
                 db_update(Content, get_prefix_from_id(target_id), get_order_from_id(target_id), target_title)
 
