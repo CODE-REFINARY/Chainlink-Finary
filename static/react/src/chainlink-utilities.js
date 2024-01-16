@@ -657,7 +657,7 @@ function _addElement(element) {
  * @returns {null}
  */
 function instantiateElement(element, index, children) {
-        var previousElementIndex = index - 1;                                 // the index of the Element directly before the Element to be created
+        let previousElementIndex = index - 1;                                 // the index of the Element directly before the Element to be created
         var previousElement = null;                                             // the Element directly before the Element that will be created
         var parentElement = null;                                               // the parent html element
         var adjacentElement = null;                                             // the element right before the element to be inserted
@@ -680,13 +680,13 @@ function instantiateElement(element, index, children) {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
                 }
-                root.render(<ChainlinkElement title={element.title} url={element.url + "-" + element.order} children={children} />);
+                root.render(<ChainlinkElement title={element.title} url={"chainlink-" + element.url + "-" + element.order} children={children} />);
 
         } else {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
                 const container = document.createElement("div");
                 const root = createRoot(container);
-                container.id = element.url + "-" + element.order;
+                container.id = "content-" + element.url + "-" + element.order;
                 container.className = "content-wrapper";
                 container.setAttribute("tag", element.type);
                 //container.setAttribute("index", numElements.value);
@@ -754,7 +754,7 @@ export function makeForm(type) {
                 else {  // Otherwise we are submitting a new element either at the beginning or in the middle
                         while (nextElement) {
                                 // Get a new Id for the next element over by incrementing the order
-                                let newId = getPrefixFromId(prevId) + (getOrderFromId(prevId) + 1);
+                                let newId = getUrlFromId(prevId) + (getOrderFromId(prevId) + 1);
                                 nextElement.id = newId;         // Assign the new order
                                 newElement = nextElement.nextElementSibling;    // Repeat this for all subsequent elements
                         }
@@ -769,7 +769,7 @@ export function makeForm(type) {
                 list.appendChild(container);
         } else {
                 order = getMatchedChildren(chainlink, contentElementClassNames).length;
-                url = getPrefixFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id'));
+                url = getUrlFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id'));
 
                 if (type == "header3") {
                         container.id = "content-creation-form";
@@ -848,11 +848,6 @@ function escape(e, ref, fallback, element, from) {
                         const children = form.parentElement.querySelectorAll(".content-wrapper");
                         form.parentElement.remove();
                         instantiateElement(element, index, children);
-                        //let container = document.createElement("h2");
-                        //let root = createRoot(container);
-                        //formParent.prepend(container);
-                        //window.location.reload();
-                        //root.render(<ChainlinkHeader title={fallback}/>);
                 } else if (chainlinkCreateForm) {
                         form.remove();
                 } else if (contentCreateForm) {
@@ -861,11 +856,6 @@ function escape(e, ref, fallback, element, from) {
                         const index = parseInt(contentEditForm.getAttribute("index"));
                         form.remove();
                         instantiateElement(element, index, null);
-                        /*form.remove();
-                        var el = document.createElement(element);
-                        el.className = "inner-content";
-                        el.innerHTML = fallback;
-                        formParent.prepend(el);*/
                 }
 
                 window.addEventListener("keydown", parseKeyDown);
@@ -991,13 +981,11 @@ export function removeEditButtons() {
         editButton.removeEventListener("click", fenceEditButtonEventHandler);
         deleteButton.removeEventListener("click", fenceDeleteButtonEventHandler);
 
-        //const numChainlinks = document.getElementsByClassName("chainlink").length;
         var chainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper");
         var numChainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper").length;
         var editButtons = Array.from(document.getElementsByClassName("cl-edit-btn"));
         var deleteButtons = Array.from(document.getElementsByClassName("cl-del-btn"));
         for (let i = 0; i < numChainlinkButtons; i++) {
-                //chainlinkButtonsWrapper.remove();
                 editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
                 deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
                 chainlinkButtons[0].remove();
@@ -1005,133 +993,21 @@ export function removeEditButtons() {
         chainlinkEditButtonsEventHandlers.length = 0;
         chainlinkDeleteButtonsEventHandlers.length = 0;
 
-        //var numContents = document.getElementsByClassName("content-wrapper").length;
         var contentButtons = document.getElementsByClassName("context-buttons-wrapper");
         var numContentButtons = document.getElementsByClassName("context-buttons-wrapper").length;
         var editButtons = Array.from(document.getElementsByClassName("cont-edit-btn"));
         var deleteButtons = Array.from(document.getElementsByClassName("cont-del-btn"));
-        //var contextButtonsWrapper = document.getElementsByClassName("context-buttons-wrapper");
         for (let i = 0; i < numContentButtons; i++) {
-                //editButtons[i].remove();
-                //deleteButtons[i].remove();
                 editButtons[i].removeEventListener("click", contentEditButtonsEventHandlers[i]);
                 deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
                 contentButtons[0].remove();
         }
 
-        /*for (let i = 0; i < numElements.value; i++) {
-                editButtons[i].removeEventListener("click", elementsEditButtonEventHandlers[i][0]);
-                deleteButton[i].removeEventListener("click", elementsEditButtonEventHandlers[i][1]);
-        }*/
         contentEditButtonsEventHandlers.length = 0;
         contentDeleteButtonsEventHandlers.length = 0;
         elementsEditButtonEventHandlers.length = 0;
 }
 
-/*
-export function instFenceEditButtons() {
-        var wrapper = document.getElementById('doc-title-wrapper');
-        var container = document.createElement("div");
-        container.id = "fence-context-buttons";
-        wrapper.appendChild(container);
-        var root = createRoot(container);
-        root.render(<FenceEditButtons />);
-}
-
-export function instChainlinkEditButtons() {
-        var numChainlinks = document.getElementsByClassName("chainlink").length;
-        var wrappers = document.getElementsByClassName("chainlink-wrapper");
-        for (let i = 0; i < numChainlinks; i++) {
-                let container = document.createElement("div");
-                let root = createRoot(container);
-                container.className = "chainlink-buttons-wrapper";
-                wrappers[i].appendChild(container);
-                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
-        }
-}
-
-export function instContentEditButtons () {
-        var numContents = document.getElementsByClassName("content-wrapper").length;
-        var wrappers = document.getElementsByClassName("content-wrapper");
-        for (let i = 0; i < numContents; i++) {
-                let container = document.createElement("div");
-                let root = createRoot(container);
-                container.className = "context-buttons-wrapper";
-                wrappers[i].appendChild(container);
-                root.render(<ContentEditButtons i={i} wrappers={wrappers}/>);
-        }
-}
-*/
-/*
-export function instContentEditButtons () {
-        const numContents = document.getElementsByClassName("content-wrapper").length;
-        const contents = document.getElementsByClassName("content-wrapper");
-        for (let i = 0; i < numContents; i++) {
-                let spanMessage = document.createElement("i");
-                let buttons_wrapper = document.createElement("div");
-                let contentEditButton = document.createElement("button");
-                let contentDeleteButton = document.createElement("button");
-                spanMessage.innerHTML = "context action &#60; - - - - - - ";
-                spanMessage.className = "context-span-message";
-                contentEditButton.innerHTML = "edit";
-                contentDeleteButton.innerHTML = "delete";
-                contentEditButton.className = "cont-edit-btn";
-                contentDeleteButton.className = "cont-del-btn";
-                buttons_wrapper.className = "context-buttons-wrapper";
-                buttons_wrapper.appendChild(spanMessage);
-                buttons_wrapper.appendChild(contentEditButton);
-                buttons_wrapper.appendChild(contentDeleteButton);
-                contents[i].appendChild(buttons_wrapper);
-                contentEditButtonsEventHandlers.push(function() { editContent(contentEditButton.closest('.content-wrapper').id) });
-                contentDeleteButtonsEventHandlers.push(function() { deleteContent(contentDeleteButton.closest('.content-wrapper').id) });
-                contentEditButton.addEventListener("click", contentEditButtonsEventHandlers[contentEditButtonsEventHandlers.length - 1]);
-                contentDeleteButton.addEventListener("click", contentDeleteButtonsEventHandlers[contentDeleteButtonsEventHandlers.length - 1]);
-        }
-}
-
-export function deleteFenceEditButtons () {
-        var editButton = document.getElementById("doc-action-edit-title");
-        var deleteButton = document.getElementById("doc-action-delete-title");
-        editButton.remove();
-        deleteButton.remove();
-        editButton.removeEventListener("click", fenceEditButtonEventHandler);
-        deleteButton.removeEventListener("click", fenceDeleteButtonEventHandler);
-}
-
-export function _deleteChainlinkButtons () {
-        //const numChainlinks = document.getElementsByClassName("chainlink").length;
-        var chainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper");
-        var numChainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper").length;
-        var editButtons = Array.from(document.getElementsByClassName("cl-edit-btn"));
-        var deleteButtons = Array.from(document.getElementsByClassName("cl-del-btn"));
-        for (let i = 0; i < numChainlinkButtons; i++) {
-                //chainlinkButtonsWrapper.remove();
-                editButtons[i].removeEventListener("click", chainlinkEditButtonsEventHandlers[i]);
-                deleteButtons[i].removeEventListener("click", chainlinkDeleteButtonsEventHandlers[i]);
-                chainlinkButtons[0].remove();     
-        }
-        chainlinkEditButtonsEventHandlers.length = 0;
-        chainlinkDeleteButtonsEventHandlers.length = 0;
-}
-
-export function deleteContentEditButtons() {
-        //var numContents = document.getElementsByClassName("content-wrapper").length;
-        var contentButtons = document.getElementsByClassName("context-buttons-wrapper");
-        var numContentButtons = document.getElementsByClassName("context-buttons-wrapper").length;
-        var editButtons = Array.from(document.getElementsByClassName("cont-edit-btn"));
-        var deleteButtons = Array.from(document.getElementsByClassName("cont-del-btn"));
-        //var contextButtonsWrapper = document.getElementsByClassName("context-buttons-wrapper");
-        for (let i = 0; i < numContentButtons; i++) {
-                //editButtons[i].remove();
-                //deleteButtons[i].remove();
-                editButtons[i].removeEventListener("click", contentEditButtonsEventHandlers[i]);
-                deleteButtons[i].removeEventListener("click", contentDeleteButtonsEventHandlers[i]);
-                contentButtons[0].remove();
-        }
-        contentEditButtonsEventHandlers.length = 0;
-        contentDeleteButtonsEventHandlers.length = 0;
-}
-*/
 export function deleteDoc() {
 
         var confirm = window.confirm("Delete document record?");
@@ -1173,9 +1049,7 @@ export function deleteChainlink(target) {
         }
 }
 
-/*
 
- */
 export function deleteContent(target) {
         var confirm = window.confirm("Delete element?");
         if( confirm == false ) {
@@ -1253,11 +1127,11 @@ export function renameDoc() {
  */
 export function editChainlink(target, children) {
         const chainlink = document.getElementById(target);
-        const chainlinkParent = chainlink.parentElement;
         const title = chainlink.querySelector(".chainlink-inner-text").textContent;
-        const url = chainlink.id;
+        const url = getUrlFromId(chainlink.id);
         const order = chainlink.index;
-        const index = parseInt(chainlink.getAttribute("index"));
+        // The frontIndex specifies the index of this Chainlink as rendered on the page.
+        const frontIndex = parseInt(chainlink.getAttribute("index"));
         const element = new Chainlink(title, url, null, true, 0, order);
         const _listener = function (e) {
                 escape(e, _listener, "", element)
@@ -1299,11 +1173,10 @@ export function editChainlink(target, children) {
                 xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                //window.location.reload();
                                 container.parentElement.remove();
                                 const updatedElement = element;
                                 updatedElement.title = event.target.input.value;
-                                instantiateElement(updatedElement, index, contents);
+                                instantiateElement(updatedElement, frontIndex, contents);
                         }
                 }
 
@@ -1325,26 +1198,21 @@ export function editChainlink(target, children) {
 export function editContent(target) {
 
         const wrapper = document.getElementById(target);
-        //const content = wrapper.getElementsByClassName("inner-content")[0];
         const content = wrapper.querySelector(".inner-content");
-        const form = document.createElement('form');
-        const input = document.createElement('input');
         const title = content.textContent;
-        const url = wrapper.id.slice(0, -2);
+        const url = getUrlFromId(wrapper.id);
         const order = getOrderFromId(wrapper.id);
-
         const tag = wrapper.getAttribute("tag");
         const index = parseInt(wrapper.getAttribute("index"));
-        var element = new Content(tag, title, url, null, true, 0, order);
+        let element = new Content(tag, title, url, null, true, 0, order);
 
         const _listener = function (e) {
-                escape(e, _listener, "", element, "from content edit window")
+                escape(e, _listener, "", element, "from content edit window");
         };
 
         window.removeEventListener("keyup", parseKeyUp);
         window.removeEventListener("keydown", parseKeyDown);
         window.addEventListener("keydown", _listener);
-        //window.addEventListener("keydown", function(e){escape(e, null, "", element)});
 
         const container = document.createElement("div");
         const root = createRoot(container);
@@ -1354,17 +1222,9 @@ export function editContent(target) {
         root.render(<ElementCreationForm placeholder="enter content title" value={title}/>);
         wrapper.insertAdjacentElement("afterend", container);
 
-        /*input.setAttribute('type', 'text');
-        input.setAttribute('id', 'input');
-        input.value = title;
-        form.appendChild(input);
-        wrapper.prepend(form);
-        input.focus({ focusVisible: true });*/
-
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
-                //addElement(type, input.value, url, order);
-                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
@@ -1374,7 +1234,6 @@ export function editContent(target) {
                 xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                //window.location.reload();
                                 container.remove();
                                 const updatedElement = element;
                                 updatedElement.content = event.target.input.value;
@@ -1406,7 +1265,7 @@ function deinstantiateElement(id) {
         if (obj_to_remove.getAttribute("class") === "content-wrapper") {
                 let nextSibling = obj_to_remove.nextElementSibling;
                 while (nextSibling) {
-                        let oldIdUrl = getPrefixFromId(nextSibling.getAttribute("id"));
+                        let oldIdUrl = getUrlFromId(nextSibling.getAttribute("id"));
                         let oldIdOrder = getOrderFromId(nextSibling.getAttribute("id"));
 
                         let newOrder = oldIdOrder - 1;
@@ -1460,15 +1319,16 @@ function getOrderFromId(id) {
  * @throws {TypeError} Throws an error if the input is not a string.
  * @throws {Error} Throws an error if the identifier format is invalid (doesn't contain a dash).
  */
-function getPrefixFromId(id) {
+function getUrlFromId(id) {
   if (typeof id !== 'string') {
     throw new TypeError("The argument must be a string");
   }
 
+  const firstIndex = id.indexOf("-") + 1;
   const lastIndex = id.lastIndexOf("-");
 
   if (lastIndex !== -1) {
-    return id.slice(0, lastIndex);
+    return id.slice(firstIndex, lastIndex);
 
   } else {
         throw new Error("An invalid id was specified. Make sure the supplied id contains a dash.")

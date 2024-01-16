@@ -52,15 +52,16 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
     tag = TagType(json_data["type"])
 
     if tag == TagType.HEADER2:
+        # Create a representation of the Chainlink object to write to the database
+        cl = Chainlink()
         # Update the parent object to indicate that it has a new child
         article = Doc.objects.get(url=parent)
         articleCount = Chainlink.objects.filter(doc=article).count()
+        # chainlink order starts at 0
+        cl.order = articleCount
         articleCount += 1
-        # Create a representation of the Chainlink object to write to the database
-        cl = Chainlink()
         cl.doc = article
         cl.title = db_try_title(Chainlink, json_data["title"])
-        cl.order = articleCount
         cl.url = db_try_url(TagType.HEADER2)
         cl.public = json_data["is_public"]
         cl.date = timezone.now()
@@ -84,8 +85,6 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
             # in the beginning or middle of the Chainlink then shift all Content up in the order.
-            #print(chainlink.count)
-            print(chainlink.title)
             for i in range(json_data["order"] + 1, numElements):
                 try:
                     Content.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
@@ -146,8 +145,6 @@ def db_remove(table, url, order):
     :param order: This is an int identifier used in tandem with url to identify Content type targets. It is this field
     # that will get updated for all subsequent Content elements so that there is no gap in the element ordering
     """
-    print(url)
-    print(order)
     if table == Chainlink:
         target = table.objects.get(url=url)
     elif table == Doc:
@@ -210,8 +207,6 @@ def db_try_url(tag_type, try_url=""):
     :param tag_type: type of record this url will be used for
     :param check_url: This string is a url that's checked. If the url is tied to a record then a new url is generated and returned. Otherwise this argument is returned.
     """
-    # print("inside try url")
-    # print(try_url)
     if not try_url:
         try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     if TagType.HEADER1:
@@ -305,9 +300,9 @@ def generic(request, key=''):
             case "doc":
                 db_remove(Doc, key, None)
             case "chainlink":
-                db_remove(Chainlink, get_prefix_from_id(target_id), None)
+                db_remove(Chainlink, get_url_from_id(target_id), get_order_from_id(target_id))
             case "content":
-                db_remove(Content, get_prefix_from_id(target_id), get_order_from_id(target_id))
+                db_remove(Content, get_url_from_id(target_id), get_order_from_id(target_id))
 
 
     elif request.method == 'PUT':
@@ -317,9 +312,9 @@ def generic(request, key=''):
             case "doc":
                 db_update(Doc, key, None, request.headers["title"])
             case "chainlink":
-                db_update(Chainlink, get_prefix_from_id(target_id), None, target_title)
+                db_update(Chainlink, get_url_from_id(target_id), None, target_title)
             case "content":
-                db_update(Content, get_prefix_from_id(target_id), get_order_from_id(target_id), target_title)
+                db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_title)
 
     return render(request, 'Patchwork/success.html', {})
 
@@ -359,7 +354,7 @@ def chainlink(request, key):
             case "chainlink":
                 db_remove(Chainlink, request.headers["target"], None)
             case "content":
-                db_remove(Content, get_prefix_from_id(request.headers["target"]),
+                db_remove(Content, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]))
 
     elif request.method == 'PUT':
@@ -367,7 +362,7 @@ def chainlink(request, key):
             case "chainlink":
                 db_update(Chainlink, request.headers["target"], None, request.headers["title"])
             case "content":
-                db_update(Content, get_prefix_from_id(request.headers["target"]),
+                db_update(Content, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]), request.headers["title"])
 
     return render(request, 'Patchwork/success.html', {})
@@ -397,8 +392,8 @@ def generate(request):
 
 def index(request):
     """
-    Take the user to the configured landing page for the application. If no such page exists the generate a new one and display
-    an explanatory welcome page for the user.
+    Take the user to the configured landing page for the application. If no such page exists then generate a new one
+    and display an explanatory welcome page for the user.
     """
 
     # Determine if a landing page exists and send the user to the landing page if it does
@@ -461,10 +456,10 @@ def aux_generate(request, is_landing_page, user=None):
 
 def get_order_from_id(id):
     """
-    Extracts and returns the order value from a given identifier.
+    Extracts and returns the order value from a chainlink/content id.
 
     Parameters:
-    - id (str): The identifier containing a dash-separated value.
+    - id (str): The identifier containing the url stored between the prefix and the order values.
 
     Returns:
     - int: The extracted order value.
@@ -487,13 +482,12 @@ def get_order_from_id(id):
         raise ValueError("An invalid id was specified. Make sure the supplied id contains a dash.")
 
 
-def get_prefix_from_id(id):
+def get_url_from_id(id):
     """
-    Extracts and returns the prefix from a given identifier.
+    Extracts and returns the url from a chainlink/content id.
 
     Parameters:
-    - id (str): The identifier containing a dash-separated value.
-
+    - id (str): The identifier containing the url stored between the prefix and the order values.
     Returns:
     - str: The extracted prefix.
 
@@ -504,12 +498,40 @@ def get_prefix_from_id(id):
     if not isinstance(id, str):
         raise TypeError("The argument must be a string")
 
+    first_index = id.find("-") + 1
     last_index = id.rfind("-")
 
     if last_index != -1:
-        return id[:last_index]
+        return id[first_index:last_index]
     else:
         raise ValueError("An invalid id was specified. Make sure the supplied id contains a dash.")
+
+
+def get_prefix_from_id(id):
+    """
+    Extracts and returns the prefix from a given identifier.
+
+    Parameters:
+    - id (str): The Element id
+
+    Returns:
+    - str: The extracted prefix. This is either "chainlink" or "content"
+
+    Raises:
+    - TypeError: If the input is not a string.
+    - ValueError: If the identifier format is invalid (doesn't contain a dash).
+    """
+    if not isinstance(id, str):
+        raise TypeError("The argument must be a string")
+
+    idx = id.lfind("-")
+
+    if last_index != -1:
+        return id[:idx]
+    else:
+        raise ValueError("An invalid id was specified. Make sure the supplied id contains a prefix section (either"
+                         "content or chainlink) followed by a dash followed by the url followed by a dash followed by"
+                         "the order.")
 
 
 def validate_and_return_count(element):

@@ -72,7 +72,7 @@
         <div id="chainlink-elements">
             {% for chainlink in chainlinks %}
                 <section class="chainlink">
-                    <div id="{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
+                    <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
                         <h2>
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
                             <span class="chainlink-inner-text">{{ chainlink.0.title }}</span>
@@ -82,19 +82,19 @@
                     </div>
                     {% for content in chainlink.1 %}
                         {% if content.tag == 'paragraph' %}
-                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
                             <p class="inner-content">{{ content.content }}</p>
                         </div>
                         {% elif content.tag == 'code' %}
-                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="code">
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="code">
                             <code class="inner-content">{{ content.content }}</code>
                         </div>
                         {% elif content.tag == 'header3' %}
-                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
                             <h3 class="inner-content">{{ content.content }}</h3>
                         </div>
                         {% elif content.tag == 'linebreak' %}
-                        <div id="{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
                             <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
                         </div>
                         {% elif content.tag == 'delimiter' %}
