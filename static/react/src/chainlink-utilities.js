@@ -13,7 +13,7 @@ var contentEditButtonsEventHandlers = [];
 var contentDeleteButtonsEventHandlers = [];
 var elementsEditButtonEventHandlers = [];
 
-// State variables to describe the state of the page. These can be called to reliable determine something about the current page
+// State variables to describe the state of the page. These can be called to reliably determine something about the current page
 var isArticle;
 var isChainlink;
 let articleIsEmpty;
@@ -24,13 +24,14 @@ var numBodyElements;        // the number of Elements rendered on the page
 let numFooterElements;
 let numHeaderElements;
 let formIsActive;
-var cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
+var cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default, it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
 
 /* Static Variables */
 const bodyElementClassNames = ["chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify body Elements
 const contentElementClassNames = ["content-wrapper"];
 const headerElementClassNames = ["header-element-wrapper"];
 const footerElementClassNames = ["footer-element-wrapper"];
+const formClassNames = ["content-creation-form"];
 
 
 // Set up state variables after DOM is ready to be read
@@ -365,12 +366,14 @@ function ChainlinkElement(props) {
                 <React.Fragment>
                         <div id={props.url} className="chainlink-wrapper" tag="chainlink">
                                 <h2>
+                                        <span className="chainlink-order">{"#" + getOrderFromId(props.url).toString()}</span>
                                         <span className="chainlink-inner-text">
                                                 {props.title}
                                         </span>
-                                        <a className="inline-url header-url" href={"/patchwork/chainlink/" + props.url + ".html"}>
-                                                {">>>" + props.url.substring(0, 9)}
+                                        <a className="inline-url header-url" href={"/patchwork/chainlink/" + getUrlFromId(props.url) + ".html"}>
+                                                {">>>" + getUrlFromId(props.url).substring(0, 9)}
                                         </a>
+                                        <span class="chainlink-date">{formatDateString(props.date)}</span>
                                 </h2>
                         </div>
                 </React.Fragment>
@@ -512,7 +515,7 @@ function refresh() {
         let noClMarker = chainlinkElements.querySelector(".no-elements");
         let noFtMarker = document.getElementById("no-footer");
         let noHrMarker = document.getElementById("no-header");
-        if (numBodyElements.value > 0) {
+        if (numBodyElements.value > 0 || formIsActive.value) {
                 if (noClMarker) {
                         noClMarker.remove()
                 }
@@ -562,7 +565,7 @@ function refresh() {
                 // "no content" marker.
                 let numChildElements = Array.from(cls[i].querySelectorAll(selector)).length;
                 let marker = cls[i].querySelector(".no-elements");
-                if (numChildElements === 0) {
+                if (numChildElements === 0 && !cls[i].querySelector("#crud-form")) {
                         if (marker === null) {
                                 const container = document.createElement("div");
                                 const root = createRoot(container);
@@ -625,7 +628,7 @@ function showDiagnostics() {
  * @param {Element} element - a descendent class of Element to be written to the database
  * @returns {null}
  */
-function _addElement(element) {
+function addElement(element) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open("POST", window.location.href, true);
@@ -658,16 +661,16 @@ function _addElement(element) {
  */
 function instantiateElement(element, index, children) {
         let previousElementIndex = index - 1;                                 // the index of the Element directly before the Element to be created
-        var previousElement = null;                                             // the Element directly before the Element that will be created
-        var parentElement = null;                                               // the parent html element
-        var adjacentElement = null;                                             // the element right before the element to be inserted
+        let previousElement = null;                                             // the Element directly before the Element that will be created
+        let parentElement = null;                                               // the parent html element
+        let adjacentElement = null;                                             // the element right before the element to be inserted
 
         if (element instanceof Header) {
 
         }
 
-        else if (element instanceof Chainlink || element.type == "header2") {
-                parentElement = document.getElementById("chainlink-elements");
+        else if (element.type === "header2") {
+                const parentElement = document.getElementById("chainlink-elements");
                 const firstChild = parentElement.firstChild;
                 const container = document.createElement("section");
                 const root = createRoot(container);
@@ -680,7 +683,7 @@ function instantiateElement(element, index, children) {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
                 }
-                root.render(<ChainlinkElement title={element.title} url={"chainlink-" + element.url + "-" + element.order} children={children} />);
+                root.render(<ChainlinkElement title={element.title} url={"chainlink-" + element.url + "-" + element.order} date={element.date} children={children} />);
 
         } else {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
@@ -753,7 +756,7 @@ export function makeForm(type) {
 
                 else {  // Otherwise we are submitting a new element either at the beginning or in the middle
                         while (nextElement) {
-                                // Get a new Id for the next element over by incrementing the order
+                                // Get a new id for the next element over by incrementing the order
                                 let newId = getUrlFromId(prevId) + (getOrderFromId(prevId) + 1);
                                 nextElement.id = newId;         // Assign the new order
                                 newElement = nextElement.nextElementSibling;    // Repeat this for all subsequent elements
@@ -786,7 +789,7 @@ export function makeForm(type) {
                 } else if (type == 'linebreak') {
                         container.id = "content-creation-form";
                         element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
-                        _addElement(element);
+                        addElement(element);
                         window.addEventListener("keydown", parseKeyDown);
                         window.addEventListener("keyup", parseKeyUp);
                         window.removeEventListener("keydown", _listener);
@@ -804,7 +807,7 @@ export function makeForm(type) {
                 }
                 window.addEventListener("keydown", parseKeyDown);
                 window.addEventListener("keyup", parseKeyUp);
-                _addElement(element);
+                addElement(element);
                 initialize();
                 container.remove();
                 window.removeEventListener("keydown", _listener);
@@ -884,7 +887,7 @@ export function createFence() {
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                         const url = xhr.response.url;
-                        var url_substring = url.substring(0, 10);
+                        let url_substring = url.substring(0, 10);
                         let nxhr = new XMLHttpRequest();
                         nxhr.open("PUT", "doc" + url + ".html", true);
                         nxhr.setRequestHeader('X-CSRFToken', csrftoken);
@@ -899,10 +902,6 @@ export function createFence() {
         }
 }
 
-
-
-
-
 // Keypress parsing function for creating chainlinks and form elements
 export function parseKeyUp(e) {
         var keyCode = e.which;
@@ -910,7 +909,7 @@ export function parseKeyUp(e) {
 
 // Keypress parsing function for moving the page up and down
 export function parseKeyDown(e) {
-        var loc = e.currentTarget.in;   // This variable describes the state of the page when keypresses are registered
+        var loc = e.currentTarget.in;   // This variable describes the state of the page when key presses are registered
         var keyCode = e.which;
         if (e.ctrlKey) {       // exit if the ctrl key is currently being pressed
                 return;
@@ -1258,18 +1257,43 @@ function deinstantiateElement(id) {
                 obj_to_remove.firstElementChild.remove();
         }
 
-        if (obj_to_remove.getAttribute("class") === "chainlink-wrapper") {
-                obj_to_remove.parentElement.remove();
-        }
-
-        if (obj_to_remove.getAttribute("class") === "content-wrapper") {
-                let nextSibling = obj_to_remove.nextElementSibling;
-                while (nextSibling) {
+        else if (obj_to_remove.getAttribute("class") === "chainlink-wrapper") {
+                let nextSiblingParent = obj_to_remove.parentElement.nextElementSibling;
+                while (nextSiblingParent) {
+                        // Update the IDs of siblings with higher order to account for this chainlink getting removed.
+                        let nextSibling = getMatchedChildren(nextSiblingParent, ["chainlink-wrapper"])[0];
+                        let orderDisplay = getMatchedChildren(nextSiblingParent, ["chainlink-order"])[0];
+                        let oldIdPrefix = getPrefixFromId(nextSibling.getAttribute("id"));
                         let oldIdUrl = getUrlFromId(nextSibling.getAttribute("id"));
                         let oldIdOrder = getOrderFromId(nextSibling.getAttribute("id"));
 
+                        // Construct the new ID for this sibling by subtracting 1 from its order (to account for the
+                        // absence of the Content Element that was just deleted).
                         let newOrder = oldIdOrder - 1;
-                        let newId = oldIdUrl + "-" + newOrder;
+                        let newId = oldIdPrefix + "-" + oldIdUrl + "-" + newOrder;
+                        nextSibling.setAttribute("id", newId)
+
+                        // Update the number that appears on the Chainlink header to account for the deleted chainlink.
+                        orderDisplay.textContent = "#" + newOrder.toString();
+
+                        // Move on to update the next sibling.
+                        nextSiblingParent = nextSiblingParent.nextElementSibling;
+                }
+                obj_to_remove.parentElement.remove();
+        }
+
+        else if (obj_to_remove.getAttribute("class") === "content-wrapper") {
+                let nextSibling = obj_to_remove.nextElementSibling;
+                while (nextSibling) {
+                        // Extract the 3 components of an Element identifier (prefix, url, and order).
+                        let oldIdPrefix = getPrefixFromId(nextSibling.getAttribute("id"));
+                        let oldIdUrl = getUrlFromId(nextSibling.getAttribute("id"));
+                        let oldIdOrder = getOrderFromId(nextSibling.getAttribute("id"));
+
+                        // Construct the new ID for this sibling by subtracting 1 from its order (to account for the
+                        // absence of the Content Element that was just deleted).
+                        let newOrder = oldIdOrder - 1;
+                        let newId = oldIdPrefix + "-" + oldIdUrl + "-" + newOrder;
                         nextSibling.setAttribute("id", newId)
                         nextSibling = nextSibling.nextElementSibling;
                 }
@@ -1285,10 +1309,11 @@ function deinstantiateElement(id) {
 
 
 /**
- * Extracts and returns the order value from a given identifier.
+ * Extracts and returns the order value from a given identifier. Every element identifer has 3 parts in this order:
+ * Prefix - Url - Order. This function returns the Order (3rd part).
  *
  * @param {string} id - The identifier containing a dash-separated value.
- * @returns {number} The extracted order value.
+ * @returns {number} The extracted order value. NOTE: This is a number not a string.
  * @throws {Error} Throws an error if the specified value after the dash is not a valid integer or if the identifier format is invalid.
  */
 function getOrderFromId(id) {
@@ -1312,10 +1337,11 @@ function getOrderFromId(id) {
 
 
 /**
- * Extracts and returns the prefix from a given identifier.
+ * Extracts and returns the url from a given identifier. Every element identifer has 3 parts in this order:
+ * Prefix - Url - Order. This function returns the Url (2nd part).
  *
  * @param {string} id - The identifier containing a dash-separated value.
- * @returns {string} The extracted prefix.
+ * @returns {string} The url of this id.
  * @throws {TypeError} Throws an error if the input is not a string.
  * @throws {Error} Throws an error if the identifier format is invalid (doesn't contain a dash).
  */
@@ -1336,7 +1362,76 @@ function getUrlFromId(id) {
 }
 
 
+/**
+ * Extracts and returns the prefix from a given identifier. Every element identifier has 3 parts in this order:
+ * Prefix - Url - Order. This function returns the Prefix (1st part).
+ *
+ * @param {string} id - The identifier containing a dash-separated value.
+ * @returns {string} The extracted prefix.
+ * @throws {TypeError} Throws an error if the input is not a string.
+ * @throws {Error} Throws an error if the identifier format is invalid (doesn't contain a dash).
+ */
+function getPrefixFromId(id) {
+  if (typeof id !== 'string') {
+    throw new TypeError("The argument must be a string");
+  }
+
+  const firstIndex = 0;
+  const lastIndex = id.indexOf("-");
+
+  if (lastIndex !== -1) {
+    return id.slice(firstIndex, lastIndex);
+
+  } else {
+        throw new Error("An invalid id was specified. A prefix wasn't able to be identified for this id.")
+  }
+}
+
+
+/**
+ * Function: getMatchedChildren
+ *
+ * Description:
+ * This function takes a parent element and an array of class names to match.
+ * It queries the parent element for children with the specified classes and returns an array of matched elements.
+ *
+ * @param {HTMLElement} parent - The parent element to search for children.
+ * @param {string[]} matchThis - An array of class names to match.
+ * @returns {T[]} - An array containing the matched child elements.
+ *
+ * Example Usage:
+ * const parentElement = document.getElementById('parent');
+ * const matchedChildren = getMatchedChildren(parentElement, ['class1', 'class2']);
+ */
 function getMatchedChildren(parent, matchThis) {
         const selectors = matchThis.map(className => `.${className}`).join(', ');
-        return(Array.from(parent.querySelectorAll(selectors)));
+        return (Array.from(parent.querySelectorAll(selectors)));
+}
+
+
+/**
+ * Formats a date string into a human-readable date and time format.
+ *
+ * @param {string} originalDateString - The input date string in the format "YYYY-MM-DDTHH:mm:ss.SSSZ".
+ * @returns {string} - The formatted date string in the format "Mon. 20, 2024, 11:43 p.m." or "Invalid date" if the input is not a valid date.
+ */
+function formatDateString(originalDateString) {
+  const originalDate = new Date(originalDateString);
+
+  // Check if the date is valid
+  if (isNaN(originalDate.getTime())) {
+    return "Invalid date";
+  }
+
+  const formattedDate = originalDate.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+    timeZoneName: 'short'
+  });
+
+  return formattedDate;
 }

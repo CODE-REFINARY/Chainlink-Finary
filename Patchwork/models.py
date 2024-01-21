@@ -19,9 +19,8 @@ class Doc(models.Model):
     public = models.BooleanField(default=False)  # Indicate whether this doc will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this doc
     url = models.CharField(max_length=75)  # relative url for this doc
-    #count = models.BigIntegerField(default=0)
     def __str__(self):
-        return "Article: " + self.title
+        return "Article: " + self.title + " Url=" + self.url[:10]
 
 
 class Chainlink(models.Model):
@@ -33,7 +32,6 @@ class Chainlink(models.Model):
     order = models.BigIntegerField(default=0)  # integer value specifying which order on the doc this chainlink appears
     public = models.BooleanField(default=False)  # Indicate whether this chainlink will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this chainlink. May or may not be visible
-    #count = models.BigIntegerField(default=0)
 
     def __str__(self):
         return self.title

@@ -145,10 +145,20 @@ def db_remove(table, url, order):
     :param order: This is an int identifier used in tandem with url to identify Content type targets. It is this field
     # that will get updated for all subsequent Content elements so that there is no gap in the element ordering
     """
-    if table == Chainlink:
+    if table == Doc:
         target = table.objects.get(url=url)
-    elif table == Doc:
+
+    elif table == Chainlink:
         target = table.objects.get(url=url)
+        parent_article = target.doc
+        parent_article_count = Chainlink.objects.filter(doc=parent_article).count()
+        for i in range(order + 1, parent_article_count):
+            next_pos_els = Chainlink.objects.filter(doc=parent_article, order=i)
+            for obj in next_pos_els:
+                obj.order -= 1
+                obj.save()
+        parent_article.save()
+
     elif table == Content:
         parent_chainlink = Chainlink.objects.get(url=url)
         parent_chainlink_count = Content.objects.filter(chainlink=parent_chainlink).count()
@@ -158,8 +168,8 @@ def db_remove(table, url, order):
             for obj in next_pos_els:
                 obj.order -= 1
                 obj.save()
-        #parent_chainlink.count -= 1
         parent_chainlink.save()
+
     target.delete()
 
 
