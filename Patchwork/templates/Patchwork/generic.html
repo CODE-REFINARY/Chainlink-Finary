@@ -77,7 +77,7 @@
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
                             <span class="chainlink-inner-text">{{ chainlink.0.title }}</span>
                             <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
-                            <span class="chainlink-date">{{ chainlink.0.date }}</span>
+                            <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
                         </h2>
                     </div>
                     {% for content in chainlink.1 %}

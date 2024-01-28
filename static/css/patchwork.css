@@ -243,7 +243,7 @@
 
 /* recurrent elements */
 .header-url {
-    margin-left: 10px;
+    margin-right: 10px;
 }
 .inline-url {
     font-size: small;
@@ -257,7 +257,11 @@
     font-size: small;
     color: #e35f5f;
 }
+.chainlink-inner-text {
+	margin-right: 10px;
+}
 .chainlink-order {
     font-size: x-small;
     color: #888888;
+    margin-right: 4px;
 }

@@ -909,32 +909,41 @@ export function parseKeyUp(e) {
 
 // Keypress parsing function for moving the page up and down
 export function parseKeyDown(e) {
-        var loc = e.currentTarget.in;   // This variable describes the state of the page when key presses are registered
-        var keyCode = e.which;
-        if (e.ctrlKey) {       // exit if the ctrl key is currently being pressed
+
+        // exit if the ctrl (windows) or command (mac) key is currently being pressed.
+        // This code is necessary to allow user to enter Ctr-C/Cmd-C without triggering a hotkey-ed dialogue window.
+        if (e.ctrlKey || e.metaKey) {
                 return;
         }
-        if (keyCode == 75) {
-            window.scrollBy(0, -70);
-        } else if (keyCode == 74) {
-            window.scrollBy(0, 70);
-        }
 
-        else if (keyCode == 80 && !articleIsEmpty.value) {
-                e.preventDefault();
-                makeForm('paragraph');
-        } else if (keyCode == 67 && !articleIsEmpty.value) {
-                e.preventDefault();
-                makeForm('code');
-        } else if (keyCode == 78 && isArticle.value) {      // disable chainlink creation for chainlink view (only enabled in doc view)
-                e.preventDefault();
-                makeForm('header2');
-        } else if (keyCode == 72 && !articleIsEmpty.value) {
-                e.preventDefault();
-                makeForm('header3');
-        } else if (keyCode == 66 && !articleIsEmpty.value) {
-                e.preventDefault();
-                makeForm('linebreak');
+        // Trigger an action depending on which key the user presses.
+        switch(e.key) {
+                case "k":
+                        window.scrollBy(0, -70);
+                        break;
+                case "j":
+                        window.scrollBy(0, 70);
+                        break;
+                case "p":
+                        e.preventDefault();
+                        makeForm('paragraph');
+                        break;
+                case "c":
+                        e.preventDefault();
+                        makeForm('code');
+                        break;
+                case "n":
+                        e.preventDefault();
+                        makeForm('header2');
+                        break;
+                case "h":
+                        e.preventDefault();
+                        makeForm('header3');
+                        break;
+                case "b":
+                        e.preventDefault();
+                        makeForm('linebreak');
+                        break;
         }
 }
 

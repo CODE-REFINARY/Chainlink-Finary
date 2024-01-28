@@ -356,6 +356,11 @@ div.combination {
 .content-wrapper {}
 .chainlink-wrapper {}
 .chainlink-wrapper h2 {
+	display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     background-color: #334756;
     padding: 7px;
     border-radius: 12px;
@@ -368,9 +373,7 @@ div.combination {
     border-style: solid;
     color: rgb(208, 68, 35);
 }
-.chainlink-wrapper a, .chainlink-wrapper span {
-    display: inline;
-}
+
 .chainlink-buttons-wrapper {
     text-align: right;
     display: none;
