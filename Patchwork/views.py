@@ -33,14 +33,9 @@ class HttpRequestWrapper(HttpRequest):
     ###################### database accessors ######################
 
 
-def db_store(payload, parent="", is_landing_page=False, user=None):
+def db_store(payload, parent, is_landing_page=False, user=None):
     """
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
-
-    :param <DEPRECATED> tag_type: tag that this item will be stored as
-    :param <DEPRECATED> parent_url: url string to identify the parent of this item
-    :param <DEPRECATED> title: the desired title for the database item
-    :param <DEPRECATED> public: flag is true if item to be marked public
     :param payload: JSON payload specifying the properties of the Element to write to the database
     :param is_landing_page: This boolean flag indicates whether this page should be set as the landing page for the site. If this flag is set then the LANDING_PAGE_URL global variable is set equal to the generated url for the page
     :param parent (optional): String indicating the url of the parent object of the Element to store. Content uses the url of its Chainlink and thus this parameter is not needed for elements of type Content. In this case, this parameter is only used if no URL is specified in the JSON payload.
@@ -51,21 +46,20 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
     # Read the type of Element to store
     tag = TagType(json_data["type"])
 
-    if tag == TagType.HEADER2:
+    if tag == TagType.CHAINLINK:
         # Create a representation of the Chainlink object to write to the database
         cl = Chainlink()
         # Update the parent object to indicate that it has a new child
-        article = Doc.objects.get(url=parent)
-        articleCount = Chainlink.objects.filter(doc=article).count()
+        collection = Doc.objects.get(url=parent)
+        articleCount = Chainlink.objects.filter(doc=collection).count()
         # chainlink order starts at 0
         cl.order = articleCount
         articleCount += 1
-        cl.doc = article
+        cl.doc = collection
         cl.title = db_try_title(Chainlink, json_data["title"])
-        cl.url = db_try_url(TagType.HEADER2)
+        cl.url = db_try_url(TagType.CHAINLINK)
         cl.public = json_data["is_public"]
         cl.date = timezone.now()
-        #cl.count = 0
 
         # write objects to the database
         cl.save()
@@ -73,7 +67,7 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         # return the request with the url updated with the url assigned to this chainlink
         json_data["url"] = cl.url
         json_data["order"] = cl.order
-        return json.dumps(json_data)
+
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
         # Update the chainlink object that's a parent of the element to be written to the database
         chainlink = Chainlink.objects.get(url=json_data["url"])
@@ -106,34 +100,40 @@ def db_store(payload, parent="", is_landing_page=False, user=None):
         content.content = json_data["content"]
         content.public = json_data["is_public"]
 
-        #chainlink.count += 1
-
         # Write changes to the database
         chainlink.save()
         content.save()
         json_data["order"] = content.order
-        return json.dumps(json_data)
-    elif tag == TagType.HEADER1:
+
+    elif tag == TagType.ARTICLE:
         # Create a representation of the Article as a python object
-        article = Doc()
-        article.title = db_try_title(Doc, json_data["title"])
-        article.url = db_try_url(TagType.HEADER1)
-        article.public = json_data["is_public"]
-        article.date = json_data["date"]
+        collection = Doc()
+        collection.title = db_try_title(Doc, json_data["title"])
+        collection.url = db_try_url(TagType.HEADER1)
+        collection.public = json_data["is_public"]
+        collection.date = json_data["date"]
 
         # Write Python Article object to database
-        article.save()
+        collection.save()
 
         # If the landing page flag is set then also write the generated url to the LANDING_PAGE_URL field of the .env
         # file
         if is_landing_page:
             logged_in_user = Account.objects.get(user=user)
-            logged_in_user.landing_page_url = article.url
+            logged_in_user.landing_page_url = collection.url
             logged_in_user.save()
 
-        json_data["url"] = article.url
-        return json.dumps(json_data)
-    return False
+        # Set the url field now that we've assigned a url so that frontend can redirect the user to this new collection.
+        json_data["url"] = collection.url
+
+    elif tag == TagType.HEADER1:
+        collection = Doc.objects.get(url=parent)
+        header = Header()
+        header.doc = collection
+        header.text = db_try_title(Chainlink, json_data["text"])
+        header.save()
+
+    return json.dumps(json_data)
 
 
 def db_remove(table, url, order):
@@ -222,7 +222,7 @@ def db_try_url(tag_type, try_url=""):
     if TagType.HEADER1:
         while Doc.objects.filter(url=try_url).exists():
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
-    elif TagType.HEADER2:
+    elif TagType.CHAINLINK:
         while Chainlink.objects.filter(url=try_url).exists():
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     return try_url
@@ -237,7 +237,7 @@ def db_check_url(tag_type, check_url):
     """
     if TagType.HEADER1:
         matching_record = Doc.objects.filter(url=check_url)
-    elif TagType.HEADER2:
+    elif TagType.CHAINLINK:
         matching_record = Chainlink.objects.filter(url=check_url)
     return matching_record.exists()
 
@@ -252,7 +252,7 @@ def db_generate_url(tag_type):
     if TagType.HEADER1:
         while Doc.objects.filter(url=try_url).exists():
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
-    elif TagType.HEADER2:
+    elif TagType.CHAINLINK:
         while Chainlink.objects.filter(url=try_url).exists():
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     return try_url
@@ -260,41 +260,51 @@ def db_generate_url(tag_type):
 
 ###################### View Methods ######################
 
-@cache_control(no_cache=True, must_revalidate=True,
-               no_store=True)  # force doc list page to not get cached so that changes from chainlink pages show up on browser back button
-def generic(request, key=''):
+# force doc list page to not get cached so that changes from chainlink pages show up on browser back button
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def generic(request, key=""):
     if not request.user.is_authenticated:
         return login(request)
-    if request.method == 'GET':
-        document = get_object_or_404(Doc, url=key)
-        if hasattr(document, 'header'):
-            header = document.header
+
+    if request.method == "GET":
+        # Get this collection from the database and return a 404 if it isn"t found
+        collection = get_object_or_404(Doc, url=key)
+
+        # Get the header record associated with this collection if one exists.
+        if hasattr(collection, "header"):
+            header = collection.header
         else:
             header = None
-        if hasattr(document, 'footer'):
-            footer = document.footer
+
+        # Do the same for the footer.
+        if hasattr(collection, "footer"):
+            footer = collection.footer
         else:
             footer = None
-        docs = Doc.objects.all()
+
+        collections = Doc.objects.all()
+
         # Chainlink and Content data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
         chainlinks = []
+
         # Populate the above list with tuples of the specified form by first getting the list of all Chainlinks that
         # are attached to this Article.
-        for chainlink in Chainlink.objects.filter(doc=document.pk).order_by('order'):
+        for chainlink in Chainlink.objects.filter(doc=collection.pk).order_by("order"):
             contents = []
-            for content in Content.objects.filter(chainlink=chainlink.pk).order_by('order'):
+            for content in Content.objects.filter(chainlink=chainlink.pk).order_by("order"):
                 contents.append(content)
             chainlinks.append((chainlink, contents))
-        return render(request, 'Patchwork/generic.html', {
-            'docs': docs,
-            'chainlinks': chainlinks,
-            'document': document,
-            'header': header,
-            'footer': footer
+
+        return render(request, "Patchwork/generic.html", {
+            "docs": collections,
+            "chainlinks": chainlinks,
+            "document": collection,
+            "header": header,
+            "footer": footer
         })
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         # Call auxiliary function to write the Element specified as JSON in the request object
         # The request payload contains JSON specifying the properties of the Element to write to the database
         payload = request.body
@@ -302,9 +312,9 @@ def generic(request, key=''):
         # updated for example)
         payload = db_store(payload, key)
         # The server response is the payload itself
-        return HttpResponse(payload, content_type='application/json')
+        return HttpResponse(payload, content_type="application/json")
 
-    elif request.method == 'DELETE':
+    elif request.method == "DELETE":
         target_id = request.headers["target"]
         match request.headers["type"]:
             case "doc":
@@ -315,7 +325,7 @@ def generic(request, key=''):
                 db_remove(Content, get_url_from_id(target_id), get_order_from_id(target_id))
 
 
-    elif request.method == 'PUT':
+    elif request.method == "PUT":
         target_id = request.headers["target"]
         target_title = request.headers["title"]
         match request.headers["type"]:
@@ -326,7 +336,7 @@ def generic(request, key=''):
             case "content":
                 db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_title)
 
-    return render(request, 'Patchwork/success.html', {})
+    return render(request, "Patchwork/success.html", {})
 
 
 @cache_control(no_cache=True, must_revalidate=True,

@@ -1,11 +1,11 @@
-class Element {
+export class Element {
         constructor() {}
 }
 
 export class Article extends Element {
         constructor(title="", url="", date=null, isPublic=false, count=0, order=0) {
                 super();
-                this.type = "header1";
+                this.type = "article";
                 this.title = title;
                 this.url = url;
                 this.date = date;
