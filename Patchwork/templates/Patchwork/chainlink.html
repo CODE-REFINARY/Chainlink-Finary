@@ -2,11 +2,11 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
-<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
+<script type="module" src="{% static 'scripts/collectionStateManager.js' %}"></script>
 <script src="{{ REACT_STATIC_ROOT }}/chainlink.js"></script>
 <!--<script type="module">
 
-	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView, createFence } from "{% static 'scripts/collectionStateManager.js' %}";
 
 	document.addEventListener("DOMContentLoaded", function() {
 		// Globals

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 
-export * as allExports from './chainlink-utilities.js';
+export * as allExports from './collectionStateManager.js';
 export { synthesizeGalleryBasic, synthesizeGallery } from './patchwork-function.js';
 
 const {

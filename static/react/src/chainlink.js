@@ -1,4 +1,4 @@
-import { parseKeyDown, createFence } from "./chainlink-utilities.js";
+import { parseKeyDown, createFence } from "./collectionStateManager.js";
 
 document.addEventListener("DOMContentLoaded", function() {
         // Globals

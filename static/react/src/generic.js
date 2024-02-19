@@ -1,4 +1,4 @@
-import { parseKeyDown, instantiateEditButtons, createFence, initialize } from "./chainlink-utilities.js";
+import { parseKeyDown, instantiateEditButtons, createFence, initialize } from "./collectionStateManager.js";
 
 // await full DOM load before adding DB items
 document.addEventListener("DOMContentLoaded", function() {

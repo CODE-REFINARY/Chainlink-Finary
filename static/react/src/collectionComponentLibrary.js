@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import {
-    chainlinkDeleteButtonsEventHandlers, chainlinkEditButtonsEventHandlers,
-    contentDeleteButtonsEventHandlers, contentEditButtonsEventHandlers,
     elementsEditButtonEventHandlers,
     deleteChainlink,
     deleteContent,
@@ -9,8 +7,11 @@ import {
     editChainlink,
     editContent, instantiateEditButtons,
     makeForm, removeEditButtons,
-    renameDoc, refresh, storeEditButtonHandlers, getOrderFromId, getUrlFromId, formatDateString
-} from "./chainlink-utilities";
+    renameDoc, refresh, storeEditButtonHandlers
+} from "./collectionStateManager";
+import {
+        getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
+} from "./staticUtils";
 
 /**
  * Render the row of Element creation buttons that appear at the bottom of the article
