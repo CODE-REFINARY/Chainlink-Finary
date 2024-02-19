@@ -11,6 +11,11 @@ __pycache__
 myvenv/
 venv/
 Scripts/
+node_modules/
+lib/
+bin/
+
+migrations/
 
 # Database
 db.sqlite3
@@ -29,3 +34,9 @@ staticfiles/
 
 # To stop tracking a file that was being tracked but now you don't want to and it's in .gitignore use:
 # git rm --cached <file>;
+.credentials
+lib64
+pyvenv.cfg
+
+# exclude the output of webpack
+static/react/static

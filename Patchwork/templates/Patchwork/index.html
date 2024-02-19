@@ -2,58 +2,38 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<script type="module">
+    import { createFence } from "{% static 'scripts/collectionStateManager.js' %}";
+    document.getElementById("add-page-btn").addEventListener("click", createFence);
+</script>
 <nav id="tabbed-buttons">
 {% for doc in docs %}
 	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
 {% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
+	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
-<section>
-    <h2>Industrial Precision Refined Artistry</h2>
-    <p class="recantation">"Global capitalism is nearly there. At the end of the world there will only be liquid advertisement and gaseous desire. Sublimated from our bodies, our untethered senses will endlessly ride escalators through pristine artificial environments, more and less than human, drugged-up and drugged down, catalyzed, consuming and consumed by a relentlessly rich economy of sensory information, valued by the pixel. The Virtual Plaza welcomes you, and you will welcome it too."<span class="authored-by"> ~~ r/Vaporwave</span></p>
-</section>
-<section>
-    <h2>Vapor Gallery</h2>
-    <p class="information">The Chainlink project is a loveletter to abandoned industrial settings and the art that depicts it. With modern artistic movements like Vaporwave and Nostalgiacore drawing upon artistic sensibilities of 80s and 90s futurism, there is a growing body of artistic work depicting these themes with some notable examples below</p>
-    <script class = "img-gallery-create">
-        var script = document.currentScript;
-        divIdentifier = "gallery-" + mediaCounter; 
-        div = document.createElement("div");
-        div.id = divIdentifier;
-        div.className = "media-section";
-        script.insertAdjacentElement('afterend', div);
-        $.get("{% static 'json/img-manifest-blue.json' %}",
-            function createGallery(data) {
-                synthesizeGalleryBasic(data, divIdentifier);
-        });
-        mediaCounter++;
-    </script>
-</section>
-<section>
-    <h2>Associated Works</h2>
-    <ul>
-        <li><i><span class="redacted">&lt;REDACTED&gt;</span></i>
-        <li><i><span class="redacted">&lt;REDACTED&gt;</span></i>
-        <li><i><span class="redacted">&lt;REDACTED&gt;</span></i>
-        <li><i><span class="redacted">&lt;REDACTED&gt;</span></i></li>
-    </ul>
-</section>
-<section>
-    <h2>Beat The Clock</h2>
-    <p class="recantation">
-        "R-R-R-R-R-R-R-R-Right about now..." the deep dish surround-sounditorium rumbled with a low-thud membrane shaking 130 bpm rhythm & shred-edited human
-        language. G closed his eyes and pushed his way thru the tightly packed dance area of his penthouse barracks, out safely to the terrace.
-        <br>
-        His party would be reviewed tomorrowas one of the top 5 ways to have spent the last 15 minutes of the century. He had personally spent every free
-        moment of the past month arrangin & preparing for it. Admittedly, that only added up to about 10 minutes, but luckily it was easier to do more in less
-        time these days.
-        <a class="expand-me" href="beat-the-clock.html">&gt;&gt;Expand&lt;&lt;</a>
-    </p>
-</section>
-<section>
-    {{ asa }}
-</section>
-<section>
-    {{ dfd }}
-</section>
+<div id="doc-title-wrapper">
+	<h1 id="doc-title">index.html</h1>
+</div>
+<div id="chainlink-display">
+	<section class="chainlink">
+		<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3" class="chainlink-wrapper">
+			<h2>
+				<span class="chainlink-inner-text">Welcome to Chainlink Finary</span>
+			</h2>
+		<div class="chainlink-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cl-edit-btn" target="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3">edit</button><button class="cl-del-btn" target="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3">delete</button></div></div>
+	<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3-0" class="content-wrapper">
+		<p class="inner-content">You are at the entry point of one of another one of the internet's boundless repositories of strange but hopefully useful information.</p>
+	<div class="context-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cont-edit-btn">edit</button><button class="cont-del-btn">delete</button></div></div>
+	<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3-1" class="content-wrapper">
+		<p class="inner-content">You can think of Chainlink Finary as a kind of collaborative blog or even a wiki developed by aimless wanderers (such as yourself) who've seen fit to leave their mark on the monolithic metal tapestry of information that will heretofore be known only as the fence.</p>
+	<div class="context-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cont-edit-btn">edit</button><button class="cont-del-btn">delete</button></div></div>
+	<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3-2" class="content-wrapper">
+		<p class="inner-content">Before is only an atomic glance of the interlocking and ever-expanding fence architecture housed within the Finary. In fact, not only is this page an example of a fence, it happens to be THE fence - the very first fence ever constructed and from which every future fence is but a templated copy of, however distant they may appear to be.</p>
+	<div class="context-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cont-edit-btn">edit</button><button class="cont-del-btn">delete</button></div></div>
+	</section>
+</div>
+
 {% endblock %}

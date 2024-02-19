@@ -10,8 +10,8 @@
 
         <!-- Static CSS -->
         <link rel="icon" type="image/x-icon" href="{% static 'images/lock_icon.png' %}">
-        <link rel="stylesheet" href="{% static 'css/reset.css' %}">
-        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
 
         <!-- Scripts -->
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -28,12 +28,16 @@
     <body>
         <header>
             <h1>Chainlink Finary</h1>
-            <h6>the patchwork portal is currently under construction</h6>
+            <h6 class="under-construction">the patchwork portal is currently under construction</h6>
+            <img class="under-construction" src="{% static 'images/under_construction.gif' %}" onclick="window.location.replace('http://textfiles.com/underconstruction/')"/>
             <nav id="upper-navigation">
                 <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Chainlink Finary</a></li>
-                    <li><a href="#">Patchwork Finary</a></li>
+                    <li><a href="index.html">Landing Page</a></li>
+                    <li><a href="#">Sitewide Announcements</a></li>
+                    <li><a href="#">Account Record</a></li>
+                    <li><a href="#">Site Configuration</a></li>
+                    <li><a href="generate.html">Doc Creation</a></li>
+                    <li><a href="#">About</a></li>
                 </ul>
             </nav>
         </header>

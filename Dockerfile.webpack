@@ -1,0 +1,12 @@
+FROM node:14
+
+# Enter the root folder
+WORKDIR /code
+
+# Copy over the list of dependencies and applications needed to support the webpack server
+COPY ./package.json ./package-lock.json ./
+COPY ./webpack.config.js ./babel.config.json ./
+
+# Install the dependencies
+RUN npm cache clean -f
+RUN npm install

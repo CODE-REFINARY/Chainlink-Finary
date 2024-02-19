@@ -1,82 +1,133 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/generic.css' %}">
-<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
-<script type="module">
-
-	import { addElement, makeForm, parseKeyUp, parseKeyDown, escape } from "{% static 'scripts/chainlink-utilities.js' %}";
-
-	// await full DOM load before adding DB items
-	document.addEventListener("DOMContentLoaded", function() {
-		// Prompt Buttons
-		let newParagraph = document.getElementById("add-p-btn");
-		let newHeader = document.getElementById("add-h3-btn");
-		let newChainlink = document.getElementById("add-cl-btn");
-		let newCode = document.getElementById("add-code-btn");
-		let newBreak = document.getElementById("add-br-btn");
-
-		// Register event listeners for content creation elements
-		newChainlink.addEventListener("click", function() { makeForm('header2', csrftoken); });
-		newHeader.addEventListener("click", function() { makeForm('header3', csrftoken); });
-		newParagraph.addEventListener("click", function() { makeForm('paragraph', csrftoken); });
-		newCode.addEventListener("click", function() { makeForm('code', csrftoken); });
-		newBreak.addEventListener("click", function() { makeForm('linebreak', csrftoken); });
-
-		// Add the event listeners above for keystrokes
-		window.addEventListener("keyup", parseKeyUp);
-		window.addEventListener("keydown", parseKeyDown);
-	});
-</script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 <nav id="tabbed-buttons">
-{% for doc in docs %}
-	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
-{% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons" onclick="window.location.href ='generate.html'">+</button>
+    {% for doc in docs %}
+        {% if doc.header.text != "" %}
+	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">{{ doc.header.text }}</button>
+        {% else %}
+            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">untitled&lt{{ doc.url|slice:"0:9" }}&gt</button>
+        {% endif %}
+    {% endfor %}
+	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
-<h1>{{ document.title|linebreaksbr }}</h1>
-<div id="chainlink-display">
-<ul id="chainlink-manifest">
-	<h2>Chainlink Manifest</h2>
-	{% if chainlinks %}
-	{% for chainlink in chainlinks %}
-	<li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
-	{% endfor %}
-	{% else %}
-	<li><i>&#60;list empty&#62;</i></li>
-	{% endif %}
-</ul>
-<ul id="keybindings-legend">
-	<h2>Keybindings Legend</h2>
-	<li>j - scroll down</li>
-	<li>k - scroll up</li>
-	<li>n - create chainlink</li>
-	<li>p - create text element</li>
-	<li>h - create header element</li>
-	<li>c - create code block</li>
-	<li>b - insert linebreak</li>
-</ul>
-{% for content in contents %}
-		{% if content.tag == 'header2' %}
-		<section><h2 id="{{ content.url }}">{{ content.title }}<a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a></h2>
-		{% elif content.tag == 'paragraph' %}
-		<p>{{ content.content }}</p>
-		{% elif content.tag == 'code' %}
-		<code>{{ content.content }}</code>
-		{% elif content.tag == 'header3' %}
-		<h3><div class="h3">{{ content.content }}</div></h3>
-		{% elif content.tag == 'linebreak' %}
-		<span class="br"></span>
-		{% elif content.tag == 'delimiter' %}
-		</section>
-		{% endif %}
-{% endfor %}
+<div id="config-display">
+    <div id="keybindings-legend">
+        <h2>Keybindings Legend</h2>
+        <ul id="keybindings-legend">
+            <li>j - scroll down</li>
+            <li>k - scroll up</li>
+            <li>n - create chainlink</li>
+            <li>p - create text element</li>
+            <li>h - create header element</li>
+            <li>c - create code block</li>
+            <li>b - insert linebreak</li>
+        </ul>
+    </div>
+    <div id="chainlink-manifest">
+        <h2>Chainlink Manifest</h2>
+        <ul id="chainlink-manifest-entries">
+            {% if chainlinks %}
+                {% for chainlink in chainlinks %}
+                    <li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
+                {% endfor %}
+            {% else %}
+                <li><i>&#60;list empty&#62;</i></li>
+            {% endif %}
+        </ul>
+    </div>
+    <div id="options-settings">
+        <h2>Options & Settings</h2>
+        <ul>
+            <li><button id="doc-action-copy-link">Share This Article</button></li>
+            <li><button id="doc-action-change-theme">Switch Theme</button></li>
+            <li><button id="doc-action-find-references">Find References</button></li>
+            <li><button id="doc-action-delete">Delete This Article</button></li>
+            <li><button id="doc-action-delete">Enable No Warning Edits</button></li>
+        </ul>
+    </div>
 </div>
-	<div id="add-buttons">
-		<button type="button" id="add-p-btn" class="add-buttons">&#60;p&#62; paragraph</button>
-		<button type="button" id="add-h3-btn" class="add-buttons">&#60;h&#62; header</button>
-		<button type="button" id="add-cl-btn" class="add-buttons">&#60;n&#62 New Chainlink</button>
-		<button type="button" id="add-code-btn" class="add-buttons">&#60;c&#62 code</button>
-		<button type="button" id="add-br-btn" class="add-buttons">&#60;b&#62; linebreak</button>
-	</div>
+
+<!-- Article content is always displayed in #chainlink-display -->
+<div id="element-display" template="article">
+    <div id="header-display">
+        <div id="header-elements">
+            {% if header %}
+                <h1 class="header-element-wrapper" id="{{ document.url }} doc-title">{{ header.text }}</h1>
+            {% else %}
+                <div id="no-header" class="no-elements">&ltno header&gt</div>
+            {% endif %}
+        </div>
+            <div class="element-creation-buttons">
+                <button id="add-h1-btn" class="add-buttons">Add Header</button>
+            </div>
+    </div>
+    <hr />
+    <div id="chainlink-display">
+        <!-- Chainlink Elements comprise the "meat" of the page. These elements are logically connected to the current
+        host Article or Chainlink. It is in this way (and this way only) that they are related to each other. -->
+        <div id="chainlink-elements">
+            {% for chainlink in chainlinks %}
+                <section class="chainlink">
+                    <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
+                        <h2>
+                            <span class="chainlink-order">#{{ chainlink.0.order }}</span>
+                            <span class="chainlink-inner-text">{{ chainlink.0.title }}</span>
+                            <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
+                            <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
+                        </h2>
+                    </div>
+                    {% for content in chainlink.1 %}
+                        {% if content.tag == 'paragraph' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
+                            <p class="inner-content">{{ content.content }}</p>
+                        </div>
+                        {% elif content.tag == 'code' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="code">
+                            <code class="inner-content">{{ content.content }}</code>
+                        </div>
+                        {% elif content.tag == 'header3' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
+                            <h3 class="inner-content">{{ content.content }}</h3>
+                        </div>
+                        {% elif content.tag == 'linebreak' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
+                            <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
+                        </div>
+                        {% elif content.tag == 'delimiter' %}
+                        {% endif %}
+                        {% empty %}
+                            <!--<div id="no-contents" class="no-elements">&ltno content&gt</div>-->
+                    {% endfor %}
+                </section>
+                {% empty %}
+                    <!--<div id="no-chainlinks" class="no-elements">&ltno content&gt</div>-->
+            {% endfor %}
+        </div>
+        <!-- Elements under the add-buttons element are buttons used to create content on the page -->
+        <div class="element-creation-buttons">
+            <!-- The chainlink add button is placed under this div -->
+            <div id="chainlink-placeholder"></div>
+            <!-- All buttons used to create content is stored under this parent div -->
+            <div id="content-placeholder"></div>
+        </div>
+    </div>
+    <hr />
+    <div id="footer-display">
+        <div id="footer-elements">
+            {% if header %}
+                <h1 id="doc-footer" class="footer-element-wrapper">{{ footer.text }}</h1>
+            {% else %}
+                <div id="no-footer" class="no-elements">&ltno footer&gt</div>
+            {% endif %}
+        </div>
+        <div class="element-creation-buttons">
+            <button id="add-h1-btn" class="add-buttons">Add Footer Text</button>
+        </div>
+    </div>
+</div>
+<!-- This text wraps the bottom of the display area -->
 {% endblock %}

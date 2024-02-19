@@ -1,0 +1,24 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<div id="doc-title-wrapper" class="article-wrapper">
+	<h1 id="doc-title">Log In</h1>
+</div>
+<div id="chainlink-display">
+    <p>an account is required to view the contents of this application</p>
+    <p>Enter your credentials below</p>
+    <form>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <input type="submit" value="Login">
+    </form>
+    <p>Or</p>
+    <a href="#">Register</a>
+</div>
+{% endblock %}

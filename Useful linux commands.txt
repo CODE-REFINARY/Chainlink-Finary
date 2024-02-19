@@ -1,5 +1,8 @@
 Linux Commands that I use:
 
+# Rebuild a docker container with changes made to files in the container
+sudo docker compose up --build
+
 This command runs the manage.py server with settings file specified:
 python manage.py runserver --settings=Chainlink.settings.docker
 python manage.py runserver --settings=Chainlink.settings.heroku
@@ -57,11 +60,10 @@ Create Superuser:
 sudo docker compose run web python manage.py createsuperuser --settings=Chainlink.settings.docker
 
 Make Migrations
-sudo docker compose run web python manage.py makemigrations --settings=Chainlink.settings.docker
+sudo docker compose run django python manage.py makemigrations
 
 Migrate
-sudo docker compose run web python manage.py migrate --settings=Chainlink.settings.docker
-<<<<<<< HEAD
+sudo docker compose run django python manage.py migrate
 
 
 

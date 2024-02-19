@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(config("DEBUG_BOOL"))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS_LIST").split(", ")
 
 
 # Application definition
@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Chainlink',
     'Patchwork',
+    "whitenoise.runserver_nostatic",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -66,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "Patchwork.context_processors.react_static",
             ],
         },
     },
@@ -83,12 +86,11 @@ CSRF_COOKIE_HTTPONLY = False    # no practical benefit here
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': config('DB_PASSWORD'),
-        #'HOST': 'host.docker.internal', # for Windows/Mac
-        'HOST': '172.17.0.1', # static IP
-        'PORT': '5432',
+        'NAME': config("DB_DATABASE"),
+        'USER': config("DB_USERNAME"),
+        'PASSWORD': config("DB_PASSWORD"),
+        'HOST': config("DB_HOST"),
+        'PORT': config("DB_PORT"),
     },
     'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -133,11 +135,17 @@ USE_TZ = True       # Make dates timezone aware
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_ROOT  = os.path.join(BASE_DIR, 'staticfiles')        # This is where collectstatic will place static files for serving
-STATIC_URL = '/static/'                                     # This is appending to the base url when serving static files in production
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]     # This is where static files are located in the project
+# This is where collectstatic will place static files for serving
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+# This is appending to the base url when serving static files in production
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'static', 'react', 'static')]
+REACT_ROOT = os.path.join(BASE_DIR, "staticfiles", "react", "build")
+REACT_STATIC_ROOT = os.path.join(STATIC_URL, "react", "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
