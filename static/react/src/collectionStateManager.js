@@ -3,8 +3,15 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Element, Article, Chainlink, Content, Header } from "./elementClassDefinitions.js"
 import {
-        ChainlinkEditButtons, ChainlinkElement, ContentEditButtons, ContentElement, CreatePageEditButtons,
-        ElementCreationForm, FenceEditButtons, NoElements
+        ChainlinkEditButtons,
+        ChainlinkElement,
+        ContentEditButtons,
+        ContentElement,
+        CreateBodyEditButtons, CreateFooterEditButtons,
+        CreateHeaderEditButtons,
+        ElementCreationForm,
+        FenceEditButtons,
+        NoElements
 } from "./collectionComponentLibrary.js"
 import {
         getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
@@ -19,11 +26,13 @@ let isArticle;
 let isChainlink;
 let articleIsEmpty;
 let chainlinkIsEmpty;
-let pageEditButtons;
+let bodyEditButtons;
 let numBodyElements;        // the number of Elements rendered on the page
 let numFooterElements;
 let numHeaderElements;
-let formIsActive;
+let bodyFormIsActive;
+let headerFormIsActive;
+let footerFormIsActive;
 let cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default, it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
 
 /* Static Variables */
@@ -32,7 +41,13 @@ const contentElementClassNames = ["content-wrapper"];
 const headerElementClassNames = ["header-element-wrapper"];
 const footerElementClassNames = ["footer-element-wrapper"];
 const formClassNames = ["content-creation-form"];
-const contentTypes = ["paragraph", "code", "linebreak", "header3"]
+
+// These constants define the internal names used to identify different Element types. These should be used to ensure
+// that continuity between the backend names and frontend names is kept.
+const contentTypes = ["paragraph", "code", "linebreak", "header3"];
+const chainlinkTypes = ["chainlink"];
+const headerTypes = ["header"];
+const footerTypes = ["footer"];
 
 
 // Set up state variables after DOM is ready to be read
@@ -67,15 +82,35 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
         };
 
-        formIsActive = {
+        headerFormIsActive = {
                 get value() {
-                        if (document.getElementById("crud-form")) {
+                        if (document.getElementById("header-creation-form")) {
+                                return true;
+                        } else {
+                                return false;
+                        }
+                }
+        }
+
+        bodyFormIsActive = {
+                get value() {
+                        if (document.getElementById("chainlink-creation-form") || document.getElementById("content-creation-form")) {
                                 return true;
                         } else {
                                 return false;
                         }
                 }
         };
+
+        footerFormIsActive = {
+                get value() {
+                        if (document.getElementById("footer-creation-form")) {
+                                return true;
+                        } else {
+                                return false;
+                        }
+                }
+        }
 
         // variable indicates the number of elements currently rendered on the screen
         numBodyElements = {
@@ -121,17 +156,20 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         // contentButtons indicates the existence of buttons that create content on the page
-        pageEditButtons = {
+        bodyEditButtons = {
                 _value: false,
-                root: createRoot(document.getElementById("content-placeholder")),
+                bodyRoot: createRoot(document.getElementById("content-placeholder")),
+                headerRoot: createRoot(document.getElementById("header-placeholder")),
+                footerRoot: createRoot(document.getElementById("footer-placeholder")),
                 get value() {
                         return this._value;
                 },
                 set value(newValue) {
                         if (newValue !== this._value) {
                                 this._value = newValue;
-                                //const root = createRoot(container);
-                                this.root.render(<CreatePageEditButtons bitmask={this._value}/>);
+                                this.bodyRoot.render(<CreateBodyEditButtons bitmask={this._value.substring(1, 3)}/>);
+                                this.headerRoot.render(<CreateHeaderEditButtons bitmask={this._value.substring(0, 1)}/>);
+                                this.footerRoot.render(<CreateFooterEditButtons bitmask={this._value.substring(3, 4)}/>);
                         }
                 }
         };
@@ -217,14 +255,14 @@ export function refresh() {
                 list.appendChild(listItem);
         });
 
-        // Remove or add the "no content" marker for the Article.
+        // Remove or add the "no content" marker for the Collection.
         const chainlinkElements = document.getElementById("chainlink-elements");
         const headerElements = document.getElementById("header-elements");
         const footerElements = document.getElementById("footer-elements");
         let noClMarker = chainlinkElements.querySelector(".no-elements");
         let noFtMarker = document.getElementById("no-footer");
         let noHrMarker = document.getElementById("no-header");
-        if (numBodyElements.value > 0 || formIsActive.value) {
+        if (numBodyElements.value > 0 || bodyFormIsActive.value) {
                 if (noClMarker) {
                         noClMarker.remove()
                 }
@@ -238,7 +276,7 @@ export function refresh() {
                 }
         }
 
-        if (numHeaderElements.value > 0) {
+        if (numHeaderElements.value > 0 || headerFormIsActive.value) {
                 if (noHrMarker) {
                         noHrMarker.remove()
                 }
@@ -252,11 +290,12 @@ export function refresh() {
                 }
         }
 
-        if (numFooterElements.value > 0) {
+        if (numFooterElements.value > 0 || footerFormIsActive.value) {
                 if (noFtMarker) {
                         noFtMarker.remove()
                 }
         } else {
+
                 if (noFtMarker === null) {
                         const container = document.createElement("div");
                         const root = createRoot(container);
@@ -291,20 +330,34 @@ export function refresh() {
                 }
         }
 
+        // This variable is a string consisting of a set number of bits each of which indicates that a specific button
+        // group should be enabled or disabled. The first bit is for the header buttons.
+        let editButtonsBitmask = "";
+
+        // Determine if the header edit buttons should be disabled or not
+        editButtonsBitmask += "1";
+
         // Grey out buttons (or un-grey them) if forms or other factors are active
-        if (formIsActive.value) {
-                pageEditButtons.value = "00";
+        if (bodyFormIsActive.value) {
+                editButtonsBitmask += "00";
         } else {
                 if (isArticle.value) {
                         if (numBodyElements.value === 0) {
-                                pageEditButtons.value = "10";
+                                editButtonsBitmask += "10";
                         } else {
-                                pageEditButtons.value = "11";
+                                editButtonsBitmask += "11";
                         }
                 } else if (isChainlink.value) {
-                        pageEditButtons.value = "01";
+                        editButtonsBitmask += "01";
                 }
         }
+
+        // Determine the footer elements
+        editButtonsBitmask += "1";
+
+        // Set the actual button enabling/disabling into motion. This is what does the actual work for setting/unsetting
+        // the edit buttons as active or not.
+        bodyEditButtons.value = editButtonsBitmask;
 
         showDiagnostics();
 }
@@ -379,7 +432,7 @@ function instantiateElement(element, index, children) {
 
         }
 
-        else if (element.type === "header2") {
+        else if (element.type === "chainlink") {
                 const parentElement = document.getElementById("chainlink-elements");
                 const firstChild = parentElement.firstChild;
                 const container = document.createElement("section");
@@ -442,8 +495,8 @@ export function makeForm(type) {
         const isPublic = undefined;
         const count = undefined;
 
-        // Define the location where the form should be rendered if it's for modification of a chainlink.
-        if (type === "header2") {
+        // If we are making this form for the creation of a chainlink element
+        if (chainlinkTypes.includes(type)) {
                 const list = document.getElementById('chainlink-elements');
                 container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
@@ -451,7 +504,8 @@ export function makeForm(type) {
                 list.appendChild(container);
         }
 
-        if (contentTypes.includes(type)) {
+        // If we are making this form for the creation of a chainlink-display element that is not a chainlink.
+        else if (contentTypes.includes(type)) {
 
                 const previousElement = document.querySelector(`[index="${cursor.value}"]`);
                 const prevId = previousElement.id
@@ -503,9 +557,24 @@ export function makeForm(type) {
                 }
         }
 
+        // Otherwise if we are making this form for the creation of a header element.
+        else if (headerTypes.includes(type)) {
+                const header = document.getElementById("header-elements");
+                container.id = "header-creation-form";
+                root.render(<ElementCreationForm placeholder="enter header content"/>);
+                header.appendChild(container);
+        }
+
+        else if (footerTypes.includes(type)) {
+                const footer = document.getElementById("footer-elements");
+                container.id = "footer-creation-form";
+                root.render(<ElementCreationForm placeholder="enter footer content"/>);
+                footer.appendChild(container);
+        }
+
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
-                if (type === "header2") {
+                if (type === "chainlink") {
                         element = new Chainlink(input.value, url, currentDateTime, isPublic, count, order);
                 } else {
                         element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
@@ -533,10 +602,12 @@ function escape(e, ref, fallback, element) {
         if (e.key === "Escape") {
                 let formParent = document.getElementById('crud-form').parentNode.parentNode;
                 let form = document.getElementById('crud-form').parentNode;
-                const display = document.getElementById("chainlink-display");
+                const display = document.getElementById("element-display");
                 const chainlinkCreateForm = display.querySelector("#chainlink-creation-form");
                 const contentCreateForm = display.querySelector("#content-creation-form");
                 const chainlinkEditForm = display.querySelector("#chainlink-edit-form");
+                const headerForm = display.querySelector("#header-creation-form");
+                const footerForm = display.querySelector("#footer-creation-form");
                 const contentEditForm = display.querySelector("#content-edit-form");
                 const fenceEditForm = (formParent.matches('#header-display'));
 
@@ -554,6 +625,10 @@ function escape(e, ref, fallback, element) {
                 } else if (chainlinkCreateForm) {
                         form.remove();
                 } else if (contentCreateForm) {
+                        form.remove();
+                } else if (headerForm) {
+                        form.remove();
+                } else if (footerForm) {
                         form.remove();
                 } else if (contentEditForm) {
                         const index = parseInt(contentEditForm.getAttribute("index"));
@@ -628,7 +703,7 @@ export function parseKeyDown(e) {
                         break;
                 case "n":
                         e.preventDefault();
-                        makeForm('header2');
+                        makeForm('chainlink');
                         break;
                 case "h":
                         e.preventDefault();

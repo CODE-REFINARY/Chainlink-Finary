@@ -20,21 +20,22 @@ import {
  * 0s and 1s (bits) indicating which buttons should be active. The first bit sets the Chainlink button active.
  * The second bit sets the rest of the buttons active.
  */
-export function CreatePageEditButtons(props) {
-        var chainlinkButton;
-        var restOfButtons;
+export function CreateBodyEditButtons(props) {
+    let chainlinkButton;
+    let restOfButtons;
 
-        if (props.bitmask[0] === "1") {
+    if (props.bitmask[0] === "1") {
                 chainlinkButton = (
-                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm('header2')}>&lt;n&gt; chainlink</button>
+                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm("chainlink")}>&lt;n&gt; chainlink</button>
                 );
-        } else if (props.bitmask[0] === "0") {
-                chainlinkButton = (
-                        <button className="inactive-add-buttons">&lt;p&gt; paragraph</button>
-                );
-        }
 
-        if (props.bitmask[1] === "1") {
+    } else if (props.bitmask[0] === "0") {
+                chainlinkButton = (
+                        <button className="inactive-add-buttons">&lt;n&gt; chainlink</button>
+                );
+    }
+
+    if (props.bitmask[1] === "1") {
                 restOfButtons = (
                         <React.Fragment>
                                 <button id="add-p-btn" className="add-buttons" onClick={() => makeForm('paragraph')}>&lt;p&gt; paragraph</button>
@@ -46,7 +47,8 @@ export function CreatePageEditButtons(props) {
                                 <button className="add-buttons">&lt;inactive&gt; ol</button>
                         </React.Fragment>
                 );
-        } else if (props.bitmask[1] === "0") {
+
+    } else if (props.bitmask[1] === "0") {
                 restOfButtons = (
                         <React.Fragment>
                                 <button className="inactive-add-buttons">&lt;h&gt; header</button>
@@ -57,14 +59,56 @@ export function CreatePageEditButtons(props) {
                                 <button className="inactive-add-buttons">&lt;inactive&gt; ol</button>
                         </React.Fragment>
                 );
-        }
+    }
 
-        return (
-                <React.Fragment>
-                        {chainlinkButton}
-                        {restOfButtons}
-                </React.Fragment>
-        );
+    return (
+        <React.Fragment>
+                {chainlinkButton}
+                {restOfButtons}
+        </React.Fragment>
+    );
+}
+
+export function CreateHeaderEditButtons(props) {
+    let headerButton;
+
+    if (props.bitmask[0] === "1") {
+                headerButton = (
+                        <button id="add-h-btn" className="add-buttons" onClick={() => makeForm("header")}>header</button>
+                );
+
+    } else if (props.bitmask[0] === "0") {
+                headerButton = (
+                        <button className="inactive-add-buttons">header</button>
+                );
+    }
+
+    return (
+        <React.Fragment>
+            {headerButton}
+        </React.Fragment>
+    );
+}
+
+export function CreateFooterEditButtons(props) {
+    let footerButton;
+
+    if (props.bitmask[0] === "1") {
+                footerButton = (
+                        <button id="add-f-btn" className="add-buttons" onClick={() => makeForm("footer")}>footer</button>
+                );
+
+    } else if (props.bitmask[0] === "0") {
+                footerButton = (
+                        <button className="inactive-add-buttons">footer</button>
+                );
+    }
+
+    return (
+        <React.Fragment>
+            {footerButton}
+        </React.Fragment>
+    );
 }
 
 export function FenceEditButtons() {

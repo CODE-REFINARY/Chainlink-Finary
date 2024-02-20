@@ -6,12 +6,13 @@ from django.contrib.auth.models import User
 
 class TagType(models.TextChoices):  # Define available tag that content can be wrapped in
     HEADER1 = 'header1', _('header1')  # define a fence type
-    CHAINLINK = 'header2', _('header2')  # define new chainlink, wrap in <section> and create <h2>
+    CHAINLINK = "chainlink"     # define new chainlink, wrap in <section> and create <h2>
     PARAGRAPH = 'paragraph', _('paragraph')  # wrap content in <p>
     CODE = 'code', _('code')  # wrap content in <code>
     HEADER3 = 'header3', _('header3')  # wrap content in <h3>
     LINEBREAK = 'linebreak', _('linebreak')  # insert <br>
     ARTICLE = "article"
+    CONTENT = "content"
 
 
 class Doc(models.Model):

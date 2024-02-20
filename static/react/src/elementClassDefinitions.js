@@ -26,7 +26,7 @@ export class Header extends Element {
 export class Chainlink extends Element {
         constructor(title="", url="", date=null, isPublic=true, count=0, order=0) {
                 super();
-                this.type = "header2";
+                this.type = "chainlink";
                 this.title = title;
                 this.url = url;
                 this.date = date;

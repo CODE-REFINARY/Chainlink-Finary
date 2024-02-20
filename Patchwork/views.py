@@ -357,31 +357,31 @@ def chainlink(request, key):
         # get POST request json payload
         json_data = json.loads(request.body)
 
-        type = json_data["type"]
+        type = TagType(json_data["type"])
         try_title = json_data["title"]
         url = json_data["url"]
         public = json_data["is_public"]
 
-        if type == "header2":
+        if type == TagType.CHAINLINK:
             if db_store(type, key, try_title, public):
                 return render(request, 'Patchwork/success.html', {})
-        elif type == 'header3' or type == 'paragraph' or type == 'code' or type == 'linebreak':
+        elif type == TagType.HEADER3 or type == TagType.PARAGRAPH or type == TagType.CODE or type == TagType.LINEBREAK:
             if db_store(type, url, try_title, public):
                 return render(request, 'Patchwork/success.html', {})
 
     elif request.method == 'DELETE':
-        match request.headers["type"]:
-            case "chainlink":
+        match TagType(request.headers["type"]):
+            case TagType.CHAINLINK:
                 db_remove(Chainlink, request.headers["target"], None)
-            case "content":
+            case TagType.CONTENT:
                 db_remove(Content, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]))
 
     elif request.method == 'PUT':
-        match request.headers["type"]:
-            case "chainlink":
+        match TagType(request.headers["type"]):
+            case TagType.CHAINLINK:
                 db_update(Chainlink, request.headers["target"], None, request.headers["title"])
-            case "content":
+            case TagType.CONTENT:
                 db_update(Content, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]), request.headers["title"])
 
