@@ -153,7 +153,7 @@ export function ContentEditButtons(props) {
 export function NoElements() {
         return (
                 <React.Fragment>
-                        &lt;no content&gt;
+                        &lt;CONTENT MISSING&gt;
                 </React.Fragment>
         );
 }
@@ -211,7 +211,7 @@ export function ChainlinkElement(props) {
                                 <h2>
                                         <span className="chainlink-order">{"#" + getOrderFromId(props.url).toString()}</span>
                                         <span className="chainlink-inner-text">
-                                                {props.title}
+                                                {props.text}
                                         </span>
                                         <a className="inline-url header-url" href={"/patchwork/chainlink/" + getUrlFromId(props.url) + ".html"}>
                                                 {">>>" + getUrlFromId(props.url).substring(0, 9)}
@@ -262,7 +262,7 @@ export function ContentElement(props) {
                 return (
                         <React.Fragment>
                                 <Tag className="inner-content">
-                                        {props.content}
+                                        {props.text}
                                 </Tag>
                                 <div className="context-buttons-wrapper">
                                         <i className="context-span-message">context action &lt; - - - - - - </i>

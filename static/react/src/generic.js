@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
         window.addEventListener("keydown", parseKeyDown);
         document.getElementById("add-page-btn").addEventListener("click", createFence);
 
-        // Add CRUD buttons for page content
+        // Add CRUD buttons for page text
         /*instFenceEditButtons();
         instChainlinkEditButtons();
         instContentEditButtons();*/

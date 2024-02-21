@@ -4,73 +4,78 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 
 
-class TagType(models.TextChoices):  # Define available tag that content can be wrapped in
-    HEADER1 = 'header1', _('header1')  # define a fence type
-    CHAINLINK = "chainlink"     # define new chainlink, wrap in <section> and create <h2>
-    PARAGRAPH = 'paragraph', _('paragraph')  # wrap content in <p>
-    CODE = 'code', _('code')  # wrap content in <code>
-    HEADER3 = 'header3', _('header3')  # wrap content in <h3>
+class TagType(models.TextChoices):  # Define available tag that text can be wrapped in
+    HEADER1 = 'header',  # define a fence type
+    CHAINLINK = "chainlink"  # define new chainlink, wrap in <section> and create <h2>
+    PARAGRAPH = 'paragraph', _('paragraph')  # wrap text in <p>
+    CODE = 'code', _('code')  # wrap text in <code>
+    HEADER3 = 'header3', _('header3')  # wrap text in <h3>
     LINEBREAK = 'linebreak', _('linebreak')  # insert <br>
-    ARTICLE = "article"
-    CONTENT = "content"
+    COLLECTION = "collection"
+    CONTENT = "text"
 
 
-class Doc(models.Model):
+class Collection(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key (useful for testing)
-    title = models.CharField(max_length=200)  # The title of the doc
-    public = models.BooleanField(default=False)  # Indicate whether this doc will be shareable
-    date = models.DateTimeField(default=timezone.now)  # Creation date for this doc
-    url = models.CharField(max_length=75)  # relative url for this doc
+    text = models.CharField(max_length=200)  # The text of the collection
+    public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
+    date = models.DateTimeField(default=timezone.now)  # Creation date for this collection
+    url = models.CharField(max_length=75)  # relative url for this collection
+
     def __str__(self):
-        return "Article: " + self.title + " Url=" + self.url[:10]
+        return "Article: " + self.text + " Url=" + self.url[:10]
 
 
 class Chainlink(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key
     tag = TagType.CHAINLINK  # all chainlinks are displayed in <h2>
-    doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)  # identifer for which doc this chainlink belongs
-    title = models.CharField(max_length=200)  # Header element for this chainlink
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE,
+                                   null=True)  # identifer for which collection this chainlink belongs
+    text = models.CharField(max_length=200)  # Header element for this chainlink
     url = models.CharField(max_length=75)  # relative url for the chainlink
-    order = models.BigIntegerField(default=0)  # integer value specifying which order on the doc this chainlink appears
+    order = models.BigIntegerField(
+        default=0)  # integer value specifying which order on the collection this chainlink appears
     public = models.BooleanField(default=False)  # Indicate whether this chainlink will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this chainlink. May or may not be visible
 
     def __str__(self):
-        return self.title
+        return self.text
 
 
 class Content(models.Model):
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE,
-                                  null=True)  # identifer for which chainlink this content is for
-    tag = models.CharField(  # specify tag to wrap content in
+                                  null=True)  # identifer for which chainlink this text is for
+    tag = models.CharField(  # specify tag to wrap text in
         max_length=10,
         choices=TagType.choices,
         default=TagType.PARAGRAPH,
     )
-    order = models.BigIntegerField(default=0)  # indicate the position of this content within the chainlink
-    content = models.CharField(max_length=10000)  # specify content to place between tags specified by tag
+    order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
+    text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
     # Content can be marked to be visibly redacted from an Article. Redactions are visible to all users and labelled as
-    # such (although the content itself cannot be accessed). Redacted content can be made visible by setting the public
+    # such (although the text itself cannot be accessed). Redacted text can be made visible by setting the public
     # flag to True.
     public = models.BooleanField(default=True)
 
     def __str__(self):
-        return str(self.order) + " " + self.chainlink.title + " - " + self.tag
+        return str(self.order) + " " + self.chainlink.text + " - " + self.tag
 
 
 class Header(models.Model):
-    doc = models.OneToOneField(Doc, on_delete=models.CASCADE, null=False)  # identifier for which doc this chainlink belongs
+    collection = models.OneToOneField(Collection, on_delete=models.CASCADE,
+                                      null=False)  # identifier for which collection this chainlink belongs
     tag = TagType.HEADER1
-    text = models.CharField(max_length=10000)  # specify content to place between tags specified by tag
+    text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
 
     def __str__(self):
         return self.text
 
 
 class Footer(models.Model):
-    doc = models.OneToOneField(Doc, on_delete=models.CASCADE, null=False)  # identifier for which doc this chainlink belongs
+    collection = models.OneToOneField(Collection, on_delete=models.CASCADE,
+                                      null=False)  # identifier for which collection this chainlink belongs
     tag = TagType.HEADER1
-    text = models.CharField(max_length=10000)  # specify content to place between tags specified by tag
+    text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
 
     def __str__(self):
         return self.text

@@ -5,11 +5,11 @@
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 <nav id="tabbed-buttons">
-    {% for doc in docs %}
-        {% if doc.header.text != "" %}
-	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">{{ doc.header.text }}</button>
+    {% for collection in collections %}
+        {% if collection.header.text != "" %}
+	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">{{ collection.header.text }}</button>
         {% else %}
-            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=doc.url %}">untitled&lt{{ doc.url|slice:"0:9" }}&gt</button>
+            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</button>
         {% endif %}
     {% endfor %}
 	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
@@ -32,7 +32,7 @@
         <ul id="chainlink-manifest-entries">
             {% if chainlinks %}
                 {% for chainlink in chainlinks %}
-                    <li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
+                    <li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.text }}</a></li>
                 {% endfor %}
             {% else %}
                 <li><i>&#60;list empty&#62;</i></li>
@@ -56,9 +56,9 @@
     <div id="header-display">
         <div id="header-elements">
             {% if header %}
-                <h1 class="header-element-wrapper" id="{{ document.url }} doc-title">{{ header.text }}</h1>
+                <h1 class="header-element-wrapper" id="{{ collection.url }} doc-title">{{ header.text }}</h1>
             {% else %}
-                <div id="no-header" class="no-elements">&ltno header&gt</div>
+                <div id="missing-header" class="no-elements">&ltCONTENT MISSING&gt</div>
             {% endif %}
         </div>
             <div class="element-creation-buttons">
@@ -76,7 +76,7 @@
                     <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
                         <h2>
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
-                            <span class="chainlink-inner-text">{{ chainlink.0.title }}</span>
+                            <span class="chainlink-inner-text">{{ chainlink.0.text }}</span>
                             <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
                             <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
                         </h2>
@@ -84,15 +84,15 @@
                     {% for content in chainlink.1 %}
                         {% if content.tag == 'paragraph' %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
-                            <p class="inner-content">{{ content.content }}</p>
+                            <p class="inner-content">{{ content.text }}</p>
                         </div>
                         {% elif content.tag == 'code' %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="code">
-                            <code class="inner-content">{{ content.content }}</code>
+                            <code class="inner-content">{{ content.text }}</code>
                         </div>
                         {% elif content.tag == 'header3' %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
-                            <h3 class="inner-content">{{ content.content }}</h3>
+                            <h3 class="inner-content">{{ content.text }}</h3>
                         </div>
                         {% elif content.tag == 'linebreak' %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
@@ -122,7 +122,7 @@
             {% if header %}
                 <h1 id="doc-footer" class="footer-element-wrapper">{{ footer.text }}</h1>
             {% else %}
-                <div id="no-footer" class="no-elements">&ltno footer&gt</div>
+                <div id="missing-footer" class="no-elements">&ltCONTENT MISSING&gt</div>
             {% endif %}
         </div>
         <div class="element-creation-buttons">

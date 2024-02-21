@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Doc, Content, TagType, Account, Header
+from .models import Chainlink, Collection, Content, TagType, Account, Header
 from django.views.decorators.cache import cache_control
 
 from decouple import Config  # This library parses .env files
@@ -8,7 +8,7 @@ from pathlib import Path  # This function defines a file path
 import os
 
 from django.utils import timezone
-from .models import TagType  # enum type for types content/chainlink type(s)
+from .models import TagType  # enum type for types text/chainlink type(s)
 import random  # use this to generate unique titles for fence and/or chainlink
 import json  # use this to parse JSON payloads in HTTP requests
 import hashlib  # use this to generate hashes for urls
@@ -50,13 +50,13 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         # Create a representation of the Chainlink object to write to the database
         cl = Chainlink()
         # Update the parent object to indicate that it has a new child
-        collection = Doc.objects.get(url=parent)
-        articleCount = Chainlink.objects.filter(doc=collection).count()
+        collection = Collection.objects.get(url=parent)
+        articleCount = Chainlink.objects.filter(collection=collection).count()
         # chainlink order starts at 0
         cl.order = articleCount
         articleCount += 1
-        cl.doc = collection
-        cl.title = db_try_title(Chainlink, json_data["title"])
+        cl.collection = collection
+        cl.text = db_try_title(Chainlink, json_data["text"])
         cl.url = db_try_url(TagType.CHAINLINK)
         cl.public = json_data["is_public"]
         cl.date = timezone.now()
@@ -84,7 +84,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
                     Content.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
                     # field for all elements after this one
                 except Content.DoesNotExist:
-                    print("ERROR: A content element specified after the new element wasn't found. Something is wrong.")
+                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
                     #chainlink.count -= 1  # We've discovered a missing element so the count must be off
                     # Find the next existing Content after the one to be added.
                     for j in range(i + 1, numElements):
@@ -97,7 +97,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
                             continue
 
         content.tag = tag
-        content.content = json_data["content"]
+        content.text = json_data["text"]
         content.public = json_data["is_public"]
 
         # Write changes to the database
@@ -105,10 +105,10 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.save()
         json_data["order"] = content.order
 
-    elif tag == TagType.ARTICLE:
+    elif tag == TagType.COLLECTION:
         # Create a representation of the Article as a python object
-        collection = Doc()
-        collection.title = db_try_title(Doc, json_data["title"])
+        collection = Collection()
+        collection.text = db_try_title(Collection, json_data["text"])
         collection.url = db_try_url(TagType.HEADER1)
         collection.public = json_data["is_public"]
         collection.date = json_data["date"]
@@ -127,10 +127,10 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         json_data["url"] = collection.url
 
     elif tag == TagType.HEADER1:
-        collection = Doc.objects.get(url=parent)
+        collection = Collection.objects.get(url=parent)
         header = Header()
-        header.doc = collection
-        header.text = db_try_title(Chainlink, json_data["text"])
+        header.collection = collection
+        header.text = db_try_title(Header, json_data["text"])
         header.save()
 
     return json.dumps(json_data)
@@ -145,15 +145,15 @@ def db_remove(table, url, order):
     :param order: This is an int identifier used in tandem with url to identify Content type targets. It is this field
     # that will get updated for all subsequent Content elements so that there is no gap in the element ordering
     """
-    if table == Doc:
+    if table == Collection:
         target = table.objects.get(url=url)
 
     elif table == Chainlink:
         target = table.objects.get(url=url)
-        parent_article = target.doc
-        parent_article_count = Chainlink.objects.filter(doc=parent_article).count()
+        parent_article = target.collection
+        parent_article_count = Chainlink.objects.filter(collection=parent_article).count()
         for i in range(order + 1, parent_article_count):
-            next_pos_els = Chainlink.objects.filter(doc=parent_article, order=i)
+            next_pos_els = Chainlink.objects.filter(collection=parent_article, order=i)
             for obj in next_pos_els:
                 obj.order -= 1
                 obj.save()
@@ -185,27 +185,27 @@ def db_update(table, url, order, payload):
     new_title = payload
     if table == Chainlink:
         target = table.objects.get(url=url)  # Get the record that we want to modify.
-        if target.title != new_title:  # Check if the new title matches the old one. If they're different then make
-            # sure the new title is valid.
-            new_title = db_try_title(table, new_title)  # Validate the new title
-            target.title = new_title
+        if target.text != new_title:  # Check if the new text matches the old one. If they're different then make
+            # sure the new text is valid.
+            new_title = db_try_title(table, new_title)  # Validate the new text
+            target.text = new_title
 
     elif table == Content:
         parent_chainlink = Chainlink.objects.get(url=url)
         target = table.objects.get(chainlink=parent_chainlink, order=order)
-        target.content = new_title
+        target.text = new_title
 
     target.save()
 
 
 def db_try_title(table, try_title):
     """
-    Validate title name input for uniqueness and return unique alternative if needed
+    Validate text name input for uniqueness and return unique alternative if needed
 
-    :param table: table within which newly title object resides
-    :param try_title: title string to validate for uniqueness
+    :param table: table within which newly text object resides
+    :param try_title: text string to validate for uniqueness
     """
-    while table.objects.filter(title=try_title).exists() or try_title == '':
+    while table.objects.filter(text=try_title).exists() or try_title == '':
         try_title += "+"
     return try_title
 
@@ -220,7 +220,7 @@ def db_try_url(tag_type, try_url=""):
     if not try_url:
         try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     if TagType.HEADER1:
-        while Doc.objects.filter(url=try_url).exists():
+        while Collection.objects.filter(url=try_url).exists():
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     elif TagType.CHAINLINK:
         while Chainlink.objects.filter(url=try_url).exists():
@@ -236,7 +236,7 @@ def db_check_url(tag_type, check_url):
     :param check_url: This string is a url that's checked. If the url is tied to a record then return True. Otherwise return False
     """
     if TagType.HEADER1:
-        matching_record = Doc.objects.filter(url=check_url)
+        matching_record = Collection.objects.filter(url=check_url)
     elif TagType.CHAINLINK:
         matching_record = Chainlink.objects.filter(url=check_url)
     return matching_record.exists()
@@ -250,7 +250,7 @@ def db_generate_url(tag_type):
     """
     try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     if TagType.HEADER1:
-        while Doc.objects.filter(url=try_url).exists():
+        while Collection.objects.filter(url=try_url).exists():
             try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
     elif TagType.CHAINLINK:
         while Chainlink.objects.filter(url=try_url).exists():
@@ -260,7 +260,7 @@ def db_generate_url(tag_type):
 
 ###################### View Methods ######################
 
-# force doc list page to not get cached so that changes from chainlink pages show up on browser back button
+# force collection list page to not get cached so that changes from chainlink pages show up on browser back button
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def generic(request, key=""):
     if not request.user.is_authenticated:
@@ -268,7 +268,7 @@ def generic(request, key=""):
 
     if request.method == "GET":
         # Get this collection from the database and return a 404 if it isn"t found
-        collection = get_object_or_404(Doc, url=key)
+        collection = get_object_or_404(Collection, url=key)
 
         # Get the header record associated with this collection if one exists.
         if hasattr(collection, "header"):
@@ -282,7 +282,7 @@ def generic(request, key=""):
         else:
             footer = None
 
-        collections = Doc.objects.all()
+        collections = Collection.objects.all()
 
         # Chainlink and Content data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
@@ -290,16 +290,16 @@ def generic(request, key=""):
 
         # Populate the above list with tuples of the specified form by first getting the list of all Chainlinks that
         # are attached to this Article.
-        for chainlink in Chainlink.objects.filter(doc=collection.pk).order_by("order"):
+        for chainlink in Chainlink.objects.filter(collection=collection.pk).order_by("order"):
             contents = []
             for content in Content.objects.filter(chainlink=chainlink.pk).order_by("order"):
                 contents.append(content)
             chainlinks.append((chainlink, contents))
 
         return render(request, "Patchwork/generic.html", {
-            "docs": collections,
+            "collections": collections,
             "chainlinks": chainlinks,
-            "document": collection,
+            "collection": collection,
             "header": header,
             "footer": footer
         })
@@ -317,23 +317,23 @@ def generic(request, key=""):
     elif request.method == "DELETE":
         target_id = request.headers["target"]
         match request.headers["type"]:
-            case "doc":
-                db_remove(Doc, key, None)
+            case "collection":
+                db_remove(Collection, key, None)
             case "chainlink":
                 db_remove(Chainlink, get_url_from_id(target_id), get_order_from_id(target_id))
-            case "content":
+            case "text":
                 db_remove(Content, get_url_from_id(target_id), get_order_from_id(target_id))
 
 
     elif request.method == "PUT":
         target_id = request.headers["target"]
-        target_title = request.headers["title"]
+        target_title = request.headers["text"]
         match request.headers["type"]:
-            case "doc":
-                db_update(Doc, key, None, request.headers["title"])
+            case "collection":
+                db_update(Collection, key, None, request.headers["text"])
             case "chainlink":
                 db_update(Chainlink, get_url_from_id(target_id), None, target_title)
-            case "content":
+            case "text":
                 db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_title)
 
     return render(request, "Patchwork/success.html", {})
@@ -346,19 +346,19 @@ def chainlink(request, key):
         return login(request)
     if request.method == 'GET':
         target = get_object_or_404(Chainlink, url=key)
-        docs = Doc.objects.all()
+        collections = Collection.objects.all()
         contents = []
         for cont in Content.objects.filter(chainlink=target).order_by('order'):
             contents.append(cont)
         return render(request, 'Patchwork/chainlink.html',
-                      {'docs': docs, 'target': target, 'contents': contents, 'url': key})
+                      {'collections': collections, 'target': target, 'contents': contents, 'url': key})
 
     elif request.method == 'POST':
         # get POST request json payload
         json_data = json.loads(request.body)
 
         type = TagType(json_data["type"])
-        try_title = json_data["title"]
+        try_title = json_data["text"]
         url = json_data["url"]
         public = json_data["is_public"]
 
@@ -380,10 +380,10 @@ def chainlink(request, key):
     elif request.method == 'PUT':
         match TagType(request.headers["type"]):
             case TagType.CHAINLINK:
-                db_update(Chainlink, request.headers["target"], None, request.headers["title"])
+                db_update(Chainlink, request.headers["target"], None, request.headers["text"])
             case TagType.CONTENT:
                 db_update(Content, get_url_from_id(request.headers["target"]),
-                          get_order_from_id(request.headers["target"]), request.headers["title"])
+                          get_order_from_id(request.headers["target"]), request.headers["text"])
 
     return render(request, 'Patchwork/success.html', {})
 
@@ -394,7 +394,7 @@ def generate(request):
     Create an Article. Write the article to the database and communicate back any updates to the specified article properties by returning the updated properties as JSON.
 
     :param request: http request object. The payload is the set of poperties for the Article.
-    <DEPRECATED> :param is_landing_page: this boolean flag indicates that the created Doc should be set as the landing page for the website
+    <DEPRECATED> :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website
     """
     if not request.user.is_authenticated:
         return login(request)
@@ -419,13 +419,13 @@ def index(request):
     # Determine if a landing page exists and send the user to the landing page if it does
     if not request.user.is_authenticated:
         return login(request)
-    if db_check_url(Doc, Account.objects.get(user=request.user).landing_page_url):
+    if db_check_url(Collection, Account.objects.get(user=request.user).landing_page_url):
         return generic(request, key=Account.objects.get(user=request.user).landing_page_url)
     # Otherwise generate a new landing page for the site and then direct the user to an informational static page
     else:
         post_request_payload = {
-            "type": "header1",
-            "title": "Landing Page",
+            "type": "header",
+            "text": "Landing Page",
             "is_public": True,
             "date": str(timezone.now())
         }
@@ -443,11 +443,6 @@ def beat_the_clock(request):
     return render(request, 'Patchwork/beat-the-clock.html', {})
 
 
-def gsdocs(request):
-    docs = Doc.objects.all()
-    return render(request, 'Patchwork/gsdocs.html', {'docs': docs})
-
-
 def react(request):
     return render(request, 'Patchwork/react.html', {})
 
@@ -463,7 +458,7 @@ def aux_generate(request, is_landing_page, user=None):
     Create a new article. If the newly created article should be a landing page send back a static information page. Otherwise send a simple HttpResponse 
 
     :param request: http request object. The payload is the set of poperties for the Article.
-    :param is_landing_page: this boolean flag indicates that the created Doc should be set as the landing page for the website.
+    :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website.
     :param user: this is the user object corresponding to the currently logged in user. The landing page will be set for this user.
     """
     payload = request.body
@@ -476,7 +471,7 @@ def aux_generate(request, is_landing_page, user=None):
 
 def get_order_from_id(id):
     """
-    Extracts and returns the order value from a chainlink/content id.
+    Extracts and returns the order value from a chainlink/text id.
 
     Parameters:
     - id (str): The identifier containing the url stored between the prefix and the order values.
@@ -504,7 +499,7 @@ def get_order_from_id(id):
 
 def get_url_from_id(id):
     """
-    Extracts and returns the url from a chainlink/content id.
+    Extracts and returns the url from a chainlink/text id.
 
     Parameters:
     - id (str): The identifier containing the url stored between the prefix and the order values.
@@ -535,7 +530,7 @@ def get_prefix_from_id(id):
     - id (str): The Element id
 
     Returns:
-    - str: The extracted prefix. This is either "chainlink" or "content"
+    - str: The extracted prefix. This is either "chainlink" or "text"
 
     Raises:
     - TypeError: If the input is not a string.
@@ -550,7 +545,7 @@ def get_prefix_from_id(id):
         return id[:idx]
     else:
         raise ValueError("An invalid id was specified. Make sure the supplied id contains a prefix section (either"
-                         "content or chainlink) followed by a dash followed by the url followed by a dash followed by"
+                         "text or chainlink) followed by a dash followed by the url followed by a dash followed by"
                          "the order.")
 
 
@@ -564,5 +559,5 @@ def validate_and_return_count(element):
     if element._meta.object_name == "Chainlink":
         return Content.objects.filter(chainlink=element).count()
 
-    elif element._meta.object_name == "Doc":
-        return Chainlink.objects.filter(doc=element).count()
+    elif element._meta.object_name == "Collection":
+        return Chainlink.objects.filter(collection=element).count()

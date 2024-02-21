@@ -25,6 +25,9 @@
     font-weight: 500;
     font-size: small;
     color: rgb(208, 68, 35);
+    border-style: dashed;
+    border-width: 1px;
+    padding: 5px;
 }
 
 .add-buttons {

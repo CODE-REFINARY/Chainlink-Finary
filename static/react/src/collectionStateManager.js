@@ -1,7 +1,7 @@
 /* React imports */
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Element, Article, Chainlink, Content, Header } from "./elementClassDefinitions.js"
+import { Element, Collection, Chainlink, Content, Header } from "./elementClassDefinitions.js"
 import {
         ChainlinkEditButtons,
         ChainlinkElement,
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
         };
 
-        // flag indicates that the chainlink has no content display. This flag is only set in Chainlink view
+        // flag indicates that the chainlink has no text display. This flag is only set in Chainlink view
         chainlinkIsEmpty = {
                 get value() {
                         if (!document.getElementById("chainlink-display").firstElementChild) {
@@ -155,10 +155,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
         };
 
-        // contentButtons indicates the existence of buttons that create content on the page
+        // contentButtons indicates the existence of buttons that create text on the page
         bodyEditButtons = {
                 _value: false,
-                bodyRoot: createRoot(document.getElementById("content-placeholder")),
+                bodyRoot: createRoot(document.getElementById("chainlink-placeholder")),
                 headerRoot: createRoot(document.getElementById("header-placeholder")),
                 footerRoot: createRoot(document.getElementById("footer-placeholder")),
                 get value() {
@@ -182,30 +182,7 @@ document.addEventListener("DOMContentLoaded", function() {
  * @returns {null}
  */
 export function initialize() {
-	/*var mainElement = document.querySelector("main");
-        var container = document.createElement("div");
-        container.id = "add-buttons";
-        mainElement.appendChild(container);
-        var root = createRoot(container);
-        if (quantity == 1) {
-                root.render(<CreateChainlinkButton />);
-        } else if (quantity == 4) {
-                root.render(<CreateContentButtons />);
-        } else if (quantity == 5) {
-                root.render(<ContentCreationButtonsFive />);
-        }
 
-        // Render chainlink/content creation buttons
-        if (isArticle.value) {
-                if (articleIsEmpty.value) {
-                        pageEditButtons.value = "10";
-                } else {
-                        pageEditButtons.value = "11";
-                }
-        } else if (isChainlink.value) {
-                pageEditButtons.value = "01";
-        }
-*/
         refresh();
 }
 
@@ -216,7 +193,7 @@ export function storeEditButtonHandlers(editFunction, deleteFunction) {
 
 
 /**
- * Assign indices to Elements. The title element is always index 0. 
+ * Assign indices to Elements. The text element is always index 0.
  *
  * @returns {null}
  */
@@ -255,13 +232,13 @@ export function refresh() {
                 list.appendChild(listItem);
         });
 
-        // Remove or add the "no content" marker for the Collection.
+        // Remove or add the "MISSING" marker for the Collection.
         const chainlinkElements = document.getElementById("chainlink-elements");
         const headerElements = document.getElementById("header-elements");
         const footerElements = document.getElementById("footer-elements");
-        let noClMarker = chainlinkElements.querySelector(".no-elements");
-        let noFtMarker = document.getElementById("no-footer");
-        let noHrMarker = document.getElementById("no-header");
+        let noClMarker = document.getElementById("missing-body");
+        let noFtMarker = document.getElementById("missing-footer");
+        let noHrMarker = document.getElementById("missing-header");
         if (numBodyElements.value > 0 || bodyFormIsActive.value) {
                 if (noClMarker) {
                         noClMarker.remove()
@@ -269,8 +246,9 @@ export function refresh() {
         } else {
                 if (noClMarker === null) {
                         const container = document.createElement("div");
-                        const root = createRoot(container);
                         container.className = "no-elements";
+                        container.id = "missing-body"
+                        const root = createRoot(container);
                         chainlinkElements.append(container);
                         root.render(<NoElements />);
                 }
@@ -283,8 +261,9 @@ export function refresh() {
         } else {
                 if (noHrMarker === null) {
                         const container = document.createElement("div");
-                        const root = createRoot(container);
+                        container.id = "missing-header";
                         container.className = "no-elements";
+                        const root = createRoot(container);
                         headerElements.append(container);
                         root.render(<NoElements />);
                 }
@@ -299,18 +278,19 @@ export function refresh() {
                 if (noFtMarker === null) {
                         const container = document.createElement("div");
                         const root = createRoot(container);
+                        container.id = "missing-footer";
                         container.className = "no-elements";
                         footerElements.append(container);
                         root.render(<NoElements />);
                 }
         }
 
-        // Remove or add "no content" marker for each Chainlink
+        // Remove or add "no text" marker for each Chainlink
         let cls = document.querySelectorAll(".chainlink");
         const selector = contentElementClassNames.map(className => `.${className}`).join(', ');
         for (let i = 0; i < cls.length; i++) {
-                // If the number of content elements that are children of this chainlink is zero then display the
-                // "no content" marker.
+                // If the number of text elements that are children of this chainlink is zero then display the
+                // "no text" marker.
                 let numChildElements = Array.from(cls[i].querySelectorAll(selector)).length;
                 let marker = cls[i].querySelector(".no-elements");
                 if (numChildElements === 0 && !cls[i].querySelector("#crud-form")) {
@@ -322,7 +302,7 @@ export function refresh() {
                                 root.render(<NoElements/>);
                         }
                 } else {
-                        // If there are elements under this chainlink then find the "no content" marker (if it exists)
+                        // If there are elements under this chainlink then find the "no text" marker (if it exists)
                         // and remove it. Otherwise, just we're done here.
                         if (marker) {
                                 marker.remove();
@@ -335,7 +315,11 @@ export function refresh() {
         let editButtonsBitmask = "";
 
         // Determine if the header edit buttons should be disabled or not
-        editButtonsBitmask += "1";
+        if (headerFormIsActive.value) {
+                editButtonsBitmask += "0";
+        } else {
+                editButtonsBitmask += "1";
+        }
 
         // Grey out buttons (or un-grey them) if forms or other factors are active
         if (bodyFormIsActive.value) {
@@ -353,7 +337,11 @@ export function refresh() {
         }
 
         // Determine the footer elements
-        editButtonsBitmask += "1";
+        if (footerFormIsActive.value) {
+                editButtonsBitmask += "0";
+        } else {
+                editButtonsBitmask += "1";
+        }
 
         // Set the actual button enabling/disabling into motion. This is what does the actual work for setting/unsetting
         // the edit buttons as active or not.
@@ -361,22 +349,6 @@ export function refresh() {
 
         showDiagnostics();
 }
-
-
-/**
- * Create the correct number of content buttons depending on current page
- *
- * @returns {null}
- */
-/*export function _addButtons() {
-        if (window.in === 'doc') {
-                addContentButtons(5);
-        } else if (window.in === 'doc-empty') {
-                addContentButtons(1);
-        } else if (window.in === 'chainlink') {
-                addContentButtons(4);
-        }
-}*/
 
 function showDiagnostics() {
         console.log("isArticle: " + isArticle.value);
@@ -446,7 +418,7 @@ function instantiateElement(element, index, children) {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
                 }
-                root.render(<ChainlinkElement title={element.title} url={"chainlink-" + element.url + "-" + element.order} date={element.date} children={children} />);
+                root.render(<ChainlinkElement text={element.text} url={"chainlink-" + element.url + "-" + element.order} date={element.date} children={children} />);
 
         } else {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
@@ -456,7 +428,7 @@ function instantiateElement(element, index, children) {
                 container.className = "content-wrapper";
                 container.setAttribute("tag", element.type);
                 //container.setAttribute("index", numElements.value);
-                /*if (adjacentElement.className == "chainlink-wrapper") {               // if we are inserting a content Element at the start of a Chainlink...
+                /*if (adjacentElement.className == "chainlink-wrapper") {               // if we are inserting a text Element at the start of a Chainlink...
                         parentElement = adjacentElement;                                // the chainlink will be the parent of this new Element
                         firstChild = parentElement.firstChild;                          // get the original first child of the Chainlink
                         parentElement.insertBefore(container, firstChild);              // insert the 
@@ -464,7 +436,7 @@ function instantiateElement(element, index, children) {
                 adjacentElement.insertAdjacentElement("afterend", container);
                 /*else
                         parentElement.appendChild(container);*/
-                root.render(<ContentElement type={element.type} content={element.content} />);
+                root.render(<ContentElement type={element.type} text={element.text} />);
         }
 }
 
@@ -549,7 +521,7 @@ export function makeForm(type) {
                         chainlink.appendChild(container);
                 } else if (type === 'linebreak') {
                         container.id = "content-creation-form";
-                        element = new Content("linebreak", undefined, url, currentDateTime, isPublic, count, order);
+                        element = new Content("linebreak", "N/A", url, currentDateTime, isPublic, count, order);
                         addElement(element);
                         window.addEventListener("keydown", parseKeyDown);
                         window.removeEventListener("keydown", _listener);
@@ -573,6 +545,7 @@ export function makeForm(type) {
         }
 
         container.addEventListener("submit", function(event) {
+                let input = document.getElementById("input")
                 event.preventDefault();
                 if (type === "chainlink") {
                         element = new Chainlink(input.value, url, currentDateTime, isPublic, count, order);
@@ -593,7 +566,7 @@ export function makeForm(type) {
  * @param {KeyboardEvent} e - the keyboard press event used to verify that the key that was pressed was the escape key
  * @param {Function} ref - a reference to the callback function specified for
  * @param {string} fallback - the original value of the field that we are editing
- * <DEPRECATED> @param {string} element - the type of content that is being edited.
+ * <DEPRECATED> @param {string} element - the type of text that is being edited.
  * @param {Element} element - the Element object that was being edited when escape was entered
  * @returns {null}
  */
@@ -614,7 +587,7 @@ function escape(e, ref, fallback, element) {
                 if (fenceEditForm) {
                         form.remove();
                         let h1 = document.createElement("h1");
-                        h1.id = "doc-title";
+                        h1.id = "collection-content";
                         h1.innerHTML = fallback;
                         formParent.prepend(h1);
                 } else if (chainlinkEditForm) {
@@ -649,7 +622,7 @@ function escape(e, ref, fallback, element) {
  */
 export function createFence() {
         const currentDateTime = new Date().toISOString();
-        const article = new Article("article", "", currentDateTime, false, 0, 0);
+        const article = new Collection("article", "", currentDateTime, false, 0, 0);
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/patchwork/article/generate.html", true);
@@ -665,7 +638,7 @@ export function createFence() {
                         let putRequest = new XMLHttpRequest();
                         putRequest.open("PUT", "doc" + url + ".html", true);
                         putRequest.setRequestHeader('X-CSRFToken', csrftoken);
-                        putRequest.setRequestHeader('type', 'doc');
+                        putRequest.setRequestHeader('type', 'collection');
                         putRequest.setRequestHeader('title', "fence" + url_substring);
                         putRequest.setRequestHeader('target', 'null');
                         putRequest.send();
@@ -785,7 +758,7 @@ export function deleteDoc() {
         let xhr = new XMLHttpRequest();
         xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.setRequestHeader('type', 'doc');
+        xhr.setRequestHeader('type', 'collection');
         xhr.send();
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -864,7 +837,7 @@ export function renameDoc() {
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'doc');
+                xhr.setRequestHeader('type', 'collection');
                 xhr.setRequestHeader('title', event.target.input.value);
                 xhr.setRequestHeader('target', 'null');
                 xhr.send();
@@ -883,7 +856,7 @@ export function renameDoc() {
 }
 
 /**
- * Edit the target chainlink. Instantiate a form to allow the user to change the content of this Chainlink.
+ * Edit the target chainlink. Instantiate a form to allow the user to change the text of this Chainlink.
  *
  * @param {string} target - this string indicates the id of the chainlink element to edit
  * @returns {null}
@@ -950,7 +923,7 @@ export function editChainlink(target) {
 }
 
 /**
- * Edit the target Content. Instantiate a form to allow the user to edit this content.
+ * Edit the target Content. Instantiate a form to allow the user to edit this text.
  *
  * @param {string} target - This string indicates the id of the Content to edit
  * @returns {null}
@@ -958,7 +931,7 @@ export function editChainlink(target) {
 export function editContent(target) {
 
         const wrapper = document.getElementById(target);
-        const content = wrapper.querySelector(".inner-content");
+        const content = wrapper.querySelector(".inner-text");
         const title = content.textContent;
         const url = getUrlFromId(wrapper.id);
         const order = getOrderFromId(wrapper.id);
