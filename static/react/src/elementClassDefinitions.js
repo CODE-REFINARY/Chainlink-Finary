@@ -3,10 +3,10 @@ export class Element {
 }
 
 export class Collection extends Element {
-        constructor(title="", url="", date=null, isPublic=false, count=0, order=0) {
+        constructor(text="", url="", date=null, isPublic=false, count=0, order=0) {
                 super();
                 this.type = "collection";
-                this.text = title;
+                this.text = text;
                 this.url = url;
                 this.date = date;
                 this.is_public = isPublic;
@@ -16,25 +16,27 @@ export class Collection extends Element {
 }
 
 export class Header extends Element {
-        constructor(text="", url="") {
+        constructor(type, text="", url="") {
                 super();
+                this.type = type;
                 this.text = text;
                 this.url = url;
         }
 }
 
 export class Footer extends Element {
-        constructor(text="", url="") {
+        constructor(type, text="", url="") {
                 super();
+                this.type = type;
                 this.text = text;
                 this.url = url;
         }
 }
 
 export class Chainlink extends Element {
-        constructor(text, url, date=null, isPublic=true, count=0, order=0) {
+        constructor(type, text, url, date=null, isPublic=true, count=0, order=0) {
                 super();
-                this.type = "chainlink";
+                this.type = type;
                 this.text = text;
                 this.url = url;
                 this.date = date;

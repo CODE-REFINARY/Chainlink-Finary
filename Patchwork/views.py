@@ -321,20 +321,20 @@ def generic(request, key=""):
                 db_remove(Collection, key, None)
             case "chainlink":
                 db_remove(Chainlink, get_url_from_id(target_id), get_order_from_id(target_id))
-            case "text":
+            case "content":
                 db_remove(Content, get_url_from_id(target_id), get_order_from_id(target_id))
 
 
     elif request.method == "PUT":
         target_id = request.headers["target"]
-        target_title = request.headers["text"]
+        target_update = request.headers["text"]
         match request.headers["type"]:
             case "collection":
-                db_update(Collection, key, None, request.headers["text"])
+                db_update(Collection, key, None, target_update)
             case "chainlink":
-                db_update(Chainlink, get_url_from_id(target_id), None, target_title)
-            case "text":
-                db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_title)
+                db_update(Chainlink, get_url_from_id(target_id), None, target_update)
+            case "content":
+                db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_update)
 
     return render(request, "Patchwork/success.html", {})
 

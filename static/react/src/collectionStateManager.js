@@ -22,6 +22,7 @@ import {
 export let elementsEditButtonEventHandlers = [];
 
 // State variables to describe the state of the page. These can be called to reliably determine something about the current page
+let collectionUrl;
 let isArticle;
 let isChainlink;
 let articleIsEmpty;
@@ -31,6 +32,7 @@ let numBodyElements;        // the number of Elements rendered on the page
 let numFooterElements;
 let numHeaderElements;
 let bodyFormIsActive;
+let anyFormIsActive;
 let headerFormIsActive;
 let footerFormIsActive;
 let cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default, it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
@@ -60,6 +62,13 @@ document.addEventListener("DOMContentLoaded", function() {
         /* Javascript objects that update alongside the page and modify it */
 
         // this flag indicates that Article view is current
+        collectionUrl = {
+                get value() {
+                        const url = document.getElementById("collection-url");
+                        return url.value;
+                }
+        };
+
         isArticle = {
                 get value() {
                         return (document.getElementById("element-display").getAttribute("template") === "article");
@@ -105,6 +114,16 @@ document.addEventListener("DOMContentLoaded", function() {
         footerFormIsActive = {
                 get value() {
                         if (document.getElementById("footer-creation-form")) {
+                                return true;
+                        } else {
+                                return false;
+                        }
+                }
+        }
+
+        anyFormIsActive = {
+                get value() {
+                        if (bodyFormIsActive.value || headerFormIsActive.value || footerFormIsActive.value) {
                                 return true;
                         } else {
                                 return false;
@@ -220,7 +239,7 @@ export function refresh() {
                 list.removeChild(list.firstChild);
         }
         chainlinks.forEach(function(element) {
-                chainlinkInfo.push([element.querySelector(".chainlink-inner-text").textContent, element.id])
+                chainlinkInfo.push([element.querySelector(".chainlink-inner-content").textContent, element.id])
         });
 
         chainlinkInfo.forEach(function(element) {
@@ -250,7 +269,7 @@ export function refresh() {
                         container.id = "missing-body"
                         const root = createRoot(container);
                         chainlinkElements.append(container);
-                        root.render(<NoElements />);
+                        root.render(<NoElements element={"BODY"}/>);
                 }
         }
 
@@ -265,7 +284,7 @@ export function refresh() {
                         container.className = "no-elements";
                         const root = createRoot(container);
                         headerElements.append(container);
-                        root.render(<NoElements />);
+                        root.render(<NoElements element={"HEADER"}/>);
                 }
         }
 
@@ -281,7 +300,7 @@ export function refresh() {
                         container.id = "missing-footer";
                         container.className = "no-elements";
                         footerElements.append(container);
-                        root.render(<NoElements />);
+                        root.render(<NoElements element={"FOOTER"}/>);
                 }
         }
 
@@ -299,7 +318,7 @@ export function refresh() {
                                 const root = createRoot(container);
                                 container.className = "no-elements";
                                 cls[i].append(container);
-                                root.render(<NoElements/>);
+                                root.render(<NoElements element={"CHAINLINK"}/>);
                         }
                 } else {
                         // If there are elements under this chainlink then find the "no text" marker (if it exists)
@@ -315,14 +334,14 @@ export function refresh() {
         let editButtonsBitmask = "";
 
         // Determine if the header edit buttons should be disabled or not
-        if (headerFormIsActive.value) {
+        if (anyFormIsActive.value) {
                 editButtonsBitmask += "0";
         } else {
                 editButtonsBitmask += "1";
         }
 
         // Grey out buttons (or un-grey them) if forms or other factors are active
-        if (bodyFormIsActive.value) {
+        if (anyFormIsActive.value) {
                 editButtonsBitmask += "00";
         } else {
                 if (isArticle.value) {
@@ -337,7 +356,7 @@ export function refresh() {
         }
 
         // Determine the footer elements
-        if (footerFormIsActive.value) {
+        if (anyFormIsActive.value) {
                 editButtonsBitmask += "0";
         } else {
                 editButtonsBitmask += "1";
@@ -351,6 +370,7 @@ export function refresh() {
 }
 
 function showDiagnostics() {
+        console.log("collectionUrl: " + collectionUrl.value);
         console.log("isArticle: " + isArticle.value);
         console.log("isChainlink: " + isChainlink.value);
         console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
@@ -404,7 +424,7 @@ function instantiateElement(element, index, children) {
 
         }
 
-        else if (element.type === "chainlink") {
+        else if (chainlinkTypes.includes(element.type)) {
                 const parentElement = document.getElementById("chainlink-elements");
                 const firstChild = parentElement.firstChild;
                 const container = document.createElement("section");
@@ -418,8 +438,16 @@ function instantiateElement(element, index, children) {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
                 }
-                root.render(<ChainlinkElement text={element.text} url={"chainlink-" + element.url + "-" + element.order} date={element.date} children={children} />);
-
+                root.render(<ChainlinkElement text={element.text} url={"chainlink-" + element.url + "-" + element.order}
+                                              date={element.date} children={children}/>);
+        } else if (headerTypes.includes(element.type)) {
+                const parentElement = document.getElementById("header-elements");
+                const container = document.createElement("h1");
+                const root = createRoot(container);
+                container.className = "header-element-wrapper";
+                container.id = (element.url).toString() + " doc-title";
+                container.innerText = element.text;
+                parentElement.appendChild(container);
         } else {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
                 const container = document.createElement("div");
@@ -547,10 +575,12 @@ export function makeForm(type) {
         container.addEventListener("submit", function(event) {
                 let input = document.getElementById("input")
                 event.preventDefault();
-                if (type === "chainlink") {
-                        element = new Chainlink(input.value, url, currentDateTime, isPublic, count, order);
-                } else {
+                if (chainlinkTypes.includes(type)) {
+                        element = new Chainlink("chainlink", input.value, url, currentDateTime, isPublic, count, order);
+                } else if (contentTypes.includes(type)) {
                         element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
+                } else if (headerTypes.includes(type)) {
+                        element = new Header(type, input.value, collectionUrl.value);
                 }
                 window.addEventListener("keydown", parseKeyDown);
                 addElement(element);
@@ -863,12 +893,12 @@ export function renameDoc() {
  */
 export function editChainlink(target) {
         const chainlink = document.getElementById(target);
-        const title = chainlink.querySelector(".chainlink-inner-text").textContent;
+        const title = chainlink.querySelector(".chainlink-inner-content").textContent;
         const url = getUrlFromId(chainlink.id);
         const order = chainlink.index;
         // The frontIndex specifies the index of this Chainlink as rendered on the page.
         const frontIndex = parseInt(chainlink.getAttribute("index"));
-        const element = new Chainlink(title, url, null, true, 0, order);
+        const element = new Chainlink("chainlink", title, url, null, true, 0, order);
         const _listener = function (e) {
                 escape(e, _listener, "", element)
         };
@@ -903,14 +933,14 @@ export function editChainlink(target) {
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'chainlink');
-                xhr.setRequestHeader('title', event.target.input.value);
+                xhr.setRequestHeader("text", event.target.input.value);
                 xhr.setRequestHeader('target', target);
                 xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                                 container.parentElement.remove();
-                                const updatedElement = element;
-                                updatedElement.title = event.target.input.value;
+                                let updatedElement = element;
+                                updatedElement.text = event.target.input.value;
                                 instantiateElement(updatedElement, frontIndex, contents);
                         }
                 }
@@ -931,7 +961,7 @@ export function editChainlink(target) {
 export function editContent(target) {
 
         const wrapper = document.getElementById(target);
-        const content = wrapper.querySelector(".inner-text");
+        const content = wrapper.querySelector(".inner-content");
         const title = content.textContent;
         const url = getUrlFromId(wrapper.id);
         const order = getOrderFromId(wrapper.id);
@@ -961,14 +991,14 @@ export function editContent(target) {
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'content');
-                xhr.setRequestHeader('title', event.target.input.value);
+                xhr.setRequestHeader("text", event.target.input.value);
                 xhr.setRequestHeader('target', target);
                 xhr.send();
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                                 container.remove();
-                                const updatedElement = element;
-                                updatedElement.content = event.target.input.value;
+                                let updatedElement = element;
+                                updatedElement.text = event.target.input.value;
                                 instantiateElement(updatedElement, index, null);
                         }
                 }

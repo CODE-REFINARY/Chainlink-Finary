@@ -150,10 +150,10 @@ export function ContentEditButtons(props) {
         );
 }
 
-export function NoElements() {
+export function NoElements(props) {
         return (
                 <React.Fragment>
-                        &lt;CONTENT MISSING&gt;
+                        &lt;{props.element} CONTENT MISSING&gt;
                 </React.Fragment>
         );
 }
@@ -161,7 +161,7 @@ export function NoElements() {
 export function ChainlinkHeader(props) {
         return (
                <React.Fragment>
-                        <span className="chainlink-inner-text">{props.title}</span>
+                        <span className="chainlink-inner-content">{props.title}</span>
                </React.Fragment>
         );
 }
@@ -210,7 +210,7 @@ export function ChainlinkElement(props) {
                         <div id={props.url} className="chainlink-wrapper" tag="chainlink">
                                 <h2>
                                         <span className="chainlink-order">{"#" + getOrderFromId(props.url).toString()}</span>
-                                        <span className="chainlink-inner-text">
+                                        <span className="chainlink-inner-content">
                                                 {props.text}
                                         </span>
                                         <a className="inline-url header-url" href={"/patchwork/chainlink/" + getUrlFromId(props.url) + ".html"}>

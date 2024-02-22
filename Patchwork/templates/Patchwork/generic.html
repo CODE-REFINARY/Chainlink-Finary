@@ -1,6 +1,7 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
 {% block content %}
+<input type="hidden" id="collection-url" value="{{ collection.url }}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
@@ -58,7 +59,7 @@
             {% if header %}
                 <h1 class="header-element-wrapper" id="{{ collection.url }} doc-title">{{ header.text }}</h1>
             {% else %}
-                <div id="missing-header" class="no-elements">&ltCONTENT MISSING&gt</div>
+                <div id="missing-header" class="no-elements">&ltHEADER CONTENT MISSING&gt</div>
             {% endif %}
         </div>
             <div class="element-creation-buttons">
@@ -76,7 +77,7 @@
                     <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
                         <h2>
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
-                            <span class="chainlink-inner-text">{{ chainlink.0.text }}</span>
+                            <span class="chainlink-inner-content">{{ chainlink.0.text }}</span>
                             <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
                             <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
                         </h2>
@@ -122,7 +123,7 @@
             {% if header %}
                 <h1 id="doc-footer" class="footer-element-wrapper">{{ footer.text }}</h1>
             {% else %}
-                <div id="missing-footer" class="no-elements">&ltCONTENT MISSING&gt</div>
+                <div id="missing-footer" class="no-elements">&ltFOOTER CONTENT MISSING&gt</div>
             {% endif %}
         </div>
         <div class="element-creation-buttons">
