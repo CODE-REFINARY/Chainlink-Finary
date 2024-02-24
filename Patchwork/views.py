@@ -1,7 +1,11 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
 from .models import Chainlink, Collection, Content, TagType, Account, Header
+
 from django.views.decorators.cache import cache_control
+from django.contrib.auth.decorators import login_required
+
+from django.contrib.auth import authenticate, login as backend_login
 
 from decouple import Config  # This library parses .env files
 from pathlib import Path  # This function defines a file path
@@ -389,6 +393,7 @@ def chainlink(request, key):
 
 
 # def generate(request, is_landing_page, user=None):
+@login_required
 def generate(request):
     """
     Create an Article. Write the article to the database and communicate back any updates to the specified article properties by returning the updated properties as JSON.
@@ -435,6 +440,21 @@ def index(request):
         return aux_generate(post_request, True, request.user)
 
 
+def login(request):
+    if request.method == "GET":
+        return render(request, 'Patchwork/login.html', {})
+
+    if request.method == 'POST':
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            backend_login(request, user)
+            return render(request, 'Patchwork/success.html')
+        else:
+            return render(request, 'Patchwork/failure.html')
+
+
 def about(request):
     return render(request, 'Patchwork/about.html', {})
 
@@ -445,10 +465,6 @@ def beat_the_clock(request):
 
 def react(request):
     return render(request, 'Patchwork/react.html', {})
-
-
-def login(request):
-    return render(request, 'Patchwork/login.html', {})
 
 
 ###################### Helper Methods ######################

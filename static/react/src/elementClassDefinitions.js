@@ -15,6 +15,10 @@ export class Collection extends Element {
         }
 }
 
+/*
+        Header elements appear in the #header-display section right above the chainlink display (main body). The title
+        Header type is must be defined before any other header elements are defined.
+ */
 export class Header extends Element {
         constructor(type, text="", url="") {
                 super();

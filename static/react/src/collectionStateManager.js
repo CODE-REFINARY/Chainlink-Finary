@@ -273,6 +273,7 @@ export function refresh() {
                 }
         }
 
+        // Set or unset the "missing header" warning.
         if (numHeaderElements.value > 0 || headerFormIsActive.value) {
                 if (noHrMarker) {
                         noHrMarker.remove()
@@ -448,6 +449,7 @@ function instantiateElement(element, index, children) {
                 container.id = (element.url).toString() + " doc-title";
                 container.innerText = element.text;
                 parentElement.appendChild(container);
+                refresh();
         } else {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
                 const container = document.createElement("div");
