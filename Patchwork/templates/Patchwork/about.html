@@ -1,60 +1,29 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
-{% block header %}
-<link rel="stylesheet" href="{% static 'css/about.css' %}">
-{% endblock %}
 {% block content %}
-<section>
-    <h2>Introduction</h2>
-    <div class="combination">
-        <div class="text-section">
-            <p>
-                Hello World! My name is George and I am a third year student at the University of California San Diego. 
-                I am interested in computer science - more specifically the web with a focus on studying how end users perceive
-                the internet. To complement the technical toolkit of a web developer I am also focused on product marketing. My
-                current goals are to develop a holistic approach to software development and to bring my knowledge with me to a 
-                California startup that is looking for a passionate developer with a robust understanding not only of how the web
-                works but also how the end-user perceives the software that we as developers craft for them. I am also deeply 
-                passionate about electronic music history.
-            </p>
-            <p>
-                I am an avid learner with a variety of interests spanning application development, processor design, and digital audio. 
-                My energetic and enthusiastic personality really comes alive in team environments where I can build interpersonal 
-                relationships among members and help guide the team to success. 
-            </p>
-            <p>
-                I am comfortable with most mainline web dev technologies including Javascript, HTML, CSS along with technologies like Docker and 
-                GitHub all of which I have integrated into projects for various classes and personal projects. I am also comfortable writing native 
-                code with C++, Java, and Python in addition to 32-bit variants of ARM and MIPS assembly.
-            </p>
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<nav id="tabbed-buttons">
+{% for doc in docs %}
+	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
+{% endfor %}
+	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
+</nav>
+<div id="doc-title-wrapper">
+	<h1 id="doc-title">About This Website</h1>
+</div>
+<div id="chainlink-display">
+	<section class="chainlink">
+		<div class="chainlink-wrapper">
+			<h2>
+				<span class="chainlink-inner-text">What Is Chainlink Finary</span>
+			</h2>
         </div>
-        <div class="media-section">
-           <img src="{% static 'images/intro-image-main1.jpg' %}" alt="Me smiling in the snow"> 
+        <div class="content-wrapper">
+            <p class="inner-content">This is text that describes the website.</p>
         </div>
-    </div>
-</section>
-<section>
-    <h2>CV & Personal Projects</h2>
-    <ul>
-        <li><a href="{% static 'files/CV_MAIN.pdf' %}" class="main-links" download>CV</a></li>
-        <li><a href="https://github.com/cse110-fa22-group29/cse110-fa22-group29" class="main-links">Food Journal Application</a></li>
-        <li><a href="https://github.com/CODE-REFINARY/Ziggomatic" class="main-links">Ziggomatic: 9-bit Microprocessor</a></li>
-    </ul>
-</section>
-<section>
-    <h2>Contact Info</h2>
-    <p>
-        Phone Number: 707-775-1795<br>
-        Email: gtdubinin@gmail.com<br>
-        Or reach out via social media.
-    </p>
-</section>
-<section>
-    <h2>Social Media</h2>
-    <ul>
-        <li><a href="https://www.linkedin.com/in/george-dubinin/" class="">LinkedIn</a></li>
-        <li><a href="https://twitter.com/DubininGeorge" class="">Twitter</a></li>
-        <li><a href="https://www.instagram.com/look_its_ashton/" class="">Instagram</a></li>
-    </ul>
-</section>
+	</section>
+</div>
+
 {% endblock %}

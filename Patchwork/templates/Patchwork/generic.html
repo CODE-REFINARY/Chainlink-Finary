@@ -13,7 +13,6 @@
             <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</button>
         {% endif %}
     {% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
 </nav>
 <div id="config-display">
     <div id="keybindings-legend">

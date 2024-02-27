@@ -17,13 +17,12 @@ class TagType(models.TextChoices):  # Define available tag that text can be wrap
 
 class Collection(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key (useful for testing)
-    text = models.CharField(max_length=200)  # The text of the collection
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this collection
     url = models.CharField(max_length=75)  # relative url for this collection
 
     def __str__(self):
-        return "Article: " + self.text + " Url=" + self.url[:10]
+        return "Collection Url= " + self.url[:10]
 
 
 class Chainlink(models.Model):

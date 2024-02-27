@@ -5,7 +5,7 @@ from .models import Chainlink, Collection, Content, TagType, Account, Header
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 
-from django.contrib.auth import authenticate, login as backend_login
+from django.contrib.auth import authenticate, login as backend_login, logout as backend_logout
 
 from decouple import Config  # This library parses .env files
 from pathlib import Path  # This function defines a file path
@@ -16,8 +16,12 @@ from .models import TagType  # enum type for types text/chainlink type(s)
 import random  # use this to generate unique titles for fence and/or chainlink
 import json  # use this to parse JSON payloads in HTTP requests
 import hashlib  # use this to generate hashes for urls
-from django.conf import settings
 from decouple import config
+
+from django.conf import settings    # Get variables defined in settings.py
+
+from django.shortcuts import redirect
+from django.urls import reverse
 
 
 class HttpRequestWrapper(HttpRequest):
@@ -112,10 +116,9 @@ def db_store(payload, parent, is_landing_page=False, user=None):
     elif tag == TagType.COLLECTION:
         # Create a representation of the Article as a python object
         collection = Collection()
-        collection.text = db_try_title(Collection, json_data["text"])
-        collection.url = db_try_url(TagType.HEADER1)
-        collection.public = json_data["is_public"]
-        collection.date = json_data["date"]
+        collection.url = db_try_url(TagType.HEADER1)    # Get a unique url for this collection.
+        collection.public = False
+        collection.date = timezone.now()
 
         # Write Python Article object to database
         collection.save()
@@ -401,26 +404,20 @@ def generate(request):
     :param request: http request object. The payload is the set of poperties for the Article.
     <DEPRECATED> :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website
     """
-    if not request.user.is_authenticated:
-        return login(request)
-    if request.method == 'POST':
-        # payload = request.body
-        # payload = db_store(payload, None, is_landing_page, user)
-        # if not is_landing_page:
-        #    return HttpResponse(payload, content_type='application/json')
-        # else:
-        #    return render(request, 'Patchwork/new_landing_page.html', {})
-        return aux_generate(request, False, None)
-    else:
-        return Http404("Only POST is supported for this url")
+    return aux_generate(request, False, None)
 
 
 def index(request):
+    collections = Collection.objects.all()
+    return render(request, "Patchwork/index.html", {"collections": collections})
+
+
+@login_required
+def profile(request):
     """
     Take the user to the configured landing page for the application. If no such page exists then generate a new one
     and display an explanatory welcome page for the user.
     """
-
     # Determine if a landing page exists and send the user to the landing page if it does
     if not request.user.is_authenticated:
         return login(request)
@@ -436,7 +433,6 @@ def index(request):
         }
         post_request = HttpRequestWrapper(json.dumps(post_request_payload), request.user)
         post_request.method = "POST"
-        # return generate(post_request, True, request.user)
         return aux_generate(post_request, True, request.user)
 
 
@@ -455,9 +451,14 @@ def login(request):
             return render(request, 'Patchwork/failure.html')
 
 
+def logout(request):
+    if request.method == "GET":
+        backend_logout(request)
+        return render(request, 'Patchwork/success.html')
+
+
 def about(request):
     return render(request, 'Patchwork/about.html', {})
-
 
 def beat_the_clock(request):
     return render(request, 'Patchwork/beat-the-clock.html', {})
@@ -477,10 +478,12 @@ def aux_generate(request, is_landing_page, user=None):
     :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website.
     :param user: this is the user object corresponding to the currently logged in user. The landing page will be set for this user.
     """
-    payload = request.body
+    # Create a new collection and write it to the database. The payload variable will contain the url for the collection
+    payload = json.dumps({"type": "collection"})
     payload = db_store(payload, None, is_landing_page, user)
     if not is_landing_page:
-        return HttpResponse(payload, content_type='application/json')
+        url = reverse("article", kwargs={"key": json.loads(payload)["url"]})
+        return redirect(url)
     else:
         return render(request, 'Patchwork/new_landing_page.html', {})
 

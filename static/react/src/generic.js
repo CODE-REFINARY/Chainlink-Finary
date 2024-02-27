@@ -7,15 +7,5 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Add the event listeners above for keystrokes
         window.addEventListener("keydown", parseKeyDown);
-        document.getElementById("add-page-btn").addEventListener("click", createFence);
-
-        // Add CRUD buttons for page text
-        /*instFenceEditButtons();
-        instChainlinkEditButtons();
-        instContentEditButtons();*/
-
-        //deleteFenceEditButtons();
-        //deleteChainlinkEditButtons();
-        //deleteContentEditButtons();
         instantiateEditButtons();
 });

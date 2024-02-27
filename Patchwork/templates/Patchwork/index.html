@@ -34,6 +34,18 @@
 		<p class="inner-content">Before is only an atomic glance of the interlocking and ever-expanding fence architecture housed within the Finary. In fact, not only is this page an example of a fence, it happens to be THE fence - the very first fence ever constructed and from which every future fence is but a templated copy of, however distant they may appear to be.</p>
 	<div class="context-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cont-edit-btn">edit</button><button class="cont-del-btn">delete</button></div></div>
 	</section>
+    <section>
+    <h2>Featured Collections</h2>
+        <ol>
+            {% for collection in collections %}
+                {% if collection.header.text != "" %}
+                    <li><a href="{% url 'article' key=collection.url %}">{{ collection.header.text }}</a></li>
+                {% else %}
+                    <li><a href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a></li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </section>
 </div>
 
 {% endblock %}
