@@ -34,12 +34,14 @@
                 <h2>Pages</h2>
                 <ul>
                     <li><a href="{% url 'index' %}">Landing Page</a></li>
-                    <li><a href="{% url 'login' %}">Login Page</a></li>
                     <li><a href="{% url 'profile' %}">My Profile</a></li>
                     <li><a href="{% url 'about' %}">About</a></li>
                 </ul>
                 <h2>Actions</h2>
-                <form action="{% url 'logout' %}" method="get"><input type="submit" value="Logout"></form>
+                {% block login_status %}
+                    <form action="{% url 'login' %}" method="get"><input type="submit" value="Login" /></form>
+                    <form action="{% url 'logout' %}" method="get"><input type="submit" value="Logout"></form>
+                {% endblock %}
                 <form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form>
             </nav>
         </header>

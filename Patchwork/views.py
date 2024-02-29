@@ -271,7 +271,8 @@ def db_generate_url(tag_type):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def generic(request, key=""):
     if not request.user.is_authenticated:
-        return login(request)
+        pass
+        #return login(request)
 
     if request.method == "GET":
         # Get this collection from the database and return a 404 if it isn"t found
@@ -446,7 +447,7 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             backend_login(request, user)
-            return render(request, 'Patchwork/success.html')
+            return HttpResponse("great")
         else:
             return render(request, 'Patchwork/failure.html')
 
