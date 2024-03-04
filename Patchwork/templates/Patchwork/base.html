@@ -32,17 +32,49 @@
             <img class="under-construction" src="{% static 'images/under_construction.gif' %}" onclick="window.location.replace('http://textfiles.com/underconstruction/')"/>
             <nav id="upper-navigation">
                 <h2>Pages</h2>
-                <ul>
-                    <li><a href="{% url 'index' %}">Landing Page</a></li>
-                    <li><a href="{% url 'profile' %}">My Profile</a></li>
-                    <li><a href="{% url 'about' %}">About</a></li>
-                </ul>
-                <h2>Actions</h2>
-                {% block login_status %}
-                    <form action="{% url 'login' %}" method="get"><input type="submit" value="Login" /></form>
-                    <form action="{% url 'logout' %}" method="get"><input type="submit" value="Logout"></form>
+                {% block pages %}
+                    {% if user.is_authenticated %}
+                        <ul>
+                            <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
+                            <li class="activated-page-list-element"><a href="{% url 'profile' %}">My Profile</a></li>
+                            <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
+                        </ul>
+                    {% else %}
+                        <ul>
+                            <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
+                            <li class="deactivated-page-list-element"><a>My Profile<span class="help-text">(log in to view your profile)</span></a></li>
+                            <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
+                        </ul>
+                    {% endif %}
                 {% endblock %}
-                <form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form>
+                <h2>Actions</h2>
+                {% block actions %}
+                    {% if user.is_authenticated %}
+                        <ul>
+                            <li class="deactivated-action-list-element">
+                                <form>
+                                    <input type="submit" value="Log In" disabled>
+                                    <span class="help-text">(you are already logged in)</span>
+                                </form></li>
+                            <li class="activated-action-list-element"><form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Log Out"></form></li>
+                            <li class="activated-action-list-element"><form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form></li>
+                        </ul>
+                    {% else %}
+                        <ul>
+                            <li class="activated-action-list-element"><form action="/login.html" method="post">
+                                {% csrf_token %}
+                                <input type="submit" value="Log In">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" name="username" required>
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="password" required>
+                                <span class="help-text">(enter credentials to log in)</span>
+                            </form></li>
+                            <li class="deactivated-action-list-element"><form><input type="submit" value="Log Out" disabled><span class="help-text">(you are already logged out)</span></form></li>
+                            <li class="deactivated-action-list-element"><form><input type="submit" value="Generate New Collection" disabled><span class="help-text">(log in to create a collection)</span></form></li>
+                        </ul>
+                    {% endif %}
+                {% endblock %}
             </nav>
         </header>
             <main>

@@ -1,5 +1,24 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
+{% block login_status %}
+    {% if user.is_authenticated %}
+        <i>Logged In</i>
+        <form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Logout"></form>
+        <form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form>
+    {% else %}
+        <i>Logged Out</i>
+        <form action="/login.html" method="post">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <input type="submit" value="Login">
+        </form>
+    {% endif %}
+{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">

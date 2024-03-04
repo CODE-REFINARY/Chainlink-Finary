@@ -344,7 +344,7 @@ def generic(request, key=""):
             case "content":
                 db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_update)
 
-    return render(request, "Patchwork/success.html", {})
+    return render(request, "Patchwork/index.html", {})
 
 
 @cache_control(no_cache=True, must_revalidate=True,
@@ -372,10 +372,10 @@ def chainlink(request, key):
 
         if type == TagType.CHAINLINK:
             if db_store(type, key, try_title, public):
-                return render(request, 'Patchwork/success.html', {})
+                return HttpResponse("CHAINLINK CREATE SUCCESS: " + url)
         elif type == TagType.HEADER3 or type == TagType.PARAGRAPH or type == TagType.CODE or type == TagType.LINEBREAK:
             if db_store(type, url, try_title, public):
-                return render(request, 'Patchwork/success.html', {})
+                return render(request, 'Patchwork/index.html', {})
 
     elif request.method == 'DELETE':
         match TagType(request.headers["type"]):
@@ -393,7 +393,7 @@ def chainlink(request, key):
                 db_update(Content, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]), request.headers["text"])
 
-    return render(request, 'Patchwork/success.html', {})
+    return render(request, 'Patchwork/login_success.html', {})
 
 
 # def generate(request, is_landing_page, user=None):
@@ -405,7 +405,8 @@ def generate(request):
     :param request: http request object. The payload is the set of poperties for the Article.
     <DEPRECATED> :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website
     """
-    return aux_generate(request, False, None)
+    if request.method == "POST":
+        return aux_generate(request, False, None)
 
 
 def index(request):
@@ -438,28 +439,26 @@ def profile(request):
 
 
 def login(request):
-    if request.method == "GET":
-        return render(request, 'Patchwork/login.html', {})
-
     if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
         if user is not None:
             backend_login(request, user)
-            return HttpResponse("great")
+            return index(request)
         else:
             return render(request, 'Patchwork/failure.html')
 
 
 def logout(request):
-    if request.method == "GET":
+    if request.method == "POST":
         backend_logout(request)
-        return render(request, 'Patchwork/success.html')
+        return index(request)
 
 
 def about(request):
     return render(request, 'Patchwork/about.html', {})
+
 
 def beat_the_clock(request):
     return render(request, 'Patchwork/beat-the-clock.html', {})
@@ -475,9 +474,9 @@ def aux_generate(request, is_landing_page, user=None):
     """
     Create a new article. If the newly created article should be a landing page send back a static information page. Otherwise send a simple HttpResponse 
 
-    :param request: http request object. The payload is the set of poperties for the Article.
+    :param request: http request object. The payload is the set of properties for the Article.
     :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website.
-    :param user: this is the user object corresponding to the currently logged in user. The landing page will be set for this user.
+    :param user: this is the user object corresponding to the currently logged-in user. The landing page will be set for this user.
     """
     # Create a new collection and write it to the database. The payload variable will contain the url for the collection
     payload = json.dumps({"type": "collection"})
