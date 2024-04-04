@@ -1,7 +1,7 @@
 /* React imports */
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Element, Collection, Chainlink, Content, Header } from "./elementClassDefinitions.js"
+import { Element, Collection, Chainlink, Content, Header, Footer } from "./elementClassDefinitions.js"
 import {
         ChainlinkEditButtons,
         ChainlinkElement,
@@ -35,6 +35,7 @@ let bodyFormIsActive;
 let anyFormIsActive;
 let headerFormIsActive;
 let footerFormIsActive;
+let collectionTitleDefined;
 let cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default, it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
 
 /* Static Variables */
@@ -46,9 +47,19 @@ const formClassNames = ["content-creation-form"];
 
 // These constants define the internal names used to identify different Element types. These should be used to ensure
 // that continuity between the backend names and frontend names is kept.
+
+// Content refers to Elements that are instantiated and exist inside a Chainlink
 const contentTypes = ["paragraph", "code", "linebreak", "header3"];
+
+// Chainlink refers to the Chainlink Element
 const chainlinkTypes = ["chainlink"];
+
+// Header Elements appear above all Chainlink Elements in their own section. An example of a header Element would be
+// The Title which is special in that there can be only one defined per Collection.
 const headerTypes = ["header"];
+
+// Footer Elements appear at the bottom of the Collection and typically contain boilerplate text (like a list of links)
+// along with clarifying "footnotes" that explain features of the Collection.
 const footerTypes = ["footer"];
 
 
@@ -164,6 +175,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
         };
 
+        collectionTitleDefined = {
+                get value() {
+                        return (document.querySelector("#header-display h1") !== null);
+                }
+        }
 
         /* Javascript objects with setters that alter contents of the page when called */
 
@@ -334,8 +350,9 @@ export function refresh() {
         // group should be enabled or disabled. The first bit is for the header buttons.
         let editButtonsBitmask = "";
 
-        // Determine if the header edit buttons should be disabled or not
-        if (anyFormIsActive.value) {
+        // Determine if the header edit buttons should be disabled or not.
+        console.log(collectionTitleDefined.value)
+        if (anyFormIsActive.value || collectionTitleDefined.value) {
                 editButtonsBitmask += "0";
         } else {
                 editButtonsBitmask += "1";
@@ -446,7 +463,17 @@ function instantiateElement(element, index, children) {
                 const container = document.createElement("h1");
                 const root = createRoot(container);
                 container.className = "header-element-wrapper";
-                container.id = (element.url).toString() + " doc-title";
+                container.id = (element.url).toString() + " collection-title";
+                container.innerText = element.text;
+                parentElement.appendChild(container);
+                refresh();
+        // Handle the case where the user is trying to instantiate a footer element
+        } else if (footerTypes.includes(element.type)) {
+                const parentElement = document.getElementById("footer-elements");
+                const container = document.createElement("p");
+                const root = createRoot(container);
+                container.className = "footer-element-wrapper";
+                container.id = (element.url).toString() + " collection-footer";
                 container.innerText = element.text;
                 parentElement.appendChild(container);
                 refresh();
@@ -567,6 +594,7 @@ export function makeForm(type) {
                 header.appendChild(container);
         }
 
+        // Identify if this is an Element that will be placed in the footer section.
         else if (footerTypes.includes(type)) {
                 const footer = document.getElementById("footer-elements");
                 container.id = "footer-creation-form";
@@ -583,6 +611,8 @@ export function makeForm(type) {
                         element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
                 } else if (headerTypes.includes(type)) {
                         element = new Header(type, input.value, collectionUrl.value);
+                } else if (footerTypes.includes(type)) {
+                        element = new Footer(type, input.value, collectionUrl.value);
                 }
                 window.addEventListener("keydown", parseKeyDown);
                 addElement(element);
@@ -842,7 +872,7 @@ export function deleteContent(target) {
 
 export function renameDoc() {
 
-        const header = document.getElementById('doc-title');
+        const header = document.getElementById('collection-title');
         const wrapper = document.getElementById('header-display');
         const title = header.innerHTML;
 

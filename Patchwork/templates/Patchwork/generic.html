@@ -8,9 +8,9 @@
 <nav id="tabbed-buttons">
     {% for collection in collections %}
         {% if collection.header.text != "" %}
-	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">{{ collection.header.text }}</button>
+            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.header.text }}</a>
         {% else %}
-            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</button>
+            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
         {% endif %}
     {% endfor %}
 </nav>
@@ -56,7 +56,7 @@
     <div id="header-display">
         <div id="header-elements">
             {% if header %}
-                <h1 class="header-element-wrapper" id="{{ collection.url }} doc-title">{{ header.text }}</h1>
+                <h1 class="header-element-wrapper" id="{{ collection.url }} collection-title">{{ header.text }}</h1>
             {% else %}
                 <div id="missing-header" class="no-elements">&ltHEADER CONTENT MISSING&gt</div>
             {% endif %}
@@ -119,8 +119,8 @@
     <hr />
     <div id="footer-display">
         <div id="footer-elements">
-            {% if header %}
-                <h1 id="doc-footer" class="footer-element-wrapper">{{ footer.text }}</h1>
+            {% if footer %}
+                <p id="doc-footer" class="footer-element-wrapper">{{ footer.text }}</p>
             {% else %}
                 <div id="missing-footer" class="no-elements">&ltFOOTER CONTENT MISSING&gt</div>
             {% endif %}

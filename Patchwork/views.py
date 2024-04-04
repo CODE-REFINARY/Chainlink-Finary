@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Collection, Content, TagType, Account, Header
+from .models import Chainlink, Collection, Content, TagType, Account, Header, Footer
 
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
@@ -139,6 +139,14 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         header.collection = collection
         header.text = db_try_title(Header, json_data["text"])
         header.save()
+
+    # If the user is attempting to create a new Footer Element...
+    elif tag == TagType.FOOTER:
+        collection = Collection.objects.get(url=parent)
+        footer = Footer()
+        footer.collection = collection
+        footer.text = json_data["text"]
+        footer.save()
 
     return json.dumps(json_data)
 

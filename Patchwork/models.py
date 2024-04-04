@@ -13,6 +13,7 @@ class TagType(models.TextChoices):  # Define available tag that text can be wrap
     LINEBREAK = 'linebreak', _('linebreak')  # insert <br>
     COLLECTION = "collection"
     CONTENT = "text"
+    FOOTER = "footer"
 
 
 class Collection(models.Model):
