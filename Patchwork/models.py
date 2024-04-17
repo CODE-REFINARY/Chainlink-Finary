@@ -1,19 +1,26 @@
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 
-
-class TagType(models.TextChoices):  # Define available tag that text can be wrapped in
-    HEADER1 = 'header',  # define a fence type
-    CHAINLINK = "chainlink"  # define new chainlink, wrap in <section> and create <h2>
-    PARAGRAPH = 'paragraph', _('paragraph')  # wrap text in <p>
-    CODE = 'code', _('code')  # wrap text in <code>
-    HEADER3 = 'header3', _('header3')  # wrap text in <h3>
-    LINEBREAK = 'linebreak', _('linebreak')  # insert <br>
+# Conceptually the "tags" defined here are what are referred to as "Elements" elsewhere. Element is a fairly broad
+# term but really refers to the components of a Collection. The Collection itself is an Element and so are the
+# various building blocks of that Collection including <code> sections, <h1> sections, linebreaks, and so on. These
+# are all identified via a model field that connects them to an entry from this class. What's happening here is the
+# strings that are passed in to views.py via front-end AJAX requests are matched against this list and this match
+# is used to identify and assign a type to the new Element that the AJAX request is seeking to create and instantiate.
+# For example, the user dispatches an AJAX request with a "chainlink" in the payload which specifies that the created
+# database element should be a TagType.CHAINLINK.
+class TagType(models.TextChoices):
+    HEADER1 = "header"
+    CHAINLINK = "CL"
+    PARAGRAPH = "P"
+    CODE = "CODE"
+    HEADER3 = "H3"
+    LINEBREAK = "BR"
     COLLECTION = "collection"
     CONTENT = "text"
     FOOTER = "footer"
+    FOOTERNOTE = "fn"
 
 
 class Collection(models.Model):

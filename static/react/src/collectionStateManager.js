@@ -49,10 +49,10 @@ const formClassNames = ["content-creation-form"];
 // that continuity between the backend names and frontend names is kept.
 
 // Content refers to Elements that are instantiated and exist inside a Chainlink
-const contentTypes = ["paragraph", "code", "linebreak", "header3"];
+const contentTypes = ["P", "CODE", "BR", "H3"];
 
 // Chainlink refers to the Chainlink Element
-const chainlinkTypes = ["chainlink"];
+const chainlinkTypes = ["CL"];
 
 // Header Elements appear above all Chainlink Elements in their own section. An example of a header Element would be
 // The Title which is special in that there can be only one defined per Collection.
@@ -564,21 +564,21 @@ export function makeForm(type) {
                 order = getMatchedChildren(chainlink, contentElementClassNames).length;
                 url = getUrlFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id'));
 
-                if (type === "header3") {
+                if (type === "H3") {
                         container.id = "content-creation-form";
                         root.render(<ElementCreationForm placeholder="enter header content"/>);
                         chainlink.appendChild(container);
-                } else if (type === "paragraph") {
+                } else if (type === "P") {
                         container.id = "content-creation-form";
                         root.render(<ElementCreationForm placeholder="enter paragraph content"/>);
                         chainlink.appendChild(container);
-                } else if (type === "code") {
+                } else if (type === "CODE") {
                         container.id = "content-creation-form";
                         root.render(<ElementCreationForm placeholder="enter code block"/>);
                         chainlink.appendChild(container);
-                } else if (type === 'linebreak') {
+                } else if (type === 'BR') {
                         container.id = "content-creation-form";
-                        element = new Content("linebreak", "N/A", url, currentDateTime, isPublic, count, order);
+                        element = new Content("BR", "N/A", url, currentDateTime, isPublic, count, order);
                         addElement(element);
                         window.addEventListener("keydown", parseKeyDown);
                         window.removeEventListener("keydown", _listener);
@@ -606,7 +606,7 @@ export function makeForm(type) {
                 let input = document.getElementById("input")
                 event.preventDefault();
                 if (chainlinkTypes.includes(type)) {
-                        element = new Chainlink("chainlink", input.value, url, currentDateTime, isPublic, count, order);
+                        element = new Chainlink("CL", input.value, url, currentDateTime, isPublic, count, order);
                 } else if (contentTypes.includes(type)) {
                         element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
                 } else if (headerTypes.includes(type)) {
@@ -730,23 +730,23 @@ export function parseKeyDown(e) {
                         break;
                 case "p":
                         e.preventDefault();
-                        makeForm('paragraph');
+                        makeForm('P');
                         break;
                 case "c":
                         e.preventDefault();
-                        makeForm('code');
+                        makeForm('CODE');
                         break;
                 case "n":
                         e.preventDefault();
-                        makeForm('chainlink');
+                        makeForm('CL');
                         break;
                 case "h":
                         e.preventDefault();
-                        makeForm('header3');
+                        makeForm('H3');
                         break;
                 case "b":
                         e.preventDefault();
-                        makeForm('linebreak');
+                        makeForm('BR');
                         break;
         }
 }
@@ -771,6 +771,7 @@ export function instantiateEditButtons() {
                 container.className = "chainlink-buttons-wrapper";
                 wrappers[i].appendChild(container);
                 root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
+                console.log(elementsEditButtonEventHandlers)
         }
 
         var numContents = document.getElementsByClassName("content-wrapper").length;
@@ -840,7 +841,7 @@ export function deleteChainlink(target) {
         let xhr = new XMLHttpRequest();
         xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.setRequestHeader('type', 'chainlink');
+        xhr.setRequestHeader('type', 'CL');
         xhr.setRequestHeader('target', target);
         xhr.send();
         xhr.onreadystatechange = function() {
@@ -930,7 +931,7 @@ export function editChainlink(target) {
         const order = chainlink.index;
         // The frontIndex specifies the index of this Chainlink as rendered on the page.
         const frontIndex = parseInt(chainlink.getAttribute("index"));
-        const element = new Chainlink("chainlink", title, url, null, true, 0, order);
+        const element = new Chainlink("CL", title, url, null, true, 0, order);
         const _listener = function (e) {
                 escape(e, _listener, "", element)
         };
@@ -964,7 +965,7 @@ export function editChainlink(target) {
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'chainlink');
+                xhr.setRequestHeader('type', 'CL');
                 xhr.setRequestHeader("text", event.target.input.value);
                 xhr.setRequestHeader('target', target);
                 xhr.send();

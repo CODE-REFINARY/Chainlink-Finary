@@ -26,7 +26,7 @@ export function CreateBodyEditButtons(props) {
 
     if (props.bitmask[0] === "1") {
                 chainlinkButton = (
-                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm("chainlink")}>&lt;n&gt; chainlink</button>
+                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm("CL")}>&lt;n&gt; chainlink</button>
                 );
 
     } else if (props.bitmask[0] === "0") {
@@ -38,10 +38,10 @@ export function CreateBodyEditButtons(props) {
     if (props.bitmask[1] === "1") {
                 restOfButtons = (
                         <React.Fragment>
-                                <button id="add-p-btn" className="add-buttons" onClick={() => makeForm('paragraph')}>&lt;p&gt; paragraph</button>
-                                <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('header3')}>&lt;h&gt; header</button>
-                                <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('code')}>&lt;c&gt; code</button>
-                                <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('linebreak')}>&lt;b&gt; linebreak</button>
+                                <button id="add-p-btn" className="add-buttons" onClick={() => makeForm("P")}>&lt;p&gt; paragraph</button>
+                                <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
+                                <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code</button>
+                                <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak</button>
                                 <button className="add-buttons">&lt;inactive&gt; img</button>
                                 <button className="add-buttons">&lt;inactive&gt; ul</button>
                                 <button className="add-buttons">&lt;inactive&gt; ol</button>
@@ -175,11 +175,11 @@ export function ElementCreationForm(props) {
                 <form id="crud-form">
                         <input autoFocus type="text" id="input" placeholder={props.placeholder} defaultValue={props.value}/>
                         <select id="element-creation-select" name="element">
-                                <option value="chainlink">chainlink</option>
+                                <option value="CL">chainlink</option>
                                 <option value="header">header</option>
-                                <option value="paragraph">paragraph</option>
-                                <option value="code">code</option>
-                                <option value="linebreak">linebreak</option>
+                                <option value="P">paragraph</option>
+                                <option value="CODE">code</option>
+                                <option value="BR">linebreak</option>
                                 <option value="unordered list">unordered list</option>
                                 <option value="ordered list">ordered list</option>
                         </select>
@@ -207,7 +207,7 @@ export function ChainlinkElement(props) {
 
         return (
                 <React.Fragment>
-                        <div id={props.url} className="chainlink-wrapper" tag="chainlink">
+                        <div id={props.url} className="chainlink-wrapper" tag="CL">
                                 <h2>
                                         <span className="chainlink-order">{"#" + getOrderFromId(props.url).toString()}</span>
                                         <span className="chainlink-inner-content">
@@ -232,13 +232,13 @@ export function ContentElement(props) {
         }, []);
 
         let Tag;
-        if (props.type === 'header3') {
+        if (props.type === 'H3') {
                 Tag = 'h3';
-        } else if (props.type === 'code') {
+        } else if (props.type === 'CODE') {
                 Tag = 'code';
-        } else if (props.type === 'paragraph') {
+        } else if (props.type === 'P') {
                 Tag = 'p';
-        } else if (props.type === 'linebreak') {
+        } else if (props.type === 'BR') {
                 Tag = 'br';
         } else {
                 Tag = 'div';

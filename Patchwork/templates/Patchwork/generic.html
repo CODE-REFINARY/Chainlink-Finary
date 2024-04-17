@@ -82,20 +82,20 @@
                         </h2>
                     </div>
                     {% for content in chainlink.1 %}
-                        {% if content.tag == 'paragraph' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="paragraph">
+                        {% if content.tag == "P" %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="P">
                             <p class="inner-content">{{ content.text }}</p>
                         </div>
-                        {% elif content.tag == 'code' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="code">
+                        {% elif content.tag == 'CODE' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="CODE">
                             <code class="inner-content">{{ content.text }}</code>
                         </div>
-                        {% elif content.tag == 'header3' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="header3">
+                        {% elif content.tag == 'H3' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="H3">
                             <h3 class="inner-content">{{ content.text }}</h3>
                         </div>
-                        {% elif content.tag == 'linebreak' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="linebreak">
+                        {% elif content.tag == 'BR' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="BR">
                             <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
                         </div>
                         {% elif content.tag == 'delimiter' %}
