@@ -74,12 +74,12 @@ export function CreateHeaderEditButtons(props) {
 
     if (props.bitmask[0] === "1") {
                 headerButton = (
-                        <button id="add-h-btn" className="add-buttons" onClick={() => makeForm("header")}>header</button>
+                        <button id="add-h1-btn" className="add-buttons" onClick={() => makeForm("H1")}>Title</button>
                 );
 
     } else if (props.bitmask[0] === "0") {
                 headerButton = (
-                        <button className="inactive-add-buttons">header</button>
+                        <button className="inactive-add-buttons">Title</button>
                 );
     }
 
@@ -95,12 +95,20 @@ export function CreateFooterEditButtons(props) {
 
     if (props.bitmask[0] === "1") {
                 footerButton = (
-                        <button id="add-f-btn" className="add-buttons" onClick={() => makeForm("footer")}>footer</button>
+                    <React.Fragment>
+                        <button id="add-en-btn" className="add-buttons" onClick={() => makeForm("EN")}>Endnote</button>
+                        <button id="add-rl-btn" className="add-buttons" onClick={() => makeForm("RL")}>Reference List</button>
+                        <button id="add-ll-btn" className="add-buttons" onClick={() => makeForm("LL")}>Link List</button>
+                    </React.Fragment>
                 );
 
     } else if (props.bitmask[0] === "0") {
                 footerButton = (
-                        <button className="inactive-add-buttons">footer</button>
+                    <React.Fragment>
+                        <button className="inactive-add-buttons">Endnote</button>
+                        <button className="inactive-add-buttons">Reference List</button>
+                        <button className="inactive-add-buttons">Link List</button>
+                    </React.Fragment>
                 );
     }
 
@@ -176,7 +184,7 @@ export function ElementCreationForm(props) {
                         <input autoFocus type="text" id="input" placeholder={props.placeholder} defaultValue={props.value}/>
                         <select id="element-creation-select" name="element">
                                 <option value="CL">chainlink</option>
-                                <option value="header">header</option>
+                                <option value="H1">header</option>
                                 <option value="P">paragraph</option>
                                 <option value="CODE">code</option>
                                 <option value="BR">linebreak</option>

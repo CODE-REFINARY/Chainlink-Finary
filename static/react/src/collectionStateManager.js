@@ -56,11 +56,11 @@ const chainlinkTypes = ["CL"];
 
 // Header Elements appear above all Chainlink Elements in their own section. An example of a header Element would be
 // The Title which is special in that there can be only one defined per Collection.
-const headerTypes = ["header"];
+const headerTypes = ["H1"];
 
 // Footer Elements appear at the bottom of the Collection and typically contain boilerplate text (like a list of links)
-// along with clarifying "footnotes" that explain features of the Collection.
-const footerTypes = ["footer"];
+// along with clarifying "endnotes" that explain features of the Collection.
+const footerTypes = ["EN", "LL", "RL"];
 
 
 // Set up state variables after DOM is ready to be read
@@ -596,10 +596,12 @@ export function makeForm(type) {
 
         // Identify if this is an Element that will be placed in the footer section.
         else if (footerTypes.includes(type)) {
-                const footer = document.getElementById("footer-elements");
-                container.id = "footer-creation-form";
-                root.render(<ElementCreationForm placeholder="enter footer content"/>);
-                footer.appendChild(container);
+                if (type === "EN") {
+                        const footer = document.getElementById("footer-elements");
+                        container.id = "footer-creation-form";
+                        root.render(<ElementCreationForm placeholder="enter footer content"/>);
+                        footer.appendChild(container);
+                }
         }
 
         container.addEventListener("submit", function(event) {

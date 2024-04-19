@@ -11,16 +11,18 @@ from django.contrib.auth.models import User
 # For example, the user dispatches an AJAX request with a "chainlink" in the payload which specifies that the created
 # database element should be a TagType.CHAINLINK.
 class TagType(models.TextChoices):
-    HEADER1 = "header"
-    CHAINLINK = "CL"
+    HEADER1 = "H1"      # The H1 appears as a title to a Collection. It is the name of the Collection and is prominently displayed as the H1 HTML element should be.
+    CHAINLINK = "CL"    # The Chainlink is similar to an HTML <h2>.
     PARAGRAPH = "P"
     CODE = "CODE"
     HEADER3 = "H3"
     LINEBREAK = "BR"
     COLLECTION = "collection"
-    CONTENT = "text"
+    CONTENT = "content"
     FOOTER = "footer"
-    FOOTERNOTE = "fn"
+    REFERENCE_LIST = "RL"   # The References List has the same role as the "References" section that you can find on Wikipedia articles.
+    LINK_LIST = "LL"    # The Link List is an unordered list of links that appears in the footer area
+    ENDNOTE = "EN"  # Endnotes are paragraphs that appear in the footer
 
 
 class Collection(models.Model):
@@ -28,6 +30,9 @@ class Collection(models.Model):
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this collection
     url = models.CharField(max_length=75)  # relative url for this collection
+    title = models.ForeignKey("Header", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")     # This
+    # is a link to the Header object that's acting as the title for this Collection. There can only be one Header object
+    # that is a title but there can be multiple Header objects associated with this Collection.
 
     def __str__(self):
         return "Collection Url= " + self.url[:10]
@@ -53,7 +58,7 @@ class Content(models.Model):
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE,
                                   null=True)  # identifer for which chainlink this text is for
     tag = models.CharField(  # specify tag to wrap text in
-        max_length=10,
+        max_length=100,
         choices=TagType.choices,
         default=TagType.PARAGRAPH,
     )
@@ -69,9 +74,12 @@ class Content(models.Model):
 
 
 class Header(models.Model):
-    collection = models.OneToOneField(Collection, on_delete=models.CASCADE,
-                                      null=False)  # identifier for which collection this chainlink belongs
-    tag = TagType.HEADER1
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
+    tag = models.CharField(
+        max_length=100,
+        choices=TagType.choices,
+        default=TagType.PARAGRAPH,
+    )
     text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
 
     def __str__(self):
@@ -79,10 +87,13 @@ class Header(models.Model):
 
 
 class Footer(models.Model):
-    collection = models.OneToOneField(Collection, on_delete=models.CASCADE,
-                                      null=False)  # identifier for which collection this chainlink belongs
-    tag = TagType.HEADER1
-    text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
+    tag = models.CharField(
+        max_length=100,
+        choices=TagType.choices,
+        default=TagType.PARAGRAPH,
+    )
+    text = models.CharField(max_length=10000)
 
     def __str__(self):
         return self.text

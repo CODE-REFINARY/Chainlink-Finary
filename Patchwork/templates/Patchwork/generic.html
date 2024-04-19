@@ -7,8 +7,8 @@
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 <nav id="tabbed-buttons">
     {% for collection in collections %}
-        {% if collection.header.text != "" %}
-            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.header.text }}</a>
+        {% if collection.title %}
+            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
         {% else %}
             <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
         {% endif %}

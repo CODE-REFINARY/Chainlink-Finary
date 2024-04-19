@@ -138,7 +138,9 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         header = Header()
         header.collection = collection
         header.text = db_try_title(Header, json_data["text"])
+        collection.title = header
         header.save()
+        collection.save()
 
     # If the user is attempting to create a new Footer Element...
     elif tag == TagType.FOOTER:
@@ -148,6 +150,17 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         footer.text = json_data["text"]
         footer.save()
 
+    elif tag == TagType.ENDNOTE:
+        endnote = Header()
+        endnote.collection = Collection.objects.get(url=parent)
+        endnote.tag = tag
+        endnote.text = json_data["text"]
+        endnote.save()
+
+    # Return the JSON payload back to be sent as an HTTP response back to the user. We do this so that we can
+    # communicate to the front-end any adjustments or system updates pertinent to the user's request back to them
+    # (for example send back the url we construct for their collection so that the front-end can redirect their browser
+    # to this new url).
     return json.dumps(json_data)
 
 
@@ -299,6 +312,7 @@ def generic(request, key=""):
             footer = None
 
         collections = Collection.objects.all()
+        collection_titles = Header.objects.all()
 
         # Chainlink and Content data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
@@ -313,6 +327,7 @@ def generic(request, key=""):
             chainlinks.append((chainlink, contents))
 
         return render(request, "Patchwork/generic.html", {
+            "collection_titles": collection_titles,
             "collections": collections,
             "chainlinks": chainlinks,
             "collection": collection,
@@ -332,24 +347,26 @@ def generic(request, key=""):
 
     elif request.method == "DELETE":
         target_id = request.headers["target"]
-        match request.headers["type"]:
-            case "collection":
+        Tag = TagType(request.headers["type"])
+        match Tag:
+            case TagType.COLLECTION:
                 db_remove(Collection, key, None)
-            case "chainlink":
+            case TagType.CHAINLINK:
                 db_remove(Chainlink, get_url_from_id(target_id), get_order_from_id(target_id))
-            case "content":
+            case TagType.CONTENT:
                 db_remove(Content, get_url_from_id(target_id), get_order_from_id(target_id))
 
 
     elif request.method == "PUT":
         target_id = request.headers["target"]
         target_update = request.headers["text"]
-        match request.headers["type"]:
-            case "collection":
+        Tag = TagType(request.headers["type"])
+        match Tag:
+            case TagType.COLLECTION:
                 db_update(Collection, key, None, target_update)
-            case "chainlink":
+            case TagType.CHAINLINK:
                 db_update(Chainlink, get_url_from_id(target_id), None, target_update)
-            case "content":
+            case TagType.CONTENT:
                 db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_update)
 
     return render(request, "Patchwork/index.html", {})
