@@ -70,7 +70,12 @@ class Content(models.Model):
     public = models.BooleanField(default=True)
 
     def __str__(self):
-        return str(self.order) + " " + self.chainlink.text + " - " + self.tag
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        return returnme
 
 
 class Header(models.Model):
@@ -80,6 +85,7 @@ class Header(models.Model):
         choices=TagType.choices,
         default=TagType.PARAGRAPH,
     )
+    order = models.BigIntegerField(default=0)
     text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
 
     def __str__(self):
@@ -94,7 +100,7 @@ class Footer(models.Model):
         default=TagType.PARAGRAPH,
     )
     text = models.CharField(max_length=10000)
-
+    order = models.BigIntegerField(default=0)
     def __str__(self):
         return self.text
 
