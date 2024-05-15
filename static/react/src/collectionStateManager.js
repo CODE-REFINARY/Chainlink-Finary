@@ -463,7 +463,7 @@ function instantiateElement(element, index, children) {
                 const container = document.createElement("h1");
                 const root = createRoot(container);
                 container.className = "header-element-wrapper";
-                container.id = (element.url).toString() + " collection-title";
+                container.id = "collection-title";
                 container.innerText = element.text;
                 parentElement.appendChild(container);
                 refresh();

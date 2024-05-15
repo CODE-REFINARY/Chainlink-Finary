@@ -1,3 +1,45 @@
+/* patchwork is a theme. The user can select this theme if they wish for a front-end that replicates the feel of old static websites
+ */
+
+
+/*  */
+#collection-title {
+	font-family: Audiowide;
+	font-weight: 100;
+	background-color: #334756;
+	text-align: center;
+	color: whitesmoke;
+	font-size: xx-large;
+	padding: 10px;
+}
+
+.index-title {
+	font-family: Audiowide;
+	font-weight: 100;
+    text-align: center;
+}
+
+
+/* chainlink header styling */
+.chainlink-wrapper h2 {
+	font-family: Audiowide;
+	font-weight: 100;
+	font-size: x-large;
+	color: whitesmoke;
+	display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    background-color: #334756;
+    padding: 7px;
+    border-radius: 12px;
+}
+
+.section-header {
+    font-family: Audiowide;
+}
+
 
 /* These are rules for backgrounds that appear behind sections of an article. */
 

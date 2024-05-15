@@ -158,22 +158,6 @@ header h1 {
     padding: 10px;
 }
 
-main h1 {
-	font-family: Audiowide;
-	font-weight: 100;
-	background-color: #334756;
-	text-align: center;
-	color: whitesmoke;
-	font-size: xx-large;
-	padding: 10px;
-}
-
-h2 {
-	font-family: Audiowide;
-	font-weight: 100;
-	font-size: x-large;
-	color: whitesmoke;
-}
 
 /* Construction Banner */
 h6.under-construction {
@@ -350,16 +334,6 @@ div.combination {
 
 .content-wrapper {}
 .chainlink-wrapper {}
-.chainlink-wrapper h2 {
-	display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    background-color: #334756;
-    padding: 7px;
-    border-radius: 12px;
-}
 .chainlink-wrapper:hover .chainlink-buttons-wrapper {
     display: block;
 }
