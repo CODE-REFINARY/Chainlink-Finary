@@ -121,6 +121,35 @@
 
 /* /////////////// General Styling /////////////// */
 
+
+
+
+/* ////////////////////////// INDEX PAGE STUFF BEGIN ////////////////////////// */
+
+
+/* These are h2 elements that appear on the index page */
+.section-header {
+
+}
+
+
+/* This is the h1 element that appears on the index page */
+.index-title {
+    text-align: center;
+}
+
+/* These are body paragraphs that appear on the index page. */
+.index-paragraph {
+	margin-top: 0.3rem;
+	margin-bottom: 0.3rem;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+
+/* ////////////////////////// INDEX PAGE STUFF END ////////////////////////// */
+
+
 body {
     background-image: url('../images/groove-minimal-lengthy.jpg');
     background-repeat: y-repeat;
@@ -137,11 +166,6 @@ main {
 	-padding-bottom: 1.3rem;
 	-padding-top: 0.3cm;
 	-padding-bottom: 1cm;
-}
-
-p {
-	color: #f5f5f5;
-	background-color: #2C394B;
 }
 
 a:active {
