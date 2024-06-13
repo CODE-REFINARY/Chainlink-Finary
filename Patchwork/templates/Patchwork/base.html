@@ -20,6 +20,14 @@
             var mediaCounter = 0;
             const imgFolder = "{% static 'images/' %}";
         </script>
+    {% if not user.is_authenticated %}
+        <!-- If the user isn't authenticated then we want to remove the edit buttons-->
+        <style>
+            .cont-edit-btn, .cont-del-btn, .cl-del-btn, .cl-edit-btn {
+                display: none;
+            }
+        </style>
+    {% endif %}
         {% block header %}
         {% endblock %}
 

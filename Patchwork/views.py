@@ -62,7 +62,6 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         articleCount = Chainlink.objects.filter(collection=collection).count()
         # chainlink order starts at 0
         cl.order = articleCount
-        articleCount += 1
         cl.collection = collection
         cl.text = db_try_title(Chainlink, json_data["text"])
         cl.url = db_try_url(TagType.CHAINLINK)
@@ -138,22 +137,17 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         header = Header()
         header.collection = collection
         header.text = db_try_title(Header, json_data["text"])
+        # Any Collection can have a maximum of one HEADER1. This Collection field makes it easy to determine its title.
         collection.title = header
         header.save()
         collection.save()
 
-    # If the user is attempting to create a new Footer Element...
-    elif tag == TagType.FOOTER:
-        collection = Collection.objects.get(url=parent)
-        footer = Footer()
-        footer.collection = collection
-        footer.text = json_data["text"]
-        footer.save()
-
     elif tag == TagType.ENDNOTE:
-        endnote = Header()
+        endnote = Footer()
         endnote.collection = Collection.objects.get(url=parent)
-        endnote.tag = tag
+        footerCount = Footer.objects.filter(collection=endnote.collection).count()
+        endnote.order = footerCount
+        endnote.tag = TagType.ENDNOTE
         endnote.text = json_data["text"]
         endnote.save()
 
@@ -305,19 +299,12 @@ def generic(request, key=""):
         else:
             header = None
 
-        # Do the same for the footer.
-        if hasattr(collection, "footer"):
-            footer = collection.footer
-        else:
-            footer = None
-
         collections = Collection.objects.all()
         collection_titles = Header.objects.all()
 
         # Chainlink and Content data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
         chainlinks = []
-
         # Populate the above list with tuples of the specified form by first getting the list of all Chainlinks that
         # are attached to this Article.
         for chainlink in Chainlink.objects.filter(collection=collection.pk).order_by("order"):
@@ -326,13 +313,17 @@ def generic(request, key=""):
                 contents.append(content)
             chainlinks.append((chainlink, contents))
 
+        footers = []
+        for footer in Footer.objects.filter(collection=collection.pk).order_by("order"):
+            footers.append(footer)
+
         return render(request, "Patchwork/generic.html", {
             "collection_titles": collection_titles,
             "collections": collections,
             "chainlinks": chainlinks,
             "collection": collection,
             "header": header,
-            "footer": footer
+            "footers": footers
         })
 
     elif request.method == "POST":

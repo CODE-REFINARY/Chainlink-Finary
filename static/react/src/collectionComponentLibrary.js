@@ -126,6 +126,7 @@ export function FenceEditButtons() {
         return (
                 <React.Fragment>
                         <i className="context-span-message">context action &lt; - - - - - -</i>
+                        <button className="doc-action-copy-title">copy</button>
                         <button id="doc-action-edit-title" onClick={ elementsEditButtonEventHandlers[0][0] }>edit</button>
                         <button id="doc-action-delete-title" onClick={ elementsEditButtonEventHandlers[0][1] }>delete</button>
                 </React.Fragment>
@@ -139,6 +140,7 @@ export function ChainlinkEditButtons(props) {
         return (
                 <React.Fragment>
                         <i className="context-span-message">context action &lt; - - - - - -</i>
+                        <button className="doc-action-copy-title">copy</button>
                         <button className="cl-edit-btn" target={props.wrappers[props.i].id} onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0] }>edit</button>
                         <button className="cl-del-btn" target={props.wrappers[props.i].id} onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1] }>delete</button>
                 </React.Fragment>
@@ -152,6 +154,7 @@ export function ContentEditButtons(props) {
         return (
                 <React.Fragment>
                         <i className="context-span-message">context action &lt; - - - - - -</i>
+                        <button className="doc-action-copy-title">copy</button>
                         <button className="cont-edit-btn" target={ props.wrappers[props.i].id } onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0] }>edit</button>
                         <button className="cont-del-btn" target={ props.wrappers[props.i].id } onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1] }>delete</button>
                 </React.Fragment>
@@ -260,6 +263,7 @@ export function ContentElement(props) {
                                 </span>
                                 <div className="context-buttons-wrapper">
                                         <i className="context-span-message">context action &lt; - - - - - - </i>
+                                        <button className="cont-copy-btn">copy</button>
                                         <button className="cont-edit-btn">edit</button>
                                         <button className="cont-del-btn">delete</button>
                                 </div>
@@ -274,6 +278,7 @@ export function ContentElement(props) {
                                 </Tag>
                                 <div className="context-buttons-wrapper">
                                         <i className="context-span-message">context action &lt; - - - - - - </i>
+                                        <button className="cont-copy-btn">copy</button>
                                         <button className="cont-edit-btn">edit</button>
                                         <button className="cont-del-btn">delete</button>
                                 </div>

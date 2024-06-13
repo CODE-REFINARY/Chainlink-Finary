@@ -32,7 +32,7 @@
         <ul id="chainlink-manifest-entries">
             {% if chainlinks %}
                 {% for chainlink in chainlinks %}
-                    <li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.text }}</a></li>
+                    <li><a class="inline-url" href="#chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}">>>>{{ chainlink.0.text }}</a></li>
                 {% endfor %}
             {% else %}
                 <li><i>&#60;list empty&#62;</i></li>
@@ -56,15 +56,15 @@
     <div id="header-display">
         <div id="header-elements">
             {% if collection.title %}
-                <h1 class="header-element-wrapper" id="collection-title">{{ collection.title.text }}</h1>
+                <h1 class="header-element-wrapper" id="collection-title" style="{{ collection.title.css }}">{{ collection.title.text }}</h1>
             {% else %}
                 <div id="missing-header" class="no-elements">&ltHEADER CONTENT MISSING&gt</div>
             {% endif %}
         </div>
-            <div class="element-creation-buttons">
-                <!-- The main header add button is placed under this div -->
-                <div id="header-placeholder"></div>
-            </div>
+                <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
+                    <!-- The main header add button is placed under this div -->
+                    <div id="header-placeholder"></div>
+                </div>
     </div>
     <hr />
     <div id="chainlink-display">
@@ -76,7 +76,7 @@
                     <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
                         <h2>
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
-                            <span class="chainlink-inner-content">{{ chainlink.0.text }}</span>
+                            <span class="chainlink-inner-content" style="{{ chainlink.0.css }}">{{ chainlink.0.text }}</span>
                             <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
                             <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
                         </h2>
@@ -84,19 +84,19 @@
                     {% for content in chainlink.1 %}
                         {% if content.tag == "P" %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="P">
-                            <p class="inner-content">{{ content.text }}</p>
+                            <p class="inner-content" style="{{ content.css }}">{{ content.text }}</p>
                         </div>
                         {% elif content.tag == 'CODE' %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="CODE">
-                            <code class="inner-content">{{ content.text }}</code>
+                            <code class="inner-content" style="{{ content.css }}">{{ content.text }}</code>
                         </div>
                         {% elif content.tag == 'H3' %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="H3">
-                            <h3 class="inner-content">{{ content.text }}</h3>
+                            <h3 class="inner-content" style="{{ content.css }}">{{ content.text }}</h3>
                         </div>
                         {% elif content.tag == 'BR' %}
                         <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="BR">
-                            <span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
+                            <span class="inner-content br" style="{{ content.css }}"><i>&#60;!-- linebreak insert --&#62;</i></span>
                         </div>
                         {% elif content.tag == 'delimiter' %}
                         {% endif %}
@@ -109,7 +109,7 @@
             {% endfor %}
         </div>
         <!-- Elements under the add-buttons element are buttons used to create content on the page -->
-        <div class="element-creation-buttons">
+        <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
             <!-- The chainlink add button is placed under this div -->
             <div id="chainlink-placeholder"></div>
             <!-- All buttons used to create content is stored under this parent div -->
@@ -119,13 +119,15 @@
     <hr />
     <div id="footer-display">
         <div id="footer-elements">
-            {% if footer %}
-                <p id="doc-footer" class="footer-element-wrapper">{{ footer.text }}</p>
+            {% if footers %}
+                {% for footer in footers %}
+                    <p id="doc-footer" class="footer-element-wrapper" style="{{ footer.css }}">{{ footer.text }}</p>
+                {% endfor %}
             {% else %}
                 <div id="missing-footer" class="no-elements">&ltFOOTER CONTENT MISSING&gt</div>
             {% endif %}
         </div>
-        <div class="element-creation-buttons">
+        <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
             <!-- The main footer add button is placed under this div -->
             <div id="footer-placeholder"></div>
         </div>

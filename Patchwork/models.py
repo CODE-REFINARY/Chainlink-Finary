@@ -33,9 +33,15 @@ class Collection(models.Model):
     title = models.ForeignKey("Header", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")     # This
     # is a link to the Header object that's acting as the title for this Collection. There can only be one Header object
     # that is a title but there can be multiple Header objects associated with this Collection.
-
     def __str__(self):
         return "Collection Url= " + self.url[:10]
+    def __str__(self):
+        returnme = ""
+        returnme += "Url: " + "%.10s" % self.url + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
+        returnme += "Title: " + str(self.title.text if self.title else "N/A")
+        return returnme
 
 
 class Chainlink(models.Model):
@@ -49,9 +55,16 @@ class Chainlink(models.Model):
         default=0)  # integer value specifying which order on the collection this chainlink appears
     public = models.BooleanField(default=False)  # Indicate whether this chainlink will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this chainlink. May or may not be visible
-
+    css = models.CharField(max_length=10000, null=False, default="")
     def __str__(self):
-        return self.text
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        return returnme
 
 
 class Content(models.Model):
@@ -68,7 +81,7 @@ class Content(models.Model):
     # such (although the text itself cannot be accessed). Redacted text can be made visible by setting the public
     # flag to True.
     public = models.BooleanField(default=True)
-
+    css = models.CharField(max_length=10000, null=False, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -87,9 +100,14 @@ class Header(models.Model):
     )
     order = models.BigIntegerField(default=0)
     text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
-
+    css = models.CharField(max_length=10000, null=False, default="")
     def __str__(self):
-        return self.text
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        return returnme
 
 
 class Footer(models.Model):
@@ -101,13 +119,18 @@ class Footer(models.Model):
     )
     text = models.CharField(max_length=10000)
     order = models.BigIntegerField(default=0)
+    css = models.CharField(max_length=10000, null=False, default="")
     def __str__(self):
-        return self.text
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        return returnme
 
 
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     landing_page_url = models.CharField(max_length=128, default="null")
-
     def __str__(self):
         return str(self.user.username)
