@@ -72,26 +72,37 @@
                         </ul>
                     {% else %}
                         <ul>
-                            <li class="activated-action-list-element"><form action="/login.html" method="post">
-                                {% csrf_token %}
-                                <input type="submit" value="Log In">
-                                <label for="username">Username:</label>
-                                <input type="text" id="username" name="username" required>
-                                <label for="password">Password:</label>
-                                <input type="password" id="password" name="password" required>
-                                {% if request.GET.logout_successful == "true" %}
-                                    <span style="color: green; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">logout success</span>
-                                {% endif %}
-                                {% if request.GET.login_successful == "false" %}
-                                    <span style="color: red; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">login failure</span>
-                                {% endif %}
-                                <span class="help-text">(enter credentials to log in)</span>
-                            </form></li>
+                            <li class="activated-action-list-element">
+                                <form action="/login.html" method="post">
+                                    {% csrf_token %}
+                                    <input type="submit" value="Log In">
+                                    <label for="username">Username:</label>
+                                    <input type="text" id="username" name="username" required>
+                                    <label for="password">Password:</label>
+                                    <input type="password" id="password" name="password" required>
+                                    {% if request.GET.logout_successful == "true" %}
+                                        <span style="color: green; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">logout success</span>
+                                    {% endif %}
+                                    {% if request.GET.login_successful == "false" %}
+                                        <span style="color: red; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">login failure</span>
+                                    {% endif %}
+                                    <span class="help-text">(enter credentials to log in)</span>
+                                </form>
+                            </li>
                             <li class="deactivated-action-list-element"><form><input type="submit" value="Log Out" disabled><span class="help-text">(you are already logged out)</span></form></li>
                             <li class="deactivated-action-list-element"><form><input type="submit" value="Generate New Collection" disabled><span class="help-text">(log in to create a collection)</span></form></li>
                         </ul>
                     {% endif %}
                 {% endblock %}
+                {% if user.is_authenticated %}
+                    <h2>Edit</h2>
+                    <ul>
+                        <li class="activated-edit-list-element"><button>Share Collection</button></li>
+                        <li class="activated-edit-list-element"><button>Change Theme</button></li>
+                        <li class="activated-edit-list-element"><button>Delete Collection</button></li>
+                    </ul>
+                {% else %}
+                {% endif %}
             </nav>
         </header>
             <main>

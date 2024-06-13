@@ -201,18 +201,19 @@
 /* config display section */
 #config-display {
     padding-top: var(--main-body-inner-content-padding-vertical);
-	padding-bottom: var(--main-body-inner-content-padding-vertical);
-	padding-right: var(--main-body-inner-content-padding-horizontal);
-	padding-left: var(--main-body-inner-content-padding-horizontal);
-    display: flex;
+    padding-bottom: var(--main-body-inner-content-padding-vertical);
+    padding-right: var(--main-body-inner-content-padding-horizontal);
+    padding-left: var(--main-body-inner-content-padding-horizontal);
+    /* display: flex; */
     justify-content: space-evenly;
 }
 #config-display ul {
     display: inline-block;
     vertical-align:top;
-    background-color: #2C394B;
+    /* background-color: #2C394B; */
     list-style-type: none;
-    -width: calc(100% / 3);
+    -
+    width: calc(100% / 3);
     height: min-content;
     border-style: solid;
     border-left-width: 5px;
@@ -224,11 +225,11 @@
 }
 #config-display h2 {
     color: whitesmoke;
-    background-color: #2C394B;
+    /* background-color: #2C394B; */
     font-family: Audiowide;
     font-weight: 100;
-    margin-bottom: 5px;
-    margin-top: 0px;
+    /* margin-bottom: 5px; */
+    /* margin-top: 0px; */
 }
 #chainlink-manifest > li {
     color: whitesmoke;

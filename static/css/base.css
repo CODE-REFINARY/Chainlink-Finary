@@ -511,7 +511,7 @@ div.combination {
 
 /* ////////////// "Actions" List ////////////// */
 
-.activated-action-list-element input[type="submit"] {
+.activated-action-list-element input[type="submit"], .activated-edit-list-element button {
 	font-family: Audiowide;
 	font-weight:bolder;
 	position: static;
