@@ -21,7 +21,9 @@ from decouple import config
 from django.conf import settings    # Get variables defined in settings.py
 
 from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse
+from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
 
 
 class HttpRequestWrapper(HttpRequest):
@@ -287,7 +289,6 @@ def db_generate_url(tag_type):
 def generic(request, key=""):
     if not request.user.is_authenticated:
         pass
-        #return login(request)
 
     if request.method == "GET":
         # Get this collection from the database and return a 404 if it isn"t found
@@ -459,17 +460,50 @@ def login(request):
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
+        referer = request.META.get('HTTP_REFERER', '/')
         if user is not None:
             backend_login(request, user)
-            return index(request)
+            query_params = {'login_successful': 'true'}
         else:
-            return render(request, 'Patchwork/failure.html')
+            query_params = {'login_successful': 'false'}
 
+        # Parse the referer URL
+        url_parts = list(urlparse(referer))
+
+        # Combine the existing query params with the new ones
+        query = dict(parse_qsl(url_parts[4]))
+        query.update(query_params)
+
+        # Update the query part of the URL
+        url_parts[4] = urlencode(query)
+
+        # Construct the new URL
+        new_url = urlunparse(url_parts)
+
+        return HttpResponseRedirect(new_url)
 
 def logout(request):
     if request.method == "POST":
         backend_logout(request)
-        return index(request)
+        referer = request.META.get('HTTP_REFERER', '/')
+
+        # Define your query parameters as a dictionary
+        query_params = {'logout_successful': 'true'}
+
+        # Parse the referer URL
+        url_parts = list(urlparse(referer))
+
+        # Combine the existing query params with the new ones
+        query = dict(parse_qsl(url_parts[4]))
+        query.update(query_params)
+
+        # Update the query part of the URL
+        url_parts[4] = urlencode(query)
+
+        # Construct the new URL
+        new_url = urlunparse(url_parts)
+
+        return HttpResponseRedirect(new_url)
 
 
 def about(request):

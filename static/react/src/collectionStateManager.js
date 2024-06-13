@@ -261,7 +261,8 @@ export function refresh() {
         chainlinkInfo.forEach(function(element) {
                 let listItem = document.createElement("li");
                 let link = document.createElement("a");
-                link.textContent = element[0];
+                link.textContent = ">>>" + element[0];
+                link.setAttribute("class", "inline-url");
                 link.setAttribute("href", "#" + element[1]);
                 listItem.appendChild(link);
                 list.appendChild(listItem);
