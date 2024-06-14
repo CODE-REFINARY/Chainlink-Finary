@@ -293,6 +293,8 @@ def generic(request, key=""):
     if request.method == "GET":
         # Get this collection from the database and return a 404 if it isn"t found
         collection = get_object_or_404(Collection, url=key)
+        if not request.user.is_authenticated and not collection.public:
+            return render(request, "Patchwork/failure.html");
 
         # Get the header record associated with this collection if one exists.
         if hasattr(collection, "header"):
@@ -300,7 +302,12 @@ def generic(request, key=""):
         else:
             header = None
 
-        collections = Collection.objects.all()
+        # If the user is logged in then display all the Collections.
+        if request.user.is_authenticated:
+            collections = Collection.objects.all()
+        else:
+        # Otherwise just display the Collections that are marked public.
+            collections = Collection.objects.filter(public=True)
         collection_titles = Header.objects.all()
 
         # Chainlink and Content data to be passed into the template takes the following form:

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 
 # Conceptually the "tags" defined here are what are referred to as "Elements" elsewhere. Element is a fairly broad
 # term but really refers to the components of a Collection. The Collection itself is an Element and so are the
@@ -25,6 +26,11 @@ class TagType(models.TextChoices):
     ENDNOTE = "EN"  # Endnotes are paragraphs that appear in the footer
 
 
+class Theme(models.TextChoices):
+    PESHAY = "peshay", _("Peshay Studio Set")
+    PATCHWORK = "patchwork", _("Patchwork")
+
+
 class Collection(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key (useful for testing)
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
@@ -33,6 +39,11 @@ class Collection(models.Model):
     title = models.ForeignKey("Header", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")     # This
     # is a link to the Header object that's acting as the title for this Collection. There can only be one Header object
     # that is a title but there can be multiple Header objects associated with this Collection.
+    theme = models.CharField(  # specify tag to wrap text in
+        max_length=100,
+        choices=Theme.choices,
+        default=Theme.PATCHWORK,
+    )
     def __str__(self):
         return "Collection Url= " + self.url[:10]
     def __str__(self):

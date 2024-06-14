@@ -150,11 +150,7 @@
 /* ////////////////////////// INDEX PAGE STUFF END ////////////////////////// */
 
 
-body {
-    background-image: url('../images/groove-minimal-lengthy.jpg');
-    background-repeat: y-repeat;
-	margin: 2% 20% 1% 20%;
-}
+
 
 main {
 	border-radius: 12px;
