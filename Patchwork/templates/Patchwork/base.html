@@ -20,6 +20,14 @@
             var mediaCounter = 0;
             const imgFolder = "{% static 'images/' %}";
         </script>
+    {% if not user.is_authenticated %}
+        <!-- If the user isn't authenticated then we want to remove the edit buttons-->
+        <style>
+            .cont-edit-btn, .cont-del-btn, .cl-del-btn, .cl-edit-btn {
+                display: none;
+            }
+        </style>
+    {% endif %}
         {% block header %}
         {% endblock %}
 
@@ -31,14 +39,70 @@
             <h6 class="under-construction">the patchwork portal is currently under construction</h6>
             <img class="under-construction" src="{% static 'images/under_construction.gif' %}" onclick="window.location.replace('http://textfiles.com/underconstruction/')"/>
             <nav id="upper-navigation">
-                <ul>
-                    <li><a href="index.html">Landing Page</a></li>
-                    <li><a href="#">Sitewide Announcements</a></li>
-                    <li><a href="#">Account Record</a></li>
-                    <li><a href="#">Site Configuration</a></li>
-                    <li><a href="generate.html">Doc Creation</a></li>
-                    <li><a href="#">About</a></li>
-                </ul>
+                <h2>Pages</h2>
+                {% block pages %}
+                    {% if user.is_authenticated %}
+                        <ul>
+                            <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
+                            <li class="activated-page-list-element"><a href="{% url 'profile' %}">My Profile</a></li>
+                            <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
+                        </ul>
+                    {% else %}
+                        <ul>
+                            <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
+                            <li class="deactivated-page-list-element"><a>My Profile<span class="help-text">(log in to view your profile)</span></a></li>
+                            <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
+                        </ul>
+                    {% endif %}
+                {% endblock %}
+                <h2>Actions</h2>
+                {% block actions %}
+                    {% if user.is_authenticated %}
+                        <ul>
+                            <li class="deactivated-action-list-element">
+                                <form>
+                                    <input type="submit" value="Log In" disabled>
+                                {% if request.GET.login_successful == "true" %}
+                                    <span style="color: green; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">login success</span>
+                                {% endif %}
+                                    <span class="help-text">(you are already logged in)</span>
+                                </form></li>
+                            <li class="activated-action-list-element"><form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Log Out"></form></li>
+                            <li class="activated-action-list-element"><form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form></li>
+                        </ul>
+                    {% else %}
+                        <ul>
+                            <li class="activated-action-list-element">
+                                <form action="/login.html" method="post">
+                                    {% csrf_token %}
+                                    <input type="submit" value="Log In">
+                                    <label for="username">Username:</label>
+                                    <input type="text" id="username" name="username" required>
+                                    <label for="password">Password:</label>
+                                    <input type="password" id="password" name="password" required>
+                                    {% if request.GET.logout_successful == "true" %}
+                                        <span style="color: green; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">logout success</span>
+                                    {% endif %}
+                                    {% if request.GET.login_successful == "false" %}
+                                        <span style="color: red; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">login failure</span>
+                                    {% endif %}
+                                    <span class="help-text">(enter credentials to log in)</span>
+                                </form>
+                            </li>
+                            <li class="deactivated-action-list-element"><form><input type="submit" value="Log Out" disabled><span class="help-text">(you are already logged out)</span></form></li>
+                            <li class="deactivated-action-list-element"><form><input type="submit" value="Generate New Collection" disabled><span class="help-text">(log in to create a collection)</span></form></li>
+                        </ul>
+                    {% endif %}
+                {% endblock %}
+                {% if user.is_authenticated %}
+                    <h2>Edit</h2>
+                    <ul>
+                        <li class="activated-edit-list-element"><button>Share Collection</button></li>
+                        <li class="activated-edit-list-element"><button>Change Theme</button></li>
+                        <li class="activated-edit-list-element"><button>Delete Collection</button></li>
+                    </ul>
+                {% else %}
+                {% endif %}
             </nav>
         </header>
             <main>

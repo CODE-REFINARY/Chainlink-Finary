@@ -1,0 +1,33 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+<input type="hidden" id="collection-url" value="{{ collection.url }}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
+<nav id="tabbed-buttons">
+    {% for collection in collections %}
+        {% if collection.header.text != "" %}
+	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">{{ collection.header.text }}</button>
+        {% else %}
+            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</button>
+        {% endif %}
+    {% endfor %}
+</nav>
+<!-- Article content is always displayed in #chainlink-display -->
+<div id="element-display" template="article">
+    <div id="header-display">
+        <div id="header-elements">
+            <h1 class="header-element-wrapper">Logout Success</h1>
+        </div>
+    </div>
+    <hr />
+    <div id="chainlink-display">
+        <div id="chainlink-elements">
+            <p>Your logout was successful. To continue click <a href="{% url 'index' %}">here</a> to go the landing page.</p>
+        </div>
+        <!-- Elements under the add-buttons element are buttons used to create content on the page -->
+    </div>
+</div>
+<!-- This text wraps the bottom of the display area -->
+{% endblock %}

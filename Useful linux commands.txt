@@ -60,11 +60,10 @@ Create Superuser:
 sudo docker compose run web python manage.py createsuperuser --settings=Chainlink.settings.docker
 
 Make Migrations
-sudo docker compose run web python manage.py makemigrations --settings=Chainlink.settings.docker
+sudo docker compose run django python manage.py makemigrations
 
 Migrate
-sudo docker compose run web python manage.py migrate --settings=Chainlink.settings.docker
-<<<<<<< HEAD
+sudo docker compose run django python manage.py migrate
 
 
 

@@ -1,0 +1,27 @@
+{% extends 'Patchwork/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
+<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+<div id="collection-title-wrapper" class="article-wrapper">
+	<h1 id="collection-title">Admin Login</h1>
+</div>
+<div id="chainlink-display">
+    <p>This website is still under construction and is not yet in a state where the actual interesting stuff is
+    accessible to unaffiliated users. In order to view the restricted parts of this website a user account is required.
+    In order to get an account you must contact the site administrator at gdubinin@chainlinkfinary.com. For details
+    on the present and future states of this website see the about page.</p>
+
+    <form action="/login.html" method="post">
+        {% csrf_token %}
+        <p>User Credentials</p>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <input type="submit" value="Login">
+    </form>
+</div>
+{% endblock %}

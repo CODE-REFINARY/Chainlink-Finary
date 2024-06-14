@@ -2,11 +2,11 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
-<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
+<script type="module" src="{% static 'scripts/collectionStateManager.js' %}"></script>
 <script src="{{ REACT_STATIC_ROOT }}/chainlink.js"></script>
 <!--<script type="module">
 
-	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
+	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, addButtonsChainlinkView, createFence } from "{% static 'scripts/collectionStateManager.js' %}";
 
 	document.addEventListener("DOMContentLoaded", function() {
 		// Globals
@@ -48,7 +48,7 @@
 		<li><button id="doc-action-find-references">Find references</button></li>
 	</ul>
 </div>
-<div id="chainlink-display">
+<div id="chainlink-display" template="chainlink">
 	<section class="chainlink">
 		<div id="{{ target.url }}" class="chainlink-wrapper">
 			<h2>
@@ -57,22 +57,22 @@
 			</h2>
 		</div>
 	{% for content in contents %}
-		{% if content.tag == 'paragraph' %}
+		{% if content.tag == "P" %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<p class="inner-content">{{ content.content }}</p>
 
 		</div>
-		{% elif content.tag == 'code' %}
+		{% elif content.tag == 'CODE' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<code class="inner-content">{{ content.content }}</code>
 
 		</div>
-		{% elif content.tag == 'header3' %}
+		{% elif content.tag == 'H3' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<h3 class="inner-content">
 				{{ content.content }}</h3>
 		</div>
-		{% elif content.tag == 'linebreak' %}
+		{% elif content.tag == 'BR' %}
 		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
 			<span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
 		</div>

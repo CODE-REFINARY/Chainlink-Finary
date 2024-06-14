@@ -1,197 +1,135 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
 {% block content %}
+<input type="hidden" id="collection-url" value="{{ collection.url }}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
-<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+{% if collection.theme == "patchwork" %}
+    <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
+{% elif collection.theme == "peshay" %}
+    <link rel="stylesheet" href="{% static 'css/peshay.css' %}">
+{% endif %}
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
-<!--<script type="module" src="{% static 'scripts/chainlink-utilities.js' %}"></script>
-<script type="module">
-
-	import { parseKeyUp, parseKeyDown, addButtonsDocView, addButtonsDocEmptyView, deleteDoc, renameDoc, editChainlink, editContent, instChainlinkEditButtons, instContentEditButtons, instFenceEditButtons, deleteFenceEditButtons, deleteChainlinkEditButtons, deleteContentEditButtons, createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
-
-	// await full DOM load before adding DB items
-	document.addEventListener("DOMContentLoaded", function() {
-
-		// Globals
-		window.ctrl = false;			// This flag indicates whether the "ctrl" key is being held down
-
-        // Handle empty document case where only chainlink add button should be present
-		if (document.getElementById("chainlink-display").querySelector(":scope > section") == null) {
-			window.in = "doc-empty";	// signal to key parser to disable all hotkeys except "c"
-			addButtonsDocEmptyView();
-		} else {
-			window.in = "doc";
-			addButtonsDocView();
-		}
-
-		// Add the event listeners above for keystrokes
-		window.addEventListener("keyup", parseKeyUp);
-		window.addEventListener("keydown", parseKeyDown);
-		document.getElementById("add-page-btn").addEventListener("click", createFence);
-
-		// Add CRUD buttons for page content
-		instFenceEditButtons();
-		instChainlinkEditButtons();
-		instContentEditButtons();
-
-		//deleteFenceEditButtons();
-		//deleteChainlinkEditButtons();
-		//deleteContentEditButtons();
-
-	});
-</script>-->
 <nav id="tabbed-buttons">
-{% for doc in docs %}
-	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
-{% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
+    {% for collection in collections %}
+        {% if user.is_authenticated %}
+            {% if collection.public == True %}
+                {% if collection.title %}
+                    <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+                {% else %}
+                    <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                {% endif %}
+            {% else %}
+                {% if collection.title %}
+                    <a class="tabbed-buttons private-collection" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+                {% else %}
+                    <a class="tabbed-buttons private-collection" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {% if collection.title %}
+                <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+            {% else %}
+                <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 </nav>
-<div id="doc-title-wrapper">
-	<h1 id="doc-title">{{ document.title|linebreaksbr }}</h1>
-</div>
 <div id="config-display">
-<ul id="keybindings-legend">
-	<h2>Keybindings Legend</h2>
-	<li>j - scroll down</li>
-	<li>k - scroll up</li>
-	<li>n - create chainlink</li>
-	<li>p - create text element</li>
-	<li>h - create header element</li>
-	<li>c - create code block</li>
-	<li>b - insert linebreak</li>
-    <li>`code` - wrapped text denotes code</li>
-    <li>~link~ - wrapped text denotes link</li>
-</ul>
-<ul id="chainlink-manifest">
-	<h2>Chainlink Manifest</h2>
-	{% if chainlinks %}
-	{% for chainlink in chainlinks %}
-	<li><a class="inline-url" href="#{{ chainlink.url }}">>>>{{ chainlink.title }}</a></li>
-	{% endfor %}
-	{% else %}
-	<li><i>&#60;list empty&#62;</i></li>
-	{% endif %}
-</ul>
-<ul id="options-settings">
-	<h2>Options & Settings</h2>
-	<li><button id="doc-action-copy-link">Copy link to this doc</button></li>
-	<li><button id="doc-action-change-theme">Change theme</button></li>
-	<li><button id="doc-action-find-references">Find references</button></li>
-</ul>
+    <div id="chainlink-manifest">
+        <h2>Chainlink Manifest</h2>
+        <ul id="chainlink-manifest-entries">
+            {% if chainlinks %}
+                {% for chainlink in chainlinks %}
+                    <li><a class="inline-url" href="#chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}">>>>{{ chainlink.0.text }}</a></li>
+                {% endfor %}
+            {% else %}
+                <li><i>&#60;list empty&#62;</i></li>
+            {% endif %}
+        </ul>
+    </div>
 </div>
-<div id="decoration-display">
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /:/  \:\  \ 
- /:/__/ \:\__\
- \:\  \  \/__/
-  \:\  \      
-   \:\  \     
-    \:\__\    
-     \/__/    
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /::\~\:\  \ 
- /:/\:\ \:\__\
- \/__\:\/:/  /
-      \::/  / 
-      /:/  /  
-     /:/  /   
-     \/__/    
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /::\~\:\  \ 
- /:/\:\ \:\__\
- \/_|::\/:/  /
-    |:|::/  / 
-    |:|\/__/  
-    |:|  |    
-     \|__|    
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /::\~\:\__\ 
- /:/\:\ \:|__|
- \:\~\:\/:/  /
-  \:\ \::/  / 
-   \:\/:/  /  
-    \::/__/   
-     ~~       
-</pre>
-<pre>
-      ___     
-     /\  \    
-    /::\  \   
-   /:/\:\  \  
-  /:/  \:\  \ 
- /:/__/ \:\__\
- \:\  \ /:/  /
-  \:\  /:/  / 
-   \:\/:/  /  
-    \::/  /   
-     \/__/    
-</pre>
-<pre>
-      ___     
-     /\__\    
-    /::|  |   
-   /:|:|  |   
-  /:/|:|  |__ 
- /:/ |:| /\__\
- \/__|:|/:/  /
-     |:/:/  / 
-     |::/  /  
-     /:/  /   
-     \/__/    
-</pre>
 
-
+<!-- Article content is always displayed in #chainlink-display -->
+<div id="element-display" template="article">
+    <div id="header-display">
+        <div id="header-elements">
+            {% if collection.title %}
+                <h1 class="header-element-wrapper" id="collection-title" style="{{ collection.title.css }}">{{ collection.title.text }}</h1>
+            {% else %}
+                <div id="missing-header" class="no-elements">&ltHEADER CONTENT MISSING&gt</div>
+            {% endif %}
+        </div>
+                <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
+                    <!-- The main header add button is placed under this div -->
+                    <div id="header-placeholder"></div>
+                </div>
+    </div>
+    <hr />
+    <div id="chainlink-display">
+        <!-- Chainlink Elements comprise the "meat" of the page. These elements are logically connected to the current
+        host Article or Chainlink. It is in this way (and this way only) that they are related to each other. -->
+        <div id="chainlink-elements">
+            {% for chainlink in chainlinks %}
+                <section class="chainlink">
+                    <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
+                        <h2>
+                            <span class="chainlink-order">#{{ chainlink.0.order }}</span>
+                            <span class="chainlink-inner-content" style="{{ chainlink.0.css }}">{{ chainlink.0.text }}</span>
+                            <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
+                            <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
+                        </h2>
+                    </div>
+                    {% for content in chainlink.1 %}
+                        {% if content.tag == "P" %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="P">
+                            <p class="inner-content" style="{{ content.css }}">{{ content.text }}</p>
+                        </div>
+                        {% elif content.tag == 'CODE' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="CODE">
+                            <code class="inner-content" style="{{ content.css }}">{{ content.text }}</code>
+                        </div>
+                        {% elif content.tag == 'H3' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="H3">
+                            <h3 class="inner-content" style="{{ content.css }}">{{ content.text }}</h3>
+                        </div>
+                        {% elif content.tag == 'BR' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="BR">
+                            <span class="inner-content br" style="{{ content.css }}"><i>&#60;!-- linebreak insert --&#62;</i></span>
+                        </div>
+                        {% elif content.tag == 'delimiter' %}
+                        {% endif %}
+                        {% empty %}
+                            <!--<div id="no-contents" class="no-elements">&ltno content&gt</div>-->
+                    {% endfor %}
+                </section>
+                {% empty %}
+                    <!--<div id="no-chainlinks" class="no-elements">&ltno content&gt</div>-->
+            {% endfor %}
+        </div>
+        <!-- Elements under the add-buttons element are buttons used to create content on the page -->
+        <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
+            <!-- The chainlink add button is placed under this div -->
+            <div id="chainlink-placeholder"></div>
+            <!-- All buttons used to create content is stored under this parent div -->
+            <div id="content-placeholder"></div>
+        </div>
+    </div>
+    <hr />
+    <div id="footer-display">
+        <div id="footer-elements">
+            {% if footers %}
+                {% for footer in footers %}
+                    <p id="doc-footer" class="footer-element-wrapper" style="{{ footer.css }}">{{ footer.text }}</p>
+                {% endfor %}
+            {% else %}
+                <div id="missing-footer" class="no-elements">&ltFOOTER CONTENT MISSING&gt</div>
+            {% endif %}
+        </div>
+        <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
+            <!-- The main footer add button is placed under this div -->
+            <div id="footer-placeholder"></div>
+        </div>
+    </div>
 </div>
-<div id="chainlink-display">
-{% for content in contents %}
-		{% if content.tag == 'header2' %}
-		<section class="chainlink">
-			<div id="{{ content.url }}" class="chainlink-wrapper">
-				<h2>
-                    <span class="chainlink-inner-text">{{ content.title }}</span>
-				    <a class="inline-url header-url" href="chainlink{{ content.url }}.html">>>>{{ content.url|slice:"0:9" }}</a>
-                </h2>
-			</div>
-		{% elif content.tag == 'paragraph' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<p class="inner-content">{{ content.content }}</p>	
-			
-		</div>
-		{% elif content.tag == 'code' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<code class="inner-content">{{ content.content }}</code>
-			
-		</div>
-		{% elif content.tag == 'header3' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<h3 class="inner-content">{{ content.content }}</h3>
-		</div>
-		{% elif content.tag == 'linebreak' %}
-		<div id="{{ content.url }}-{{ content.order }}" class="content-wrapper">
-			<span class="inner-content br"><i>&#60;!-- linebreak insert --&#62;</i></span>
-		</div>
-        {% elif content.tag == 'delimiter' %}
-		</section>
-		{% endif %}
-{% endfor %}
+<!-- This text wraps the bottom of the display area -->
 {% endblock %}
-</div>

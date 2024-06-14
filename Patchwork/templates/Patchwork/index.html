@@ -1,39 +1,54 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
+{% block login_status %}
+    {% if user.is_authenticated %}
+        <i>Logged In</i>
+        <form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Logout"></form>
+        <form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form>
+    {% else %}
+        <i>Logged Out</i>
+        <form action="/login.html" method="post">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <input type="submit" value="Login">
+        </form>
+    {% endif %}
+{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
-<link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
-<script type="module">
-    import { createFence } from "{% static 'scripts/chainlink-utilities.js' %}";
-    document.getElementById("add-page-btn").addEventListener("click", createFence);
-</script>
 <nav id="tabbed-buttons">
-{% for doc in docs %}
-	<button type="button" class="tabbed-buttons" onclick="window.location.href ='doc{{ doc.url }}.html'">{{ doc.title }}</button>
-{% endfor %}
-	<button type="button" id="add-page-btn" class="tabbed-buttons">+</button>
+    {% for collection in collections %}
+        {% if collection.title %}
+            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+        {% else %}
+            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+        {% endif %}
+    {% endfor %}
 </nav>
-<div id="doc-title-wrapper">
-	<h1 id="doc-title">index.html</h1>
-</div>
-<div id="chainlink-display">
-	<section class="chainlink">
-		<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3" class="chainlink-wrapper">
-			<h2>
-				<span class="chainlink-inner-text">Welcome to Chainlink Finary</span>
-			</h2>
-		<div class="chainlink-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cl-edit-btn" target="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3">edit</button><button class="cl-del-btn" target="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3">delete</button></div></div>
-	<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3-0" class="content-wrapper">
-		<p class="inner-content">You are at the entry point of one of another one of the internet's boundless repositories of strange but hopefully useful information.</p>
-	<div class="context-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cont-edit-btn">edit</button><button class="cont-del-btn">delete</button></div></div>
-	<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3-1" class="content-wrapper">
-		<p class="inner-content">You can think of Chainlink Finary as a kind of collaborative blog or even a wiki developed by aimless wanderers (such as yourself) who've seen fit to leave their mark on the monolithic metal tapestry of information that will heretofore be known only as the fence.</p>
-	<div class="context-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cont-edit-btn">edit</button><button class="cont-del-btn">delete</button></div></div>
-	<div id="c10a6a3dd70552856601e6f8121cff3a7228ae22ef6af3824e12ffaf6f97d5a3-2" class="content-wrapper">
-		<p class="inner-content">Before is only an atomic glance of the interlocking and ever-expanding fence architecture housed within the Finary. In fact, not only is this page an example of a fence, it happens to be THE fence - the very first fence ever constructed and from which every future fence is but a templated copy of, however distant they may appear to be.</p>
-	<div class="context-buttons-wrapper"><i class="context-span-message">context action &lt; - - - - - - </i><button class="cont-edit-btn">edit</button><button class="cont-del-btn">delete</button></div></div>
-	</section>
-</div>
+<h1 class="index-title">index.html</h1>
+<section class="chainlink">
+    <h2 class="section-header">Welcome to Chainlink Finary</h2>
+    <p class="index-paragraph">You are at the entry point of one of another one of the internet's boundless repositories of strange but hopefully useful information.</p>
+    <p class="index-paragraph">You can think of Chainlink Finary as a kind of collaborative blog or even a wiki developed by aimless wanderers (such as yourself) who've seen fit to leave their mark on the monolithic metal tapestry of information that will heretofore be known only as the fence.</p>
+    <p class="index-paragraph">Before is only an atomic glance of the interlocking and ever-expanding fence architecture housed within the Finary. In fact, not only is this page an example of a fence, it happens to be THE fence - the very first fence ever constructed and from which every future fence is but a templated copy of, however distant they may appear to be.</p>
+</section>
+<section>
+    <h2 class="section-header">Featured Collections</h2>
+    <ol>
+        {% for collection in collections %}
+            {% if collection.title %}
+                <li><a href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a></li>
+            {% else %}
+                <li><a href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</section>
 
 {% endblock %}

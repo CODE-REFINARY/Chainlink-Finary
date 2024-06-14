@@ -16,8 +16,8 @@
 	#tabbed-buttons {
 		text-align: center !important;
 	}
-	#tabbed-buttons button {
-		width: 33.333% !important;	
+	#tabbed-buttons button, a {
+		width: 33.333% !important;
 		height: 45px !important;
 		margin-top: 30px !important;
 		margin-bottom: 30px !important;
@@ -32,7 +32,7 @@
 	src: url('../fonts/cipher.ttf') format("truetype");
 	font-display: fallback;
 }
-	
+
 @font-face {
     font-family: 'Matrix';
     src: url('../fonts/OCR-A.ttf') format("truetype");
@@ -121,26 +121,47 @@
 
 /* /////////////// General Styling /////////////// */
 
-body {
-    background-image: url('../images/groove-minimal-lengthy.jpg'); 
-    background-repeat: y-repeat;
-	margin: 2% 20% 1% 20%;
+
+
+
+/* ////////////////////////// INDEX PAGE STUFF BEGIN ////////////////////////// */
+
+
+/* These are h2 elements that appear on the index page */
+.section-header {
+
 }
+
+
+/* This is the h1 element that appears on the index page */
+.index-title {
+    text-align: center;
+}
+
+/* These are body paragraphs that appear on the index page. */
+.index-paragraph {
+	margin-top: 0.3rem;
+	margin-bottom: 0.3rem;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+
+/* ////////////////////////// INDEX PAGE STUFF END ////////////////////////// */
+
+
+
 
 main {
 	border-radius: 12px;
 	background-color: #2C2E43;
+	padding-bottom: calc(var(--main-body-inner-content-padding-vertical));
 	-padding-left: 1cm;
 	-padding-right: 1cm;
 	-padding-top: 1.3rem;
 	-padding-bottom: 1.3rem;
 	-padding-top: 0.3cm;
 	-padding-bottom: 1cm;
-}
-
-p {
-	color: #f5f5f5;
-	background-color: #2C394B;
 }
 
 a:active {
@@ -157,22 +178,6 @@ header h1 {
     padding: 10px;
 }
 
-main h1 {
-	font-family: Audiowide;
-	font-weight: 100;
-	background-color: #334756;
-	text-align: center;
-	color: whitesmoke;
-	font-size: xx-large;
-	padding: 10px;
-}
-
-h2 {
-	font-family: Audiowide;
-	font-weight: 100;
-	font-size: x-large;
-	color: whitesmoke;
-}
 
 /* Construction Banner */
 h6.under-construction {
@@ -249,14 +254,6 @@ ol {
 	list-style-position: inside;
 }
 
-ul > li {
-	-font-family: monospace;
-	-margin-top: 1mm;
-	-margin-bottom: 1mm;
-	-color: whitesmoke;
-	-line-height: 1.2em;
-}
-
 section > ul > li > a {
 	text-decoration: none;
 	color: whitesmoke;
@@ -275,22 +272,25 @@ div.combination {
 	margin: 0 2rem 0 2rem;
 }
 
-/* Fence Header */
-#doc-title-wrapper {
+/* Sections Padding and Dimension Settings */
+#header-display, #chainlink-display, #footer-display {
     -text-align: center;
     padding-top: var(--main-body-inner-content-padding-vertical);
 	padding-bottom: var(--main-body-inner-content-padding-vertical);
 	padding-left: var(--main-body-inner-content-padding-horizontal);
 	padding-right: var(--main-body-inner-content-padding-horizontal);
 }
+
+
+
 #fence-context-buttons {
     text-align: right;
     display: none;
 }
-#doc-title-wrapper:hover #fence-context-buttons {
+#collection-title-wrapper:hover #fence-context-buttons {
     display: block;
 }
-#doc-title-wrapper:hover h1 {
+#collection-title-wrapper:hover h1 {
     border-width: 1px;
     border-style: solid;
     border-color: rgb(208, 68, 35);
@@ -303,12 +303,14 @@ div.combination {
     color: rgb(208, 68, 35);;
     font-size: x-small;
 }
-#doc-title {
+#collection-title {
     -display: block;
 }
 #doc-action-edit-title, #doc-action-delete-title {
 
 }
+
+/* Style settings for the oval nav buttons at the top of the document */
 
 #tabbed-buttons {
 	padding-top: calc(var(--main-body-inner-content-padding-vertical) * 2);
@@ -319,29 +321,39 @@ div.combination {
 	background-image: linear-gradient(180deg, #b4000000 0%, #2c2e43 0%);
     font-size: 0;
 	text-align: right;
+	display: flex;
+	flex-direction: row-reverse;
+	flex-wrap: wrap;
+}
+
+.tabbed-buttons {
+	font-family: 'Courier New', Courier, monospace;
+	font-weight:bolder;
+	position: static;
+	background-color: #334756;
+	color: #f5f5f5;
+	cursor: pointer;
+	border-radius: 10px;
+	border-color: #b0b0b057;
+	font-size: 12px;
+	white-space: nowrap;
+	word-break: keep-all;
+	line-height: normal;
+	text-decoration: none;
+	margin: 0em;
+	border-style: outset;
+	padding: 6px;
+}
+
+.tabbed-buttons:hover {
+	background-color: #2a3946;
+	text-decoration: underline;
 }
 
 /* chainlink display elements - chainlinks */
-section form {
-    padding-top: var(--main-body-inner-content-padding-vertical);
-	padding-bottom: var(--main-body-inner-content-padding-vertical);
-	padding-left: var(--main-body-inner-content-padding-horizontal);
-	padding-right: var(--main-body-inner-content-padding-horizontal);
-}
-.content-wrapper {
-    padding-left: var(--chainlink-display-inner-content-padding-horizontal);
-    padding-right: var(--chainlink-display-inner-content-padding-horizontal);
-    padding-top: calc(var(--chainlink-display-inner-content-padding-vertical) / 2);
-    padding-bottom: calc(var(--chainlink-display-inner-content-padding-vertical) / 2);
-}
-.chainlink-wrapper {
-    padding: 1rem 0 0.5rem 0;
-}
-.chainlink-wrapper h2 {
-    background-color: #334756;
-    padding: 10px;
-    border-radius: 12px;
-}
+
+.content-wrapper {}
+.chainlink-wrapper {}
 .chainlink-wrapper:hover .chainlink-buttons-wrapper {
     display: block;
 }
@@ -350,9 +362,7 @@ section form {
     border-style: solid;
     color: rgb(208, 68, 35);
 }
-.chainlink-wrapper a, .chainlink-wrapper span {
-    display: inline;
-}
+
 .chainlink-buttons-wrapper {
     text-align: right;
     display: none;
@@ -376,14 +386,6 @@ section form {
 }
 
 
-
-
-
-.tabbed-buttons:hover {
-	background-color: #2a3946;
-	text-decoration: underline;
-}
-
 #upper-navigation ul {
 	background-color: #acacacd5;
 	margin-bottom: 30px;
@@ -395,19 +397,19 @@ section form {
 }
 
 #upper-navigation ul li:hover {
-	background-color: #959595c7;
+	-background-color: #959595c7;
 }
 
 #upper-navigation ul li a {
-	text-decoration: none;
-	font-family: 'Courier New';
-	font-size: 14px;
-	font-weight: bolder;
-	color: rgb(208, 68, 35);
+	-text-decoration: none;
+	-font-family: 'Courier New';
+	-font-size: 14px;
+	-font-weight: bolder;
+	-color: rgb(208, 68, 35);
 }
 
 #upper-navigation ul li a:hover{
-	text-decoration: underline;
+	-text-decoration: underline;
 }
 
 #copyright {
@@ -417,7 +419,7 @@ section form {
 }
 
 
-/* content elements */
+/* text elements */
 .content-wrapper h3 {
 	display: block;
 	font-family: 'Courier';
@@ -452,7 +454,7 @@ section form {
     text-align: center;
 }
 
-.content-wrapper p {
+.content-wrapper p, #footer-elements p {
 	display: block;
 	font-family: Audiowide;
 	background-color: #2C394B;
@@ -461,6 +463,95 @@ section form {
 	letter-spacing: .00em;
 	font-size: 12px;
 	border-radius: 12px;
+}
+
+
+/* ////////////// "Pages" List ////////////// */
+
+.deactivated-page-list-element {
+}
+
+.deactivated-page-list-element a {
+	font-family: 'Courier New';
+	font-size: 14px;
+	font-weight: bolder;
+	color: dimgrey;
+	font-style: normal;
+	text-decoration: unset;
+	cursor: not-allowed;
+}
+
+.activated-page-list-element {
+
+}
+
+.activated-page-list-element a {
+	text-decoration: none;
+	font-family: 'Courier New';
+	font-size: 14px;
+	font-weight: bolder;
+	color: rgb(208, 68, 35);
+}
+
+.activated-page-list-element a:hover {
+	text-decoration: underline;
+}
+
+.activated-page-list-element:hover {
+	background-color: #959595c7;
+	border-width: 1px;
+    border-style: solid;
+    color: rgb(208, 68, 35);
+}
+
+
+/* ////////////// "Actions" List ////////////// */
+
+.activated-action-list-element input[type="submit"], .activated-edit-list-element button {
+	font-family: Audiowide;
+	font-weight:bolder;
+	position: static;
+	background-color: #334756;
+	color: #f5f5f5;
+	height: 30px;
+	margin-top: 1px;
+	cursor: pointer;
+	border-radius: 10px;
+	border-color: #b0b0b057;
+	font-size: 12px;
+	white-space: nowrap;
+    word-break: keep-all;
+}
+
+.deactivated-action-list-element {
+
+}
+
+.deactivated-action-list-element input[type="submit"] {
+	font-family: Audiowide;
+	position: static;
+	-background-color: #343537;
+	background-color: dimgray;
+	color: #f5f5f5;
+	height: 30px;
+	cursor: pointer;
+	border-radius: 10px;
+	border-color: #b0b0b057;
+	font-size: 12px;
+	white-space: nowrap;
+    word-break: keep-all;
+	cursor: not-allowed;
+}
+
+/* /////////////// The help text that appears to clarify buttons/links to users /////////////// */
+
+.help-text {
+	font-style: italic;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: x-small;
+    color: dimgrey;
+	font-weight: lighter;
+	margin-left: 12px;
 }
 
 

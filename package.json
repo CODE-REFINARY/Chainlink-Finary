@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development --watch",
-    "heroku-postbuild": "webpack --mode production"
+    "dev": "npx webpack --mode development --watch",
+    "heroku-postbuild": "npx webpack --mode production"
   },
   "license": "MIT",
   "dependencies": {
