@@ -48,7 +48,7 @@ const formClassNames = ["content-creation-form"];
 // These constants define the internal names used to identify different Element types. These should be used to ensure
 // that continuity between the backend names and frontend names is kept.
 
-// Content refers to Elements that are instantiated and exist inside a Chainlink
+// Body refers to Elements that are instantiated and exist inside a Chainlink
 const contentTypes = ["P", "CODE", "BR", "H3"];
 
 // Chainlink refers to the Chainlink Element
@@ -691,7 +691,7 @@ export function createFence() {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/patchwork/article/generate.html", true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Body-Type', 'application/json');
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         xhr.responseType = "json";
         xhr.send(JSON.stringify(article));
@@ -989,9 +989,9 @@ export function editChainlink(target) {
 }
 
 /**
- * Edit the target Content. Instantiate a form to allow the user to edit this text.
+ * Edit the target Body. Instantiate a form to allow the user to edit this text.
  *
- * @param {string} target - This string indicates the id of the Content to edit
+ * @param {string} target - This string indicates the id of the Body to edit
  * @returns {null}
  */
 export function editContent(target) {
@@ -1066,7 +1066,7 @@ function deinstantiateElement(id) {
                         let oldIdOrder = getOrderFromId(nextSibling.getAttribute("id"));
 
                         // Construct the new ID for this sibling by subtracting 1 from its order (to account for the
-                        // absence of the Content Element that was just deleted).
+                        // absence of the Body Element that was just deleted).
                         let newOrder = oldIdOrder - 1;
                         let newId = oldIdPrefix + "-" + oldIdUrl + "-" + newOrder;
                         nextSibling.setAttribute("id", newId)
@@ -1089,7 +1089,7 @@ function deinstantiateElement(id) {
                         let oldIdOrder = getOrderFromId(nextSibling.getAttribute("id"));
 
                         // Construct the new ID for this sibling by subtracting 1 from its order (to account for the
-                        // absence of the Content Element that was just deleted).
+                        // absence of the Body Element that was just deleted).
                         let newOrder = oldIdOrder - 1;
                         let newId = oldIdPrefix + "-" + oldIdUrl + "-" + newOrder;
                         nextSibling.setAttribute("id", newId)

@@ -31,6 +31,12 @@ class Theme(models.TextChoices):
     PATCHWORK = "patchwork", _("Patchwork")
 
 
+class Section(models.TextChoices):
+    HEADER = "header", _("Header")
+    BODY = "body", _("Body")
+    FOOTER = "footer", _("Footer")
+
+
 class Collection(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key (useful for testing)
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
@@ -78,21 +84,60 @@ class Chainlink(models.Model):
         return returnme
 
 
-class Content(models.Model):
-    chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE,
-                                  null=True)  # identifer for which chainlink this text is for
-    tag = models.CharField(  # specify tag to wrap text in
-        max_length=100,
-        choices=TagType.choices,
-        default=TagType.PARAGRAPH,
-    )
+class Body(models.Model):
+    chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
     order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
-    text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
-    # Content can be marked to be visibly redacted from an Article. Redactions are visible to all users and labelled as
-    # such (although the text itself cannot be accessed). Redacted text can be made visible by setting the public
-    # flag to True.
     public = models.BooleanField(default=True)
     css = models.CharField(max_length=10000, null=False, default="")
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
+        returnme += "Tag: "
+        if  hasattr(self, "paragraph"):
+            returnme += "paragraph"
+        elif hasattr(self, "code"):
+            returnme += "code"
+        return returnme
+
+
+class Paragraph(Body):
+    tag = TagType.PARAGRAPH
+    text = models.CharField(max_length=10000, default="")
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        return returnme
+
+
+class Code(Body):
+    tag = TagType.CODE
+    text = models.CharField(max_length=10000, default="")
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        return returnme
+
+
+class Linebreak(Body):
+    tag = TagType.LINEBREAK
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
+        return returnme
+
+
+class Header3(Body):
+    tag = TagType.HEADER3
+    text = models.CharField(max_length=10000, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -104,14 +149,22 @@ class Content(models.Model):
 
 class Header(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
-    tag = models.CharField(
-        max_length=100,
-        choices=TagType.choices,
-        default=TagType.PARAGRAPH,
-    )
     order = models.BigIntegerField(default=0)
-    text = models.CharField(max_length=10000)  # specify text to place between tags specified by tag
     css = models.CharField(max_length=10000, null=False, default="")
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Tag: "
+        if hasattr(self, "title"):
+            returnme += "title"
+        return returnme
+
+
+class Header1(Header):
+    tag = TagType.HEADER1
+    text = models.CharField(max_length=10000)
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -123,14 +176,13 @@ class Header(models.Model):
 
 class Footer(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
-    tag = models.CharField(
-        max_length=100,
-        choices=TagType.choices,
-        default=TagType.PARAGRAPH,
-    )
-    text = models.CharField(max_length=10000)
     order = models.BigIntegerField(default=0)
-    css = models.CharField(max_length=10000, null=False, default="")
+    css = models.CharField(max_length=10000, null=True, default="")
+
+
+class Endnote(Footer):
+    tag = TagType.ENDNOTE
+    text = models.CharField(max_length=10000)
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "

@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Collection, Content, TagType, Account, Header, Footer
+from .models import Chainlink, Collection, Body, TagType, Account, Header, Footer
 
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
@@ -48,7 +48,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
     :param payload: JSON payload specifying the properties of the Element to write to the database
     :param is_landing_page: This boolean flag indicates whether this page should be set as the landing page for the site. If this flag is set then the LANDING_PAGE_URL global variable is set equal to the generated url for the page
-    :param parent (optional): String indicating the url of the parent object of the Element to store. Content uses the url of its Chainlink and thus this parameter is not needed for elements of type Content. In this case, this parameter is only used if no URL is specified in the JSON payload.
+    :param parent (optional): String indicating the url of the parent object of the Element to store. Body uses the url of its Chainlink and thus this parameter is not needed for elements of type Body. In this case, this parameter is only used if no URL is specified in the JSON payload.
     :param user: The user object indicates the currently logged in user. This argument is used to set the landing page field for the logged in user if the is_landing_page parameter is set to True
     """
     # Parse the stringified json in the argument so that the payload can be read and written to the database
@@ -80,29 +80,29 @@ def db_store(payload, parent, is_landing_page=False, user=None):
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
         # Update the chainlink object that's a parent of the element to be written to the database
         chainlink = Chainlink.objects.get(url=json_data["url"])
-        numElements = Content.objects.filter(chainlink=chainlink).count()
+        numElements = Body.objects.filter(chainlink=chainlink).count()
 
-        # Create a representation of the Content object to write to database
-        content = Content()
+        # Create a representation of the Body object to write to database
+        content = Body()
         content.chainlink = chainlink
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
-            # in the beginning or middle of the Chainlink then shift all Content up in the order.
+            # in the beginning or middle of the Chainlink then shift all Body up in the order.
             for i in range(json_data["order"] + 1, numElements):
                 try:
-                    Content.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
+                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
                     # field for all elements after this one
-                except Content.DoesNotExist:
+                except Body.DoesNotExist:
                     print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
                     #chainlink.count -= 1  # We've discovered a missing element so the count must be off
-                    # Find the next existing Content after the one to be added.
+                    # Find the next existing Body after the one to be added.
                     for j in range(i + 1, numElements):
                         try:
                             # Subtract from this first future element an amount equal to distance we had to travel to
                             # get to this element.
-                            Content.objects.get(chainlink=chainlink, order=j).order -= (j - i)
+                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
                             break
-                        except Content.DoesNotExist:
+                        except Body.DoesNotExist:
                             continue
 
         content.tag = tag
@@ -145,7 +145,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         collection.save()
 
     elif tag == TagType.ENDNOTE:
-        endnote = Footer()
+        endnote = Endnote()
         endnote.collection = Collection.objects.get(url=parent)
         footerCount = Footer.objects.filter(collection=endnote.collection).count()
         endnote.order = footerCount
@@ -166,8 +166,8 @@ def db_remove(table, url, order):
 
     :param table: identify table holding the target
     :param url: url string identifying target item
-    :param order: This is an int identifier used in tandem with url to identify Content type targets. It is this field
-    # that will get updated for all subsequent Content elements so that there is no gap in the element ordering
+    :param order: This is an int identifier used in tandem with url to identify Body type targets. It is this field
+    # that will get updated for all subsequent Body elements so that there is no gap in the element ordering
     """
     if table == Collection:
         target = table.objects.get(url=url)
@@ -183,12 +183,12 @@ def db_remove(table, url, order):
                 obj.save()
         parent_article.save()
 
-    elif table == Content:
+    elif table == Body:
         parent_chainlink = Chainlink.objects.get(url=url)
-        parent_chainlink_count = Content.objects.filter(chainlink=parent_chainlink).count()
+        parent_chainlink_count = Body.objects.filter(chainlink=parent_chainlink).count()
         target = table.objects.get(chainlink=parent_chainlink, order=order)
         for i in range(order + 1, parent_chainlink_count):
-            next_pos_els = Content.objects.filter(chainlink=parent_chainlink, order=i)
+            next_pos_els = Body.objects.filter(chainlink=parent_chainlink, order=i)
             for obj in next_pos_els:
                 obj.order -= 1
                 obj.save()
@@ -203,7 +203,7 @@ def db_update(table, url, order, payload):
 
     :param table: identify table holding the target
     :param url: url string identifying target item
-    :param order: item identifier used in tandem with url to identify Content type targets
+    :param order: item identifier used in tandem with url to identify Body type targets
     :param payload: string indicating changes to make to target item
     """
     new_title = payload
@@ -214,7 +214,7 @@ def db_update(table, url, order, payload):
             new_title = db_try_title(table, new_title)  # Validate the new text
             target.text = new_title
 
-    elif table == Content:
+    elif table == Body:
         parent_chainlink = Chainlink.objects.get(url=url)
         target = table.objects.get(chainlink=parent_chainlink, order=order)
         target.text = new_title
@@ -310,14 +310,14 @@ def generic(request, key=""):
             collections = Collection.objects.filter(public=True)
         collection_titles = Header.objects.all()
 
-        # Chainlink and Content data to be passed into the template takes the following form:
+        # Chainlink and Body data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
         chainlinks = []
         # Populate the above list with tuples of the specified form by first getting the list of all Chainlinks that
         # are attached to this Article.
         for chainlink in Chainlink.objects.filter(collection=collection.pk).order_by("order"):
             contents = []
-            for content in Content.objects.filter(chainlink=chainlink.pk).order_by("order"):
+            for content in Body.objects.filter(chainlink=chainlink.pk).order_by("order"):
                 contents.append(content)
             chainlinks.append((chainlink, contents))
 
@@ -353,7 +353,7 @@ def generic(request, key=""):
             case TagType.CHAINLINK:
                 db_remove(Chainlink, get_url_from_id(target_id), get_order_from_id(target_id))
             case TagType.CONTENT:
-                db_remove(Content, get_url_from_id(target_id), get_order_from_id(target_id))
+                db_remove(Body, get_url_from_id(target_id), get_order_from_id(target_id))
 
 
     elif request.method == "PUT":
@@ -366,7 +366,7 @@ def generic(request, key=""):
             case TagType.CHAINLINK:
                 db_update(Chainlink, get_url_from_id(target_id), None, target_update)
             case TagType.CONTENT:
-                db_update(Content, get_url_from_id(target_id), get_order_from_id(target_id), target_update)
+                db_update(Body, get_url_from_id(target_id), get_order_from_id(target_id), target_update)
 
     return render(request, "Patchwork/index.html", {})
 
@@ -380,7 +380,7 @@ def chainlink(request, key):
         target = get_object_or_404(Chainlink, url=key)
         collections = Collection.objects.all()
         contents = []
-        for cont in Content.objects.filter(chainlink=target).order_by('order'):
+        for cont in Body.objects.filter(chainlink=target).order_by('order'):
             contents.append(cont)
         return render(request, 'Patchwork/chainlink.html',
                       {'collections': collections, 'target': target, 'contents': contents, 'url': key})
@@ -406,7 +406,7 @@ def chainlink(request, key):
             case TagType.CHAINLINK:
                 db_remove(Chainlink, request.headers["target"], None)
             case TagType.CONTENT:
-                db_remove(Content, get_url_from_id(request.headers["target"]),
+                db_remove(Body, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]))
 
     elif request.method == 'PUT':
@@ -414,7 +414,7 @@ def chainlink(request, key):
             case TagType.CHAINLINK:
                 db_update(Chainlink, request.headers["target"], None, request.headers["text"])
             case TagType.CONTENT:
-                db_update(Content, get_url_from_id(request.headers["target"]),
+                db_update(Body, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]), request.headers["text"])
 
     return render(request, 'Patchwork/login_success.html', {})
@@ -633,7 +633,7 @@ def validate_and_return_count(element):
     :return: - This function returns an int equal to the number of child elements of `element`.
     """
     if element._meta.object_name == "Chainlink":
-        return Content.objects.filter(chainlink=element).count()
+        return Body.objects.filter(chainlink=element).count()
 
     elif element._meta.object_name == "Collection":
         return Chainlink.objects.filter(collection=element).count()
