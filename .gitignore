@@ -41,3 +41,5 @@ pyvenv.cfg
 # exclude the output of webpack
 static/react/static
 /Patchwork/migrations
+.DS_Store
+/static/react/static
