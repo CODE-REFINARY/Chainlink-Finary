@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Collection, Body, TagType, Account, Header, Footer
+from .models import Chainlink, Collection, Body, TagType, Account, Header, Footer, Endnote, Paragraph, Linebreak, Header1, Header3, Code
 
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
@@ -77,6 +77,117 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         json_data["url"] = cl.url
         json_data["order"] = cl.order
 
+    elif tag ==TagType.PARAGRAPH:
+        chainlink = Chainlink.objects.get(url=json_data["url"])
+        numElements = Body.objects.filter(chainlink=chainlink).count()
+        content = Paragraph()
+        content.chainlink = chainlink
+        content.order = json_data["order"]
+        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
+            # in the beginning or middle of the Chainlink then shift all Body up in the order.
+            for i in range(json_data["order"] + 1, numElements):
+                try:
+                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
+                    # field for all elements after this one
+                except Body.DoesNotExist:
+                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
+                    # Find the next existing Body after the one to be added.
+                    for j in range(i + 1, numElements):
+                        try:
+                            # Subtract from this first future element an amount equal to distance we had to travel to
+                            # get to this element.
+                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
+                            break
+                        except Body.DoesNotExist:
+                            continue
+        content.text = json_data["text"]
+        content.public = json_data["is_public"]
+        content.save()
+        json_data["order"] = content.order
+
+    elif tag == TagType.LINEBREAK:
+        chainlink = Chainlink.objects.get(url=json_data["url"])
+        numElements = Body.objects.filter(chainlink=chainlink).count()
+        content = Linebreak()
+        content.chainlink = chainlink
+        content.order = json_data["order"]
+        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
+            # in the beginning or middle of the Chainlink then shift all Body up in the order.
+            for i in range(json_data["order"] + 1, numElements):
+                try:
+                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
+                    # field for all elements after this one
+                except Body.DoesNotExist:
+                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
+                    # Find the next existing Body after the one to be added.
+                    for j in range(i + 1, numElements):
+                        try:
+                            # Subtract from this first future element an amount equal to distance we had to travel to
+                            # get to this element.
+                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
+                            break
+                        except Body.DoesNotExist:
+                            continue
+        content.public = json_data["is_public"]
+        content.save()
+        json_data["order"] = content.order
+
+    elif tag ==TagType.CODE:
+        chainlink = Chainlink.objects.get(url=json_data["url"])
+        numElements = Body.objects.filter(chainlink=chainlink).count()
+        content = Code()
+        content.chainlink = chainlink
+        content.order = json_data["order"]
+        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
+            # in the beginning or middle of the Chainlink then shift all Body up in the order.
+            for i in range(json_data["order"] + 1, numElements):
+                try:
+                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
+                    # field for all elements after this one
+                except Body.DoesNotExist:
+                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
+                    # Find the next existing Body after the one to be added.
+                    for j in range(i + 1, numElements):
+                        try:
+                            # Subtract from this first future element an amount equal to distance we had to travel to
+                            # get to this element.
+                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
+                            break
+                        except Body.DoesNotExist:
+                            continue
+        content.text = json_data["text"]
+        content.public = json_data["is_public"]
+        content.save()
+        json_data["order"] = content.order
+
+    elif tag ==TagType.HEADER3:
+        chainlink = Chainlink.objects.get(url=json_data["url"])
+        numElements = Body.objects.filter(chainlink=chainlink).count()
+        content = Header3()
+        content.chainlink = chainlink
+        content.order = json_data["order"]
+        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
+            # in the beginning or middle of the Chainlink then shift all Body up in the order.
+            for i in range(json_data["order"] + 1, numElements):
+                try:
+                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
+                    # field for all elements after this one
+                except Body.DoesNotExist:
+                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
+                    # Find the next existing Body after the one to be added.
+                    for j in range(i + 1, numElements):
+                        try:
+                            # Subtract from this first future element an amount equal to distance we had to travel to
+                            # get to this element.
+                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
+                            break
+                        except Body.DoesNotExist:
+                            continue
+        content.text = json_data["text"]
+        content.public = json_data["is_public"]
+        content.save()
+        json_data["order"] = content.order
+
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
         # Update the chainlink object that's a parent of the element to be written to the database
         chainlink = Chainlink.objects.get(url=json_data["url"])
@@ -136,9 +247,9 @@ def db_store(payload, parent, is_landing_page=False, user=None):
 
     elif tag == TagType.HEADER1:
         collection = Collection.objects.get(url=parent)
-        header = Header()
+        header = Header1()
         header.collection = collection
-        header.text = db_try_title(Header, json_data["text"])
+        header.text = db_try_title(Header1, json_data["text"])
         # Any Collection can have a maximum of one HEADER1. This Collection field makes it easy to determine its title.
         collection.title = header
         header.save()

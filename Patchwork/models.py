@@ -17,7 +17,7 @@ class TagType(models.TextChoices):
     PARAGRAPH = "P"
     CODE = "CODE"
     HEADER3 = "H3"
-    LINEBREAK = "BR"
+    LINEBREAK = "BR", _("linebreak")
     COLLECTION = "collection"
     CONTENT = "content"
     FOOTER = "footer"
@@ -31,18 +31,12 @@ class Theme(models.TextChoices):
     PATCHWORK = "patchwork", _("Patchwork")
 
 
-class Section(models.TextChoices):
-    HEADER = "header", _("Header")
-    BODY = "body", _("Body")
-    FOOTER = "footer", _("Footer")
-
-
 class Collection(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key (useful for testing)
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this collection
     url = models.CharField(max_length=75)  # relative url for this collection
-    title = models.ForeignKey("Header", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")     # This
+    title = models.ForeignKey("Header1", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")     # This
     # is a link to the Header object that's acting as the title for this Collection. There can only be one Header object
     # that is a title but there can be multiple Header objects associated with this Collection.
     theme = models.CharField(  # specify tag to wrap text in
@@ -50,8 +44,6 @@ class Collection(models.Model):
         choices=Theme.choices,
         default=Theme.PATCHWORK,
     )
-    def __str__(self):
-        return "Collection Url= " + self.url[:10]
     def __str__(self):
         returnme = ""
         returnme += "Url: " + "%.10s" % self.url + " | "
@@ -84,26 +76,35 @@ class Chainlink(models.Model):
         return returnme
 
 
+
 class Body(models.Model):
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
     order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
     public = models.BooleanField(default=True)
     css = models.CharField(max_length=10000, null=False, default="")
+    @property
+    def content(self):  # This field is how you access the child content element that's associated with this element.
+        if hasattr(self, "paragraph"):
+            return self.paragraph
+        elif hasattr(self, "code"):
+            return self.code
+        elif hasattr(self, "linebreak"):
+            return self.linebreak
+        elif hasattr(self, "header3"):
+            return self.header3
+        else:
+            return None
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Chainlink: " + str(self.chainlink.text) + " | "
-        returnme += "Tag: "
-        if  hasattr(self, "paragraph"):
-            returnme += "paragraph"
-        elif hasattr(self, "code"):
-            returnme += "code"
+        returnme += "Tag: " + (self.content.tag if self.content else "N/A")
         return returnme
 
 
 class Paragraph(Body):
     tag = TagType.PARAGRAPH
-    text = models.CharField(max_length=10000, default="")
+    text = models.CharField(max_length=1000000, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -115,7 +116,7 @@ class Paragraph(Body):
 
 class Code(Body):
     tag = TagType.CODE
-    text = models.CharField(max_length=10000, default="")
+    text = models.CharField(max_length=1000000, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -151,14 +152,17 @@ class Header(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
     css = models.CharField(max_length=10000, null=False, default="")
+    @property
+    def content(self):  # This field is how you access the child content element that's associated with this element.
+        if hasattr(self, "header1"):
+            return self.header1
+        else:
+            return None
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
-        returnme += "Tag: " + str(self.tag) + " | "
         returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
-        returnme += "Tag: "
-        if hasattr(self, "title"):
-            returnme += "title"
+        returnme += "Tag: " + (self.content.tag if self.content else "N/A")
         return returnme
 
 
@@ -178,6 +182,18 @@ class Footer(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
     css = models.CharField(max_length=10000, null=True, default="")
+    @property
+    def content(self):  # This field is how you access the child content element that's associated with this element.
+        if hasattr(self, "endnote"):
+            return self.endnote
+        else:
+            return None
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Tag: " + (self.content.tag if self.content else "N/A")
+        return returnme
 
 
 class Endnote(Footer):
