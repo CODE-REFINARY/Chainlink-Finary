@@ -49,18 +49,18 @@ const formClassNames = ["content-creation-form"];
 // that continuity between the backend names and frontend names is kept.
 
 // Body refers to Elements that are instantiated and exist inside a Chainlink
-const contentTypes = ["P", "CODE", "BR", "H3"];
+const contentTypes = ["P", "CODE", "BR", "H3", "LI", "LINK", "NOTE", "IMG"];
 
 // Chainlink refers to the Chainlink Element
 const chainlinkTypes = ["CL"];
 
 // Header Elements appear above all Chainlink Elements in their own section. An example of a header Element would be
 // The Title which is special in that there can be only one defined per Collection.
-const headerTypes = ["H1"];
+const headerTypes = ["H1", "HBNR"];
 
 // Footer Elements appear at the bottom of the Collection and typically contain boilerplate text (like a list of links)
 // along with clarifying "endnotes" that explain features of the Collection.
-const footerTypes = ["EN", "LL", "RL"];
+const footerTypes = ["EN", "FTRLI"];
 
 
 // Set up state variables after DOM is ready to be read
@@ -530,7 +530,7 @@ export function makeForm(type) {
                 const list = document.getElementById('chainlink-elements');
                 container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
-                root.render(<ElementCreationForm placeholder="enter chainlink content"/>);
+                root.render(<ElementCreationForm placeholder="enter chainlink content" type={type}/>);
                 list.appendChild(container);
         }
 
@@ -567,32 +567,39 @@ export function makeForm(type) {
 
                 if (type === "H3") {
                         container.id = "content-creation-form";
-                        root.render(<ElementCreationForm placeholder="enter header content"/>);
+                        root.render(<ElementCreationForm placeholder="enter header content" type={type}/>);
                         chainlink.appendChild(container);
                 } else if (type === "P") {
                         container.id = "content-creation-form";
-                        root.render(<ElementCreationForm placeholder="enter paragraph content"/>);
+                        root.render(<ElementCreationForm type={type}/>);
                         chainlink.appendChild(container);
                 } else if (type === "CODE") {
                         container.id = "content-creation-form";
-                        root.render(<ElementCreationForm placeholder="enter code block"/>);
+                        root.render(<ElementCreationForm type={type}/>);
                         chainlink.appendChild(container);
                 } else if (type === 'BR') {
                         container.id = "content-creation-form";
+                        root.render(<ElementCreationForm type={type}/>);
+                        chainlink.appendChild(container);
+                        /*container.id = "content-creation-form";
                         element = new Content("BR", "N/A", url, currentDateTime, isPublic, count, order);
                         addElement(element);
                         window.addEventListener("keydown", parseKeyDown);
                         window.removeEventListener("keydown", _listener);
-                        return null;
+                        return null;*/
                 }
         }
 
         // Otherwise if we are making this form for the creation of a header element.
         else if (headerTypes.includes(type)) {
-                const header = document.getElementById("header-elements");
-                container.id = "header-creation-form";
-                root.render(<ElementCreationForm placeholder="enter header content"/>);
-                header.appendChild(container);
+                if (type == "H1") {
+                        const header = document.getElementById("header-elements");
+                        container.id = "header-creation-form";
+                        root.render(<ElementCreationForm placeholder="enter header content" type={type}/>);
+                        header.appendChild(container);
+                } else if (type == "HBNR") {
+
+                }
         }
 
         // Identify if this is an Element that will be placed in the footer section.
@@ -600,18 +607,37 @@ export function makeForm(type) {
                 if (type === "EN") {
                         const footer = document.getElementById("footer-elements");
                         container.id = "footer-creation-form";
-                        root.render(<ElementCreationForm placeholder="enter footer content"/>);
+                        root.render(<ElementCreationForm placeholder="enter footer content" type={type}/>);
                         footer.appendChild(container);
                 }
         }
 
         container.addEventListener("submit", function(event) {
+                let formData = new FormData(event.target);
                 let input = document.getElementById("input")
+                let values = {};
+
                 event.preventDefault();
+
+                // Store the field name/value pairs of all fields in the form.
+                formData.forEach((value, key) => {
+                        values[key] = value;
+                })
+
+                console.log(values);
+
                 if (chainlinkTypes.includes(type)) {
                         element = new Chainlink("CL", input.value, url, currentDateTime, isPublic, count, order);
                 } else if (contentTypes.includes(type)) {
-                        element = new Content(type, input.value, url, currentDateTime, isPublic, count, order);
+                        element = new Content(type, "", url, currentDateTime, isPublic, count, order);
+
+                        // I'm just taking the name for each field from the form and making that exact name a field
+                        // of the Javascript representation of the Element we're creating the corresponding value from
+                        // the form is the same value that we're setting the field of the Javascript object. Fuck that
+                        // was confusing.
+                        Object.keys(values).forEach(key =>
+                            element[key.toString()] = values[key]
+                        );
                 } else if (headerTypes.includes(type)) {
                         element = new Header(type, input.value, collectionUrl.value);
                 } else if (footerTypes.includes(type)) {
@@ -969,7 +995,7 @@ export function editChainlink(target) {
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'CL');
-                xhr.setRequestHeader("text", event.target.input.value);
+                xhr.setRequestHeader("payload", JSON.stringify([{"text": event.target.input.value}]));
                 xhr.setRequestHeader('target', target);
                 xhr.send();
                 xhr.onreadystatechange = function() {
@@ -1027,7 +1053,7 @@ export function editContent(target) {
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 xhr.setRequestHeader('type', 'content');
-                xhr.setRequestHeader("text", event.target.input.value);
+                xhr.setRequestHeader("payload", JSON.stringify([{"text": event.target.input.value}]));
                 xhr.setRequestHeader('target', target);
                 xhr.send();
                 xhr.onreadystatechange = function() {

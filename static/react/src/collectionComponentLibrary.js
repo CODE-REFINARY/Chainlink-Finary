@@ -19,6 +19,10 @@ import {
  * @param {string} bitmask - indicate which buttons to enable and disable. This is regular string containing
  * 0s and 1s (bits) indicating which buttons should be active. The first bit sets the Chainlink button active.
  * The second bit sets the rest of the buttons active.
+ * Example: 10 - this sets the chainlink button to active and the rest of the buttons to `inactive`. An instance where
+ * this particular value would occur is when the user creates a new Collection. There are no Chainlinks defined for the
+ * Collection yet and so the other Body Element buttons should be grayed out and only the Chainlink button should be
+ * active.
  */
 export function CreateBodyEditButtons(props) {
     let chainlinkButton;
@@ -42,21 +46,24 @@ export function CreateBodyEditButtons(props) {
                                 <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
                                 <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code</button>
                                 <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak</button>
-                                <button className="add-buttons">&lt;inactive&gt; img</button>
-                                <button className="add-buttons">&lt;inactive&gt; ul</button>
-                                <button className="add-buttons">&lt;inactive&gt; ol</button>
+                                <button id="add-li-btn" className="add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
+                                <button id="add-link-btn" className="add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link</button>
+                                <button id="add-img-btn" className="add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
+                                <button id="add-note-btn" className="add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note</button>
                         </React.Fragment>
                 );
 
     } else if (props.bitmask[1] === "0") {
                 restOfButtons = (
                         <React.Fragment>
+                                <button className="inactive-add-buttons">&lt;p&gt; paragraph</button>
                                 <button className="inactive-add-buttons">&lt;h&gt; header</button>
                                 <button className="inactive-add-buttons">&lt;c&gt; code</button>
                                 <button className="inactive-add-buttons">&lt;b&gt; linebreak</button>
-                                <button className="inactive-add-buttons">&lt;inactive&gt; img</button>
-                                <button className="inactive-add-buttons">&lt;inactive&gt; ul</button>
-                                <button className="inactive-add-buttons">&lt;inactive&gt; ol</button>
+                                <button className="inactive-add-buttons">&lt;l&gt; list</button>
+                                <button className="inactive-add-buttons">&lt;q&gt; link</button>
+                                <button className="inactive-add-buttons">&lt;i&gt; img</button>
+                                <button className="inactive-add-buttons">&lt;n&gt; note</button>
                         </React.Fragment>
                 );
     }
@@ -73,14 +80,20 @@ export function CreateHeaderEditButtons(props) {
     let headerButton;
 
     if (props.bitmask[0] === "1") {
-                headerButton = (
-                        <button id="add-h1-btn" className="add-buttons" onClick={() => makeForm("H1")}>Title</button>
-                );
+        headerButton = (
+            <React.Fragment>
+                <button id="add-h1-btn" className="add-buttons" onClick={() => makeForm("H1")}>Title</button>
+                <button id="add-hbnr-btn" className="add-buttons" onClick={() => makeForm("HBNR")}>Header Banner</button>
+            </React.Fragment>
+        );
 
     } else if (props.bitmask[0] === "0") {
-                headerButton = (
-                        <button className="inactive-add-buttons">Title</button>
-                );
+        headerButton = (
+            <React.Fragment>
+                <button className="inactive-add-buttons">Title</button>
+                <button className="inactive-add-buttons">Header Banner</button>
+            </React.Fragment>
+        );
     }
 
     return (
@@ -97,8 +110,7 @@ export function CreateFooterEditButtons(props) {
                 footerButton = (
                     <React.Fragment>
                         <button id="add-en-btn" className="add-buttons" onClick={() => makeForm("EN")}>Endnote</button>
-                        <button id="add-rl-btn" className="add-buttons" onClick={() => makeForm("RL")}>Reference List</button>
-                        <button id="add-ll-btn" className="add-buttons" onClick={() => makeForm("LL")}>Link List</button>
+                        <button id="add-ftrli-btn" className="add-buttons" onClick={() => makeForm("FTRLI")}>Footer List</button>z
                     </React.Fragment>
                 );
 
@@ -106,8 +118,7 @@ export function CreateFooterEditButtons(props) {
                 footerButton = (
                     <React.Fragment>
                         <button className="inactive-add-buttons">Endnote</button>
-                        <button className="inactive-add-buttons">Reference List</button>
-                        <button className="inactive-add-buttons">Link List</button>
+                        <button className="inactive-add-buttons">Footer List</button>
                     </React.Fragment>
                 );
     }
@@ -182,23 +193,50 @@ export function ElementCreationForm(props) {
         useEffect(() => {
                 refresh();
         })
-        return (
+
+        if (props.type === 'H3') {
+            return (
+                <React.Fragment>
+                    <ConstructHeader3Element type={props.type}/>
+                </React.Fragment>
+            );
+        } else if (props.type === 'CODE') {
+            return (
+                <React.Fragment>
+                    <ConstructCodeElement type={props.type}/>
+                </React.Fragment>
+            );
+        } else if (props.type === 'P') {
+            return (
+                <React.Fragment>
+                    <ConstructParagraphElement type={props.type}/>
+                </React.Fragment>
+            );
+        } else if (props.type === 'BR') {
+            return (
+                <React.Fragment>
+                    <ConstructLinebreakElement type={props.type}/>
+                </React.Fragment>
+            );
+        } else {
+            return (
                 <form id="crud-form">
-                        <input autoFocus type="text" id="input" placeholder={props.placeholder} defaultValue={props.value}/>
-                        <select id="element-creation-select" name="element">
-                                <option value="CL">chainlink</option>
-                                <option value="H1">header</option>
-                                <option value="P">paragraph</option>
-                                <option value="CODE">code</option>
-                                <option value="BR">linebreak</option>
-                                <option value="unordered list">unordered list</option>
-                                <option value="ordered list">ordered list</option>
-                        </select>
-                        <div id="element-creation-text-align-right">
-                            <button id="element-creation-submit" type="submit">Submit</button>
-                        </div>
+                    <input autoFocus type="text" id="input" placeholder={props.placeholder} defaultValue={props.value}/>
+                    <select id="element-creation-select" name="element">
+                        <option value="CL">chainlink</option>
+                        <option value="H1">header</option>
+                        <option value="P">paragraph</option>
+                        <option value="CODE">code</option>
+                        <option value="BR">linebreak</option>
+                        <option value="unordered list">unordered list</option>
+                        <option value="ordered list">ordered list</option>
+                    </select>
+                    <div id="element-creation-text-align-right">
+                        <button id="element-creation-submit" type="submit">Submit</button>
+                    </div>
                 </form>
-        );
+            );
+        }
 }
 
 export function ChainlinkElement(props) {
@@ -234,6 +272,9 @@ export function ChainlinkElement(props) {
         );
 }
 
+/**
+ * Create a Content Element. The type of Element to instantiate is specified by `props.type`.
+ */
 export function ContentElement(props) {
 
         useEffect(() => {
@@ -286,3 +327,59 @@ export function ContentElement(props) {
                 );
         }
 }
+
+// Form components for individual Elements
+// These are forms displayed whenever a user is creating or updating an Element. Every Element has its own form. These
+// components are not exported because they are always called by ElementCreationForm.
+
+// This form is instantiated whenever a new Paragraph is being created
+function ConstructParagraphElement(props) {
+    return (
+        <form id="crud-form">
+            <input autoFocus type="text" id="input" placeholder="enter paragraph content" name="text" defaultValue={props.value}/>
+            <div id="element-creation-text-align-right">
+                <input id="element-creation-submit" type="submit" value="Submit" />
+            </div>
+        </form>
+    );
+};
+
+// This form is instantiated whenever a Code section is being created
+function ConstructCodeElement(props) {
+    return (
+        <form id="crud-form">
+            <input autoFocus type="text" id="input" placeholder="Shift+Enter For New Line" name="text" defaultValue={props.value}/>
+            <div id="element-creation-text-align-right">
+                <input id="element-creation-submit" type="submit" value="Submit" />
+            </div>
+        </form>
+    );
+};
+
+// This form is instantiated whenever an H3 Element is being created
+function ConstructHeader3Element(props) {
+    return (
+        <form id="crud-form">
+            <input autoFocus type="text" id="input" defaultValue={props.value} name="text" />
+            <div id="element-creation-text-align-right">
+                <input id="element-creation-submit" type="submit" value="Submit" />
+            </div>
+        </form>
+    );
+};
+
+// This form is instantiated whenever an H3 Element is being created
+function ConstructLinebreakElement(props) {
+    return (
+        <form id="crud-form">
+            <select name="height">
+                <option value="single">Single</option>
+                <option value="double">Double</option>
+                <option value="max">Max</option>
+            </select>
+            <div id="element-creation-text-align-right">
+                <input id="element-creation-submit" type="submit" value="Submit" />
+            </div>
+        </form>
+    );
+};

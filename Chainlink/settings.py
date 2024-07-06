@@ -149,3 +149,7 @@ REACT_STATIC_ROOT = os.path.join(STATIC_URL, "react", "static")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# This is the URL to the media folder that users see when making network requests to get images.
+MEDIA_URL = '/media/'
+# This is the actual URL on the host system that points to where the media files are stored.
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

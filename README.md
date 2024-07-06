@@ -1,7 +1,16 @@
-## Chainlink Finary
+# Chainlink Finary
 
-This project is the Python/Django implementation of the Chainlink Finary concept. This web application is containerized and runs out-of-the box on localhost:8000 with a simple `sudo docker compose up`.
+## Setup
+<p>Chainlink Finary is a web application that currently lives at https://www.chainlinkfinary.com/. This application is can
+be run locally using Docker. Using the included `docker-compose.yml` file you can spin up all the containers and
+necessary to run the application. In order for this to work you must have root privileges on your machine and your
+port 8000 must be free. With these requirements met you may spin up the containers by running `sudo docker compose up`
+in the same directory as the `docker-compose.yml` file.</p>
 
-In order to run the server a .env file must be created in the root folder with the `SECRET_KEY` variable set along with `DB_PASSWORD=postgres`.
+<p>The server container which is named `django` will not work unless you have defined a .env file in the same directory as
+this README.md file. The included `.envTEMPLATE` file contains the .env settings that I use when I run the application
+locally. Instead of creating a new .env file I recommend just renaming `.envTEMPLATE` to `.env`.</p>
 
-On Windows the postgres database is accessed within settings.py via `host.docker.internal` whereas on Linux the correct way to access it is with the static IP: `172.17.0.1` assuming a "standard" network configuration.
+<p>The BH_HOST variable defined in `.envTEMPLATE` specifies the IP address of the database (but not port). If you are
+running this program on a Windows machine you will want to set this value to `host.docker.internal`. If you are on
+Linux or MacOS you will want to set this to `172.17.0.1`.</p>

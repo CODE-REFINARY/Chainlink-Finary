@@ -1,6 +1,7 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Collection, Body, TagType, Account, Header, Footer, Endnote, Paragraph, Linebreak, Header1, Header3, Code
+from .models import Chainlink, Collection, Body, TagType, Account, Header, Footer, Endnote, Paragraph, Linebreak, \
+    Header1, Header3, Code
 
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
@@ -18,7 +19,7 @@ import json  # use this to parse JSON payloads in HTTP requests
 import hashlib  # use this to generate hashes for urls
 from decouple import config
 
-from django.conf import settings    # Get variables defined in settings.py
+from django.conf import settings  # Get variables defined in settings.py
 
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
@@ -77,7 +78,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         json_data["url"] = cl.url
         json_data["order"] = cl.order
 
-    elif tag ==TagType.PARAGRAPH:
+    elif tag == TagType.PARAGRAPH:
         chainlink = Chainlink.objects.get(url=json_data["url"])
         numElements = Body.objects.filter(chainlink=chainlink).count()
         content = Paragraph()
@@ -132,7 +133,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.save()
         json_data["order"] = content.order
 
-    elif tag ==TagType.CODE:
+    elif tag == TagType.CODE:
         chainlink = Chainlink.objects.get(url=json_data["url"])
         numElements = Body.objects.filter(chainlink=chainlink).count()
         content = Code()
@@ -160,7 +161,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.save()
         json_data["order"] = content.order
 
-    elif tag ==TagType.HEADER3:
+    elif tag == TagType.HEADER3:
         chainlink = Chainlink.objects.get(url=json_data["url"])
         numElements = Body.objects.filter(chainlink=chainlink).count()
         content = Header3()
@@ -205,7 +206,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
                     # field for all elements after this one
                 except Body.DoesNotExist:
                     print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
-                    #chainlink.count -= 1  # We've discovered a missing element so the count must be off
+                    # chainlink.count -= 1  # We've discovered a missing element so the count must be off
                     # Find the next existing Body after the one to be added.
                     for j in range(i + 1, numElements):
                         try:
@@ -228,7 +229,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
     elif tag == TagType.COLLECTION:
         # Create a representation of the Article as a python object
         collection = Collection()
-        collection.url = db_try_url(TagType.HEADER1)    # Get a unique url for this collection.
+        collection.url = db_try_url(TagType.HEADER1)  # Get a unique url for this collection.
         collection.public = False
         collection.date = timezone.now()
 
@@ -280,8 +281,16 @@ def db_remove(table, url, order):
     :param order: This is an int identifier used in tandem with url to identify Body type targets. It is this field
     # that will get updated for all subsequent Body elements so that there is no gap in the element ordering
     """
+    # If the user is trying to delete a Collection then we have to worry about cases where other
     if table == Collection:
         target = table.objects.get(url=url)
+        chainlinks = Chainlink.objects.get(Collection=target)
+        for chainlink in chainlinks:
+            if chainlink.archive:
+                # For any Chainlinks that are referencing the target Collection and which have been set to be archived
+                # don't delete them when the Collection is deleted. Instead, orphan them by setting their associated
+                # Collection to NULL in the database.
+                chainlink.Collection = None
 
     elif table == Chainlink:
         target = table.objects.get(url=url)
@@ -317,18 +326,27 @@ def db_update(table, url, order, payload):
     :param order: item identifier used in tandem with url to identify Body type targets
     :param payload: string indicating changes to make to target item
     """
-    new_title = payload
-    if table == Chainlink:
-        target = table.objects.get(url=url)  # Get the record that we want to modify.
-        if target.text != new_title:  # Check if the new text matches the old one. If they're different then make
-            # sure the new text is valid.
-            new_title = db_try_title(table, new_title)  # Validate the new text
-            target.text = new_title
+    change_list = json.loads(payload)
+    for change in change_list:
+        key = list(change.keys())[0]  # value of the field to update
+        value = list(change.values())[0]  # value of the value to set the field to
 
-    elif table == Body:
-        parent_chainlink = Chainlink.objects.get(url=url)
-        target = table.objects.get(chainlink=parent_chainlink, order=order)
-        target.text = new_title
+        if table == Chainlink:
+            target = table.objects.get(url=url)  # Get the record that we want to modify.
+            # If the user is trying to modify the title text of the Chainlink then make sure the text is unique.
+            if key == "text":
+                # Check if the new text matches the old one. If they're different then validate it. Otherwise, pass.
+                if target.text != value:
+                    target.text = db_try_title(table, value)  # Validate the new text
+
+        elif table == Body:
+            parent_chainlink = Chainlink.objects.get(url=url)
+            target = Body.objects.get(chainlink=parent_chainlink, order=order).content
+            if hasattr(target, key):
+                setattr(target, key, value)
+            else:
+                print(
+                    "Error: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
 
     target.save()
 
@@ -417,7 +435,7 @@ def generic(request, key=""):
         if request.user.is_authenticated:
             collections = Collection.objects.all()
         else:
-        # Otherwise just display the Collections that are marked public.
+            # Otherwise just display the Collections that are marked public.
             collections = Collection.objects.filter(public=True)
         collection_titles = Header.objects.all()
 
@@ -469,7 +487,7 @@ def generic(request, key=""):
 
     elif request.method == "PUT":
         target_id = request.headers["target"]
-        target_update = request.headers["text"]
+        target_update = request.headers["payload"]
         Tag = TagType(request.headers["type"])
         match Tag:
             case TagType.COLLECTION:
@@ -599,6 +617,7 @@ def login(request):
         new_url = urlunparse(url_parts)
 
         return HttpResponseRedirect(new_url)
+
 
 def logout(request):
     if request.method == "POST":

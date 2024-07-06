@@ -54,7 +54,6 @@ export class Content extends Element {
         constructor(tag, text, url, date=null, isPublic=true, count=0, order=0) {
                 super();
                 this.type = tag;
-                this.text = text;
                 this.url = url;
                 this.date = date;
                 this.is_public = isPublic;

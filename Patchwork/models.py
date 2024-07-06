@@ -3,6 +3,14 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+
+class Account(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    landing_page_url = models.CharField(max_length=128, default="null")
+    def __str__(self):
+        return str(self.user.username)
+
+
 # Conceptually the "tags" defined here are what are referred to as "Elements" elsewhere. Element is a fairly broad
 # term but really refers to the components of a Collection. The Collection itself is an Element and so are the
 # various building blocks of that Collection including <code> sections, <h1> sections, linebreaks, and so on. These
@@ -21,9 +29,14 @@ class TagType(models.TextChoices):
     COLLECTION = "collection"
     CONTENT = "content"
     FOOTER = "footer"
-    REFERENCE_LIST = "RL"   # The References List has the same role as the "References" section that you can find on Wikipedia articles.
-    LINK_LIST = "LL"    # The Link List is an unordered list of links that appears in the footer area
     ENDNOTE = "EN"  # Endnotes are paragraphs that appear in the footer
+    IMAGE = "IMG", _("image")
+    LIST = "LI", _("list")
+    LINK = "LINK", _("link")
+    HEADER_BANNER = "HBNR", _("header banner")
+    FOOTER_LIST = "FTRLI", _("footer list")
+    NOTE = "NOTE", _("note")
+
 
 
 class Theme(models.TextChoices):
@@ -56,10 +69,21 @@ class Collection(models.Model):
 class Chainlink(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key
     tag = TagType.CHAINLINK  # all chainlinks are displayed in <h2>
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE,
-                                   null=True)  # identifer for which collection this chainlink belongs
+
+    # Chainlinks are always associated with a Collection at creation. This link is defined in this field. If the
+    # associated Collection is deleted then a Chainlink is typically deleted. However, if the Chainlink archive field
+    # is set to True then the Chainlink should not be deleted. In this case the Chainlink will be orphaned and will
+    # not be associated with a Collection. We want to avoid instances where this nullifying behavior occurs,
+    # so we'll implement checks and user prompts to warn users against accidentally orphaning Chainlinks that other
+    # Collections are referencing.
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=True)
     text = models.CharField(max_length=200)  # Header element for this chainlink
     url = models.CharField(max_length=75)  # relative url for the chainlink
+    # The user may decide to archive a chainlink which sets this boolean. By default, a created Chainlink is not
+    # archived. If a chainlink is archived then it cannot be deleted except with access to the database. An archived
+    # chainlink will not be deleted if its Collection is deleted. This means that other Collections that reference
+    # this chainlink via Link elements will not be affected by the Chainlink's Collection being deleted.
+    archive = models.BooleanField(default=False)
     order = models.BigIntegerField(
         default=0)  # integer value specifying which order on the collection this chainlink appears
     public = models.BooleanField(default=False)  # Indicate whether this chainlink will be shareable
@@ -76,8 +100,10 @@ class Chainlink(models.Model):
         return returnme
 
 
-
 class Body(models.Model):
+
+    # We do not want body elements to be orphaned. Every body element must be assoaciated with a Chainlink, otherwise
+    # we have no way of displaying it.
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
     order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
     public = models.BooleanField(default=True)
@@ -128,6 +154,7 @@ class Code(Body):
 
 class Linebreak(Body):
     tag = TagType.LINEBREAK
+    height = models.TextChoices("single", "double", "max")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -147,6 +174,73 @@ class Header3(Body):
         returnme += "Text: " + "%.35s" % self.text
         return returnme
 
+
+class Image(Body):
+    tag = TagType.IMAGE
+
+    # This field tells us where images
+    img = models.ImageField(upload_to='image_uploads/')
+    # This does the same thing as the HTML 'title' attribute of <img>. It's a tooltip for screen readers and instances
+    # where the image can't be loaded.
+    title = models.CharField(max_length=10000)
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Image Title: " + "%.35s" % self.title
+        return returnme
+
+
+class Note(Body):
+    tag = TagType.NOTE
+    text = models.CharField(max_length=100000, default="")
+    # This type field is for specifying how the note section should look. These are inspired (read also `ripped off`
+    # from the options available in the Confluence Note feature which this model is inspired by.
+    type = models.TextChoices("info", "note", "success", "warning", "error")
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        returnme += "Note Type: " + "%.35s" % self.type
+        return returnme
+
+
+class Link(Body):
+    tag = TagType.LINK
+    # If the Chainlink that's linked here is deleted we don't want this record to be gone either. Instead, we want to
+    # alert the user and let them decide whether to keep this Element or not.
+    linked_chainlink = models.ForeignKey(Chainlink, on_delete=models.SET_NULL, null=True)
+
+    # I've encountered situations were I want to add a clarifying note to a Chainlink because its use in another
+    # workflow requires some clarification or small adjustment. This variable is for that clarifying text.
+    context_note = models.CharField(max_length=10000, null=False, default="")
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Linked Chainlink: " + "%.35s" % self.linked_chainlink.title if linked_chainlink else "N/A"
+        returnme += "Context Note: " + "%.35s" % self.context_note
+        return returnme
+
+
+class List(Body):
+    tag = TagType.LIST
+    content = models.JSONField()
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        return returnme
+
+
+
+#################################################################################################################
+# Header
 
 class Header(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
@@ -178,6 +272,24 @@ class Header1(Header):
         return returnme
 
 
+class HeaderBanner(Header):
+    tag = TagType.HEADER_BANNER
+    content = models.JSONField()
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        return returnme
+
+
+#################################################################################################################
+# Footer
+
+# The Footer is one of the three section of a Collection. It is the section that appears at the bottom of the Collection
+# below any and all Chainlinks. This section contains paragraphs or lists. Footer elements are child classes of this
+# Footer class. The order in which they appear in the Collection is dictated by the `order` field which they all get
+# because they inherit it from this Footer parent class.
 class Footer(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
@@ -196,6 +308,8 @@ class Footer(models.Model):
         return returnme
 
 
+# This is just a paragraph that appears in the footer section of the Collection. The options available here are
+# pretty much identical to what you get when you create a regular paragraph in a Chainlink.
 class Endnote(Footer):
     tag = TagType.ENDNOTE
     text = models.CharField(max_length=10000)
@@ -208,8 +322,14 @@ class Endnote(Footer):
         return returnme
 
 
-class Account(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    landing_page_url = models.CharField(max_length=128, default="null")
+# This is a list of items that appear in the footer section of a Collection. This list is supposed to be very
+# customizable with things like the ability to display the contents vertically or horizontally.
+class FooterList(Footer):
+    tag = TagType.FOOTER_LIST
+    content = models.JSONField()
     def __str__(self):
-        return str(self.user.username)
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        return returnme
