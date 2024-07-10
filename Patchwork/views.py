@@ -26,6 +26,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
 
+from datetime import datetime
+
 
 class HttpRequestWrapper(HttpRequest):
     def __init__(self, body_data, user_data, *args, **kwargs):
@@ -68,8 +70,16 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         cl.collection = collection
         cl.text = db_try_title(Chainlink, json_data["text"])
         cl.url = db_try_url(TagType.CHAINLINK)
-        cl.public = json_data["is_public"]
-        cl.date = timezone.now()
+        cl.public = json_data["public"]
+        cl.archive = json_data["archive"]
+        cl.css = json_data["css"]
+
+        if json_data["date"]:
+            try:
+                cl.date = datetime.strptime(json_data["date"], '%m/%d/%y %H:%M:%S')
+            except ValueError:
+                print("The user supplied a bad date so instead I will use the current date and time.")
+                cl.date = timezone.now()
 
         # write objects to the database
         cl.save()

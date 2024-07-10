@@ -218,6 +218,12 @@ export function ElementCreationForm(props) {
                     <ConstructLinebreakElement type={props.type}/>
                 </React.Fragment>
             );
+        } else if (props.type == "CL") {
+            return (
+                <React.Fragment>
+                    <ConstructChainlinkElement type={props.type}/>
+                </React.Fragment>
+            )
         } else {
             return (
                 <form id="crud-form">
@@ -377,6 +383,38 @@ function ConstructLinebreakElement(props) {
                 <option value="double">Double</option>
                 <option value="max">Max</option>
             </select>
+            <div id="element-creation-text-align-right">
+                <input id="element-creation-submit" type="submit" value="Submit" />
+            </div>
+        </form>
+    );
+};
+
+function ConstructChainlinkElement(props) {
+    return (
+        <form id="crud-form">
+            <div id="non-submit-fields">
+                <div className="form-group">
+                    <label htmlFor="text" id="chainlink-form-text-label" className="form-label">text</label>
+                    <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text" className="form-field" />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="public" id="chainlink-form-public-label" className="form-label">public</label>
+                    <input type="checkbox" name="public" id="chainlink-form-public" value="on" className="form-field" />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="archive" id="chainlink-form-archive-label" className="form-label">archive</label>
+                    <input type="checkbox" name="archive" value="on" id="chainlink-form-archive" className="form-field" />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="date" id="chainlink-form-date-label" className="form-label">date</label>
+                    <input type="input" name="date" id="chainlink-form-date" placeholder="ex: 09/19/22 13:55:26" className="form-field" />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="css" id="chainlink-form-css-label" className="form-label">css</label>
+                    <input type="input" name="css" id="chainlink-form-css" className="form-field" />
+                </div>
+            </div>
             <div id="element-creation-text-align-right">
                 <input id="element-creation-submit" type="submit" value="Submit" />
             </div>

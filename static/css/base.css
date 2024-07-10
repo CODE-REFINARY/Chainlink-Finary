@@ -561,3 +561,26 @@ div.combination {
 	padding-left: 25px;
 	padding-right: 25px;
 }
+
+
+/* ////////////////////////// FORM ELEMENTS ////////////////////////// */
+
+#non-submit-fields {
+	display: flex;
+	flex-direction: column;
+
+}
+
+.form-label {
+    float: left;
+}
+
+.form-field {
+    float: right;
+}
+
+.form-group {
+	padding: 7px 7px 7px 7px;
+	display: block;
+	margin-bottom: 15px;
+}

@@ -23,3 +23,7 @@ clone with way fewer features. I've been using Confluence for several years now 
 a version of Confluence that only has the features that I use and has none of the ones that I don't. The motivation
 is exactly what my friend described - an effort to promote consistency across documents by limiting the number of
 individual trivial decisions you make when writing out a document, especially formatting decisions.</p>
+
+<p>Perhaps the greatest change to the way Confluence usually works is hinted it in the structure of this README. You
+might notice the straightforward structure of this document. There is one H1 followed by a series of H2's with
+content filling in the gaps of those H2s.</p>

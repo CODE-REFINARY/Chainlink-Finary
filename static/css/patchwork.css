@@ -1,5 +1,11 @@
-/* patchwork is a theme. The user can select this theme if they wish for a front-end that replicates the feel of old static websites
- */
+/* patchwork is a theme. The user can select this theme if they wish for a front-end that replicates the feel of old static websites */
+
+/* ////////////////////////// GLOBAL CONSTANTS ////////////////////////// */
+
+:root {
+    --form-text-color: #ffffff;
+    --form-field-background-color: #3e435db8;
+}
 
 /* ////////////////////////// PATCHWORK BACKGROUND ////////////////////////// */
 
@@ -331,4 +337,19 @@ body {
     font-size: x-small;
     color: #888888;
     margin-right: 4px;
+}
+
+
+/* ////////////////////////// FORM ELEMENTS ////////////////////////// */
+
+.form-label {
+    color: var(--form-text-color);
+}
+
+.form-group {
+    background-color: var(--form-field-background-color);
+}
+
+.form-field {
+
 }

@@ -565,29 +565,9 @@ export function makeForm(type) {
                 order = getMatchedChildren(chainlink, contentElementClassNames).length;
                 url = getUrlFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id'));
 
-                if (type === "H3") {
-                        container.id = "content-creation-form";
-                        root.render(<ElementCreationForm placeholder="enter header content" type={type}/>);
-                        chainlink.appendChild(container);
-                } else if (type === "P") {
-                        container.id = "content-creation-form";
-                        root.render(<ElementCreationForm type={type}/>);
-                        chainlink.appendChild(container);
-                } else if (type === "CODE") {
-                        container.id = "content-creation-form";
-                        root.render(<ElementCreationForm type={type}/>);
-                        chainlink.appendChild(container);
-                } else if (type === 'BR') {
-                        container.id = "content-creation-form";
-                        root.render(<ElementCreationForm type={type}/>);
-                        chainlink.appendChild(container);
-                        /*container.id = "content-creation-form";
-                        element = new Content("BR", "N/A", url, currentDateTime, isPublic, count, order);
-                        addElement(element);
-                        window.addEventListener("keydown", parseKeyDown);
-                        window.removeEventListener("keydown", _listener);
-                        return null;*/
-                }
+                container.id = "content-creation-form";
+                root.render(<ElementCreationForm placeholder="enter header content" type={type}/>);
+                chainlink.appendChild(container);
         }
 
         // Otherwise if we are making this form for the creation of a header element.
@@ -624,12 +604,8 @@ export function makeForm(type) {
                         values[key] = value;
                 })
 
-                console.log(values);
-
                 if (chainlinkTypes.includes(type)) {
-                        element = new Chainlink("CL", input.value, url, currentDateTime, isPublic, count, order);
-                } else if (contentTypes.includes(type)) {
-                        element = new Content(type, "", url, currentDateTime, isPublic, count, order);
+                        element = new Chainlink("CL", null, url, currentDateTime, isPublic, count, order);
 
                         // I'm just taking the name for each field from the form and making that exact name a field
                         // of the Javascript representation of the Element we're creating the corresponding value from
@@ -638,11 +614,31 @@ export function makeForm(type) {
                         Object.keys(values).forEach(key =>
                             element[key.toString()] = values[key]
                         );
+
+                        // We have to check the values of the form checkboxes manually since if the user leaves it
+                        // unchecked it there will not be an entry for it returned by FormData (this is just how HTML
+                        // works and has always worked).
+                        if (!values["public"]) {
+                                element["public"] = false;
+                        } else {
+                                element["public"] = true;
+                        }
+
+                        // Also manually check for the archive field checkbox
+                        if (!values["archive"]) {
+                                element["archive"] = false;
+                        } else {
+                                element["archive"] = true;
+                        }
+
+                } else if (contentTypes.includes(type)) {
+                        element = new Content(type, "", url, currentDateTime, isPublic, order);
                 } else if (headerTypes.includes(type)) {
                         element = new Header(type, input.value, collectionUrl.value);
                 } else if (footerTypes.includes(type)) {
                         element = new Footer(type, input.value, collectionUrl.value);
                 }
+
                 window.addEventListener("keydown", parseKeyDown);
                 addElement(element);
                 container.remove();
@@ -1029,7 +1025,7 @@ export function editContent(target) {
         const order = getOrderFromId(wrapper.id);
         const tag = wrapper.getAttribute("tag");
         const index = parseInt(wrapper.getAttribute("index"));
-        let element = new Content(tag, title, url, null, true, 0, order);
+        let element = new Content(tag, title, url, null, true, order);
 
         const _listener = function (e) {
                 escape(e, _listener, "", element);
