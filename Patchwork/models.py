@@ -102,7 +102,7 @@ class Chainlink(models.Model):
 
 class Body(models.Model):
 
-    # We do not want body elements to be orphaned. Every body element must be assoaciated with a Chainlink, otherwise
+    # We do not want body elements to be orphaned. Every body element must be associated with a Chainlink, otherwise
     # we have no way of displaying it.
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
     order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
@@ -154,7 +154,7 @@ class Code(Body):
 
 class Linebreak(Body):
     tag = TagType.LINEBREAK
-    height = models.TextChoices("single", "double", "max")
+    height = models.CharField(max_length=1000000, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
