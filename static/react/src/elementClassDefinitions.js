@@ -1,5 +1,28 @@
+export const TagType = Object.freeze({
+    HEADER1: "H1",
+    CHAINLINK: "CL",
+    PARAGRAPH: Symbol("P"),
+    CODE: Symbol("CODE"),
+    HEADER3: Symbol("H3"),
+    LINEBREAK: Symbol("BR"),
+    COLLECTION: Symbol("collection"),
+    ENDNOTE: Symbol("EN"),
+    IMAGE: Symbol("IMG"),
+    LIST: Symbol("LI"),
+    LINK: Symbol("LINK"),
+    HEADER_BANNER: Symbol("HBNR"),
+    FOOTER_LIST: Symbol("FTRLI"),
+    NOTE: Symbol("NOTE")
+});
+
 export class Element {
-        constructor() {}
+    constructor(type) {
+        if (!Object.values(TagType).includes(type)) {
+            throw new Error("An invalid type was specified for the new Element.");
+        } else {
+            this.type = type
+        }
+    }
 }
 
 export class Collection extends Element {

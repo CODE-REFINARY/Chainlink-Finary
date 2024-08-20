@@ -1,7 +1,7 @@
 /* React imports */
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Element, Collection, Chainlink, Content, Header, Footer } from "./elementClassDefinitions.js"
+import { TagType, Element, Collection, Chainlink, Content, Header, Footer } from "./elementClassDefinitions.js"
 import {
         ChainlinkEditButtons,
         ChainlinkElement,
@@ -605,7 +605,11 @@ export function makeForm(type) {
                 })
 
                 if (chainlinkTypes.includes(type)) {
-                        element = new Chainlink("CL", null, url, currentDateTime, isPublic, count, order);
+                        //element = new Chainlink("CL", null, url, currentDateTime, isPublic, count, order);
+
+                        let cl_type = TagType.CHAINLINK;
+                        console.log(typeof(cl_type));
+                        let element = new Element(cl_type);
 
                         // I'm just taking the name for each field from the form and making that exact name a field
                         // of the Javascript representation of the Element we're creating the corresponding value from

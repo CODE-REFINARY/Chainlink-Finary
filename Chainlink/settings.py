@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Chainlink',
     'Patchwork',
+    'YACalendar',
     "whitenoise.runserver_nostatic",
 ]
 
