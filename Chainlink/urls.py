@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Patchwork.urls')),
     path('patchwork/', include('Patchwork.urls')),
+    path('yacalendar/', include('YACalendar.urls')),
 ]
 
 if settings.DEBUG:  # Serve static files only during development

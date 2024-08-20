@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Landing page for Rock YA Google Calendar">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/calendar-favicon-16.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/yacalendar.css' %}">
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">-->
+    <title>YA Event Calendar</title>
+</head>
+<body>
+        <header class="header">
+            <h1>YA&nbsp;Event&nbsp;Calendar</h1>
+        </header>
+        <main class="calendar">
+            <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FLos_Angeles&bgcolor=%238e8bd0&src=NmI3MDE3YzFhNWEwN2M3NmIwMTFlOGZjNWVlNDBkMWJiOTczNjZmMDllM2Y4Y2U2ODI4NzY2YTQ2NGRiYjhkNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23A79B8E" style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+        </main>
+        <footer class="footer">
+            <p>** Unaffiliated **</p>
+        </footer>
+</body>
+</html>

@@ -79,24 +79,24 @@
                             <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
                         </h2>
                     </div>
-                    {% for content in chainlink.1 %}
-                        {% if content.tag == "P" %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="P">
-                            <p class="inner-content" style="{{ content.css }}">{{ content.text }}</p>
+                    {% for body_element in chainlink.1 %}
+                        {% if body_element.content.tag == "P" %}
+                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="P">
+                            <p class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</p>
                         </div>
-                        {% elif content.tag == 'CODE' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="CODE">
-                            <code class="inner-content" style="{{ content.css }}">{{ content.text }}</code>
+                        {% elif body_element.content.tag == 'CODE' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="CODE">
+                            <code class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</code>
                         </div>
-                        {% elif content.tag == 'H3' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="H3">
-                            <h3 class="inner-content" style="{{ content.css }}">{{ content.text }}</h3>
+                        {% elif body_element.content.tag == 'H3' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="H3">
+                            <h3 class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</h3>
                         </div>
-                        {% elif content.tag == 'BR' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ content.order }}" class="content-wrapper" tag="BR">
-                            <span class="inner-content br" style="{{ content.css }}"><i>&#60;!-- linebreak insert --&#62;</i></span>
+                        {% elif body_element.content.tag == 'BR' %}
+                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="BR">
+                            <span class="inner-content br" style="{{ body_element.css }}"><i>&#60;!-- linebreak insert --&#62;</i></span>
                         </div>
-                        {% elif content.tag == 'delimiter' %}
+                        {% elif body_element.tag == 'delimiter' %}
                         {% endif %}
                         {% empty %}
                             <!--<div id="no-contents" class="no-elements">&ltno content&gt</div>-->
@@ -119,7 +119,7 @@
         <div id="footer-elements">
             {% if footers %}
                 {% for footer in footers %}
-                    <p id="doc-footer" class="footer-element-wrapper" style="{{ footer.css }}">{{ footer.text }}</p>
+                    <p id="doc-footer" class="footer-element-wrapper" style="{{ footer.css }}">{{ footer.content.text }}</p>
                 {% endfor %}
             {% else %}
                 <div id="missing-footer" class="no-elements">&ltFOOTER CONTENT MISSING&gt</div>
