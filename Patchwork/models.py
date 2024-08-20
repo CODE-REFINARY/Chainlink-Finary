@@ -44,6 +44,23 @@ class Theme(models.TextChoices):
     PATCHWORK = "patchwork", _("Patchwork")
 
 
+
+class HeightSpacing(models.TextChoices):
+    SINGLE = "single", _("Single Spacing")
+    DOUBLE = "double", _("Double Spacing")
+    MAX = "max", _("Maximum Space")
+
+
+
+class NoteType(models.TextChoices):
+    INFO = "info", _("I (Informational) Blue Icon Message")
+    NOTE = "note", _("Yellow Sticky Note Message")
+    SUCCESS = "success", _("Green Success Message")
+    WARNING = "warning", _("Triangle Icon Yellow Warning Message")
+    ERROR = "error", _("Message with Red Error Symbol")
+
+
+
 class Collection(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key (useful for testing)
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
@@ -154,7 +171,8 @@ class Code(Body):
 
 class Linebreak(Body):
     tag = TagType.LINEBREAK
-    height = models.CharField(max_length=1000000, default="")
+    # Originally there were 3 choices for the height: a "single", a "double", and a "maximum" spacing option
+    height = models.CharField(max_length=100, choices=HeightSpacing.choices, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -197,7 +215,7 @@ class Note(Body):
     text = models.CharField(max_length=100000, default="")
     # This type field is for specifying how the note section should look. These are inspired (read also `ripped off`
     # from the options available in the Confluence Note feature which this model is inspired by.
-    type = models.TextChoices("info", "note", "success", "warning", "error")
+    height = models.CharField(max_length=100, choices=NoteType.choices, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
