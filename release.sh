@@ -1,4 +1,3 @@
 #!/bin/bash
-python manage.py makemigrations --noinput
-python manage.py migrate --noinput
+pip install -r requirements.txt --quiet
 python manage.py collectstatic --no-input
