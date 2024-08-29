@@ -14,6 +14,10 @@ from pathlib import Path
 from decouple import config
 import os
 
+# This package is used in the database definition section to parse the DATABASE_UR environment var that Heroku defines
+# for the postgres addon.
+import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,6 +31,8 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True if config("DEBUG_BOOL").upper() == "TRUE" else False
 
 ALLOWED_HOSTS = ['*']
+
+# This is now required with Django 4.0. This is a list of trusted origins for unsafe requests (e.g. POST).
 CSRF_TRUSTED_ORIGINS = ['https://www.chainlinkfinary.com', 'https://chainlink-finary.herokuapp.com']
 
 # Application definition
@@ -86,18 +92,10 @@ CSRF_COOKIE_HTTPONLY = False  # no practical benefit here
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config("DB_DATABASE"),
-        'USER': config("DB_USERNAME"),
-        'PASSWORD': config("DB_PASSWORD"),
-        'HOST': config("DB_HOST"),
-        'PORT': config("DB_PORT"),
-    },
-    'sqlite': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # This is the connection to the postgres database. In the docker environment this requires the DATABASE_URL to
+    # be defined in the .env file. In Heroku this variable is defined automatically as an environment var so there's
+    # minimal steps required to get it to run in Heroku. This is why we use the dj_database_url library here.
+    'default': dj_database_url.config(default=config('DATABASE_URL'), conn_max_age=600)
 }
 
 # Password validation
@@ -165,14 +163,7 @@ EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)  # EUse MAIL_P
 # Celery Beat
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# Heroku rotates the credentials for the Redis database so it's better to get to use the REDIS_URL environment variable
-# which is automatically maintained by Heroku. Otherwise, if you use hard-values
-"""if config("ENVIRONMENT", cast=str, default=None) == "HEROKU":
-    CELERY_BROKER_URL = os.environ.get('REDIS_URL')
-    CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
-else:
-    CELERY_BROKER_URL = config("CELERY_BROKER", cast=str, default=None)
-    CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", cast=str, default=None)"""
-
+# REDIS_URL is an environment variable that's managed automatically in Heroku, so we don't have to define a Heroku
+# config variable in Heroku (but we do have to give it a value for the Docker environment).
 CELERY_BROKER_URL = config("REDIS_URL", cast=str, default=None)
 CELERY_RESULT_BACKEND = config("REDIS_URL", cast=str, default=None)
