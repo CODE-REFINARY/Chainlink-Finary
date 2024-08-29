@@ -8,6 +8,7 @@ __pycache__
 # Env
 .env
 .credentials
+.DS_Store
 myvenv/
 venv/
 Scripts/
