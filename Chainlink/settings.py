@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True if config("DEBUG_BOOL").upper() == "TRUE" else False
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['www.chainlinkfinary.com', 'chainlink-finary.herokuapp.com']
+CSRF_TRUSTED_ORIGINS = ['https://www.chainlinkfinary.com', 'https://chainlink-finary.herokuapp.com']
 
 # Application definition
 
