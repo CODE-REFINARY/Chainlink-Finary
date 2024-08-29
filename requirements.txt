@@ -1,6 +1,12 @@
-Django>=3.0,<4.0
+Django==4.2.7
 psycopg2>=2.8
 python-decouple>=3.6,<4.0
 WhiteNoise>=6.5.0
 python-dotenv==1.0.0
 Pillow==10.3.0
+beautifulsoup4==4.12.3
+celery==5.4.0
+django-celery-beat==2.7.0
+django-celery==3.1.17
+redis==5.0.8
+requests==2.31.0

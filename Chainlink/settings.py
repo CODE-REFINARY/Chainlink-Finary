@@ -17,7 +17,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True if config("DEBUG_BOOL").upper() == "TRUE" else False
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS_LIST").split(", ")
-
 
 # Application definition
 
@@ -42,6 +40,8 @@ INSTALLED_APPS = [
     'Chainlink',
     'Patchwork',
     'YACalendar',
+    'CFScrape',
+    'django_celery_beat',
     "whitenoise.runserver_nostatic",
 ]
 
@@ -78,8 +78,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Chainlink.wsgi.application'
 
 # CSRF
-CSRF_USE_SESSIONS = True        # store the CSRF token in the user session instead of a cookie
-CSRF_COOKIE_HTTPONLY = False    # no practical benefit here
+CSRF_USE_SESSIONS = True  # store the CSRF token in the user session instead of a cookie
+CSRF_COOKIE_HTTPONLY = False  # no practical benefit here
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -99,7 +99,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -118,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -130,8 +128,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True       # Make dates timezone aware
-
+USE_TZ = True  # Make dates timezone aware
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -154,3 +151,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 # This is the actual URL on the host system that points to where the media files are stored.
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Email Connection Details/Credentials
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config("EMAIL_HOST", cast=str, default=None)
+EMAIL_PORT = config("EMAIL_PORT", cast=str, default='587')
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str, default=None)
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str, default=None)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)  # Use EMAIL_PORT 587 for TLS
+EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)  # EUse MAIL_PORT 465 for SSL
+
+# Celery Beat
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Heroku rotates the credentials for the Redis database so it's better to get to use the REDIS_URL environment variable
+# which is automatically maintained by Heroku. Otherwise, if you use hard-values
+"""if config("ENVIRONMENT", cast=str, default=None) == "HEROKU":
+    CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+    CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+else:
+    CELERY_BROKER_URL = config("CELERY_BROKER", cast=str, default=None)
+    CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", cast=str, default=None)"""
+
+CELERY_BROKER_URL = config("REDIS_URL", cast=str, default=None)
+CELERY_RESULT_BACKEND = config("REDIS_URL", cast=str, default=None)

@@ -43,3 +43,6 @@ static/react/static
 /Patchwork/migrations
 .DS_Store
 /static/react/static
+
+# This file is created by celery-beat to keep track of the last time a task was run. It's not very useful.
+celerybeat-schedule

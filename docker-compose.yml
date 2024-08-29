@@ -31,6 +31,7 @@ services:
     depends_on:
       - db
       - webpack
+      - redis
   webpack:
     build:
       dockerfile: Dockerfile.webpack
@@ -41,3 +42,9 @@ services:
     volumes:
       - ./static/react/src:/code/static/react/src
       - ./static/react/static:/code/static/react/static
+  redis:
+    image: redis/redis-stack-server:7.2.0-v6
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
