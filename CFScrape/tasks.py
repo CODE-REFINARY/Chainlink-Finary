@@ -3,6 +3,11 @@ from django.core.mail import send_mail
 import requests
 from django.conf import settings
 from celery import shared_task
+import redis
+
+
+# redis_client = redis.from_url("redis://:123abc@172.17.0.1:6379")
+redis_client = redis.from_url(settings.CELERY_BACKEND_URL)
 
 
 @shared_task()
@@ -51,3 +56,61 @@ def send_email(subject, message, recipient_list):
         recipient_list,
         fail_silently=False,
     )
+
+
+@shared_task()
+def getListOfOutstandingNav():
+    """
+    Get a list of all cruises that need to have R2R nav run.
+    Get all RC cruises from API with https://service.rvdata.us/api/cruise/?vessel_shortname=Carson
+    """
+
+
+def getVesselShortnamesForAllActiveVessels():
+    """
+    Hit the R2R api and return a set containing the short names for all active vessels in R2R.
+    """
+    url = 'https://service.rvdata.us/api/vessel/'
+    response = requests.get(url)
+    data = response.json()["data"]
+    name_set = set()
+    for item in data:
+        if item["is_active"]:
+            name_set.add(item["short_name"])
+    return name_set
+
+
+def getListOfCruisesMissingNav():
+    """
+    Hit the R2R api and return a set of cruises that have no NAV product.
+    """
+    cruise_set = set()
+    vessel_shortnames = getVesselShortnamesForAllActiveVessels()
+    for name in vessel_shortnames:
+        vessel_cruises_url = 'https://service.rvdata.us/api/cruise/?vessel_shortname=' + name
+        response = requests.get(vessel_cruises_url)
+        data = response.json()["data"]
+        for cruise in data:
+            if not cruise["has_r2rnav"]:
+                cruise_set.add(cruise["cruise_id"])
+    return cruise_set
+
+
+@shared_task()
+def emailListOfNewCruisesMissingNav():
+    """
+    Send an email containing a list of cruises that are missing nav that haven't been
+    """
+
+    # Get the setwise difference between the set of all current cruises missing nav and the previously computed set
+    # of all cruises missing nav (these previously computed cruise_ids are stored in the redis database).
+    new_cruise_ids_missing_nav = getListOfCruisesMissingNav() - {item.decode('utf-8') for item in redis_client.smembers('cruises_missing_nav')}
+    # Add all of these new cruise_ids to the redis database.
+    for cruise_id in new_cruise_ids_missing_nav:
+        redis_client.sadd('cruises_missing_nav', cruise_id)
+
+    email_subject = "New Cruises That Need NAV"
+    email_message = """The following is a list of new cruises that require NAV\n\n""" + ", ".join(sorted(new_cruise_ids_missing_nav))
+
+    send_email(email_subject, email_message, ["gtdubinin@ucsd.edu"])
+

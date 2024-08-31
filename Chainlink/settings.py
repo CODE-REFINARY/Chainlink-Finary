@@ -166,4 +166,4 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # REDIS_URL is an environment variable that's managed automatically in Heroku, so we don't have to define a Heroku
 # config variable in Heroku (but we do have to give it a value for the Docker environment).
 CELERY_BROKER_URL = config("REDIS_URL", cast=str, default=None)
-CELERY_RESULT_BACKEND = config("REDIS_URL", cast=str, default=None)
+CELERY_BACKEND_URL = config("REDIS_URL", cast=str, default=None)

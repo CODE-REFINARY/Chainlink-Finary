@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:16.0
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -47,3 +47,10 @@ services:
       - "6379:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    volumes:
+      - redis_data:/data
+    command: bash -c "redis-server --appendonly yes --bind 0.0.0.0 --port 6379 --requirepass 123abc"
+
+volumes:
+  redis_data:
+  postgres_data:
