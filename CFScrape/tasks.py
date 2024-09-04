@@ -80,6 +80,20 @@ def getVesselShortnamesForAllActiveVessels():
     return name_set
 
 
+# DEPRECATED
+def checkIfCruisePageContainsNav(cruise_id):
+    """
+    This function returns True if there is at least one NAV device (GNSS or INS) listed on the cruise_page of the
+    cruise page indicated by the argument. THIS DOESN'T WORK BECAUSE THE CRUISE PAGE IS NOT DESIGNED TO BE SCRAPEABLE
+    """
+    cruise_page_url = 'https://www.rvdata.us/search/cruise/' + cruise_id
+    response = requests.get(cruise_page_url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    # Check if the page contains at least one GNSS or INS device. If the number of these devices located is 0 (as in
+    # none were found) then return false.
+    return len(soup.find_all('td', string=lambda text: text and ('GNSS' in text or 'INS' in text))) != 0
+
+
 def getListOfCruisesMissingNav():
     """
     Hit the R2R api and return a set of cruises that have no NAV product.
@@ -91,8 +105,14 @@ def getListOfCruisesMissingNav():
         response = requests.get(vessel_cruises_url)
         data = response.json()["data"]
         for cruise in data:
-            if not cruise["has_r2rnav"]:
+            # We want to definitely get all released cruises that still don't have NAV although this isn't the only
+            # condition.
+            if not cruise["has_r2rnav"] and cruise["release_option"] == "release_now":
                 cruise_set.add(cruise["cruise_id"])
+            # There is a possibility that the cruise has not yet been released but NAV data is ready to be processed. In
+            # this case the only check is to visit the cruise page and check if a NAV product exists. This takes time
+            # which is why this is not our first check.
+            # TODO: implement this check
     return cruise_set
 
 
