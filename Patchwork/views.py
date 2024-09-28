@@ -96,7 +96,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
             # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(json_data["order"] + 1, numElements):
+            for i in range(int(json_data["order"]) + 1, numElements):
                 try:
                     Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
                     # field for all elements after this one
@@ -112,7 +112,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
                         except Body.DoesNotExist:
                             continue
         content.text = json_data["text"]
-        content.public = json_data["is_public"]
+        content.public = json_data["public"]
         content.save()
         json_data["order"] = content.order
 
@@ -124,7 +124,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
             # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(json_data["order"] + 1, numElements):
+            for i in range(int(json_data["order"]) + 1, numElements):
                 try:
                     Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
                     # field for all elements after this one
@@ -139,7 +139,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
                             break
                         except Body.DoesNotExist:
                             continue
-        content.public = json_data["is_public"]
+        content.public = json_data["public"]
         content.save()
         json_data["order"] = content.order
 
@@ -151,7 +151,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
             # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(json_data["order"] + 1, numElements):
+            for i in range(int(json_data["order"]) + 1, numElements):
                 try:
                     Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
                     # field for all elements after this one
@@ -167,7 +167,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
                         except Body.DoesNotExist:
                             continue
         content.text = json_data["text"]
-        content.public = json_data["is_public"]
+        content.public = json_data["public"]
         content.save()
         json_data["order"] = content.order
 
@@ -179,7 +179,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
             # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(json_data["order"] + 1, numElements):
+            for i in range(int(json_data["order"]) + 1, numElements):
                 try:
                     Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
                     # field for all elements after this one
@@ -195,7 +195,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
                         except Body.DoesNotExist:
                             continue
         content.text = json_data["text"]
-        content.public = json_data["is_public"]
+        content.public = json_data["public"]
         content.save()
         json_data["order"] = content.order
 
@@ -210,7 +210,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         content.order = json_data["order"]
         if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
             # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(json_data["order"] + 1, numElements):
+            for i in range(int(json_data["order"]) + 1, numElements):
                 try:
                     Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
                     # field for all elements after this one
@@ -229,7 +229,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
 
         content.tag = tag
         content.text = json_data["text"]
-        content.public = json_data["is_public"]
+        content.public = json_data["public"]
 
         # Write changes to the database
         chainlink.save()
@@ -531,7 +531,7 @@ def chainlink(request, key):
         type = TagType(json_data["type"])
         try_title = json_data["text"]
         url = json_data["url"]
-        public = json_data["is_public"]
+        public = json_data["public"]
 
         if type == TagType.CHAINLINK:
             if db_store(type, key, try_title, public):
@@ -593,7 +593,7 @@ def profile(request):
         post_request_payload = {
             "type": "header",
             "text": "Landing Page",
-            "is_public": True,
+            "public": True,
             "date": str(timezone.now())
         }
         post_request = HttpRequestWrapper(json.dumps(post_request_payload), request.user)

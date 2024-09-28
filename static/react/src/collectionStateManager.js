@@ -530,7 +530,7 @@ export function makeForm(type) {
                 const list = document.getElementById('chainlink-elements');
                 container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
-                root.render(<ElementCreationForm placeholder="enter chainlink content" type={type}/>);
+                root.render(<ElementCreationForm placeholder="enter chainlink content" type={type} order={order}/>);
                 list.appendChild(container);
         }
 
@@ -566,7 +566,7 @@ export function makeForm(type) {
                 url = getUrlFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id'));
 
                 container.id = "content-creation-form";
-                root.render(<ElementCreationForm placeholder="enter header content" type={type}/>);
+                root.render(<ElementCreationForm placeholder="enter header content" type={type} url={url} order={order}/>);
                 chainlink.appendChild(container);
         }
 
@@ -592,59 +592,24 @@ export function makeForm(type) {
                 }
         }
 
+        /*
+        For the form submit event listener we will grab the values from the form and simply send those values out
+        as http request headers via the addElement() function.
+         */
         container.addEventListener("submit", function(event) {
                 let formData = new FormData(event.target);
                 let input = document.getElementById("input")
-                let values = {};
+                let formFields = {};
 
                 event.preventDefault();
 
                 // Store the field name/value pairs of all fields in the form.
                 formData.forEach((value, key) => {
-                        values[key] = value;
-                })
-
-                if (chainlinkTypes.includes(type)) {
-                        //element = new Chainlink("CL", null, url, currentDateTime, isPublic, count, order);
-
-                        let cl_type = TagType.CHAINLINK;
-                        console.log(typeof(cl_type));
-                        let element = new Element(cl_type);
-
-                        // I'm just taking the name for each field from the form and making that exact name a field
-                        // of the Javascript representation of the Element we're creating the corresponding value from
-                        // the form is the same value that we're setting the field of the Javascript object. Fuck that
-                        // was confusing.
-                        Object.keys(values).forEach(key =>
-                            element[key.toString()] = values[key]
-                        );
-
-                        // We have to check the values of the form checkboxes manually since if the user leaves it
-                        // unchecked it there will not be an entry for it returned by FormData (this is just how HTML
-                        // works and has always worked).
-                        if (!values["public"]) {
-                                element["public"] = false;
-                        } else {
-                                element["public"] = true;
-                        }
-
-                        // Also manually check for the archive field checkbox
-                        if (!values["archive"]) {
-                                element["archive"] = false;
-                        } else {
-                                element["archive"] = true;
-                        }
-
-                } else if (contentTypes.includes(type)) {
-                        element = new Content(type, "", url, currentDateTime, isPublic, order);
-                } else if (headerTypes.includes(type)) {
-                        element = new Header(type, input.value, collectionUrl.value);
-                } else if (footerTypes.includes(type)) {
-                        element = new Footer(type, input.value, collectionUrl.value);
-                }
+                        formFields[key] = value;
+                });
 
                 window.addEventListener("keydown", parseKeyDown);
-                addElement(element);
+                addElement(formFields);
                 container.remove();
                 window.removeEventListener("keydown", _listener);
                 refresh();
@@ -984,7 +949,7 @@ export function editChainlink(target) {
 
         container.id = "chainlink-edit-form";
         container.setAttribute("index", chainlink.getAttribute("index"));
-        root.render(<ElementCreationForm placeholder="enter Chainlink title" value={title} />);
+        root.render(<ElementCreationForm placeholder="enter Chainlink title" value={title} url={url} order={order}/>);
         chainlink.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {

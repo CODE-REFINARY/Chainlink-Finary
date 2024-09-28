@@ -1,18 +1,18 @@
 export const TagType = Object.freeze({
     HEADER1: "H1",
     CHAINLINK: "CL",
-    PARAGRAPH: Symbol("P"),
-    CODE: Symbol("CODE"),
-    HEADER3: Symbol("H3"),
-    LINEBREAK: Symbol("BR"),
-    COLLECTION: Symbol("collection"),
-    ENDNOTE: Symbol("EN"),
-    IMAGE: Symbol("IMG"),
-    LIST: Symbol("LI"),
-    LINK: Symbol("LINK"),
-    HEADER_BANNER: Symbol("HBNR"),
-    FOOTER_LIST: Symbol("FTRLI"),
-    NOTE: Symbol("NOTE")
+    PARAGRAPH: "P",
+    CODE: "CODE",
+    HEADER3: "H3",
+    LINEBREAK: "BR",
+    COLLECTION: "COLLECTION",
+    ENDNOTE: "EN",
+    IMAGE: "IMG",
+    LIST: "LI",
+    LINK: "LINK",
+    HEADER_BANNER: "HBNR",
+    FOOTER_LIST: "FTRLI",
+    NOTE: "NOTE"
 });
 
 export class Element {

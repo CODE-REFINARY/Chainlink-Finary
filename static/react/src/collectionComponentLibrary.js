@@ -197,31 +197,31 @@ export function ElementCreationForm(props) {
         if (props.type === 'H3') {
             return (
                 <React.Fragment>
-                    <ConstructHeader3Element type={props.type}/>
+                    <ConstructHeader3Element type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type === 'CODE') {
             return (
                 <React.Fragment>
-                    <ConstructCodeElement type={props.type}/>
+                    <ConstructCodeElement type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type === 'P') {
             return (
                 <React.Fragment>
-                    <ConstructParagraphElement type={props.type}/>
+                    <ConstructParagraphElement type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type === 'BR') {
             return (
                 <React.Fragment>
-                    <ConstructLinebreakElement type={props.type}/>
+                    <ConstructLinebreakElement type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type == "CL") {
             return (
                 <React.Fragment>
-                    <ConstructChainlinkElement type={props.type}/>
+                    <ConstructChainlinkElement type={props.type} url={props.url} order={props.order}/>
                 </React.Fragment>
             )
         } else {
@@ -343,6 +343,11 @@ function ConstructParagraphElement(props) {
     return (
         <form id="crud-form">
             <input autoFocus type="text" id="input" placeholder="enter paragraph content" name="text" defaultValue={props.value}/>
+            <input type="hidden" name="url" value={props.url} />
+            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
+            <input type="hidden" name="type" value="P" />
+            <input type="hidden" name="public" value="True" />
+            <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
                 <input id="element-creation-submit" type="submit" value="Submit" />
             </div>
@@ -355,6 +360,11 @@ function ConstructCodeElement(props) {
     return (
         <form id="crud-form">
             <input autoFocus type="text" id="input" placeholder="Shift+Enter For New Line" name="text" defaultValue={props.value}/>
+            <input type="hidden" name="url" value={props.url} />
+            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
+            <input type="hidden" name="type" value="CODE" />
+            <input type="hidden" name="public" value="True" />
+            <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
                 <input id="element-creation-submit" type="submit" value="Submit" />
             </div>
@@ -367,6 +377,11 @@ function ConstructHeader3Element(props) {
     return (
         <form id="crud-form">
             <input autoFocus type="text" id="input" defaultValue={props.value} name="text" />
+            <input type="hidden" name="url" value={props.url} />
+            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
+            <input type="hidden" name="type" value="H3" />
+            <input type="hidden" name="public" value="True" />
+            <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
                 <input id="element-creation-submit" type="submit" value="Submit" />
             </div>
@@ -383,6 +398,11 @@ function ConstructLinebreakElement(props) {
                 <option value="double">Double</option>
                 <option value="max">Max</option>
             </select>
+            <input type="hidden" name="url" value={props.url} />
+            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
+            <input type="hidden" name="type" value="BR" />
+            <input type="hidden" name="public" value="True" />
+            <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
                 <input id="element-creation-submit" type="submit" value="Submit" />
             </div>
@@ -394,15 +414,18 @@ function ConstructChainlinkElement(props) {
     return (
         <form id="crud-form">
             <div id="non-submit-fields">
+                <input type="hidden" name="type" value="CL" />
                 <div className="form-group">
                     <label htmlFor="text" id="chainlink-form-text-label" className="form-label">text</label>
                     <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text" className="form-field" />
                 </div>
                 <div className="form-group">
+                    <input type="hidden" name="public" value="False" />
                     <label htmlFor="public" id="chainlink-form-public-label" className="form-label">public</label>
                     <input type="checkbox" name="public" id="chainlink-form-public" value="on" className="form-field" />
                 </div>
                 <div className="form-group">
+                    <input type="hidden" name="archive" value="False" />
                     <label htmlFor="archive" id="chainlink-form-archive-label" className="form-label">archive</label>
                     <input type="checkbox" name="archive" value="on" id="chainlink-form-archive" className="form-field" />
                 </div>
