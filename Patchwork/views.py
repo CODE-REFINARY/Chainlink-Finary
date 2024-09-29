@@ -27,6 +27,8 @@ from django.urls import reverse
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
 
 from datetime import datetime
+from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class HttpRequestWrapper(HttpRequest):
@@ -336,29 +338,30 @@ def db_update(table, url, order, payload):
     :param order: item identifier used in tandem with url to identify Body type targets
     :param payload: string indicating changes to make to target item
     """
+    if table == Chainlink:
+        target = table.objects.get(url=url)  # Get the record that we want to modify.
+        # If the user is trying to modify the title text of the Chainlink then make sure the text is unique.
+    elif table == Body:
+        parent_chainlink = Chainlink.objects.get(url=url)
+        target = Body.objects.get(chainlink=parent_chainlink, order=order).content
+    else:
+        raise RuntimeError("Table not recognized.")
+
     change_list = json.loads(payload)
     for change in change_list:
-        key = list(change.keys())[0]  # value of the field to update
-        value = list(change.values())[0]  # value of the value to set the field to
+        key = change
+        value = change_list[key]
 
-        if table == Chainlink:
-            target = table.objects.get(url=url)  # Get the record that we want to modify.
-            # If the user is trying to modify the title text of the Chainlink then make sure the text is unique.
-            if key == "text":
-                # Check if the new text matches the old one. If they're different then validate it. Otherwise, pass.
-                if target.text != value:
-                    target.text = db_try_title(table, value)  # Validate the new text
-
-        elif table == Body:
-            parent_chainlink = Chainlink.objects.get(url=url)
-            target = Body.objects.get(chainlink=parent_chainlink, order=order).content
-            if hasattr(target, key):
+        if hasattr(target, key):
+            if key == "url":
+                value = get_url_from_id(value)
+            try:
+                value = cast_value(table._meta.get_field(key), value)
                 setattr(target, key, value)
-            else:
-                print(
-                    "Error: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
+                target.save()
+            except ValidationError:
+                print("Validation Error: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
 
-    target.save()
 
 
 def db_try_title(table, try_title):
@@ -494,18 +497,19 @@ def generic(request, key=""):
             case TagType.CONTENT:
                 db_remove(Body, get_url_from_id(target_id), get_order_from_id(target_id))
 
-
     elif request.method == "PUT":
-        target_id = request.headers["target"]
-        target_update = request.headers["payload"]
-        Tag = TagType(request.headers["type"])
+        #target_id = request.headers["url"]
+        #target_update = request.headers["payload"]
+        payload = request.body
+        payload_json = json.loads(payload)
+        Tag = TagType(payload_json["type"])
         match Tag:
             case TagType.COLLECTION:
                 db_update(Collection, key, None, target_update)
             case TagType.CHAINLINK:
-                db_update(Chainlink, get_url_from_id(target_id), None, target_update)
+                db_update(Chainlink, get_url_from_id(payload_json["url"]), None, payload)
             case TagType.CONTENT:
-                db_update(Body, get_url_from_id(target_id), get_order_from_id(target_id), target_update)
+                db_update(Body, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
 
     return render(request, "Patchwork/index.html", {})
 
@@ -777,3 +781,41 @@ def validate_and_return_count(element):
 
     elif element._meta.object_name == "Collection":
         return Chainlink.objects.filter(collection=element).count()
+
+
+def cast_value(field, value):
+    """
+    Attempts to cast a value to the correct type based on the field's class.
+    """
+    field_type = type(field)
+
+    try:
+        if field_type == models.CharField:
+            # Cast to string for CharField
+            return str(value)
+        elif field_type == models.IntegerField:
+            # Cast to integer for IntegerField
+            return int(value)
+        elif field_type == models.FloatField:
+            # Cast to float for FloatField
+            return float(value)
+        elif field_type == models.BooleanField:
+            # Cast to boolean for BooleanField
+            return bool(value) if isinstance(value, (str, int)) else value
+        elif field_type == models.DateTimeField:
+            # Attempt to parse datetime for DateTimeField
+            if isinstance(value, str):
+                return datetime.fromisoformat(value)
+            return value
+        elif field_type == models.DateField:
+            # Attempt to parse date for DateField
+            if isinstance(value, str):
+                return datetime.strptime(value, '%Y-%m-%d').date()
+            return value
+        # Add more cases as needed for other field types...
+        else:
+            # Return the value as-is if no matching type
+            return value
+    except (ValueError, TypeError) as e:
+        # Log or raise error if casting fails
+        raise ValidationError(f"Failed to cast value '{value}' to {field_type.__name__}: {e}")

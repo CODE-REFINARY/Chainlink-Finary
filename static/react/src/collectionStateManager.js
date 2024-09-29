@@ -62,7 +62,6 @@ const headerTypes = ["H1", "HBNR"];
 // along with clarifying "endnotes" that explain features of the Collection.
 const footerTypes = ["EN", "FTRLI"];
 
-
 // Set up state variables after DOM is ready to be read
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -210,7 +209,6 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 });
 
-
 /**
  * This function should be called by a controller only once.
  *
@@ -221,11 +219,9 @@ export function initialize() {
         refresh();
 }
 
-
 export function storeEditButtonHandlers(editFunction, deleteFunction) {
         elementsEditButtonEventHandlers.push([editFunction, deleteFunction]);
 }
-
 
 /**
  * Assign indices to Elements. The text element is always index 0.
@@ -508,7 +504,7 @@ function instantiateElement(element, index, children) {
  */
 export function makeForm(type) {
         const currentDateTime = new Date().toISOString();
-        const _listener = function (e) { escape(e, _listener, "", null) };
+        const _listener = function (e) { escape(e, _listener, null) };
 
         window.removeEventListener("keydown", parseKeyDown);
         window.addEventListener("keydown", _listener);
@@ -573,9 +569,10 @@ export function makeForm(type) {
         // Otherwise if we are making this form for the creation of a header element.
         else if (headerTypes.includes(type)) {
                 if (type == "H1") {
+                        let order = 0; // TODO fix this. The H1 will not always be the first element... or will it???? haven't decided yet
                         const header = document.getElementById("header-elements");
                         container.id = "header-creation-form";
-                        root.render(<ElementCreationForm placeholder="enter header content" type={type}/>);
+                        root.render(<ElementCreationForm placeholder="enter header content" type={type} order={order}/>);
                         header.appendChild(container);
                 } else if (type == "HBNR") {
 
@@ -597,11 +594,10 @@ export function makeForm(type) {
         as http request headers via the addElement() function.
          */
         container.addEventListener("submit", function(event) {
-                let formData = new FormData(event.target);
-                let input = document.getElementById("input")
-                let formFields = {};
-
                 event.preventDefault();
+
+                let formData = new FormData(event.target);
+                let formFields = {};
 
                 // Store the field name/value pairs of all fields in the form.
                 formData.forEach((value, key) => {
@@ -618,52 +614,16 @@ export function makeForm(type) {
 
 /**œ
  * Callback function used for when the user presses the Esc key while an input dialogue is open
- *
- * @param {KeyboardEvent} e - the keyboard press event used to verify that the key that was pressed was the escape key
- * @param {Function} ref - a reference to the callback function specified for
- * @param {string} fallback - the original value of the field that we are editing
- * <DEPRECATED> @param {string} element - the type of text that is being edited.
- * @param {Element} element - the Element object that was being edited when escape was entered
- * @returns {null}
- */
-function escape(e, ref, fallback, element) {
+**/
+function escape(e, ref, element) {
         // if the escape key is pressed...
         if (e.key === "Escape") {
-                let formParent = document.getElementById('crud-form').parentNode.parentNode;
                 let form = document.getElementById('crud-form').parentNode;
-                const display = document.getElementById("element-display");
-                const chainlinkCreateForm = display.querySelector("#chainlink-creation-form");
-                const contentCreateForm = display.querySelector("#content-creation-form");
-                const chainlinkEditForm = display.querySelector("#chainlink-edit-form");
-                const headerForm = display.querySelector("#header-creation-form");
-                const footerForm = display.querySelector("#footer-creation-form");
-                const contentEditForm = display.querySelector("#content-edit-form");
-                const fenceEditForm = (formParent.matches('#header-display'));
 
-                if (fenceEditForm) {
-                        form.remove();
-                        let h1 = document.createElement("h1");
-                        h1.id = "collection-content";
-                        h1.innerHTML = fallback;
-                        formParent.prepend(h1);
-                } else if (chainlinkEditForm) {
-                        const index = parseInt(chainlinkEditForm.getAttribute("index"));
-                        const children = form.parentElement.querySelectorAll(".content-wrapper");
-                        form.parentElement.remove();
-                        instantiateElement(element, index, children);
-                } else if (chainlinkCreateForm) {
-                        form.remove();
-                } else if (contentCreateForm) {
-                        form.remove();
-                } else if (headerForm) {
-                        form.remove();
-                } else if (footerForm) {
-                        form.remove();
-                } else if (contentEditForm) {
-                        const index = parseInt(contentEditForm.getAttribute("index"));
-                        form.remove();
-                        instantiateElement(element, index, null);
+                if (element) {
+                        form.insertAdjacentElement('afterend', element);
                 }
+                form.remove();
 
                 window.addEventListener("keydown", parseKeyDown);
                 window.removeEventListener("keydown", ref);
@@ -750,12 +710,6 @@ export function deleteButtons() {
 }
 
 export function instantiateEditButtons() {
-        var wrapper = document.getElementById('header-display');
-        var container = document.createElement("div");
-        container.id = "fence-context-buttons";
-        wrapper.appendChild(container);
-        var root = createRoot(container);
-        root.render(<FenceEditButtons />);
 
         var numChainlinks = document.getElementsByClassName("chainlink").length;
         var wrappers = document.getElementsByClassName("chainlink-wrapper");
@@ -765,7 +719,6 @@ export function instantiateEditButtons() {
                 container.className = "chainlink-buttons-wrapper";
                 wrappers[i].appendChild(container);
                 root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
-                console.log(elementsEditButtonEventHandlers)
         }
 
         var numContents = document.getElementsByClassName("content-wrapper").length;
@@ -775,15 +728,11 @@ export function instantiateEditButtons() {
                 let root = createRoot(container);
                 container.className = "context-buttons-wrapper";
                 wrappers[i].appendChild(container);
-                root.render(<ContentEditButtons i={i} wrappers={wrappers}/>);
+                root.render(<ContentEditButtons i={i} wrappers={wrappers} />);
         }
 }
 
 export function removeEditButtons() {
-        var editButton = document.getElementById("doc-action-edit-title");
-        var deleteButton = document.getElementById("doc-action-delete-title");
-        editButton.remove();
-        deleteButton.remove();
 
         var chainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper");
         var numChainlinkButtons = document.getElementsByClassName("chainlink-buttons-wrapper").length;
@@ -865,7 +814,7 @@ export function deleteContent(target) {
         }
 }
 
-export function renameDoc() {
+/*export function renameDoc() {
 
         const header = document.getElementById('collection-title');
         const wrapper = document.getElementById('header-display');
@@ -873,7 +822,7 @@ export function renameDoc() {
 
         window.removeEventListener("keydown", parseKeyDown);
         
-        var _listener = function (e) { escape(e, _listener, title, "h1") };
+        var _listener = function (e) { alt_escape(e, _listener, title, "h1") };
         window.addEventListener("keydown", _listener);
 
         const container = document.createElement("div");
@@ -910,7 +859,7 @@ export function renameDoc() {
         });
 
         header.remove();
-}
+}*/
 
 /**
  * Edit the target chainlink. Instantiate a form to allow the user to change the text of this Chainlink.
@@ -922,12 +871,11 @@ export function editChainlink(target) {
         const chainlink = document.getElementById(target);
         const title = chainlink.querySelector(".chainlink-inner-content").textContent;
         const url = getUrlFromId(chainlink.id);
-        const order = chainlink.index;
+        const order = getOrderFromId(chainlink.id);
         // The frontIndex specifies the index of this Chainlink as rendered on the page.
         const frontIndex = parseInt(chainlink.getAttribute("index"));
-        const element = new Chainlink("CL", title, url, null, true, 0, order);
         const _listener = function (e) {
-                escape(e, _listener, "", element)
+                escape(e, _listener, chainlink)
         };
 
         let contents = []
@@ -949,7 +897,7 @@ export function editChainlink(target) {
 
         container.id = "chainlink-edit-form";
         container.setAttribute("index", chainlink.getAttribute("index"));
-        root.render(<ElementCreationForm placeholder="enter Chainlink title" value={title} url={url} order={order}/>);
+        root.render(<ElementCreationForm placeholder="enter Chainlink title" type="CL" value={title} url={chainlink.id} order={order} />);
         chainlink.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {
@@ -959,16 +907,24 @@ export function editChainlink(target) {
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'CL');
-                xhr.setRequestHeader("payload", JSON.stringify([{"text": event.target.input.value}]));
-                xhr.setRequestHeader('target', target);
-                xhr.send();
+
+                let formData = new FormData(event.target);
+                let formFields = {}
+                // Store the field name/value pairs of all fields in the form.
+                formData.forEach((value, key) => {
+                        formFields[key] = value;
+                });
+                //xhr.setRequestHeader("payload", JSON.stringify(formFields));
+                //xhr.setRequestHeader("payload", JSON.stringify([{"text": event.target.input.value}]));
+                //xhr.setRequestHeader('target', target);
+                xhr.send(JSON.stringify(formFields));
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                container.parentElement.remove();
-                                let updatedElement = element;
-                                updatedElement.text = event.target.input.value;
-                                instantiateElement(updatedElement, frontIndex, contents);
+                                //container.parentElement.remove();
+                                //let updatedElement = element;
+                                //updatedElement.text = event.target.input.value;
+                                //instantiateElement(formFields, frontIndex, contents);
+                                instantiateElement(formFields, frontIndex, null);
                         }
                 }
 
@@ -994,10 +950,10 @@ export function editContent(target) {
         const order = getOrderFromId(wrapper.id);
         const tag = wrapper.getAttribute("tag");
         const index = parseInt(wrapper.getAttribute("index"));
-        let element = new Content(tag, title, url, null, true, order);
+        //let element = new Content(tag, title, url, null, true, order);
 
         const _listener = function (e) {
-                escape(e, _listener, "", element);
+                escape(e, _listener, wrapper)
         };
 
         window.removeEventListener("keydown", parseKeyDown);
@@ -1008,7 +964,7 @@ export function editContent(target) {
 
         container.id = "content-edit-form";
         container.setAttribute("index", wrapper.getAttribute("index"));
-        root.render(<ElementCreationForm placeholder="enter content title" value={title}/>);
+        root.render(<ElementCreationForm placeholder="enter content title" type={tag} value={title} url={url} order={order} />);
         wrapper.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {

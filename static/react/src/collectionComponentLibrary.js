@@ -130,7 +130,7 @@ export function CreateFooterEditButtons(props) {
     );
 }
 
-export function FenceEditButtons() {
+/*export function FenceEditButtons() {
         const editFunction = function() { renameDoc() };
         const deleteFunction = function() { deleteDoc() };
         storeEditButtonHandlers(editFunction, deleteFunction)
@@ -142,7 +142,7 @@ export function FenceEditButtons() {
                         <button id="doc-action-delete-title" onClick={ elementsEditButtonEventHandlers[0][1] }>delete</button>
                 </React.Fragment>
         );
-}
+}*/
 
 export function ChainlinkEditButtons(props) {
         const editFunction = function() { editChainlink(props.wrappers[props.i].id) };
@@ -221,27 +221,15 @@ export function ElementCreationForm(props) {
         } else if (props.type == "CL") {
             return (
                 <React.Fragment>
-                    <ConstructChainlinkElement type={props.type} url={props.url} order={props.order}/>
+                    <ConstructChainlinkElement type={props.type} url={props.url} order={props.order} value={props.value} date={props.date} css={props.css} />
                 </React.Fragment>
             )
-        } else {
+        } else if (props.type == "H1") {
             return (
-                <form id="crud-form">
-                    <input autoFocus type="text" id="input" placeholder={props.placeholder} defaultValue={props.value}/>
-                    <select id="element-creation-select" name="element">
-                        <option value="CL">chainlink</option>
-                        <option value="H1">header</option>
-                        <option value="P">paragraph</option>
-                        <option value="CODE">code</option>
-                        <option value="BR">linebreak</option>
-                        <option value="unordered list">unordered list</option>
-                        <option value="ordered list">ordered list</option>
-                    </select>
-                    <div id="element-creation-text-align-right">
-                        <button id="element-creation-submit" type="submit">Submit</button>
-                    </div>
-                </form>
-            );
+                <React.Fragment>
+                    <ConstructHeader1Element type={props.type} url={props.url} order={props.order} />
+                </React.Fragment>
+            )
         }
 }
 
@@ -415,6 +403,8 @@ function ConstructChainlinkElement(props) {
         <form id="crud-form">
             <div id="non-submit-fields">
                 <input type="hidden" name="type" value="CL" />
+                <input type="hidden" name="url" value={props.url} />
+                <input type="hidden" name="order" value={parseInt(props.order, 10)} />
                 <div className="form-group">
                     <label htmlFor="text" id="chainlink-form-text-label" className="form-label">text</label>
                     <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text" className="form-field" />
@@ -422,12 +412,12 @@ function ConstructChainlinkElement(props) {
                 <div className="form-group">
                     <input type="hidden" name="public" value="False" />
                     <label htmlFor="public" id="chainlink-form-public-label" className="form-label">public</label>
-                    <input type="checkbox" name="public" id="chainlink-form-public" value="on" className="form-field" />
+                    <input type="checkbox" name="public" id="chainlink-form-public" value="True" className="form-field" />
                 </div>
                 <div className="form-group">
                     <input type="hidden" name="archive" value="False" />
                     <label htmlFor="archive" id="chainlink-form-archive-label" className="form-label">archive</label>
-                    <input type="checkbox" name="archive" value="on" id="chainlink-form-archive" className="form-field" />
+                    <input type="checkbox" name="archive" value="True" id="chainlink-form-archive" className="form-field" />
                 </div>
                 <div className="form-group">
                     <label htmlFor="date" id="chainlink-form-date-label" className="form-label">date</label>
@@ -438,6 +428,22 @@ function ConstructChainlinkElement(props) {
                     <input type="input" name="css" id="chainlink-form-css" className="form-field" />
                 </div>
             </div>
+            <div id="element-creation-text-align-right">
+                <input id="element-creation-submit" type="submit" value="Submit" />
+            </div>
+        </form>
+    );
+};
+
+function ConstructHeader1Element(props) {
+    return (
+        <form id="crud-form">
+            <input autoFocus type="text" id="input" defaultValue={props.value} name="text" />
+            <input type="hidden" name="url" value={props.url} />
+            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
+            <input type="hidden" name="type" value="H1" />
+            <input type="hidden" name="public" value="True" />
+            <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
                 <input id="element-creation-submit" type="submit" value="Submit" />
             </div>
