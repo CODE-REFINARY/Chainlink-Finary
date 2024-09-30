@@ -49,7 +49,7 @@ const formClassNames = ["content-creation-form"];
 // that continuity between the backend names and frontend names is kept.
 
 // Body refers to Elements that are instantiated and exist inside a Chainlink
-const contentTypes = ["P", "CODE", "BR", "H3", "LI", "LINK", "NOTE", "IMG"];
+const bodyTypes = ["P", "CODE", "BR", "H3", "LI", "LINK", "NOTE", "IMG"];
 
 // Chainlink refers to the Chainlink Element
 const chainlinkTypes = ["CL"];
@@ -453,7 +453,7 @@ function instantiateElement(element, index, children) {
                         previousElement = document.querySelector(`[index="${previousElementIndex}"]`).parentNode;            // the Element directly before the Element that will be created
                         previousElement.insertAdjacentElement("afterend", container);
                 }
-                root.render(<ChainlinkElement text={element.text} url={"chainlink-" + element.url + "-" + element.order}
+                root.render(<ChainlinkElement text={element.text} url={element.url}
                                               date={element.date} children={children}/>);
         } else if (headerTypes.includes(element.type)) {
                 const parentElement = document.getElementById("header-elements");
@@ -474,11 +474,11 @@ function instantiateElement(element, index, children) {
                 container.innerText = element.text;
                 parentElement.appendChild(container);
                 refresh();
-        } else {
+        } else if (bodyTypes.includes(element.type)) {
                 adjacentElement = document.querySelector(`[index="${previousElementIndex}"]`);
                 const container = document.createElement("div");
                 const root = createRoot(container);
-                container.id = "content-" + element.url + "-" + element.order;
+                container.id = element.url;
                 container.className = "content-wrapper";
                 container.setAttribute("tag", element.type);
                 //container.setAttribute("index", numElements.value);
@@ -531,7 +531,7 @@ export function makeForm(type) {
         }
 
         // If we are making this form for the creation of a chainlink-display element that is not a chainlink.
-        else if (contentTypes.includes(type)) {
+        else if (bodyTypes.includes(type)) {
 
                 const previousElement = document.querySelector(`[index="${cursor.value}"]`);
                 const prevId = previousElement.id
@@ -559,7 +559,7 @@ export function makeForm(type) {
                 }
 
                 order = getMatchedChildren(chainlink, contentElementClassNames).length;
-                url = getUrlFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id'));
+                url = "content-" + getUrlFromId(chainlink.querySelector(".chainlink-wrapper").getAttribute('id')) + '-' + order;
 
                 container.id = "content-creation-form";
                 root.render(<ElementCreationForm placeholder="enter header content" type={type} url={url} order={order}/>);
@@ -869,35 +869,41 @@ export function deleteContent(target) {
  */
 export function editChainlink(target) {
         const chainlink = document.getElementById(target);
-        const title = chainlink.querySelector(".chainlink-inner-content").textContent;
-        const url = getUrlFromId(chainlink.id);
+        const text = chainlink.querySelector(".chainlink-inner-content").textContent;
         const order = getOrderFromId(chainlink.id);
         // The frontIndex specifies the index of this Chainlink as rendered on the page.
-        const frontIndex = parseInt(chainlink.getAttribute("index"));
+        const index = parseInt(chainlink.getAttribute("index"));
         const _listener = function (e) {
                 escape(e, _listener, chainlink)
         };
 
-        let contents = []
+        // Capture the child elements of this chainlink. Whenever we update a chainlink we supply list of child nodes
+        // to the instantiateElement() because if the chainlink order is changed then its children should follow it.
+        let chainlinkChildren = []
+        // Loop through all siblings (technically children but they're on the same level as the <h2>) and add them to
+        // the list of children.
         let sibling = chainlink;
         while (sibling) {
                 if (sibling !== chainlink) {
-                        contents.push(sibling)
+                        chainlinkChildren.push(sibling)
                 }
                 sibling = sibling.nextElementSibling;
         }
 
-
-        // html elements to create
         const container = document.createElement("div");
         const root = createRoot(container);
 
+        // Remove keybinds temporarily while the form is open so that the user doesn't accidentally open another form
+        // via hotkey.
         window.removeEventListener("keydown", parseKeyDown);
+        // Add hotkey for escape key to close the form.
         window.addEventListener("keydown", _listener);
 
+        // Instantiate the form for editing this chainlink and supply all the default parameter values from values
+        // on this chainlink.
         container.id = "chainlink-edit-form";
         container.setAttribute("index", chainlink.getAttribute("index"));
-        root.render(<ElementCreationForm placeholder="enter Chainlink title" type="CL" value={title} url={chainlink.id} order={order} />);
+        root.render(<ElementCreationForm placeholder="enter Chainlink title" type="CL" value={text} url={chainlink.id} order={order} />);
         chainlink.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {
@@ -914,17 +920,12 @@ export function editChainlink(target) {
                 formData.forEach((value, key) => {
                         formFields[key] = value;
                 });
-                //xhr.setRequestHeader("payload", JSON.stringify(formFields));
-                //xhr.setRequestHeader("payload", JSON.stringify([{"text": event.target.input.value}]));
-                //xhr.setRequestHeader('target', target);
+
                 xhr.send(JSON.stringify(formFields));
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                //container.parentElement.remove();
-                                //let updatedElement = element;
-                                //updatedElement.text = event.target.input.value;
-                                //instantiateElement(formFields, frontIndex, contents);
-                                instantiateElement(formFields, frontIndex, null);
+                                container.parentElement.remove();
+                                instantiateElement(formFields, index, chainlinkChildren);
                         }
                 }
 
@@ -964,25 +965,31 @@ export function editContent(target) {
 
         container.id = "content-edit-form";
         container.setAttribute("index", wrapper.getAttribute("index"));
-        root.render(<ElementCreationForm placeholder="enter content title" type={tag} value={title} url={url} order={order} />);
+        root.render(<ElementCreationForm placeholder="enter content title" type={tag} value={title} url={wrapper.id} order={order} />);
         wrapper.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
+
+                let formData = new FormData(event.target);
+                let formFields = {}
+                // Store the field name/value pairs of all fields in the form.
+                formData.forEach((value, key) => {
+                        formFields[key] = value;
+                });
+
                 let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'content');
-                xhr.setRequestHeader("payload", JSON.stringify([{"text": event.target.input.value}]));
-                xhr.setRequestHeader('target', target);
-                xhr.send();
+                //xhr.setRequestHeader('type', 'content');
+                //xhr.setRequestHeader("payload", JSON.stringify([{"text": event.target.input.value}]));
+                //xhr.setRequestHeader('target', target);
+                xhr.send(JSON.stringify(formFields));
                 xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                                 container.remove();
-                                let updatedElement = element;
-                                updatedElement.text = event.target.input.value;
-                                instantiateElement(updatedElement, index, null);
+                                instantiateElement(formFields, index, null);
                         }
                 }
                 window.addEventListener("keydown", parseKeyDown);

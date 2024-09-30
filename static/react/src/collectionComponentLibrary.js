@@ -197,37 +197,37 @@ export function ElementCreationForm(props) {
         if (props.type === 'H3') {
             return (
                 <React.Fragment>
-                    <ConstructHeader3Element type={props.type} url={props.url} order={props.order} />
+                    <ConstructHeader3Element value={props.value} type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type === 'CODE') {
             return (
                 <React.Fragment>
-                    <ConstructCodeElement type={props.type} url={props.url} order={props.order} />
+                    <ConstructCodeElement value={props.value} type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type === 'P') {
             return (
                 <React.Fragment>
-                    <ConstructParagraphElement type={props.type} url={props.url} order={props.order} />
+                    <ConstructParagraphElement value={props.value} type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type === 'BR') {
             return (
                 <React.Fragment>
-                    <ConstructLinebreakElement type={props.type} url={props.url} order={props.order} />
+                    <ConstructLinebreakElement value={props.value} type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             );
         } else if (props.type == "CL") {
             return (
                 <React.Fragment>
-                    <ConstructChainlinkElement type={props.type} url={props.url} order={props.order} value={props.value} date={props.date} css={props.css} />
+                    <ConstructChainlinkElement value={props.value} type={props.type} url={props.url} order={props.order} value={props.value} date={props.date} css={props.css} />
                 </React.Fragment>
             )
         } else if (props.type == "H1") {
             return (
                 <React.Fragment>
-                    <ConstructHeader1Element type={props.type} url={props.url} order={props.order} />
+                    <ConstructHeader1Element value={props.value} type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             )
         }

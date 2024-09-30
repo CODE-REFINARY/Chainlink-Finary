@@ -1,31 +1,22 @@
 from django.http import HttpResponse, Http404, HttpRequest
 from django.shortcuts import render, get_object_or_404
-from .models import Chainlink, Collection, Body, TagType, Account, Header, Footer, Endnote, Paragraph, Linebreak, \
-    Header1, Header3, Code
-
+from .models import *
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
-
 from django.contrib.auth import authenticate, login as backend_login, logout as backend_logout
-
 from decouple import Config  # This library parses .env files
 from pathlib import Path  # This function defines a file path
 import os
-
 from django.utils import timezone
-from .models import TagType  # enum type for types text/chainlink type(s)
 import random  # use this to generate unique titles for fence and/or chainlink
 import json  # use this to parse JSON payloads in HTTP requests
 import hashlib  # use this to generate hashes for urls
 from decouple import config
-
 from django.conf import settings  # Get variables defined in settings.py
-
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
-
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -87,11 +78,11 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         cl.save()
 
         # return the request with the url updated with the url assigned to this chainlink
-        json_data["url"] = cl.url
+        json_data["url"] = "chainlink-" + cl.url + "-" + str(cl.order)
         json_data["order"] = cl.order
 
     elif tag == TagType.PARAGRAPH:
-        chainlink = Chainlink.objects.get(url=json_data["url"])
+        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
         numElements = Body.objects.filter(chainlink=chainlink).count()
         content = Paragraph()
         content.chainlink = chainlink
@@ -119,7 +110,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         json_data["order"] = content.order
 
     elif tag == TagType.LINEBREAK:
-        chainlink = Chainlink.objects.get(url=json_data["url"])
+        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
         numElements = Body.objects.filter(chainlink=chainlink).count()
         content = Linebreak()
         content.chainlink = chainlink
@@ -146,7 +137,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         json_data["order"] = content.order
 
     elif tag == TagType.CODE:
-        chainlink = Chainlink.objects.get(url=json_data["url"])
+        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
         numElements = Body.objects.filter(chainlink=chainlink).count()
         content = Code()
         content.chainlink = chainlink
@@ -174,7 +165,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         json_data["order"] = content.order
 
     elif tag == TagType.HEADER3:
-        chainlink = Chainlink.objects.get(url=json_data["url"])
+        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
         numElements = Body.objects.filter(chainlink=chainlink).count()
         content = Header3()
         content.chainlink = chainlink
@@ -203,7 +194,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
 
     elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
         # Update the chainlink object that's a parent of the element to be written to the database
-        chainlink = Chainlink.objects.get(url=json_data["url"])
+        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
         numElements = Body.objects.filter(chainlink=chainlink).count()
 
         # Create a representation of the Body object to write to database
@@ -346,7 +337,6 @@ def db_update(table, url, order, payload):
         target = Body.objects.get(chainlink=parent_chainlink, order=order).content
     else:
         raise RuntimeError("Table not recognized.")
-
     change_list = json.loads(payload)
     for change in change_list:
         key = change
@@ -356,12 +346,11 @@ def db_update(table, url, order, payload):
             if key == "url":
                 value = get_url_from_id(value)
             try:
-                value = cast_value(table._meta.get_field(key), value)
+                value = cast_value(target._meta.get_field(key), value)
                 setattr(target, key, value)
                 target.save()
             except ValidationError:
                 print("Validation Error: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
-
 
 
 def db_try_title(table, try_title):
@@ -503,13 +492,16 @@ def generic(request, key=""):
         payload = request.body
         payload_json = json.loads(payload)
         Tag = TagType(payload_json["type"])
-        match Tag:
-            case TagType.COLLECTION:
-                db_update(Collection, key, None, target_update)
-            case TagType.CHAINLINK:
-                db_update(Chainlink, get_url_from_id(payload_json["url"]), None, payload)
-            case TagType.CONTENT:
-                db_update(Body, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
+        if Tag == TagType.COLLECTION:
+            db_update(Collection, key, None, target_update)
+        elif Tag == TagType.CHAINLINK:
+            db_update(Chainlink, get_url_from_id(payload_json["url"]), None, payload)
+        elif inheritsBody(Tag):
+            db_update(Body, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
+        elif inheritsHeader(Tag):
+            db_update(Header, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
+        elif inheritsFooter(Tag):
+            db_update(Footer, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
 
     return render(request, "Patchwork/index.html", {})
 

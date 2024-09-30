@@ -27,7 +27,6 @@ class TagType(models.TextChoices):
     HEADER3 = "H3"
     LINEBREAK = "BR", _("linebreak")
     COLLECTION = "collection"
-    CONTENT = "content"
     FOOTER = "footer"
     ENDNOTE = "EN"  # Endnotes are paragraphs that appear in the footer
     IMAGE = "IMG", _("image")
@@ -38,11 +37,61 @@ class TagType(models.TextChoices):
     NOTE = "NOTE", _("note")
 
 
+def inheritsBody(tag):
+    return tag in [TagType.HEADER3, TagType.PARAGRAPH, TagType.CODE, TagType.LINEBREAK, TagType.IMAGE, TagType.LIST, TagType.LINK, TagType.NOTE]
+
+
+def inheritsFooter(tag):
+    return tag in [TagType.FOOTER_LIST, TagType.ENDNOTE]
+
+
+def inheritsHeader(tag):
+    return tag in [TagType.HEADER_BANNER, TagType.HEADER1]
+
+
+def getTableFromTag(tag):
+    """
+    Given a TagType, returns its associated table object.
+    """
+    match tag:
+        case TagType.HEADER1:
+            return Header1
+        case TagType.CHAINLINK:
+            return Chainlink
+        case TagType.PARAGRAPH:
+            return Paragraph
+        case TagType.CODE:
+            return Code
+        case TagType.HEADER3:
+            return Header3
+        case TagType.LINEBREAK:
+            return Linebreak
+        case TagType.COLLECTION:
+            return Collection
+        case TagType.FOOTER:
+            return Footer
+        case TagType.ENDNOTE:
+            return Endnote
+        case TagType.IMAGE:
+            return Image
+        case TagType.LIST:
+            return List
+        case TagType.LINK:
+            return Link
+        case TagType.HEADER_BANNER:
+            return HeaderBanner
+        case TagType.FOOTER_LIST:
+            return FooterList
+        case TagType.NOTE:
+            return Note
+        case _:
+            raise ValueError(f"Unrecognized tag type: {tag}")
+
 
 class Theme(models.TextChoices):
     PESHAY = "peshay", _("Peshay Studio Set")
     PATCHWORK = "patchwork", _("Patchwork")
-
+    WASHINGTON = "washington", _("Washington")
 
 
 class HeightSpacing(models.TextChoices):
@@ -51,14 +100,12 @@ class HeightSpacing(models.TextChoices):
     MAX = "max", _("Maximum Space")
 
 
-
 class NoteType(models.TextChoices):
     INFO = "info", _("I (Informational) Blue Icon Message")
     NOTE = "note", _("Yellow Sticky Note Message")
     SUCCESS = "success", _("Green Success Message")
     WARNING = "warning", _("Triangle Icon Yellow Warning Message")
     ERROR = "error", _("Message with Red Error Symbol")
-
 
 
 class Collection(models.Model):
@@ -256,10 +303,6 @@ class List(Body):
         return returnme
 
 
-
-#################################################################################################################
-# Header
-
 class Header(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
@@ -301,13 +344,6 @@ class HeaderBanner(Header):
         return returnme
 
 
-#################################################################################################################
-# Footer
-
-# The Footer is one of the three section of a Collection. It is the section that appears at the bottom of the Collection
-# below any and all Chainlinks. This section contains paragraphs or lists. Footer elements are child classes of this
-# Footer class. The order in which they appear in the Collection is dictated by the `order` field which they all get
-# because they inherit it from this Footer parent class.
 class Footer(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
