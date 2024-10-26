@@ -347,6 +347,8 @@ def db_update(table, url, order, payload):
                 value = get_url_from_id(value)
             try:
                 value = cast_value(target._meta.get_field(key), value)
+                print(type(value))
+                print(value==True)
                 setattr(target, key, value)
                 target.save()
             except ValidationError:
@@ -780,6 +782,9 @@ def cast_value(field, value):
     Attempts to cast a value to the correct type based on the field's class.
     """
     field_type = type(field)
+    print("------")
+    print(field)
+    print(value)
 
     try:
         if field_type == models.CharField:
@@ -793,7 +798,14 @@ def cast_value(field, value):
             return float(value)
         elif field_type == models.BooleanField:
             # Cast to boolean for BooleanField
-            return bool(value) if isinstance(value, (str, int)) else value
+            if value == "False":
+                return False
+            elif value == "True":
+                return True
+            elif isinstance(value, bool):
+                return value
+            else:
+                raise ValueError("Invalid boolean value. The `value` argument must be either a str value of 'True' or 'False' or a boolean value.")
         elif field_type == models.DateTimeField:
             # Attempt to parse datetime for DateTimeField
             if isinstance(value, str):
