@@ -62,6 +62,10 @@ const headerTypes = ["H1", "HBNR"];
 // along with clarifying "endnotes" that explain features of the Collection.
 const footerTypes = ["EN", "FTRLI"];
 
+// Collections are web pages that contain content. A user-friendly synonym might be "article" as a Collection is a web
+// page that often contains similar items that an article would have.
+const collectionTypes = ["COL"];
+
 // Set up state variables after DOM is ready to be read
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -207,6 +211,9 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                 }
         };
+
+        let colForm = document.getElementById("add-col-form");
+        colForm.addEventListener("submit", (event)=>{event.preventDefault(); makeForm("COL")});
 });
 
 /**
@@ -435,11 +442,7 @@ function instantiateElement(element, index, children) {
         let previousElement = null;                                             // the Element directly before the Element that will be created
         let adjacentElement = null;                                             // the element right before the element to be inserted
 
-        if (element instanceof Header) {
-
-        }
-
-        else if (chainlinkTypes.includes(element.type)) {
+        if (chainlinkTypes.includes(element.type)) {
                 const parentElement = document.getElementById("chainlink-elements");
                 const firstChild = parentElement.firstChild;
                 const container = document.createElement("section");
@@ -587,6 +590,15 @@ export function makeForm(type) {
                         root.render(<ElementCreationForm placeholder="enter footer content" type={type}/>);
                         footer.appendChild(container);
                 }
+        }
+
+        // This means the user wants to create a new collection. They probably pressed the "+" button in the list of
+        // collection titles.
+        else if (collectionTypes.includes(type)) {
+                const addColButton = document.getElementById("add-col-form");
+                container.id = "collection-creation-form";
+                root.render(<ElementCreationForm placeholder="enter the title for the new collection (optional)" type={type}/>);
+                addColButton.appendChild(container);
         }
 
         /*

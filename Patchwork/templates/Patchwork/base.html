@@ -71,7 +71,7 @@
                                         <span class="help-text">(you are already logged in)</span>
                                     </form></li>
                                 <li class="activated-action-list-element"><form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Log Out"></form></li>
-                                <li class="activated-action-list-element"><form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form></li>
+                                <li class="activated-action-list-element"><form id="add-col-form" action="{% url 'generate' %}" method="post">{% csrf_token %}<input id="add-col-btn" type="submit" value="Generate New Collection"></form></li>
                             </ul>
                         {% else %}
                             <ul>

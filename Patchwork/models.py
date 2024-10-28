@@ -26,7 +26,6 @@ class TagType(models.TextChoices):
     CODE = "CODE"
     HEADER3 = "H3"
     LINEBREAK = "BR", _("linebreak")
-    COLLECTION = "collection"
     FOOTER = "footer"
     ENDNOTE = "EN"  # Endnotes are paragraphs that appear in the footer
     IMAGE = "IMG", _("image")
@@ -35,6 +34,7 @@ class TagType(models.TextChoices):
     HEADER_BANNER = "HBNR", _("header banner")
     FOOTER_LIST = "FTRLI", _("footer list")
     NOTE = "NOTE", _("note")
+    COLLECTION = "COL", _("collection")
 
 
 def inheritsBody(tag):

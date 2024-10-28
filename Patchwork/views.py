@@ -674,7 +674,7 @@ def aux_generate(request, is_landing_page, user=None):
     :param user: this is the user object corresponding to the currently logged-in user. The landing page will be set for this user.
     """
     # Create a new collection and write it to the database. The payload variable will contain the url for the collection
-    payload = json.dumps({"type": "collection"})
+    payload = json.dumps({"type": "COL"})
     payload = db_store(payload, None, is_landing_page, user)
     if not is_landing_page:
         url = reverse("article", kwargs={"key": json.loads(payload)["url"]})

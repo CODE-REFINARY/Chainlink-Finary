@@ -15,20 +15,10 @@ export const TagType = Object.freeze({
     NOTE: "NOTE"
 });
 
-export class Element {
-    constructor(type) {
-        if (!Object.values(TagType).includes(type)) {
-            throw new Error("An invalid type was specified for the new Element.");
-        } else {
-            this.type = type
-        }
-    }
-}
 
-export class Collection extends Element {
+export class Collection {
         constructor(text="", url="", date=null, isPublic=false, count=0, order=0) {
-                super();
-                this.type = "collection";
+                this.type = "COL";
                 this.text = text;
                 this.url = url;
                 this.date = date;
@@ -39,9 +29,22 @@ export class Collection extends Element {
 }
 
 /*
+export class Element {
+    constructor(type) {
+        if (!Object.values(TagType).includes(type)) {
+            throw new Error("An invalid type was specified for the new Element.");
+        } else {
+            this.type = type
+        }
+    }
+}
+
+
+
+
         Header elements appear in the #header-display section right above the chainlink display (main body). The title
         Header type is must be defined before any other header elements are defined.
- */
+
 export class Header extends Element {
         constructor(type, text="", url="") {
                 super();
@@ -73,10 +76,10 @@ export class Chainlink extends Element {
         }
 }
 
-/*
+
  * The purpose of this class is to define a set of fields that are always defined for Elements that appear underneath
  * Chainlink elements. This class is analogous to the "Body" class defined in Patchwork/models.py.
- */
+
 export class Content extends Element {
         constructor(tag, text, url, date=null, isPublic=true, order=0) {
                 super();
@@ -91,3 +94,5 @@ export class Content extends Element {
         }
 
 }
+
+*/

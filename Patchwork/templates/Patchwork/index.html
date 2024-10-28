@@ -24,10 +24,26 @@
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 <nav id="tabbed-buttons">
     {% for collection in collections %}
-        {% if collection.title %}
-            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+        {% if user.is_authenticated %}
+            {% if collection.public == True %}
+                {% if collection.title %}
+                    <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+                {% else %}
+                    <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                {% endif %}
+            {% else %}
+                {% if collection.title %}
+                    <a class="tabbed-buttons private-collection" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+                {% else %}
+                    <a class="tabbed-buttons private-collection" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                {% endif %}
+            {% endif %}
         {% else %}
-            <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+            {% if collection.title %}
+                <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+            {% else %}
+                <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+            {% endif %}
         {% endif %}
     {% endfor %}
 </nav>

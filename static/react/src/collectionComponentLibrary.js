@@ -230,6 +230,12 @@ export function ElementCreationForm(props) {
                     <ConstructHeader1Element value={props.value} type={props.type} url={props.url} order={props.order} />
                 </React.Fragment>
             )
+        } else if (props.type == "COL") {
+            return (
+                <React.Fragment>
+                    <ConstructColElement />
+                </React.Fragment>
+            )
         }
 }
 
@@ -450,3 +456,34 @@ function ConstructHeader1Element(props) {
         </form>
     );
 };
+
+function ConstructColElement(props) {
+    return (
+        <form id="crud-form">
+            <input type="hidden" name="type" value="COL"/>
+            <div className="form-group">
+                <label htmlFor="text" id="col-form-text-label" className="form-label">text</label>
+                <input autoFocus type="text" id="input col-form-text" defaultValue={props.value} name="text"
+                       className="form-field"/>
+            </div>
+            <div className="form-group">
+                <input type="hidden" name="public" value="False"/>
+                <label htmlFor="public" id="col-form-public-label" className="form-label">public</label>
+                <input type="checkbox" name="public" id="col-form-public" value="True" className="form-field"/>
+            </div>
+            <div className="form-group">
+                <label htmlFor="date" id="col-form-date-label" className="form-label">date</label>
+                <input type="input" name="date" id="col-form-date" placeholder="ex: 09/19/22 13:55:26"
+                       className="form-field"/>
+            </div>
+            <div className="form-group">
+                <label htmlFor="theme" id="col-form-theme-label" className="form-label">text</label>
+                <input autoFocus type="text" id="input col-form-text" defaultValue="Patchwork" name="text"
+                       className="form-field"/>
+            </div>
+            <div id="element-creation-text-align-right">
+                <input id="element-creation-submit" type="submit" value="Submit"/>
+            </div>
+        </form>
+    )
+}
