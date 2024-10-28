@@ -47,3 +47,6 @@ static/react/static
 
 # This file is created by celery-beat to keep track of the last time a task was run. It's not very useful.
 celerybeat-schedule
+
+# Exclude files that Unix-like systems generate
+static/.DS_Store
