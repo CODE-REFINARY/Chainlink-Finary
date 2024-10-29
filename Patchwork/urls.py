@@ -12,7 +12,7 @@ urlpatterns = [
     # This is the destination for all things Collections related. Supported request types are GET, POST, PUT, DELETE.
     # GET obviously just returns the webpage. POST is used to create a new Collection. PUT is used to edit an existing
     # Collection. DELETE is for deleting a Collection.
-    path("article/<str:key>.html", views.generic, name="article"),  # regularly generated blog pages match here
+    path("collection/<str:url>.html", views.generic, name="collection"),  # regularly generated blog pages match here
     #path("generic.html", views.generic, name="generic"),
 
     # This is the destination for when you want to view a specific Chainlink. The supported requests are the same as

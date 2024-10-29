@@ -16,22 +16,22 @@
         {% if user.is_authenticated %}
             {% if collection.public == True %}
                 {% if collection.title %}
-                    <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
                 {% else %}
-                    <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
                 {% endif %}
             {% else %}
                 {% if collection.title %}
-                    <a class="tabbed-buttons private-collection" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+                    <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
                 {% else %}
-                    <a class="tabbed-buttons private-collection" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                    <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
                 {% endif %}
             {% endif %}
         {% else %}
             {% if collection.title %}
-                <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">{{ collection.title.text }}</a>
+                <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
             {% else %}
-                <a class="tabbed-buttons" href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
             {% endif %}
         {% endif %}
     {% endfor %}
@@ -52,7 +52,7 @@
 </div>
 
 <!-- Article content is always displayed in #chainlink-display -->
-<div id="element-display" template="article">
+<div id="element-display" template="collection">
     <div id="header-display">
         <div id="header-elements">
             {% if collection.title %}

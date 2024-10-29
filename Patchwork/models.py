@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    landing_page_url = models.CharField(max_length=128, default="null")
+    landing_page_collection = models.ForeignKey("Collection", on_delete=models.SET_NULL, null=True)
     def __str__(self):
         return str(self.user.username)
 

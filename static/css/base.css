@@ -350,6 +350,10 @@ div.combination {
 	text-decoration: underline;
 }
 
+.private-collection {
+    color: red;
+}
+
 /* chainlink display elements - chainlinks */
 
 .content-wrapper {}

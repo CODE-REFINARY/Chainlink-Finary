@@ -14,7 +14,7 @@ import {
 } from "./staticUtils";
 
 /**
- * Render the row of Element creation buttons that appear at the bottom of the article
+ * Render the row of Element creation buttons that appear at the bottom of the collection
  *
  * @param {string} bitmask - indicate which buttons to enable and disable. This is regular string containing
  * 0s and 1s (bits) indicating which buttons should be active. The first bit sets the Chainlink button active.

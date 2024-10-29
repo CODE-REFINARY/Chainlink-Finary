@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         isArticle = {
                 get value() {
-                        return (document.getElementById("element-display").getAttribute("template") === "article");
+                        return (document.getElementById("element-display").getAttribute("template") === "collection");
                 }
         };
         // flag indicates that Chainlink view is current
@@ -236,7 +236,7 @@ export function storeEditButtonHandlers(editFunction, deleteFunction) {
  * @returns {null}
  */
 export function refresh() {
-        // Assign indices to all elements in the article/chainlink body
+        // Assign indices to all elements in the collection/chainlink body
         let index = 0;
         const allElements = document.querySelectorAll('#chainlink-display *');
         for (let i = 0; i < allElements.length; i++) {
@@ -648,6 +648,7 @@ function escape(e, ref, element) {
  *
  * @returns {null}
  */
+/*
 export function createFence() {
         const currentDateTime = new Date().toISOString();
         const article = new Collection("article", "", currentDateTime, false, 0, 0);
@@ -676,6 +677,7 @@ export function createFence() {
                 }
         }
 }
+ */
 
 // Keypress parsing function for moving the page up and down
 export function parseKeyDown(e) {

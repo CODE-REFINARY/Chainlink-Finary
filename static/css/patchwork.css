@@ -15,10 +15,6 @@ body {
 	margin: 2% 20% 1% 20%;
 }
 
-.private-collection {
-    color: red;
-}
-
 /* ////////////////////////// INDEX PAGE STUFF BEGIN ////////////////////////// */
 
 /*  */
@@ -68,7 +64,7 @@ body {
 /* ////////////////////////// INDEX PAGE STUFF END ////////////////////////// */
 
 
-/* These are rules for backgrounds that appear behind sections of an article. */
+/* These are rules for backgrounds that appear behind sections of an collection. */
 
 #header-display {
 }

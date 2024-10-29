@@ -243,7 +243,8 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         # file
         if is_landing_page:
             logged_in_user = Account.objects.get(user=user)
-            logged_in_user.landing_page_url = collection.url
+            #logged_in_user.landing_page_url = collection.url <-- this line should probalby be removed. It's here just for easy revision
+            loggin_in_user.landing_page_collection = collection
             logged_in_user.save()
 
         # Set the url field now that we've assigned a url so that frontend can redirect the user to this new collection.
@@ -419,13 +420,20 @@ def db_generate_url(tag_type):
 
 # force collection list page to not get cached so that changes from chainlink pages show up on browser back button
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def generic(request, key=""):
+def generic(request, url=None):
+    """
+    This is the big view. The one that all Collection urls call. Maybe I would want to call this view "Collection"
+    instead... Oh well.The url parameter is how you specify which collection to grab.
+    """
     if not request.user.is_authenticated:
         pass
 
+    if url is None:
+        raise ValueError("A null key and null url value were both supplied to the generic view. At least one of these values must be populated")
+
     if request.method == "GET":
         # Get this collection from the database and return a 404 if it isn"t found
-        collection = get_object_or_404(Collection, url=key)
+        collection = get_object_or_404(Collection, url=url)
         if not request.user.is_authenticated and not collection.public:
             return render(request, "Patchwork/failure.html");
 
@@ -473,7 +481,7 @@ def generic(request, key=""):
         payload = request.body
         # db_store returns this payload argument back with any modifications that were made (such as a url being
         # updated for example)
-        payload = db_store(payload, key)
+        payload = db_store(payload, url)
         # The server response is the payload itself
         return HttpResponse(payload, content_type="application/json")
 
@@ -482,7 +490,7 @@ def generic(request, key=""):
         Tag = TagType(request.headers["type"])
         match Tag:
             case TagType.COLLECTION:
-                db_remove(Collection, key, None)
+                db_remove(Collection, url, None)
             case TagType.CHAINLINK:
                 db_remove(Chainlink, get_url_from_id(target_id), get_order_from_id(target_id))
             case TagType.CONTENT:
@@ -495,7 +503,7 @@ def generic(request, key=""):
         payload_json = json.loads(payload)
         Tag = TagType(payload_json["type"])
         if Tag == TagType.COLLECTION:
-            db_update(Collection, key, None, target_update)
+            db_update(Collection, url, None, target_update)
         elif Tag == TagType.CHAINLINK:
             db_update(Chainlink, get_url_from_id(payload_json["url"]), None, payload)
         elif inheritsBody(Tag):
@@ -561,7 +569,7 @@ def chainlink(request, key):
 @login_required
 def generate(request):
     """
-    Create an Article. Write the article to the database and communicate back any updates to the specified article properties by returning the updated properties as JSON.
+    Create an Article. Write the collection to the database and communicate back any updates to the specified collection properties by returning the updated properties as JSON.
 
     :param request: http request object. The payload is the set of poperties for the Article.
     <DEPRECATED> :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website
@@ -584,8 +592,9 @@ def profile(request):
     # Determine if a landing page exists and send the user to the landing page if it does
     if not request.user.is_authenticated:
         return login(request)
-    if db_check_url(Collection, Account.objects.get(user=request.user).landing_page_url):
-        return generic(request, key=Account.objects.get(user=request.user).landing_page_url)
+    if db_check_url(Collection, Account.objects.get(user=request.user).landing_page_collection.url):
+       return generic(request, url=Account.objects.get(user=request.user).landing_page_collection.url)
+
     # Otherwise generate a new landing page for the site and then direct the user to an informational static page
     else:
         post_request_payload = {
@@ -667,7 +676,7 @@ def react(request):
 
 def aux_generate(request, is_landing_page, user=None):
     """
-    Create a new article. If the newly created article should be a landing page send back a static information page. Otherwise send a simple HttpResponse 
+    Create a new collection. If the newly created collection should be a landing page send back a static information page. Otherwise send a simple HttpResponse
 
     :param request: http request object. The payload is the set of properties for the Article.
     :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website.
@@ -677,7 +686,7 @@ def aux_generate(request, is_landing_page, user=None):
     payload = json.dumps({"type": "COL"})
     payload = db_store(payload, None, is_landing_page, user)
     if not is_landing_page:
-        url = reverse("article", kwargs={"key": json.loads(payload)["url"]})
+        url = reverse("collection", kwargs={"url": json.loads(payload)["url"]})
         return redirect(url)
     else:
         return render(request, 'Patchwork/new_landing_page.html', {})

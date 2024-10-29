@@ -59,9 +59,9 @@
                 </div>
                 <div id="navbar-actions" class="navbar">
                     <h2>Interact with the patchwork portal</h2>
-                    {% block actions %}
-                        {% if user.is_authenticated %}
-                            <ul>
+                    <ul>
+                        {% block actions %}
+                            {% if user.is_authenticated %}
                                 <li class="deactivated-action-list-element">
                                     <form>
                                         <input type="submit" value="Log In" disabled>
@@ -72,9 +72,7 @@
                                     </form></li>
                                 <li class="activated-action-list-element"><form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Log Out"></form></li>
                                 <li class="activated-action-list-element"><form id="add-col-form" action="{% url 'generate' %}" method="post">{% csrf_token %}<input id="add-col-btn" type="submit" value="Generate New Collection"></form></li>
-                            </ul>
-                        {% else %}
-                            <ul>
+                            {% else %}
                                 <li class="activated-action-list-element">
                                     <form action="/login.html" method="post">
                                         {% csrf_token %}
@@ -94,9 +92,10 @@
                                 </li>
                                 <li class="deactivated-action-list-element"><form><input type="submit" value="Log Out" disabled><span class="help-text">(you are already logged out)</span></form></li>
                                 <li class="deactivated-action-list-element"><form><input type="submit" value="Generate New Collection" disabled><span class="help-text">(log in to create a collection)</span></form></li>
-                            </ul>
-                        {% endif %}
-                    {% endblock %}
+                            {% endif %}
+                            <li class="deactivated-action-list-element"><form><input type="submit" value="Convert to PDF" disabled><span class="help-text">(display this Collection as a PDF - feature not yet implemented)</span></form></li>
+                        {% endblock %}
+                    </ul>
                 </div>
                 <div id="navbar-edit" class="navbar">
                     {% if user.is_authenticated %}

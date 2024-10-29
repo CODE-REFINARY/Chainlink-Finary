@@ -8,14 +8,14 @@
 <nav id="tabbed-buttons">
     {% for collection in collections %}
         {% if collection.header.text != "" %}
-	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">{{ collection.header.text }}</button>
+	        <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'collection' key=collection.url %}">{{ collection.header.text }}</button>
         {% else %}
-            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'article' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</button>
+            <button type="button" class="tabbed-buttons" onclick=window.location.href="{% url 'collection' key=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</button>
         {% endif %}
     {% endfor %}
 </nav>
 <!-- Article content is always displayed in #chainlink-display -->
-<div id="element-display" template="article">
+<div id="element-display" template="collection">
     <div id="header-display">
         <div id="header-elements">
             <h1 class="header-element-wrapper">Logout Success</h1>
