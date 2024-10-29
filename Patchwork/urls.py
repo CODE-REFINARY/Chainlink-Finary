@@ -20,4 +20,5 @@ urlpatterns = [
     path("chainlink/<str:key>.html", views.chainlink, name="chainlink"),
     path("login.html", views.login, name="login"),
     path("logout", views.logout, name="logout"),
+    path("automations", views.automations, name="automations"),
 ]

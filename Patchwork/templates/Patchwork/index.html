@@ -1,52 +1,13 @@
 {% extends 'Patchwork/base.html' %}
 {% load static %}
-{% block login_status %}
-    {% if user.is_authenticated %}
-        <i>Logged In</i>
-        <form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Logout"></form>
-        <form action="{% url 'generate' %}" method="post">{% csrf_token %}<input type="submit" value="Generate New Collection"></form>
-    {% else %}
-        <i>Logged Out</i>
-        <form action="/login.html" method="post">
-            {% csrf_token %}
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <input type="submit" value="Login">
-        </form>
-    {% endif %}
+{# This is section removes the tabbed-buttons section by overriding the block with just nothing. #}
+{% block tabbed_buttons %}
 {% endblock %}
+
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
-<nav id="tabbed-buttons">
-    {% for collection in collections %}
-        {% if user.is_authenticated %}
-            {% if collection.public == True %}
-                {% if collection.title %}
-                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
-                {% else %}
-                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
-                {% endif %}
-            {% else %}
-                {% if collection.title %}
-                    <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
-                {% else %}
-                    <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
-                {% endif %}
-            {% endif %}
-        {% else %}
-            {% if collection.title %}
-                <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
-            {% else %}
-                <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-</nav>
 <h1 class="index-title">index.html</h1>
 <section class="chainlink">
     <h2 class="section-header">Welcome to Chainlink Finary</h2>

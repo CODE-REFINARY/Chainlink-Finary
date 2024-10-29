@@ -50,3 +50,4 @@ celerybeat-schedule
 
 # Exclude files that Unix-like systems generate
 static/.DS_Store
+/.tmp.driveupload

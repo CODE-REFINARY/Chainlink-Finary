@@ -47,20 +47,22 @@
                                 <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
                                 <li class="activated-page-list-element"><a href="{% url 'profile' %}">My Profile</a></li>
                                 <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
+                                <li class="activated-page-list-element"><a href="{% url 'automations' %}">Site Automations</a></li>
                             </ul>
                         {% else %}
                             <ul>
                                 <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
                                 <li class="deactivated-page-list-element"><a>My Profile<span class="help-text">(log in to view your profile)</span></a></li>
                                 <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
+                                <li class="activated-page-list-element"><a href="{% url 'automations' %}">Site Automations</a></li>
                             </ul>
                         {% endif %}
                     {% endblock %}
                 </div>
-                <div id="navbar-actions" class="navbar">
-                    <h2>Interact with the patchwork portal</h2>
+                <div id="navbar-login" class="navbar">
+                    <h2>Login/Logout</h2>
                     <ul>
-                        {% block actions %}
+                        {% block login %}
                             {% if user.is_authenticated %}
                                 <li class="deactivated-action-list-element">
                                     <form>
@@ -71,7 +73,6 @@
                                         <span class="help-text">(you are already logged in)</span>
                                     </form></li>
                                 <li class="activated-action-list-element"><form action="{% url 'logout' %}" method="post">{% csrf_token %}<input type="submit" value="Log Out"></form></li>
-                                <li class="activated-action-list-element"><form id="add-col-form" action="{% url 'generate' %}" method="post">{% csrf_token %}<input id="add-col-btn" type="submit" value="Generate New Collection"></form></li>
                             {% else %}
                                 <li class="activated-action-list-element">
                                     <form action="/login.html" method="post">
@@ -91,26 +92,69 @@
                                     </form>
                                 </li>
                                 <li class="deactivated-action-list-element"><form><input type="submit" value="Log Out" disabled><span class="help-text">(you are already logged out)</span></form></li>
+                            {% endif %}
+                        {% endblock %}
+                    </ul>
+                </div>
+                {% if view == "generic" %}
+                    <div id="navbar-actions" class="navbar">
+                    <h2>Interact with the patchwork portal</h2>
+                    <ul>
+                        {% block actions %}
+                            {% if user.is_authenticated %}
+                                <li class="activated-action-list-element"><form id="add-col-form" action="{% url 'generate' %}" method="post">{% csrf_token %}<input id="add-col-btn" type="submit" value="Generate New Collection"></form></li>
+                            {% else %}
                                 <li class="deactivated-action-list-element"><form><input type="submit" value="Generate New Collection" disabled><span class="help-text">(log in to create a collection)</span></form></li>
                             {% endif %}
                             <li class="deactivated-action-list-element"><form><input type="submit" value="Convert to PDF" disabled><span class="help-text">(display this Collection as a PDF - feature not yet implemented)</span></form></li>
                         {% endblock %}
                     </ul>
                 </div>
-                <div id="navbar-edit" class="navbar">
-                    {% if user.is_authenticated %}
-                        <h2>Edit an existing collection</h2>
-                        <ul>
-                            <li class="activated-edit-list-element"><button>Share Collection</button></li>
-                            <li class="activated-edit-list-element"><button>Change Theme</button></li>
-                            <li class="activated-edit-list-element"><button>Delete Collection</button></li>
-                        </ul>
-                    {% else %}
-                    {% endif %}
+                    <div id="navbar-edit" class="navbar">
+                    <h2>Edit an existing collection</h2>
+                    <ul>
+                        {% if user.is_authenticated %}
+                            <li class="activated-edit-list-element"><form><input type="submit" value="Edit Permissions" /></form></li>
+                            <li class="activated-edit-list-element"><form><input type="submit" value="Change Theme" /></form></li>
+                            <li class="activated-edit-list-element"><form><input type="submit" value="Delete Collection" /></form></li>
+                        {% else %}
+                            <li class="deactivated-edit-list-element"><form><input type="submit" value="Edit Permissions" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                            <li class="deactivated-edit-list-element"><form><input type="submit" value="Change Theme" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                            <li class="deactivated-edit-list-element"><form><input type="submit" value="Delete Collection" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                        {% endif %}
+                    </ul>
                 </div>
+                {% endif %}
             </nav>
         </header>
             <main>
+                {% block tabbed_buttons %}
+                    <nav id="tabbed-buttons">
+                        {% for collection in collections %}
+                            {% if user.is_authenticated %}
+                                {% if collection.public == True %}
+                                    {% if collection.title %}
+                                        <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
+                                    {% else %}
+                                        <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                                    {% endif %}
+                                {% else %}
+                                    {% if collection.title %}
+                                        <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
+                                    {% else %}
+                                        <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                {% if collection.title %}
+                                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
+                                {% else %}
+                                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </nav>
+                {% endblock %}
                 {% block content %}
                 {% endblock %}
             </main>

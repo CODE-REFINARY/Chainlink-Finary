@@ -11,31 +11,6 @@
     <link rel="stylesheet" href="{% static 'css/washington.css' %}">
 {% endif %}
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
-<nav id="tabbed-buttons">
-    {% for collection in collections %}
-        {% if user.is_authenticated %}
-            {% if collection.public == True %}
-                {% if collection.title %}
-                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
-                {% else %}
-                    <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
-                {% endif %}
-            {% else %}
-                {% if collection.title %}
-                    <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
-                {% else %}
-                    <a class="tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
-                {% endif %}
-            {% endif %}
-        {% else %}
-            {% if collection.title %}
-                <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
-            {% else %}
-                <a class="tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-</nav>
 <div id="config-display">
     <div id="chainlink-manifest">
         <h2>Chainlink Manifest</h2>

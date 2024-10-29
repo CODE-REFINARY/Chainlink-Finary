@@ -472,7 +472,8 @@ def generic(request, url=None):
             "chainlinks": chainlinks,
             "collection": collection,
             "header": header,
-            "footers": footers
+            "footers": footers,
+            "view": "generic"
         })
 
     elif request.method == "POST":
@@ -579,8 +580,15 @@ def generate(request):
 
 
 def index(request):
-    collections = Collection.objects.all()
-    return render(request, "Patchwork/index.html", {"collections": collections})
+    collections = Collection.objects.filter(public=True).order_by("date")
+    return render(request, "Patchwork/index.html", {"collections": collections, "view": "index"})
+
+def automations(request):
+    """
+    This is a static page that displays interesting (hopefully) information about the automated processes that the
+    web server runs.
+    """
+    return render(request, "Patchwork/automations.html", {"view": "automations"})
 
 
 @login_required
@@ -661,7 +669,7 @@ def logout(request):
 
 
 def about(request):
-    return render(request, 'Patchwork/about.html', {})
+    return render(request, 'Patchwork/about.html', {"view": "about"})
 
 
 def beat_the_clock(request):

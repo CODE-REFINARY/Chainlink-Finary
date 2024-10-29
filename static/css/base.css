@@ -524,7 +524,7 @@ div.combination {
 
 /* ////////////// "Actions" List ////////////// */
 
-.activated-action-list-element input[type="submit"], .activated-edit-list-element button {
+.activated-action-list-element input[type="submit"], .activated-edit-list-element input[type="submit"] {
 	font-family: Audiowide;
 	font-weight:bolder;
 	position: static;
@@ -544,7 +544,7 @@ div.combination {
 
 }
 
-.deactivated-action-list-element input[type="submit"] {
+.deactivated-action-list-element input[type="submit"], .deactivated-edit-list-element input[type="submit"] {
 	font-family: Audiowide;
 	position: static;
 	-background-color: #343537;
