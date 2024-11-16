@@ -9,8 +9,7 @@ import {
         ContentElement,
         CreateBodyEditButtons, CreateFooterEditButtons,
         CreateHeaderEditButtons,
-        ElementCreationForm,
-        FenceEditButtons,
+        ElementCreationForm, ElementDeletionForm, ChainlinkDeletionForm,
         NoElements
 } from "./collectionComponentLibrary.js"
 import {
@@ -407,7 +406,7 @@ function showDiagnostics() {
  * @returns {null}
  */
 function addElement(element) {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        /*const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open("POST", window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -417,13 +416,41 @@ function addElement(element) {
         // dispatch an AJAX post
         xhr.send(JSON.stringify(element));
 
+         */
+        // Our target endpoint is the generic view which is the same as this web page.
+        let url = window.location.href
         // instantiate element once AJAX Post comes back successful
+        let xhr = dispatchAjaxAndAwaitResponse("POST", url, element);
         xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                         instantiateElement(xhr.response, numBodyElements.value, null);
                 }
-        }
+        };
 }
+
+
+/**
+ * Dispatches an AJAX request and returns the XMLHttpRequest object.
+ *
+ * @param {string} requestMethod - The HTTP method to use for the request (e.g., 'GET', 'POST').
+ * @param {string} url - The URL to which the request is sent.
+ * @param {Object} element - The data to be sent with the request, typically a JSON object.
+ * @return {XMLHttpRequest} - The XMLHttpRequest object used to dispatch the request.
+ */
+function dispatchAjaxAndAwaitResponse(requestMethod, url, element) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open(requestMethod, url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+
+        // dispatch an AJAX post
+        xhr.send(JSON.stringify(element));
+
+        return xhr;
+}
+
 
 /**
  * Create an Element and insert it into the display area. The location to insert into is denoted by an argument. This
@@ -732,7 +759,7 @@ export function instantiateEditButtons() {
                 let root = createRoot(container);
                 container.className = "chainlink-buttons-wrapper";
                 wrappers[i].appendChild(container);
-                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers}/>);
+                root.render(<ChainlinkEditButtons i={i} wrappers={wrappers} />);
         }
 
         var numContents = document.getElementsByClassName("content-wrapper").length;
@@ -789,6 +816,7 @@ export function deleteDoc() {
 
 export function deleteChainlink(target) {
 
+        /*
         var confirm = window.confirm("Delete chainlink?");
         if( confirm == false ) {
                 return
@@ -806,18 +834,171 @@ export function deleteChainlink(target) {
                         deinstantiateElement(target)
                 }
         }
+
+         */
+
+        const chainlink = document.getElementById(target);
+        const text = chainlink.querySelector(".chainlink-inner-content").textContent;
+        const order = getOrderFromId(chainlink.id);
+        // The frontIndex specifies the index of this Chainlink as rendered on the page.
+        const index = parseInt(chainlink.getAttribute("index"));
+        const _listener = function (e) {
+                escape(e, _listener, chainlink)
+        };
+
+        // Capture the child elements of this chainlink. Whenever we update a chainlink we supply list of child nodes
+        // to the instantiateElement() because if the chainlink order is changed then its children should follow it.
+        let chainlinkChildren = []
+        // Loop through all siblings (technically children but they're on the same level as the <h2>) and add them to
+        // the list of children.
+        let sibling = chainlink;
+        while (sibling) {
+                if (sibling !== chainlink) {
+                        chainlinkChildren.push(sibling)
+                }
+                sibling = sibling.nextElementSibling;
+        }
+
+        const container = document.createElement("div");
+        const root = createRoot(container);
+
+        // Remove keybinds temporarily while the form is open so that the user doesn't accidentally open another form
+        // via hotkey.
+        window.removeEventListener("keydown", parseKeyDown);
+        // Add hotkey for escape key to close the form.
+        window.addEventListener("keydown", _listener);
+
+        // Instantiate the form for editing this chainlink and supply all the default parameter values from values
+        // on this chainlink.
+        container.id = "chainlink-delete-form";
+        container.setAttribute("index", chainlink.getAttribute("index"));
+        root.render(<ElementDeletionForm type="CL" furl={chainlink.id} />);
+        chainlink.insertAdjacentElement("afterend", container);
+
+        container.addEventListener("submit", function(event) {
+                /*
+                event.preventDefault();
+                //addElement(type, input.value, url, order);
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);*/
+
+                let formData = new FormData(event.target);
+                let formFields = {}
+                // Store the field name/value pairs of all fields in the form.
+                formData.forEach((value, key) => {
+                        formFields[key] = value;
+                });
+
+                dispatchAjaxAndAwaitResponse("DELETE", window.location.href, formFields).onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                container.remove();
+                                refresh();
+                                //deinstantiateElement(target);
+                        }
+                };
+
+                /*
+                xhr.send(JSON.stringify(formFields));
+                xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                container.parentElement.remove();
+                                instantiateElement(formFields, index, chainlinkChildren);
+                        }
+                }*/
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.removeEventListener("keydown", _listener)
+        });
+        chainlink.remove();
+        refresh();
 }
 
 export function deleteContent(target) {
-        var confirm = window.confirm("Delete element?");
-        if( confirm == false ) {
-                return
-        }
 
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const wrapper = document.getElementById(target);
+        const content = wrapper.querySelector(".inner-content");
+        const title = content.textContent;
+        const order = getOrderFromId(wrapper.id);
+        const tag = wrapper.getAttribute("tag");
+        const index = parseInt(wrapper.getAttribute("index"));
+
+        const _listener = function (e) {
+                escape(e, _listener, wrapper)
+        };
+
+        window.removeEventListener("keydown", parseKeyDown);
+        window.addEventListener("keydown", _listener);
+
+        const container = document.createElement("div");
+        const root = createRoot(container);
+
+        container.id = "content-delete-form";
+        container.setAttribute("index", wrapper.getAttribute("index"));
+        root.render(<ElementDeletionForm type={tag} furl={wrapper.id} />);
+        wrapper.insertAdjacentElement("afterend", container);
+
+        container.addEventListener("submit", function(event) {
+                event.preventDefault();
+
+                let formData = new FormData(event.target);
+                let formFields = {}
+                // Store the field name/value pairs of all fields in the form.
+                formData.forEach((value, key) => {
+                        formFields[key] = value;
+                });
+
+                dispatchAjaxAndAwaitResponse("DELETE", window.location.href, formFields).onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+
+                                // Update the ID field of all sibling elements:
+                                let sibling = container.nextElementSibling;
+
+                                while (sibling) {
+                                        // Extract the current id
+                                        const currentId = sibling.id;
+
+                                        // Ensure the id matches the expected format
+                                        if (currentId && currentId.startsWith("content-")) {
+                                                // Find the part after the last dash and parse it as an integer
+                                                const parts = currentId.split("-");
+                                                const lastPart = parts[parts.length - 1];
+
+                                                // Increment the last part if it's a valid number
+                                                if (!isNaN(lastPart)) {
+                                                        const incrementedValue = parseInt(lastPart, 10) - 1;
+                                                        parts[parts.length - 1] = incrementedValue;
+
+                                                        // Update the id
+                                                        sibling.id = parts.join("-");
+                                                }
+                                        }
+
+                                        // Move to the next sibling
+                                        sibling = sibling.nextElementSibling;
+                                }
+
+                                container.remove();
+                                removeEditButtons();
+                                instantiateEditButtons();
+                                refresh();
+                                //deinstantiateElement(target);
+                        }
+                };
+
+                window.addEventListener("keydown", parseKeyDown);
+                window.removeEventListener("keydown", _listener);
+        });
+
+        wrapper.remove();
+        refresh();
+
+        /*const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open("DELETE", window.location.href, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('type', 'content');
         xhr.setRequestHeader('target', target);
         xhr.send();
@@ -826,54 +1007,23 @@ export function deleteContent(target) {
                         deinstantiateElement(target)
                 }
         }
+
+        let deletionRequestPayload = {
+                type: tag,
+                target: target
+        };
+
+        let url = window.location.href;
+
+        // deinstantiate element once AJAX Post comes back successful
+        dispatchAjaxAndAwaitResponse("DELETE", url, deletionRequestPayload).onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                        deinstantiateElement(target);
+                }
+        };
+        */
 }
 
-/*export function renameDoc() {
-
-        const header = document.getElementById('collection-title');
-        const wrapper = document.getElementById('header-display');
-        const title = header.innerHTML;
-
-        window.removeEventListener("keydown", parseKeyDown);
-        
-        var _listener = function (e) { alt_escape(e, _listener, title, "h1") };
-        window.addEventListener("keydown", _listener);
-
-        const container = document.createElement("div");
-        const root = createRoot(container);
-
-        deinstantiateElement("header-display");
-
-        container.id = "chainlink-edit-form";
-        container.setAttribute("index", "0");
-        root.render(<ElementCreationForm placeholder="enter Article title" />);
-        wrapper.appendChild(container);
-
-        deleteButtons();         
-        container.addEventListener("submit", function(event) {
-                event.preventDefault();
-                //addElement(type, input.value, url, order);
-                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                let xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.location.href, true);
-                xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.setRequestHeader('type', 'collection');
-                xhr.setRequestHeader('title', event.target.input.value);
-                xhr.setRequestHeader('target', 'null');
-                xhr.send();
-                xhr.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                                //window.location.reload();
-                        }
-                }
-
-                window.addEventListener("keydown", parseKeyDown);
-                window.removeEventListener("keydown", _listener)
-                //_addButtons();
-        });
-
-        header.remove();
-}*/
 
 /**
  * Edit the target chainlink. Instantiate a form to allow the user to change the text of this Chainlink.
@@ -992,6 +1142,14 @@ export function editContent(target) {
                         formFields[key] = value;
                 });
 
+                dispatchAjaxAndAwaitResponse("PUT", window.location.href, formFields).onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                                container.remove();
+                                instantiateElement(formFields, index, null);
+                        }
+                };
+
+                /*
                 let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.location.href, true);
@@ -1006,6 +1164,8 @@ export function editContent(target) {
                                 instantiateElement(formFields, index, null);
                         }
                 }
+                */
+
                 window.addEventListener("keydown", parseKeyDown);
                 window.removeEventListener("keydown", _listener);
         });
@@ -1017,7 +1177,9 @@ export function editContent(target) {
 function deinstantiateElement(id) {
 
         let obj_to_remove = document.getElementById(id);
-        let objToRemoveIndex = parseInt(obj_to_remove.getAttribute("index"));
+        console.log(obj_to_remove);
+        //let obj_to_remove = document.querySelector(`[index="${index}"]`);
+        //let objToRemoveIndex = parseInt(obj_to_remove.getAttribute("index"));
 
         if (obj_to_remove.className === "article-wrapper") {
                 obj_to_remove.firstElementChild.remove();

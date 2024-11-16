@@ -276,18 +276,25 @@ def db_store(payload, parent, is_landing_page=False, user=None):
     return json.dumps(json_data)
 
 
-def db_remove(table, url, order):
+def db_remove(tag, furl, order):
     """
     Delete data from the database.
 
-    :param table: identify table holding the target
-    :param url: url string identifying target item
+    :param tag: This is the tag of the element
+    :param furl: This stands for "Full-Url" and this is a url that specifies the type of element and and its order and
+    can be used to uniquely identify the element.
     :param order: This is an int identifier used in tandem with url to identify Body type targets. It is this field
     # that will get updated for all subsequent Body elements so that there is no gap in the element ordering
     """
-    # If the user is trying to delete a Collection then we have to worry about cases where other
-    if table == Collection:
-        target = table.objects.get(url=url)
+    # Anything except for a Collection is identified via a furl
+    if tag != TagType.HEADER1:
+        prefix, url, order = unpack_furl(furl)
+    else:
+        # If the user is trying to delete a Collection then the furl will be just a regular url since Collections don't have furls
+        url = furl
+
+    if tag == TagType.HEADER1:
+        target = Collection.objects.get(url=url)
         chainlinks = Chainlink.objects.get(Collection=target)
         for chainlink in chainlinks:
             if chainlink.archive:
@@ -296,10 +303,13 @@ def db_remove(table, url, order):
                 # Collection to NULL in the database.
                 chainlink.Collection = None
 
-    elif table == Chainlink:
-        target = table.objects.get(url=url)
+    elif tag == TagType.CHAINLINK:
+        target = Chainlink.objects.get(url=url)
         parent_article = target.collection
+        #print("Delete Chainlink Target" + target)
+        #print("Delete Parent Collection" + parent_article)
         parent_article_count = Chainlink.objects.filter(collection=parent_article).count()
+        print("Parent Collection: " + str(parent_article_count))
         for i in range(order + 1, parent_article_count):
             next_pos_els = Chainlink.objects.filter(collection=parent_article, order=i)
             for obj in next_pos_els:
@@ -307,16 +317,24 @@ def db_remove(table, url, order):
                 obj.save()
         parent_article.save()
 
-    elif table == Body:
+    elif inheritsBody(tag):
         parent_chainlink = Chainlink.objects.get(url=url)
         parent_chainlink_count = Body.objects.filter(chainlink=parent_chainlink).count()
-        target = table.objects.get(chainlink=parent_chainlink, order=order)
+        print(parent_chainlink_count)
+        print(order)
+        target = Body.objects.get(chainlink=parent_chainlink, order=order)
         for i in range(order + 1, parent_chainlink_count):
             next_pos_els = Body.objects.filter(chainlink=parent_chainlink, order=i)
             for obj in next_pos_els:
                 obj.order -= 1
                 obj.save()
         parent_chainlink.save()
+
+    elif inheritsHeader(tag):
+        pass
+
+    elif inheritsBody(tag):
+        pass
 
     target.delete()
 
@@ -487,15 +505,11 @@ def generic(request, url=None):
         return HttpResponse(payload, content_type="application/json")
 
     elif request.method == "DELETE":
-        target_id = request.headers["target"]
-        Tag = TagType(request.headers["type"])
-        match Tag:
-            case TagType.COLLECTION:
-                db_remove(Collection, url, None)
-            case TagType.CHAINLINK:
-                db_remove(Chainlink, get_url_from_id(target_id), get_order_from_id(target_id))
-            case TagType.CONTENT:
-                db_remove(Body, get_url_from_id(target_id), get_order_from_id(target_id))
+        payload = request.body
+        payload_json = json.loads(payload)
+        furl = payload_json["furl"]
+        tag = TagType(payload_json["tag"])
+        db_remove(tag, furl, None)
 
     elif request.method == "PUT":
         #target_id = request.headers["url"]
@@ -698,6 +712,41 @@ def aux_generate(request, is_landing_page, user=None):
         return redirect(url)
     else:
         return render(request, 'Patchwork/new_landing_page.html', {})
+
+
+def unpack_furl(furl):
+    """
+    Unpack the input furl (full-url) string and return a 3-tuple containing the 3 distinct elements of the furl (prefix, url, and order)
+    A furl always contains 2 dashes which separate these 3 components. The prefix indicates the type of element (chainlink, content, header, or footer).
+    The url is the unique identifier of the parent element (in the case of content, header, or footer) and the order indicates the order of the element
+    relative to other elements that have the same parent. If the input string is not a furl then it gets quietly returned back.
+    """
+    if not isinstance(furl, str):
+        raise TypeError("The argument must be a string")
+
+    end_of_prefix_idx = furl.find("-")
+    start_of_url_idx = furl.find("-") + 1
+    end_of_url_idx = furl.rfind("-")
+    start_of_order_idx = furl.rfind("-") + 1
+
+    if end_of_prefix_idx != -1:
+        prefix = furl[:end_of_prefix_idx]
+    else:
+        raise ValueError("An invalid id was specified. Make sure the supplied id contains a prefix section (either"
+                         "text or chainlink) followed by a dash followed by the url followed by a dash followed by"
+                         "the order.")
+
+    if start_of_url_idx != -1:
+        url = furl[start_of_url_idx:end_of_url_idx]
+    else:
+        raise ValueError("An invalid id was specified. The url between the dashes was malformed.")
+
+    if end_of_url_idx != -1:
+        order = int(furl[start_of_order_idx:])
+    else:
+        raise ValueError("The value specified after the second dash must be an int.")
+
+    return (prefix, url, order)
 
 
 def get_order_from_id(id):

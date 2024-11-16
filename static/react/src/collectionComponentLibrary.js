@@ -3,7 +3,6 @@ import {
     elementsEditButtonEventHandlers,
     deleteChainlink,
     deleteContent,
-    deleteDoc,
     editChainlink,
     editContent, instantiateEditButtons,
     makeForm, removeEditButtons,
@@ -130,20 +129,6 @@ export function CreateFooterEditButtons(props) {
     );
 }
 
-/*export function FenceEditButtons() {
-        const editFunction = function() { renameDoc() };
-        const deleteFunction = function() { deleteDoc() };
-        storeEditButtonHandlers(editFunction, deleteFunction)
-        return (
-                <React.Fragment>
-                        <i className="context-span-message">context action &lt; - - - - - -</i>
-                        <button className="doc-action-copy-title">copy</button>
-                        <button id="doc-action-edit-title" onClick={ elementsEditButtonEventHandlers[0][0] }>edit</button>
-                        <button id="doc-action-delete-title" onClick={ elementsEditButtonEventHandlers[0][1] }>delete</button>
-                </React.Fragment>
-        );
-}*/
-
 export function ChainlinkEditButtons(props) {
         const editFunction = function() { editChainlink(props.wrappers[props.i].id) };
         const deleteFunction = function() { deleteChainlink(props.wrappers[props.i].id) };
@@ -239,16 +224,55 @@ export function ElementCreationForm(props) {
         }
 }
 
+export function ElementDeletionForm(props) {
+        useEffect(() => {
+                refresh();
+        })
+
+        return (
+            <React.Fragment>
+                <form id="crud-form">
+                    <input type="hidden" name="furl" value={props.furl}/>
+                    <input type="hidden" name="tag" value={props.type}/>
+                    {props.type === "CL" ? <input type="checkbox" name="archive content" value="False" id="chainlink-delete-form-archive-content" className="form-field"/> : null}
+                    <div id="element-creation-text-align-right">
+                        <input id="element-creation-submit" type="submit" value="Submit"/>
+                    </div>
+                </form>
+            </React.Fragment>
+        );
+}
+
+export function ChainlinkDeletionForm(props) {
+        useEffect(() => {
+                refresh();
+        })
+
+        return (
+            <React.Fragment>
+                <form id="crud-form">
+                    <input type="hidden" name="furl" value={props.furl}/>
+                    <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+                    <input type="hidden" name="tag" value="CL"/>
+                    <input type="checkbox" name="archive content" value="False" id="chainlink-delete-form-archive-content" className="form-field"/>
+                    <div id="chainlink-deletion-text-align-right">
+                        <input id="chainlink-deletion-submit" type="submit" value="Submit"/>
+                    </div>
+                </form>
+            </React.Fragment>
+        );
+}
+
 export function ChainlinkElement(props) {
 
-        useEffect(() => {
-                // insert all child elements of this Chainlink now the Chainlink has been rendered
-                if (props.children != null && props.children.length !== 0) {           // if the children parameter is not null then add append them to the Chainlink element
-                        let chainlink = document.getElementById(props.url).parentElement;       // This object represents the Chainlink that was just rendered
-                        for (let i = 0; i < props.children.length; i++) {
-                                chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
-                        }
-                }
+    useEffect(() => {
+        // insert all child elements of this Chainlink now the Chainlink has been rendered
+        if (props.children != null && props.children.length !== 0) {           // if the children parameter is not null then add append them to the Chainlink element
+            let chainlink = document.getElementById(props.url).parentElement;       // This object represents the Chainlink that was just rendered
+            for (let i = 0; i < props.children.length; i++) {
+                chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
+            }
+        }
                 refresh();   // Now that the Chainlink and its children are instantiated assign indices
                 removeEditButtons();
                 instantiateEditButtons();

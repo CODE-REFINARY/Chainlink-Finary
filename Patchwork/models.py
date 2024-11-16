@@ -182,6 +182,14 @@ class Body(models.Model):
             return self.linebreak
         elif hasattr(self, "header3"):
             return self.header3
+        elif hasattr(self, "link"):
+            return self.link
+        elif hasattr(self, "list"):
+            return self.list
+        elif hasattr(self, "note"):
+            return self.note
+        elif hasattr(self, "image"):
+            return self.image
         else:
             return None
     def __str__(self):
