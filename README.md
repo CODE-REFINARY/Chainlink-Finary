@@ -27,3 +27,11 @@ individual trivial decisions you make when writing out a document, especially fo
 <p>Perhaps the greatest change to the way Confluence usually works is hinted it in the structure of this README. You
 might notice the straightforward structure of this document. There is one H1 followed by a series of H2's with
 content filling in the gaps of those H2s.</p>
+
+## Technical Details
+
+#### What's the template schema?
+The goal with using django templating (I guess this is really Jinja not Django) is to minimize repeated HTML. The
+current main HTML base file from which all other templates inherit the header items from (<DOCTYPE>, <meta>, etc.) is
+located in `Patchwork/templates/Patchwork/base.html`. The idea is that I can exclude these header tags from all other
+HTML by having them all inherit these tags from `base.html`.

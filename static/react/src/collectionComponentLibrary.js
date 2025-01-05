@@ -234,7 +234,12 @@ export function ElementDeletionForm(props) {
                 <form id="crud-form">
                     <input type="hidden" name="furl" value={props.furl}/>
                     <input type="hidden" name="tag" value={props.type}/>
-                    {props.type === "CL" ? <input type="checkbox" name="archive content" value="False" id="chainlink-delete-form-archive-content" className="form-field"/> : null}
+                    {props.type === "CL" ? <div className="form-group">
+                        <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
+                               className="form-label">archive content</label>
+                        <input type="checkbox" name="archive content" value="False"
+                               id="chainlink-delete-form-archive-content" className="form-field"/>
+                    </div> : null}
                     <div id="element-creation-text-align-right">
                         <input id="element-creation-submit" type="submit" value="Submit"/>
                     </div>
@@ -244,17 +249,22 @@ export function ElementDeletionForm(props) {
 }
 
 export function ChainlinkDeletionForm(props) {
-        useEffect(() => {
-                refresh();
-        })
+    useEffect(() => {
+        refresh();
+    })
 
-        return (
-            <React.Fragment>
-                <form id="crud-form">
+    return (
+        <React.Fragment>
+            <form id="crud-form">
                     <input type="hidden" name="furl" value={props.furl}/>
                     <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
                     <input type="hidden" name="tag" value="CL"/>
-                    <input type="checkbox" name="archive content" value="False" id="chainlink-delete-form-archive-content" className="form-field"/>
+                    <div className="form-group">
+                        <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
+                               className="form-label">archive content</label>
+                        <input type="checkbox" name="archive content" value="False"
+                               id="chainlink-delete-form-archive-content" className="form-field"/>
+                    </div>
                     <div id="chainlink-deletion-text-align-right">
                         <input id="chainlink-deletion-submit" type="submit" value="Submit"/>
                     </div>

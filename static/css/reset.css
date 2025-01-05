@@ -57,7 +57,7 @@ table {
   border-spacing: 0;
 }
 
-input, select {
+input, select, label {
   vertical-align :middle;
 }
 

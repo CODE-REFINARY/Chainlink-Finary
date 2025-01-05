@@ -838,10 +838,7 @@ export function deleteChainlink(target) {
          */
 
         const chainlink = document.getElementById(target);
-        const text = chainlink.querySelector(".chainlink-inner-content").textContent;
-        const order = getOrderFromId(chainlink.id);
         // The frontIndex specifies the index of this Chainlink as rendered on the page.
-        const index = parseInt(chainlink.getAttribute("index"));
         const _listener = function (e) {
                 escape(e, _listener, chainlink)
         };
@@ -883,7 +880,7 @@ export function deleteChainlink(target) {
                 let xhr = new XMLHttpRequest();
                 xhr.open("PUT", window.location.href, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);*/
-
+                event.preventDefault();
                 let formData = new FormData(event.target);
                 let formFields = {}
                 // Store the field name/value pairs of all fields in the form.
@@ -893,7 +890,30 @@ export function deleteChainlink(target) {
 
                 dispatchAjaxAndAwaitResponse("DELETE", window.location.href, formFields).onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                                container.remove();
+                                let nextSiblingParent = container.parentElement.nextElementSibling;
+                                while (nextSiblingParent) {
+                                        // Update the IDs of siblings with higher order to account for this chainlink getting removed.
+                                        let nextSibling = getMatchedChildren(nextSiblingParent, ["chainlink-wrapper"])[0];
+                                        let orderDisplay = getMatchedChildren(nextSiblingParent, ["chainlink-order"])[0];
+                                        let oldIdPrefix = getPrefixFromId(nextSibling.getAttribute("id"));
+                                        let oldIdUrl = getUrlFromId(nextSibling.getAttribute("id"));
+                                        let oldIdOrder = getOrderFromId(nextSibling.getAttribute("id"));
+
+                                        // Construct the new ID for this sibling by subtracting 1 from its order (to account for the
+                                        // absence of the Body Element that was just deleted).
+                                        let newOrder = oldIdOrder - 1;
+                                        let newId = oldIdPrefix + "-" + oldIdUrl + "-" + newOrder;
+                                        nextSibling.setAttribute("id", newId)
+
+                                        // Update the number that appears on the Chainlink header to account for the deleted chainlink.
+                                        orderDisplay.textContent = "#" + newOrder.toString();
+
+                                        // Move on to update the next sibling.
+                                        nextSiblingParent = nextSiblingParent.nextElementSibling;
+                                }
+                                container.parentElement.remove();
+                                removeEditButtons();
+                                instantiateEditButtons();
                                 refresh();
                                 //deinstantiateElement(target);
                         }

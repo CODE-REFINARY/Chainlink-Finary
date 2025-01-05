@@ -92,6 +92,7 @@ class Theme(models.TextChoices):
     PESHAY = "peshay", _("Peshay Studio Set")
     PATCHWORK = "patchwork", _("Patchwork")
     WASHINGTON = "washington", _("Washington")
+    BLUESKY = "bluesky", _("Bluesky")
 
 
 class HeightSpacing(models.TextChoices):
