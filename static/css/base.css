@@ -391,14 +391,14 @@ div.combination {
 
 /* The styles here are for the navbars that appear on the generic patchwork pages. There's an edit navbar, actions, navbar
  etc. */
-.navbar {
+.cf-navbar {
 	background-color: #acacacd5;
 	margin-bottom: 30px;
 	border-radius: 15px;
 	padding: 7px;
 }
 
-.navbar h2 {
+.cf-navbar h2 {
 	font-style: italic;
     font-family: 'Courier New', Courier, monospace;
     font-size: small;
@@ -588,6 +588,7 @@ div.combination {
 
 }
 
+/*
 .form-label {
     float: left;
 }
@@ -600,4 +601,4 @@ div.combination {
 	padding: 7px 7px 7px 7px;
 	display: block;
 	margin-bottom: 15px;
-}
+}*/

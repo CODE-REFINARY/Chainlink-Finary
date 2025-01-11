@@ -7,11 +7,18 @@
         <!-- Document Metadata -->
         <meta name="Patchwork Base" content="Patchwork">
         <meta charset="utf-8">
+    
+        <!-- Make the page responsive -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- Static CSS -->
         <link rel="icon" type="image/x-icon" href="{% static 'images/lock_icon.png' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+
+        <!-- Bulma CDN -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 
         <!-- Scripts -->
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -39,18 +46,18 @@
             <h6 class="under-construction">the patchwork portal is currently under construction</h6>
             <img class="under-construction" src="{% static 'images/under_construction.gif' %}" onclick="window.location.replace('http://textfiles.com/underconstruction/')"/>
             <nav id="upper-navigation">
-                <div id="navbar-pages" class="navbar">
-                    <h2>Browse the patchwork portal</h2>
+                <div id="navbar-pages" class="menu cf-navbar">
+                    <h2 class="menu-label">Browse the patchwork portal</h2>
                     {% block pages %}
                         {% if user.is_authenticated %}
-                            <ul>
+                            <ul class="menu-list">
                                 <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
                                 <li class="activated-page-list-element"><a href="{% url 'profile' %}">My Profile</a></li>
                                 <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
                                 <li class="activated-page-list-element"><a href="{% url 'automations' %}">Site Automations</a></li>
                             </ul>
                         {% else %}
-                            <ul>
+                            <ul class="menu-list">
                                 <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
                                 <li class="deactivated-page-list-element"><a>My Profile<span class="help-text">(log in to view your profile)</span></a></li>
                                 <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
@@ -59,7 +66,7 @@
                         {% endif %}
                     {% endblock %}
                 </div>
-                <div id="navbar-login" class="navbar">
+                <div id="navbar-login" class="cf-navbar">
                     <h2>Login/Logout</h2>
                     <ul>
                         {% block login %}
@@ -97,7 +104,7 @@
                     </ul>
                 </div>
                 {% if view == "generic" %}
-                    <div id="navbar-actions" class="navbar">
+                    <div id="navbar-actions" class="cf-navbar">
                     <h2>Interact with the patchwork portal</h2>
                     <ul>
                         {% block actions %}
@@ -110,7 +117,7 @@
                         {% endblock %}
                     </ul>
                 </div>
-                    <div id="navbar-edit" class="navbar">
+                    <div id="navbar-edit" class="cf-navbar">
                     <h2>Edit an existing collection</h2>
                     <ul>
                         {% if user.is_authenticated %}
