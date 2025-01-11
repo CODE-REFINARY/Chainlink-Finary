@@ -51,6 +51,14 @@ services:
       - redis_data:/data
     command: bash -c "redis-server --appendonly yes --bind 0.0.0.0 --port 6379 --requirepass 123abc"
 
+  sass:
+    build:
+      dockerfile: Dockerfile.sass
+      context: .
+    volumes:
+      - .:/code
+    command:
+
 volumes:
   redis_data:
   postgres_data:
