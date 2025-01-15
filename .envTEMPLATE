@@ -1,3 +1,4 @@
+# For Windows you might need to change the static ip "172.17.0.1" to "10.0.75.1" or "host.docker.internal"
 ENVIRONMENT="DOCKER"
 DB_HOST=172.17.0.1
 DB_DATABASE=postgres
@@ -13,4 +14,7 @@ EMAIL_HOST_PASSWORD="aaaa bbbb cccc zzzz"
 EMAIL_USE_TLS=True
 EMAIL_USE_SSL=False
 REDIS_URL="redis://:thepasswordyouwanttouse@172.17.0.1:6379"
+
+# This string is used to connect to the postgres database. The format is as follows (braces indicate variable substitution):
+#   postgres://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}
 DATABASE_URL="postgres://postgres:postgres@172.17.0.1:5430/postgres"

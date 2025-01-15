@@ -50,14 +50,14 @@ services:
     volumes:
       - redis_data:/data
     command: bash -c "redis-server --appendonly yes --bind 0.0.0.0 --port 6379 --requirepass 123abc"
-
-  sass:
-    build:
-      dockerfile: Dockerfile.sass
-      context: .
+  dart-sass:
+    image: michalklempa/dart-sass:latest
     volumes:
-      - .:/code
-    command:
+      - ./static/sass:/sass
+      - ./static/css:/css
+    stdin_open: true  # Equivalent to -it (interactive)
+    tty: true  # Keep the terminal open
+    command: ["/opt/dart-sass/sass", "--watch", "/sass", "/css"]
 
 volumes:
   redis_data:

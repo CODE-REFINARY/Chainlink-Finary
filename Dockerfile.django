@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.11.11-bookworm
 
 # Specify directory for Django
 WORKDIR /code
