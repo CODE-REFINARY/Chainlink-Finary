@@ -57,7 +57,7 @@ services:
       - ./static/css:/css
     stdin_open: true  # Equivalent to -it (interactive)
     tty: true  # Keep the terminal open
-    command: ["/opt/dart-sass/sass", "--watch", "/sass", "/css"]
+    command: ["/opt/dart-sass/sass", "/sass:/css", "--watch"]
 
 volumes:
   redis_data:
