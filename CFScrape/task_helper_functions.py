@@ -10,8 +10,8 @@ from celery import Celery
 # Set up logging for diagnostics and debugging
 logging.basicConfig(level=logging.DEBUG)
 
-redis_client = redis.from_url("redis://:123abc@172.17.0.1:6379")
-#redis_client = redis.from_url(settings.CELERY_BACKEND_URL)
+#redis_client = redis.from_url("redis://:123abc@172.17.0.1:6379")
+redis_client = redis.from_url(settings.CELERY_BACKEND_URL)
 
 sio_managed_vessel_shortnames = {"Thompson", "Healy", "Revelle", "Sproul", "Sally Ride", "Blue Heron", "Rachel Carson", "Sikuliaq"}
 sio_managed_vessel_acronyms = {"TN", "HLY", "RR", "SP", "SR", "BH", "RC", "SKQ"}

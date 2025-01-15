@@ -1,6 +1,6 @@
 #!/bin/bash
-python manage.py collectstatic --no-input
 python -m pip install -r requirements.txt --quiet
+python manage.py collectstatic --no-input
 python -m celery -A Chainlink worker -l info &
 python -m celery -A Chainlink beat -l info &
 # python manage.py makemigrations --noinput
