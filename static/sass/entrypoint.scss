@@ -1,17 +1,14 @@
 // Set your brand colors
-$purple: #8a4d76;
-$pink: #fa7c91;
-$brown: #757763;
-$beige-light: #d0d1cd;
-$beige-lighter: #eff0eb;
+$metallic-blue: #334756;
+$navy-blue: #19354b;
+$gray-may: #a8a8a8;
+$foggy-blue: #63839b;
 
 // Override global Sass variables from the /utilities folder
 @use "bulma/sass/utilities" with (
   $family-primary: '"Nunito", sans-serif',
-  $grey-dark: $brown,
-  $grey-light: $beige-light,
-  $primary: $purple,
-  $link: $pink,
+  $primary: $gray-may,
+  $link: $metallic-blue,
   $control-border-width: 3px
 );
 
@@ -20,12 +17,15 @@ $beige-lighter: #eff0eb;
   $input-shadow: none
 );
 
+@use "bulma/sass/elements/button" with (
+  $button-family: "Courier New, Courier, monospace",
+);
+
 // Import the components you need
 @forward "bulma/sass/base";
 @forward "bulma/sass/components/card";
 @forward "bulma/sass/components/modal";
 @forward "bulma/sass/components/navbar";
-@forward "bulma/sass/elements/button";
 @forward "bulma/sass/elements/icon";
 @forward "bulma/sass/elements/content";
 @forward "bulma/sass/elements/notification";
@@ -38,3 +38,9 @@ $beige-lighter: #eff0eb;
 
 // Import the Google Font
 @import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
+
+.button.is-warning {
+  font-style: italic;
+  background-color: $foggy-blue;
+  color: white;
+}

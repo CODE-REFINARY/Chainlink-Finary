@@ -47,12 +47,13 @@ pyvenv.cfg
 # exclude the output of webpack
 static/react/static
 /Patchwork/migrations
-.DS_Store
 /static/react/static
 
 # This file is created by celery-beat to keep track of the last time a task was run. It's not very useful.
 celerybeat-schedule
 
 # Exclude files that Unix-like systems generate
-static/.DS_Store
 /.tmp.driveupload
+
+# fuck these dumb little guys
+**/.DS_Store

@@ -317,16 +317,14 @@ div.combination {
 	padding-bottom: var(--main-body-inner-content-padding-vertical);
 	padding-left: var(--main-body-inner-content-padding-horizontal);
 	padding-right: var(--main-body-inner-content-padding-horizontal);
-	border-radius: 12px;
-	background-image: linear-gradient(180deg, #b4000000 0%, #2c2e43 0%);
-    font-size: 0;
-	text-align: right;
+	#border-radius: 12px;
+	#background-image: linear-gradient(180deg, #b4000000 0%, #2c2e43 0%);
 	display: flex;
 	flex-direction: row-reverse;
 	flex-wrap: wrap;
 }
 
-.tabbed-buttons {
+/*.tabbed-buttons {
 	font-family: 'Courier New', Courier, monospace;
 	font-weight:bolder;
 	position: static;
@@ -343,16 +341,16 @@ div.combination {
 	margin: 0em;
 	border-style: outset;
 	padding: 6px;
-}
+}*/
 
-.tabbed-buttons:hover {
+/*.tabbed-buttons:hover {
 	background-color: #2a3946;
 	text-decoration: underline;
-}
+}*/
 
-.private-collection {
+/*.private-collection {
     color: red;
-}
+}*/
 
 /* chainlink display elements - chainlinks */
 
