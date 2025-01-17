@@ -237,11 +237,11 @@ export function ElementDeletionForm(props) {
                     {props.type === "CL" ? <div className="form-group">
                         <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
                                className="form-label">archive content</label>
-                        <input type="checkbox" name="archive content" value="False"
+                        <input className="checkbox" type="checkbox" name="archive content" value="False"
                                id="chainlink-delete-form-archive-content" className="form-field"/>
                     </div> : null}
                     <div id="element-creation-text-align-right">
-                        <input id="element-creation-submit" type="submit" value="Submit"/>
+                        <input className="button is-danger is-medium is-outlined" type="submit" value="DELETE"/>
                     </div>
                 </form>
             </React.Fragment>
@@ -377,7 +377,7 @@ function ConstructParagraphElement(props) {
             <input type="hidden" name="public" value="True" />
             <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
-                <input id="element-creation-submit" type="submit" value="Submit" />
+                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
         </form>
     );
@@ -394,7 +394,7 @@ function ConstructCodeElement(props) {
             <input type="hidden" name="public" value="True" />
             <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
-                <input id="element-creation-submit" type="submit" value="Submit" />
+                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
         </form>
     );
@@ -411,7 +411,7 @@ function ConstructHeader3Element(props) {
             <input type="hidden" name="public" value="True" />
             <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
-                <input id="element-creation-submit" type="submit" value="Submit" />
+                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
         </form>
     );
@@ -432,7 +432,7 @@ function ConstructLinebreakElement(props) {
             <input type="hidden" name="public" value="True" />
             <input type="hidden" name="css" value="" />
             <div id="element-creation-text-align-right">
-                <input id="element-creation-submit" type="submit" value="Submit" />
+                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
         </form>
     );
@@ -469,7 +469,7 @@ function ConstructChainlinkElement(props) {
                 </div>
             </div>
             <div id="element-creation-text-align-right">
-                <input id="element-creation-submit" type="submit" value="Submit" />
+                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
         </form>
     );

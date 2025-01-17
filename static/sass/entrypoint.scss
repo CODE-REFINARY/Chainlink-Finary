@@ -3,13 +3,15 @@ $metallic-blue: #334756;
 $navy-blue: #19354b;
 $gray-may: #a8a8a8;
 $foggy-blue: #63839b;
+$danger-red: #cc2a20;
 
 // Override global Sass variables from the /utilities folder
 @use "bulma/sass/utilities" with (
   $family-primary: '"Nunito", sans-serif',
   $primary: $gray-may,
   $link: $metallic-blue,
-  $control-border-width: 3px
+  $control-border-width: 3px,
+  $danger: $danger-red
 );
 
 // Override Sass variables from the /form folder
@@ -32,15 +34,10 @@ $foggy-blue: #63839b;
 @forward "bulma/sass/elements/progress";
 @forward "bulma/sass/elements/tag";
 @forward "bulma/sass/layout/footer";
+@forward "bulma/sass/components/menu";
 
 // Import the themes so that all CSS variables have a value
 @forward "bulma/sass/themes";
 
 // Import the Google Font
 @import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
-
-.button.is-warning {
-  font-style: italic;
-  background-color: $foggy-blue;
-  color: white;
-}

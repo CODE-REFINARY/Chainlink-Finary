@@ -58,10 +58,10 @@
                             </ul>
                         {% else %}
                             <ul class="menu-list">
-                                <li class="activated-page-list-element"><a href="{% url 'index' %}">Landing Page</a></li>
-                                <li class="deactivated-page-list-element"><a>My Profile<span class="help-text">(log in to view your profile)</span></a></li>
-                                <li class="activated-page-list-element"><a href="{% url 'about' %}">About</a></li>
-                                <li class="activated-page-list-element"><a href="{% url 'automations' %}">Site Automations</a></li>
+                                <li class="activated-page-list-element"><a class="button is-link" href="{% url 'index' %}">Landing Page</a></li>
+                                <li class="deactivated-page-list-element"><a class="is-static is-light">My Profile<span class="help-text">(log in to view your profile)</span></a></li>
+                                <li class="activated-page-list-element"><a class="button is-link" href="{% url 'about' %}">About</a></li>
+                                <li class="activated-page-list-element"><a class="button is-link" href="{% url 'automations' %}">Site Automations</a></li>
                             </ul>
                         {% endif %}
                     {% endblock %}
@@ -73,7 +73,7 @@
                             {% if user.is_authenticated %}
                                 <li class="deactivated-action-list-element">
                                     <form>
-                                        <input type="submit" value="Log In" disabled>
+                                        <input class="is-static is-light" type="submit" value="Log In" disabled>
                                     {% if request.GET.login_successful == "true" %}
                                         <span style="color: green; font-style: italic; font-size: small; font-family: 'Courier New', Courier, monospace; font-weight: bold">login success</span>
                                     {% endif %}
@@ -98,7 +98,7 @@
                                         <span class="help-text">(enter credentials to log in)</span>
                                     </form>
                                 </li>
-                                <li class="deactivated-action-list-element"><form><input type="submit" value="Log Out" disabled><span class="help-text">(you are already logged out)</span></form></li>
+                                <li class="deactivated-action-list-element"><form><input class="is-static is-light" type="submit" value="Log Out" disabled><span class="help-text">(you are already logged out)</span></form></li>
                             {% endif %}
                         {% endblock %}
                     </ul>
@@ -111,9 +111,9 @@
                             {% if user.is_authenticated %}
                                 <li class="activated-action-list-element"><form id="add-col-form" action="{% url 'generate' %}" method="post">{% csrf_token %}<input id="add-col-btn" type="submit" value="Generate New Collection"></form></li>
                             {% else %}
-                                <li class="deactivated-action-list-element"><form><input type="submit" value="Generate New Collection" disabled><span class="help-text">(log in to create a collection)</span></form></li>
+                                <li class="deactivated-action-list-element"><form><input class="is-static is-light" type="submit" value="Generate New Collection" disabled><span class="help-text">(log in to create a collection)</span></form></li>
                             {% endif %}
-                            <li class="deactivated-action-list-element"><form><input type="submit" value="Convert to PDF" disabled><span class="help-text">(display this Collection as a PDF - feature not yet implemented)</span></form></li>
+                            <li class="deactivated-action-list-element"><form><input class="is-static is-light" type="submit" value="Convert to PDF" disabled><span class="help-text">(display this Collection as a PDF - feature not yet implemented)</span></form></li>
                         {% endblock %}
                     </ul>
                 </div>
@@ -121,13 +121,13 @@
                     <h2>Edit an existing collection</h2>
                     <ul>
                         {% if user.is_authenticated %}
-                            <li class="activated-edit-list-element"><form><input type="submit" value="Edit Permissions" /></form></li>
+                            <li class="activated-edit-list-element"><form><input class="button is-success" type="submit" value="Edit Permissions" /></form></li>
                             <li class="activated-edit-list-element"><form><input type="submit" value="Change Theme" /></form></li>
                             <li class="activated-edit-list-element"><form><input type="submit" value="Delete Collection" /></form></li>
                         {% else %}
-                            <li class="deactivated-edit-list-element"><form><input type="submit" value="Edit Permissions" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
-                            <li class="deactivated-edit-list-element"><form><input type="submit" value="Change Theme" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
-                            <li class="deactivated-edit-list-element"><form><input type="submit" value="Delete Collection" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                            <li class="deactivated-edit-list-element"><form><input class="is-static is-light" type="submit" value="Edit Permissions" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                            <li class="deactivated-edit-list-element"><form><input class="is-static is-light" type="submit" value="Change Theme" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                            <li class="deactivated-edit-list-element"><form><input class="is-static is-light" type="submit" value="Delete Collection" disabled><span class="help-text">(you must be logged in and have permission to edit this Collection)</span></form></li>
                         {% endif %}
                     </ul>
                 </div>
@@ -147,9 +147,9 @@
                                     {% endif %}
                                 {% else %}
                                     {% if collection.title %}
-                                        <a class="button is-link is-rounded is-right is-small is-warning tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
+                                        <a class="button is-link is-rounded is-right is-small tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}"><img src="{% static 'images/lock_icon.png' %}" alt="lock icon" style="width: 16px; height: 16px; vertical-align: middle;">{{ collection.title.text }}</a>
                                     {% else %}
-                                        <a class="button is-link is-rounded is-right is-small is-warning tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
+                                        <a class="button is-link is-rounded is-right is-small tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}"><img src="{% static 'images/lock_icon.png' %}" alt="lock icon" style="width: 16px; height: 16px; vertical-align: middle;">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
                                     {% endif %}
                                 {% endif %}
                             {% else %}

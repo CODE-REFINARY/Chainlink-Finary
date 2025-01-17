@@ -396,7 +396,7 @@ div.combination {
 	padding: 7px;
 }
 
-.cf-navbar h2 {
+/*.cf-navbar h2 {
 	font-style: italic;
     font-family: 'Courier New', Courier, monospace;
     font-size: small;
@@ -404,7 +404,7 @@ div.combination {
 	font-weight: lighter;
 	margin-top: 1px;
 	margin-bottom: 4px;
-}
+}*/
 
 #uppger-navigation ul li {
 	margin-top: 0px;
@@ -496,19 +496,15 @@ div.combination {
 	cursor: not-allowed;
 }
 
-.activated-page-list-element {
-
-}
-
-.activated-page-list-element a {
+/*.activated-page-list-element a {
 	text-decoration: none;
 	font-family: 'Courier New';
 	font-size: 14px;
 	font-weight: bolder;
 	color: rgb(208, 68, 35);
-}
+}*/
 
-.activated-page-list-element a:hover {
+/*.activated-page-list-element a:hover {
 	text-decoration: underline;
 }
 
@@ -517,12 +513,12 @@ div.combination {
 	border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
-}
+}*/
 
 
 /* ////////////// "Actions" List ////////////// */
 
-.activated-action-list-element input[type="submit"], .activated-edit-list-element input[type="submit"] {
+/*.activated-action-list-element input[type="submit"], .activated-edit-list-element input[type="submit"] {
 	font-family: Audiowide;
 	font-weight:bolder;
 	position: static;
@@ -536,13 +532,13 @@ div.combination {
 	font-size: 12px;
 	white-space: nowrap;
     word-break: keep-all;
-}
+}*/
 
 .deactivated-action-list-element {
 
 }
 
-.deactivated-action-list-element input[type="submit"], .deactivated-edit-list-element input[type="submit"] {
+/*.deactivated-action-list-element input[type="submit"], .deactivated-edit-list-element input[type="submit"] {
 	font-family: Audiowide;
 	position: static;
 	-background-color: #343537;
@@ -556,7 +552,7 @@ div.combination {
 	white-space: nowrap;
     word-break: keep-all;
 	cursor: not-allowed;
-}
+}*/
 
 /* /////////////// The help text that appears to clarify buttons/links to users /////////////// */
 
