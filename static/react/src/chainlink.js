@@ -1,4 +1,4 @@
-import { parseKeyDown, createFence } from "./collectionStateManager.js";
+import { parseKeyDown } from "./collectionStateManager.js";
 
 document.addEventListener("DOMContentLoaded", function() {
         // Globals
@@ -6,5 +6,5 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Add the event listeners above for keystrokes
         window.addEventListener("keydown", parseKeyDown);
-        document.getElementById("add-page-btn").addEventListener("click", createFence);
+        //document.getElementById("add-page-btn").addEventListener("click", createFence);
 });

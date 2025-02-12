@@ -6,7 +6,6 @@ export { synthesizeGalleryBasic, synthesizeGallery } from './patchwork-function.
 
 const {
   addElement,
-  createFence,
   makeForm,
   parseKeyUp,
   parseKeyDown,

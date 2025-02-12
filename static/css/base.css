@@ -154,7 +154,7 @@
 
 main {
 	border-radius: 12px;
-	background-color: #2C2E43;
+	-background-color: #2C2E43;
 	padding-bottom: calc(var(--main-body-inner-content-padding-vertical));
 	-padding-left: 1cm;
 	-padding-right: 1cm;
@@ -168,6 +168,7 @@ a:active {
 	color: #800080;
 }
 
+/*
 header h1 {
     font-family: Audiowide;
     font-weight: 100;
@@ -176,18 +177,16 @@ header h1 {
 	color: whitesmoke;
 	font-size: xx-large;
     padding: 10px;
-}
+}*/
 
 
 /* Construction Banner */
+
+/*
 h6.under-construction {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: large;
-	font-weight: 600;
-    display: block;
+    -font-family: 'Courier New', Courier, monospace;
     text-align: center;
-	padding: 3em 5% 1rem 5%;
-	color: rgb(208, 68, 35)
+	-padding: 3em 5% 1rem 5%;
 }
 img.under-construction {
     display: block;
@@ -200,7 +199,7 @@ h1, section > p, section > h2, section > ul, section > code, .text-section > p, 
     border-width: 5px;
     border-color: transparent;
     border-radius: 12px;
-}
+} */
 
 .text-section {
 	max-width: 65%;
@@ -389,12 +388,12 @@ div.combination {
 
 /* The styles here are for the navbars that appear on the generic patchwork pages. There's an edit navbar, actions, navbar
  etc. */
-.cf-navbar {
+/*.cf-navbar {
 	background-color: #acacacd5;
 	margin-bottom: 30px;
 	border-radius: 15px;
 	padding: 7px;
-}
+}*/
 
 /*.cf-navbar h2 {
 	font-style: italic;
@@ -435,7 +434,7 @@ div.combination {
 
 
 /* text elements */
-.content-wrapper h3 {
+/*.content-wrapper h3 {
 	display: block;
 	font-family: 'Courier';
 	font-weight: 300;
@@ -445,18 +444,18 @@ div.combination {
 	display: inline-block;
 	background-color: #000000;
 	-border-radius: 0.4em;
-}
+}*/
 
 .content-wrapper code {
-	font-family: monospace;
-	display: block;
-	overflow-wrap: break-word;
-	color: #8ecd95;
-	background-color: #0d0208;
-	-border-width: 5px !important;
-	-border-radius: 3px !important;
-	line-height: 1.2em;
-	border-radius: 12px;
+	/*! font-family: monospace; */
+	/*! display: block; */
+	/*! overflow-wrap: break-word; */
+	/*! color: #8ecd95; */
+	/*! background-color: #0d0208; */
+	/*! -border-width: 5px !important; */
+	/*! -border-radius: 3px !important; */
+	/*! line-height: 1.2em; */
+	/*! border-radius: 12px; */
 }
 
 .content-wrapper .br {
@@ -469,7 +468,7 @@ div.combination {
     text-align: center;
 }
 
-.content-wrapper p, #footer-elements p {
+/*.content-wrapper p, #footer-elements p {
 	display: block;
 	font-family: Audiowide;
 	background-color: #2C394B;
@@ -478,7 +477,7 @@ div.combination {
 	letter-spacing: .00em;
 	font-size: 12px;
 	border-radius: 12px;
-}
+}*/
 
 
 /* ////////////// "Pages" List ////////////// */
@@ -556,6 +555,7 @@ div.combination {
 
 /* /////////////// The help text that appears to clarify buttons/links to users /////////////// */
 
+/*
 .help-text {
 	font-style: italic;
     font-family: 'Courier New', Courier, monospace;
@@ -563,7 +563,7 @@ div.combination {
     color: dimgrey;
 	font-weight: lighter;
 	margin-left: 12px;
-}
+}*/
 
 
 /* /////////////// Specific IDs /////////////// */

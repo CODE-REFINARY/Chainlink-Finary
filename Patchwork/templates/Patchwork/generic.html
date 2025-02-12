@@ -14,9 +14,9 @@
 {% endif %}
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 <div id="config-display">
-    <div id="chainlink-manifest">
-        <h2>Chainlink Manifest</h2>
-        <ul id="chainlink-manifest-entries">
+    <div id="chainlink-manifest" class="menu">
+        <h2 class="menu-label">Chainlink Manifest</h2>
+        <ul id="chainlink-manifest-entries" class="menu-list">
             {% if chainlinks %}
                 {% for chainlink in chainlinks %}
                     <li><a class="inline-url" href="#chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}">>>>{{ chainlink.0.text }}</a></li>
@@ -51,7 +51,7 @@
             {% for chainlink in chainlinks %}
                 <section class="chainlink">
                     <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
-                        <h2>
+                        <h2 class="title is-2">
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
                             <span class="chainlink-inner-content" style="{{ chainlink.0.css }}">{{ chainlink.0.text }}</span>
                             <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
@@ -64,11 +64,11 @@
                             <p class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</p>
                         </div>
                         {% elif body_element.content.tag == 'CODE' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="CODE">
+                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="code content-wrapper" tag="CODE">
                             <code class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</code>
                         </div>
                         {% elif body_element.content.tag == 'H3' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="H3">
+                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="title is-3 content-wrapper" tag="H3">
                             <h3 class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</h3>
                         </div>
                         {% elif body_element.content.tag == 'BR' %}

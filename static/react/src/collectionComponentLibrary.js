@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import {
     elementsEditButtonEventHandlers,
     deleteChainlink,
@@ -9,7 +9,7 @@ import {
     renameDoc, refresh, storeEditButtonHandlers
 } from "./collectionStateManager";
 import {
-        getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
+    getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
 } from "./staticUtils";
 
 /**
@@ -28,49 +28,54 @@ export function CreateBodyEditButtons(props) {
     let restOfButtons;
 
     if (props.bitmask[0] === "1") {
-                chainlinkButton = (
-                        <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm("CL")}>&lt;n&gt; chainlink</button>
-                );
+        chainlinkButton = (
+            <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm("CL")}>&lt;n&gt; chainlink</button>
+        );
 
     } else if (props.bitmask[0] === "0") {
-                chainlinkButton = (
-                        <button className="inactive-add-buttons">&lt;n&gt; chainlink</button>
-                );
+        chainlinkButton = (
+            <button className="inactive-add-buttons">&lt;n&gt; chainlink</button>
+        );
     }
 
     if (props.bitmask[1] === "1") {
-                restOfButtons = (
-                        <React.Fragment>
-                                <button id="add-p-btn" className="add-buttons" onClick={() => makeForm("P")}>&lt;p&gt; paragraph</button>
-                                <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
-                                <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code</button>
-                                <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak</button>
-                                <button id="add-li-btn" className="add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
-                                <button id="add-link-btn" className="add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link</button>
-                                <button id="add-img-btn" className="add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
-                                <button id="add-note-btn" className="add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note</button>
-                        </React.Fragment>
-                );
+        restOfButtons = (
+            <React.Fragment>
+                <button id="add-p-btn" className="add-buttons" onClick={() => makeForm("P")}>&lt;p&gt; paragraph
+                </button>
+                <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
+                <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
+                </button>
+                <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak
+                </button>
+                <button id="add-li-btn" className="add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
+                <button id="add-link-btn" className="add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
+                </button>
+                <button id="add-img-btn" className="add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
+                <button id="add-note-btn" className="add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
+                </button>
+            </React.Fragment>
+        );
 
     } else if (props.bitmask[1] === "0") {
-                restOfButtons = (
-                        <React.Fragment>
-                                <button className="inactive-add-buttons">&lt;p&gt; paragraph</button>
-                                <button className="inactive-add-buttons">&lt;h&gt; header</button>
-                                <button className="inactive-add-buttons">&lt;c&gt; code</button>
-                                <button className="inactive-add-buttons">&lt;b&gt; linebreak</button>
-                                <button className="inactive-add-buttons">&lt;l&gt; list</button>
-                                <button className="inactive-add-buttons">&lt;q&gt; link</button>
-                                <button className="inactive-add-buttons">&lt;i&gt; img</button>
-                                <button className="inactive-add-buttons">&lt;n&gt; note</button>
-                        </React.Fragment>
-                );
+        restOfButtons = (
+            <React.Fragment>
+                <button className="inactive-add-buttons">&lt;p&gt; paragraph</button>
+                <button className="inactive-add-buttons">&lt;h&gt; header</button>
+                <button className="inactive-add-buttons">&lt;c&gt; code</button>
+                <button className="inactive-add-buttons">&lt;b&gt; linebreak</button>
+                <button className="inactive-add-buttons">&lt;l&gt; list</button>
+                <button className="inactive-add-buttons">&lt;q&gt; link</button>
+                <button className="inactive-add-buttons">&lt;i&gt; img</button>
+                <button className="inactive-add-buttons">&lt;n&gt; note</button>
+            </React.Fragment>
+        );
     }
 
     return (
         <React.Fragment>
-                {chainlinkButton}
-                {restOfButtons}
+            {chainlinkButton}
+            {restOfButtons}
         </React.Fragment>
     );
 }
@@ -82,7 +87,8 @@ export function CreateHeaderEditButtons(props) {
         headerButton = (
             <React.Fragment>
                 <button id="add-h1-btn" className="add-buttons" onClick={() => makeForm("H1")}>Title</button>
-                <button id="add-hbnr-btn" className="add-buttons" onClick={() => makeForm("HBNR")}>Header Banner</button>
+                <button id="add-hbnr-btn" className="add-buttons" onClick={() => makeForm("HBNR")}>Header Banner
+                </button>
             </React.Fragment>
         );
 
@@ -106,20 +112,22 @@ export function CreateFooterEditButtons(props) {
     let footerButton;
 
     if (props.bitmask[0] === "1") {
-                footerButton = (
-                    <React.Fragment>
-                        <button id="add-en-btn" className="add-buttons" onClick={() => makeForm("EN")}>Endnote</button>
-                        <button id="add-ftrli-btn" className="add-buttons" onClick={() => makeForm("FTRLI")}>Footer List</button>z
-                    </React.Fragment>
-                );
+        footerButton = (
+            <React.Fragment>
+                <button id="add-en-btn" className="add-buttons" onClick={() => makeForm("EN")}>Endnote</button>
+                <button id="add-ftrli-btn" className="add-buttons" onClick={() => makeForm("FTRLI")}>Footer List
+                </button>
+                z
+            </React.Fragment>
+        );
 
     } else if (props.bitmask[0] === "0") {
-                footerButton = (
-                    <React.Fragment>
-                        <button className="inactive-add-buttons">Endnote</button>
-                        <button className="inactive-add-buttons">Footer List</button>
-                    </React.Fragment>
-                );
+        footerButton = (
+            <React.Fragment>
+                <button className="inactive-add-buttons">Endnote</button>
+                <button className="inactive-add-buttons">Footer List</button>
+            </React.Fragment>
+        );
     }
 
     return (
@@ -130,122 +138,139 @@ export function CreateFooterEditButtons(props) {
 }
 
 export function ChainlinkEditButtons(props) {
-        const editFunction = function() { editChainlink(props.wrappers[props.i].id) };
-        const deleteFunction = function() { deleteChainlink(props.wrappers[props.i].id) };
-        storeEditButtonHandlers(editFunction, deleteFunction)
-        return (
-                <React.Fragment>
-                        <i className="context-span-message">context action &lt; - - - - - -</i>
-                        <button className="doc-action-copy-title">copy</button>
-                        <button className="cl-edit-btn" target={props.wrappers[props.i].id} onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0] }>edit</button>
-                        <button className="cl-del-btn" target={props.wrappers[props.i].id} onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1] }>delete</button>
-                </React.Fragment>
-        );
+    const editFunction = function () {
+        editChainlink(props.wrappers[props.i].id)
+    };
+    const deleteFunction = function () {
+        deleteChainlink(props.wrappers[props.i].id)
+    };
+    storeEditButtonHandlers(editFunction, deleteFunction)
+    return (
+        <React.Fragment>
+            <i className="context-span-message">context action &lt; - - - - - -</i>
+            <button className="doc-action-copy-title">copy</button>
+            <button className="cl-edit-btn" target={props.wrappers[props.i].id}
+                    onClick={elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0]}>edit
+            </button>
+            <button className="cl-del-btn" target={props.wrappers[props.i].id}
+                    onClick={elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1]}>delete
+            </button>
+        </React.Fragment>
+    );
 }
 
 export function ContentEditButtons(props) {
-        const editFunction = function() { editContent(props.wrappers[props.i].id) };
-        const deleteFunction = function() { deleteContent(props.wrappers[props.i].id) };
-        storeEditButtonHandlers(editFunction, deleteFunction)
-        return (
-                <React.Fragment>
-                        <i className="context-span-message">context action &lt; - - - - - -</i>
-                        <button className="doc-action-copy-title">copy</button>
-                        <button className="cont-edit-btn" target={ props.wrappers[props.i].id } onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0] }>edit</button>
-                        <button className="cont-del-btn" target={ props.wrappers[props.i].id } onClick={ elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1] }>delete</button>
-                </React.Fragment>
-        );
+    const editFunction = function () {
+        editContent(props.wrappers[props.i].id)
+    };
+    const deleteFunction = function () {
+        deleteContent(props.wrappers[props.i].id)
+    };
+    storeEditButtonHandlers(editFunction, deleteFunction)
+    return (
+        <React.Fragment>
+            <i className="context-span-message">context action &lt; - - - - - -</i>
+            <button className="doc-action-copy-title button is-small is-info">copy</button>
+            <button className="cont-edit-btn button is-small is-info" target={props.wrappers[props.i].id}
+                    onClick={elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0]}>edit
+            </button>
+            <button className="cont-del-btn button is-small is-danger" target={props.wrappers[props.i].id}
+                    onClick={elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1]}>delete
+            </button>
+        </React.Fragment>
+    );
 }
 
 export function NoElements(props) {
-        return (
-                <React.Fragment>
-                        &lt;{props.element} CONTENT MISSING&gt;
-                </React.Fragment>
-        );
+    return (
+        <React.Fragment>
+            &lt;{props.element} CONTENT MISSING&gt;
+        </React.Fragment>
+    );
 }
 
 export function ChainlinkHeader(props) {
-        return (
-               <React.Fragment>
-                        <span className="chainlink-inner-content">{props.title}</span>
-               </React.Fragment>
-        );
+    return (
+        <React.Fragment>
+            <span className="chainlink-inner-content">{props.title}</span>
+        </React.Fragment>
+    );
 }
 
 export function ElementCreationForm(props) {
 
-        useEffect(() => {
-                refresh();
-        })
+    useEffect(() => {
+        refresh();
+    })
 
-        if (props.type === 'H3') {
-            return (
-                <React.Fragment>
-                    <ConstructHeader3Element value={props.value} type={props.type} url={props.url} order={props.order} />
-                </React.Fragment>
-            );
-        } else if (props.type === 'CODE') {
-            return (
-                <React.Fragment>
-                    <ConstructCodeElement value={props.value} type={props.type} url={props.url} order={props.order} />
-                </React.Fragment>
-            );
-        } else if (props.type === 'P') {
-            return (
-                <React.Fragment>
-                    <ConstructParagraphElement value={props.value} type={props.type} url={props.url} order={props.order} />
-                </React.Fragment>
-            );
-        } else if (props.type === 'BR') {
-            return (
-                <React.Fragment>
-                    <ConstructLinebreakElement value={props.value} type={props.type} url={props.url} order={props.order} />
-                </React.Fragment>
-            );
-        } else if (props.type == "CL") {
-            return (
-                <React.Fragment>
-                    <ConstructChainlinkElement value={props.value} type={props.type} url={props.url} order={props.order} value={props.value} date={props.date} css={props.css} />
-                </React.Fragment>
-            )
-        } else if (props.type == "H1") {
-            return (
-                <React.Fragment>
-                    <ConstructHeader1Element value={props.value} type={props.type} url={props.url} order={props.order} />
-                </React.Fragment>
-            )
-        } else if (props.type == "COL") {
-            return (
-                <React.Fragment>
-                    <ConstructColElement />
-                </React.Fragment>
-            )
-        }
+    if (props.type === 'H3') {
+        return (
+            <React.Fragment>
+                <ConstructHeader3Element value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        );
+    } else if (props.type === 'CODE') {
+        return (
+            <React.Fragment>
+                <ConstructCodeElement value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        );
+    } else if (props.type === 'P') {
+        return (
+            <React.Fragment>
+                <ConstructParagraphElement value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        );
+    } else if (props.type === 'BR') {
+        return (
+            <React.Fragment>
+                <ConstructLinebreakElement value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        );
+    } else if (props.type == "CL") {
+        return (
+            <React.Fragment>
+                <ConstructChainlinkElement value={props.value} type={props.type} url={props.url} order={props.order}
+                                           value={props.value} date={props.date} css={props.css}/>
+            </React.Fragment>
+        )
+    } else if (props.type == "H1") {
+        return (
+            <React.Fragment>
+                <ConstructHeader1Element value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        )
+    } else if (props.type == "COL") {
+        return (
+            <React.Fragment>
+                <ConstructColElement/>
+            </React.Fragment>
+        )
+    }
 }
 
 export function ElementDeletionForm(props) {
-        useEffect(() => {
-                refresh();
-        })
+    useEffect(() => {
+        refresh();
+    })
 
-        return (
-            <React.Fragment>
-                <form id="crud-form">
-                    <input type="hidden" name="furl" value={props.furl}/>
-                    <input type="hidden" name="tag" value={props.type}/>
-                    {props.type === "CL" ? <div className="form-group">
-                        <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
-                               className="form-label">archive content</label>
-                        <input className="checkbox" type="checkbox" name="archive content" value="False"
-                               id="chainlink-delete-form-archive-content" className="form-field"/>
-                    </div> : null}
-                    <div id="element-creation-text-align-right">
-                        <input className="button is-danger is-medium is-outlined" type="submit" value="DELETE"/>
-                    </div>
-                </form>
-            </React.Fragment>
-        );
+    return (
+        <React.Fragment>
+            <form id="crud-form">
+                <input type="hidden" name="furl" value={props.furl}/>
+                <input type="hidden" name="tag" value={props.type}/>
+                {props.type === "CL" ? <div className="form-group">
+                    <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
+                           className="form-label">archive content</label>
+                    <input className="checkbox" type="checkbox" name="archive content" value="False"
+                           id="chainlink-delete-form-archive-content" className="form-field"/>
+                </div> : null}
+                <div id="element-creation-text-align-right">
+                    <input className="button is-danger is-medium is-outlined" type="submit" value="DELETE"/>
+                </div>
+            </form>
+        </React.Fragment>
+    );
 }
 
 export function ChainlinkDeletionForm(props) {
@@ -256,21 +281,21 @@ export function ChainlinkDeletionForm(props) {
     return (
         <React.Fragment>
             <form id="crud-form">
-                    <input type="hidden" name="furl" value={props.furl}/>
-                    <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
-                    <input type="hidden" name="tag" value="CL"/>
-                    <div className="form-group">
-                        <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
-                               className="form-label">archive content</label>
-                        <input type="checkbox" name="archive content" value="False"
-                               id="chainlink-delete-form-archive-content" className="form-field"/>
-                    </div>
-                    <div id="chainlink-deletion-text-align-right">
-                        <input id="chainlink-deletion-submit" type="submit" value="Submit"/>
-                    </div>
-                </form>
-            </React.Fragment>
-        );
+                <input type="hidden" name="furl" value={props.furl}/>
+                <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+                <input type="hidden" name="tag" value="CL"/>
+                <div className="form-group">
+                    <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
+                           className="form-label">archive content</label>
+                    <input type="checkbox" name="archive content" value="False"
+                           id="chainlink-delete-form-archive-content" className="form-field"/>
+                </div>
+                <div id="chainlink-deletion-text-align-right">
+                    <input id="chainlink-deletion-submit" type="submit" value="Submit"/>
+                </div>
+            </form>
+        </React.Fragment>
+    );
 }
 
 export function ChainlinkElement(props) {
@@ -283,27 +308,28 @@ export function ChainlinkElement(props) {
                 chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
             }
         }
-                refresh();   // Now that the Chainlink and its children are instantiated assign indices
-                removeEditButtons();
-                instantiateEditButtons();
-        }, []);
+        refresh();   // Now that the Chainlink and its children are instantiated assign indices
+        removeEditButtons();
+        instantiateEditButtons();
+    }, []);
 
-        return (
-                <React.Fragment>
-                        <div id={props.url} className="chainlink-wrapper" tag="CL">
-                                <h2>
-                                        <span className="chainlink-order">{"#" + getOrderFromId(props.url).toString()}</span>
-                                        <span className="chainlink-inner-content">
+    return (
+        <React.Fragment>
+            <div id={props.url} className="chainlink-wrapper" tag="CL">
+                <h2>
+                    <span className="chainlink-order">{"#" + getOrderFromId(props.url).toString()}</span>
+                    <span className="chainlink-inner-content">
                                                 {props.text}
                                         </span>
-                                        <a className="inline-url header-url" href={"/patchwork/chainlink/" + getUrlFromId(props.url) + ".html"}>
-                                                {">>>" + getUrlFromId(props.url).substring(0, 9)}
-                                        </a>
-                                        <span className="chainlink-date">{formatDateString(props.date)}</span>
-                                </h2>
-                        </div>
-                </React.Fragment>
-        );
+                    <a className="inline-url header-url"
+                       href={"/patchwork/chainlink/" + getUrlFromId(props.url) + ".html"}>
+                        {">>>" + getUrlFromId(props.url).substring(0, 9)}
+                    </a>
+                    <span className="chainlink-date">{formatDateString(props.date)}</span>
+                </h2>
+            </div>
+        </React.Fragment>
+    );
 }
 
 /**
@@ -311,55 +337,54 @@ export function ChainlinkElement(props) {
  */
 export function ContentElement(props) {
 
-        useEffect(() => {
-                refresh();
-                removeEditButtons();
-                instantiateEditButtons();
-        }, []);
+    useEffect(() => {
+        refresh();
+        removeEditButtons();
+        instantiateEditButtons();
+    }, []);
 
-        let Tag;
-        if (props.type === 'H3') {
-                Tag = 'h3';
-        } else if (props.type === 'CODE') {
-                Tag = 'code';
-        } else if (props.type === 'P') {
-                Tag = 'p';
-        } else if (props.type === 'BR') {
-                Tag = 'br';
-        } else {
-                Tag = 'div';
-        }
+    let Tag;
+    if (props.type === 'H3') {
+        Tag = 'h3';
+    } else if (props.type === 'CODE') {
+        Tag = 'code';
+    } else if (props.type === 'P') {
+        Tag = 'p';
+    } else if (props.type === 'BR') {
+        Tag = 'br';
+    } else {
+        Tag = 'div';
+    }
 
-        if (Tag === 'br') {
-                return (
-                        <React.Fragment>
+    if (Tag === 'br') {
+        return (
+            <React.Fragment>
                                 <span className="inner-content br">
                                         <i>&lt;!-- linebreak insert --&gt;</i>
                                 </span>
-                                <div className="context-buttons-wrapper">
-                                        <i className="context-span-message">context action &lt; - - - - - - </i>
-                                        <button className="cont-copy-btn">copy</button>
-                                        <button className="cont-edit-btn">edit</button>
-                                        <button className="cont-del-btn">delete</button>
-                                </div>
-                        </React.Fragment>
-                );
-        }
-        else {
-                return (
-                        <React.Fragment>
-                                <Tag className="inner-content">
-                                        {props.text}
-                                </Tag>
-                                <div className="context-buttons-wrapper">
-                                        <i className="context-span-message">context action &lt; - - - - - - </i>
-                                        <button className="cont-copy-btn">copy</button>
-                                        <button className="cont-edit-btn">edit</button>
-                                        <button className="cont-del-btn">delete</button>
-                                </div>
-                        </React.Fragment>
-                );
-        }
+                <div className="context-buttons-wrapper">
+                    <i className="context-span-message">context action &lt; - - - - - - </i>
+                    <button className="cont-copy-btn">copy</button>
+                    <button className="cont-edit-btn">edit</button>
+                    <button className="cont-del-btn">delete</button>
+                </div>
+            </React.Fragment>
+        );
+    } else {
+        return (
+            <React.Fragment>
+                <Tag className="inner-content">
+                    {props.text}
+                </Tag>
+                <div className="context-buttons-wrapper">
+                    <i className="context-span-message">context action &lt; - - - - - - </i>
+                    <button className="cont-copy-btn">copy</button>
+                    <button className="cont-edit-btn">edit</button>
+                    <button className="cont-del-btn">delete</button>
+                </div>
+            </React.Fragment>
+        );
+    }
 }
 
 // Form components for individual Elements
@@ -370,12 +395,13 @@ export function ContentElement(props) {
 function ConstructParagraphElement(props) {
     return (
         <form id="crud-form">
-            <input autoFocus type="text" id="input" placeholder="enter paragraph content" name="text" defaultValue={props.value}/>
-            <input type="hidden" name="url" value={props.url} />
-            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
-            <input type="hidden" name="type" value="P" />
-            <input type="hidden" name="public" value="True" />
-            <input type="hidden" name="css" value="" />
+            <input autoFocus type="text" id="input" placeholder="enter paragraph content" name="text"
+                   defaultValue={props.value}/>
+            <input type="hidden" name="url" value={props.url}/>
+            <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+            <input type="hidden" name="type" value="P"/>
+            <input type="hidden" name="public" value="True"/>
+            <input type="hidden" name="css" value=""/>
             <div id="element-creation-text-align-right">
                 <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
@@ -384,15 +410,16 @@ function ConstructParagraphElement(props) {
 };
 
 // This form is instantiated whenever a Code section is being created
+//             <input autoFocus type="text" id="input" placeholder="Shift+Enter For New Line" name="text" defaultValue={props.value}/>
 function ConstructCodeElement(props) {
     return (
         <form id="crud-form">
-            <input autoFocus type="text" id="input" placeholder="Shift+Enter For New Line" name="text" defaultValue={props.value}/>
-            <input type="hidden" name="url" value={props.url} />
-            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
-            <input type="hidden" name="type" value="CODE" />
-            <input type="hidden" name="public" value="True" />
-            <input type="hidden" name="css" value="" />
+            <textarea name="text" id="input" style={{ resize: 'none', width: '100%', height: '100%' }} defaultValue={props.value}></textarea>
+            <input type="hidden" name="url" value={props.url}/>
+            <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+            <input type="hidden" name="type" value="CODE"/>
+            <input type="hidden" name="public" value="True"/>
+            <input type="hidden" name="css" value=""/>
             <div id="element-creation-text-align-right">
                 <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
@@ -404,12 +431,12 @@ function ConstructCodeElement(props) {
 function ConstructHeader3Element(props) {
     return (
         <form id="crud-form">
-            <input autoFocus type="text" id="input" defaultValue={props.value} name="text" />
-            <input type="hidden" name="url" value={props.url} />
-            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
-            <input type="hidden" name="type" value="H3" />
-            <input type="hidden" name="public" value="True" />
-            <input type="hidden" name="css" value="" />
+            <input autoFocus type="text" id="input" defaultValue={props.value} name="text"/>
+            <input type="hidden" name="url" value={props.url}/>
+            <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+            <input type="hidden" name="type" value="H3"/>
+            <input type="hidden" name="public" value="True"/>
+            <input type="hidden" name="css" value=""/>
             <div id="element-creation-text-align-right">
                 <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
@@ -426,11 +453,11 @@ function ConstructLinebreakElement(props) {
                 <option value="double">Double</option>
                 <option value="max">Max</option>
             </select>
-            <input type="hidden" name="url" value={props.url} />
-            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
-            <input type="hidden" name="type" value="BR" />
-            <input type="hidden" name="public" value="True" />
-            <input type="hidden" name="css" value="" />
+            <input type="hidden" name="url" value={props.url}/>
+            <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+            <input type="hidden" name="type" value="BR"/>
+            <input type="hidden" name="public" value="True"/>
+            <input type="hidden" name="css" value=""/>
             <div id="element-creation-text-align-right">
                 <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
@@ -442,30 +469,34 @@ function ConstructChainlinkElement(props) {
     return (
         <form id="crud-form">
             <div id="non-submit-fields">
-                <input type="hidden" name="type" value="CL" />
-                <input type="hidden" name="url" value={props.url} />
-                <input type="hidden" name="order" value={parseInt(props.order, 10)} />
+                <input type="hidden" name="type" value="CL"/>
+                <input type="hidden" name="url" value={props.url}/>
+                <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
                 <div className="form-group">
                     <label htmlFor="text" id="chainlink-form-text-label" className="form-label">text</label>
-                    <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text" className="form-field" />
+                    <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text"
+                           className="form-field"/>
                 </div>
                 <div className="form-group">
-                    <input type="hidden" name="public" value="False" />
+                    <input type="hidden" name="public" value="False"/>
                     <label htmlFor="public" id="chainlink-form-public-label" className="form-label">public</label>
-                    <input type="checkbox" name="public" id="chainlink-form-public" value="True" className="form-field" />
+                    <input type="checkbox" name="public" id="chainlink-form-public" value="True"
+                           className="form-field"/>
                 </div>
                 <div className="form-group">
-                    <input type="hidden" name="archive" value="False" />
+                    <input type="hidden" name="archive" value="False"/>
                     <label htmlFor="archive" id="chainlink-form-archive-label" className="form-label">archive</label>
-                    <input type="checkbox" name="archive" value="True" id="chainlink-form-archive" className="form-field" />
+                    <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
+                           className="form-field"/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="date" id="chainlink-form-date-label" className="form-label">date</label>
-                    <input type="input" name="date" id="chainlink-form-date" placeholder="ex: 09/19/22 13:55:26" className="form-field" />
+                    <input type="input" name="date" id="chainlink-form-date" placeholder="ex: 09/19/22 13:55:26"
+                           className="form-field"/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="css" id="chainlink-form-css-label" className="form-label">css</label>
-                    <input type="input" name="css" id="chainlink-form-css" className="form-field" />
+                    <input type="input" name="css" id="chainlink-form-css" className="form-field"/>
                 </div>
             </div>
             <div id="element-creation-text-align-right">
@@ -478,14 +509,14 @@ function ConstructChainlinkElement(props) {
 function ConstructHeader1Element(props) {
     return (
         <form id="crud-form">
-            <input autoFocus type="text" id="input" defaultValue={props.value} name="text" />
-            <input type="hidden" name="url" value={props.url} />
-            <input type="hidden" name="order" value={parseInt(props.order, 10)} />
-            <input type="hidden" name="type" value="H1" />
-            <input type="hidden" name="public" value="True" />
-            <input type="hidden" name="css" value="" />
+            <input autoFocus type="text" id="input" defaultValue={props.value} name="text"/>
+            <input type="hidden" name="url" value={props.url}/>
+            <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+            <input type="hidden" name="type" value="H1"/>
+            <input type="hidden" name="public" value="True"/>
+            <input type="hidden" name="css" value=""/>
             <div id="element-creation-text-align-right">
-                <input id="element-creation-submit" type="submit" value="Submit" />
+                <input id="element-creation-submit" type="submit" value="Submit"/>
             </div>
         </form>
     );
