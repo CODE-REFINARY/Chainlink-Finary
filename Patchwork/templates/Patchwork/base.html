@@ -116,7 +116,7 @@
                     {% if user.is_authenticated %}
                         <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-light" type="submit" value="Edit Permissions" /></form></li>
                         <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-light" type="submit" value="Change Theme" /></form></li>
-                        <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-light" type="submit" value="Delete Collection" /></form></li>
+                        <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-danger" type="submit" value="Delete Collection" /></form></li>
                     {% else %}
                         <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Edit Permissions" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
                         <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Change Theme" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>

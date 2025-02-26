@@ -29,7 +29,7 @@
 </div>
 
 <!-- Article content is always displayed in #chainlink-display -->
-<div id="element-display" template="collection">
+<div id="element-display" template="collection">a
     <div id="header-display">
         <div id="header-elements">
             {% if collection.title %}
@@ -43,13 +43,12 @@
                     <div id="header-placeholder"></div>
                 </div>
     </div>
-    <hr />
     <div id="chainlink-display">
         <!-- Chainlink Elements comprise the "meat" of the page. These elements are logically connected to the current
         host Article or Chainlink. It is in this way (and this way only) that they are related to each other. -->
         <div id="chainlink-elements">
             {% for chainlink in chainlinks %}
-                <section class="chainlink">
+                <section class="section is-medium chainlink">
                     <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper" tag="chainlink">
                         <h2 class="title is-2">
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
@@ -64,8 +63,8 @@
                             <p class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</p>
                         </div>
                         {% elif body_element.content.tag == 'CODE' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="code content-wrapper" tag="CODE">
-                            <code class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</code>
+                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="CODE">
+                            <code class="code inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</code>
                         </div>
                         {% elif body_element.content.tag == 'H3' %}
                         <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="title is-3 content-wrapper" tag="H3">
@@ -88,12 +87,11 @@
         <!-- Elements under the add-buttons element are buttons used to create content on the page -->
         <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
             <!-- The chainlink add button is placed under this div -->
-            <div id="chainlink-placeholder"></div>
+            <div id="chainlink-placeholder" class="grid"></div>
             <!-- All buttons used to create content is stored under this parent div -->
             <div id="content-placeholder"></div>
         </div>
     </div>
-    <hr />
     <div id="footer-display">
         <div id="footer-elements">
             {% if footers %}

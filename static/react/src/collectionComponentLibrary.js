@@ -29,30 +29,30 @@ export function CreateBodyEditButtons(props) {
 
     if (props.bitmask[0] === "1") {
         chainlinkButton = (
-            <button id="add-cl-btn" className="add-buttons" onClick={() => makeForm("CL")}>&lt;n&gt; chainlink</button>
+            <button id="add-cl-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => makeForm("CL")}>&lt;n&gt; chainlink</button>
         );
 
     } else if (props.bitmask[0] === "0") {
         chainlinkButton = (
-            <button className="inactive-add-buttons">&lt;n&gt; chainlink</button>
+            <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; chainlink</button>
         );
     }
 
     if (props.bitmask[1] === "1") {
         restOfButtons = (
             <React.Fragment>
-                <button id="add-p-btn" className="add-buttons" onClick={() => makeForm("P")}>&lt;p&gt; paragraph
+                <button id="add-p-btn" className="button is-rounded is-black cell add-buttons" onClick={() => makeForm("P")}>&lt;p&gt; paragraph
                 </button>
-                <button id="add-h3-btn" className="add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
-                <button id="add-code-btn" className="add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
+                <button id="add-h3-btn" className="button is-rounded is-primary cell add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
+                <button id="add-code-btn" className="button is-rounded is-success cell add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
                 </button>
-                <button id="add-br-btn" className="add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak
+                <button id="add-br-btn" className="button is-rounded is-warning cell add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak
                 </button>
-                <button id="add-li-btn" className="add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
-                <button id="add-link-btn" className="add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
+                <button id="add-li-btn" className="button is-rounded is-white cell add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
+                <button id="add-link-btn" className="button is-rounded is-link cell add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
                 </button>
-                <button id="add-img-btn" className="add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
-                <button id="add-note-btn" className="add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
+                <button id="add-img-btn" className="button is-rounded is-info cell add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
+                <button id="add-note-btn" className="button is-rounded is-dark cell add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
                 </button>
             </React.Fragment>
         );
@@ -60,14 +60,14 @@ export function CreateBodyEditButtons(props) {
     } else if (props.bitmask[1] === "0") {
         restOfButtons = (
             <React.Fragment>
-                <button className="inactive-add-buttons">&lt;p&gt; paragraph</button>
-                <button className="inactive-add-buttons">&lt;h&gt; header</button>
-                <button className="inactive-add-buttons">&lt;c&gt; code</button>
-                <button className="inactive-add-buttons">&lt;b&gt; linebreak</button>
-                <button className="inactive-add-buttons">&lt;l&gt; list</button>
-                <button className="inactive-add-buttons">&lt;q&gt; link</button>
-                <button className="inactive-add-buttons">&lt;i&gt; img</button>
-                <button className="inactive-add-buttons">&lt;n&gt; note</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;p&gt; paragraph</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;h&gt; header</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;c&gt; code</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;b&gt; linebreak</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;l&gt; list</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;q&gt; link</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;i&gt; img</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; note</button>
             </React.Fragment>
         );
     }

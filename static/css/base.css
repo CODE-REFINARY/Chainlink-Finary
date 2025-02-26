@@ -1,14 +1,14 @@
 /* SEE reset.css FOR ALL OTHER CSS RULES */
 
 /* /////////////// Custom Vars /////////////// */
-
+/*
 :root {
 	--x-large-for-courier: 1.6rem;
 	--main-body-inner-content-padding-horizontal: 1rem;
 	--main-body-inner-content-padding-vertical: 1rem;
 	--chainlink-display-inner-content-padding-horizontal: 5%;
 	--chainlink-display-inner-content-padding-vertical: 3px;
-}
+}*/
 
 /* /////////////// Media Queries /////////////// */
 
@@ -245,23 +245,23 @@ h1, section > p, section > h2, section > ul, section > code, .text-section > p, 
 }
 
 section > ul {
-	padding-left: 2rem;
+	/*! padding-left: 2rem; */
 }
 
 ol {
-	list-style-type: number;
-	list-style-position: inside;
+	-list-style-type: number;
+	-list-style-position: inside;
 }
 
 section > ul > li > a {
-	text-decoration: none;
-	color: whitesmoke;
-	font-style: italic;
+	/*! text-decoration: none; */
+	/*! color: whitesmoke; */
+	/*! font-style: italic; */
 }
 
 section > ul > li > a:hover {
-	text-decoration: underline;
-	background-color: #334756ec;
+	-text-decoration: underline;
+	-background-color: #334756ec;
 }
 
 div.combination {

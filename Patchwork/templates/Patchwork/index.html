@@ -8,13 +8,9 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
-<h1 class="index-title">index.html</h1>
-<section class="chainlink">
-    <h2 class="section-header">Welcome to Chainlink Finary</h2>
-</section>
-<section>
-    <h2 class="section-header">Featured Collections</h2>
-    <ol>
+<section class="menu">
+    <h2 class="menu-label section-header">Featured Collections</h2>
+    <ul class="menu-list">
         {% for collection in collections %}
             {% if collection.title %}
                 <li><a href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a></li>
@@ -22,7 +18,7 @@
                 <li><a href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a></li>
             {% endif %}
         {% endfor %}
-    </ol>
+    </ul>
 </section>
 
 {% endblock %}
