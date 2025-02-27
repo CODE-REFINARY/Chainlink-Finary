@@ -41,7 +41,7 @@
         {% csrf_token %}
     </head>
     <body>
-        <header>
+        <header class="section is-medium">
             <h1 class="title is-spaced is-1">Chainlink Finary</h1>
             <h6 class="under-construction subtitle">Is There Anybody Out There?</h6>
             <!--<img class="under-construction" src="{% static 'images/under_construction.gif' %}" onclick="window.location.replace('http://textfiles.com/underconstruction/')"/>-->
@@ -126,9 +126,9 @@
                 {% endif %}
             </nav>
         </header>
-            <main>
+            <main class="section is-medium">
                 {% block tabbed_buttons %}
-                    <nav id="tabbed-buttons">
+                    <nav id="tabbed-buttons" class="section is-medium pt-0">
                         {% for collection in collections %}
                             {% if user.is_authenticated %}
                                 {% if collection.public == True %}
@@ -157,7 +157,7 @@
                 {% block content %}
                 {% endblock %}
             </main>
-        <footer>
+        <footer class="section is-medium">
             <div id="responseOutput">&nbsp;</div>
             <div id="copyright">gdubinin@chainlinkfinary.com</div>
         </footer>

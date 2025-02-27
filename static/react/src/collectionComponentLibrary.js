@@ -147,12 +147,11 @@ export function ChainlinkEditButtons(props) {
     storeEditButtonHandlers(editFunction, deleteFunction)
     return (
         <React.Fragment>
-            <i className="context-span-message">context action &lt; - - - - - -</i>
-            <button className="doc-action-copy-title">copy</button>
-            <button className="cl-edit-btn" target={props.wrappers[props.i].id}
+            <button className="doc-action-copy-title button is-small is-info">copy</button>
+            <button className="cl-edit-btn button is-small is-warning" target={props.wrappers[props.i].id}
                     onClick={elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0]}>edit
             </button>
-            <button className="cl-del-btn" target={props.wrappers[props.i].id}
+            <button className="cl-del-btn button is-small is-danger" target={props.wrappers[props.i].id}
                     onClick={elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][1]}>delete
             </button>
         </React.Fragment>
@@ -169,9 +168,8 @@ export function ContentEditButtons(props) {
     storeEditButtonHandlers(editFunction, deleteFunction)
     return (
         <React.Fragment>
-            <i className="context-span-message">context action &lt; - - - - - -</i>
             <button className="doc-action-copy-title button is-small is-info">copy</button>
-            <button className="cont-edit-btn button is-small is-info" target={props.wrappers[props.i].id}
+            <button className="cont-edit-btn button is-small is-warning" target={props.wrappers[props.i].id}
                     onClick={elementsEditButtonEventHandlers[elementsEditButtonEventHandlers.length - 1][0]}>edit
             </button>
             <button className="cont-del-btn button is-small is-danger" target={props.wrappers[props.i].id}
@@ -359,11 +357,10 @@ export function ContentElement(props) {
     if (Tag === 'br') {
         return (
             <React.Fragment>
-                                <span className="inner-content br">
+                                <span className="pb-6 pt-6 inner-content br">
                                         <i>&lt;!-- linebreak insert --&gt;</i>
                                 </span>
                 <div className="context-buttons-wrapper">
-                    <i className="context-span-message">context action &lt; - - - - - - </i>
                     <button className="cont-copy-btn">copy</button>
                     <button className="cont-edit-btn">edit</button>
                     <button className="cont-del-btn">delete</button>
@@ -377,7 +374,6 @@ export function ContentElement(props) {
                     {props.text}
                 </Tag>
                 <div className="context-buttons-wrapper">
-                    <i className="context-span-message">context action &lt; - - - - - - </i>
                     <button className="cont-copy-btn">copy</button>
                     <button className="cont-edit-btn">edit</button>
                     <button className="cont-del-btn">delete</button>

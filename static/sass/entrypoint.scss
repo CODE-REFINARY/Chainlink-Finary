@@ -9,6 +9,8 @@ $danger-red: #cc2a20;
 $cf-border-radius: 15px;
 $light-mode: #f3f4f6;
 
+$bulma-block-spacing: 3rem;
+
 // Set the 5 font families that Bulma recognizes
 $family-primary: "Chakra Petch";
 $family-secondary: "Genos";
@@ -74,6 +76,9 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 @forward "bulma/sass/elements/tag";
 @forward "bulma/sass/layout/footer";
 
+// Bulma Helper Styling
+@forward "bulma/sass/helpers/spacing";
+
 // Import the themes so that all CSS variables have a value
 @forward "bulma/sass/themes";
 
@@ -83,10 +88,13 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 @import url('https://fonts.googleapis.com/css2?family=Genos:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet');
 
+:root {
+  --bulma-block-spacing: 2rem;
+}
+
 .menu {
   -background-color: $light-gray;
   border-radius: $cf-border-radius;
-  margin-bottom: 3rem;
 }
 
 .menu-list a {
