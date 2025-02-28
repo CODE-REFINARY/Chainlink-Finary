@@ -151,3 +151,11 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
   -height: 30px;
   -border-radius: 5px;
 }
+
+// This sets the background color of static form input elements to make them look disabled without actually using
+// the disabled html attribute.
+.input.is-static {
+  background-color: hsl(220, 14.3%, 95.9%);
+  color: hsl(221deg,14%,48%);
+  font-style: italic;
+}

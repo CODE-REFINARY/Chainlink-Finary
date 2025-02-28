@@ -105,16 +105,16 @@ body {
 
 /* Element Form Creation */
 #content-creation-form, #chainlink-creation-form, #chainlink-edit-form, #content-edit-form, #footer-creation-form, #header-creation-form, #content-delete-form {
-    background-color: #00000061;
-    border-radius: 3px;
-    border-width: 4px;
-    border-color: #343537;
-    border-style: groove;
-    height: 12rem;
-    padding-top: var(--main-body-inner-content-padding-vertical);
-    padding-bottom: var(--main-body-inner-content-padding-vertical);
-    padding-left: var(--main-body-inner-content-padding-horizontal);
-    padding-right: var(--main-body-inner-content-padding-horizontal);
+    /*! background-color: #00000061; */
+    /*! border-radius: 3px; */
+    /*! border-width: 4px; */
+    /*! border-color: #343537; */
+    /*! border-style: groove; */
+    /*! height: 12rem; */
+    /*! padding-top: var(--main-body-inner-content-padding-vertical); */
+    /*! padding-bottom: var(--main-body-inner-content-padding-vertical); */
+    /*! padding-left: var(--main-body-inner-content-padding-horizontal); */
+    /*! padding-right: var(--main-body-inner-content-padding-horizontal); */
 }
 #content-creation-form > form {
 
@@ -266,9 +266,9 @@ body {
 /* ////////////////////////// FORM ELEMENTS ////////////////////////// */
 
 .form-label {
-    color: var(--form-text-color);
+    /*! color: var(--form-text-color); */
 }
 
 .form-group {
-    background-color: var(--form-field-background-color);
+    /*! background-color: var(--form-field-background-color); */
 }

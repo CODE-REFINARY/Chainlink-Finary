@@ -464,39 +464,59 @@ function ConstructLinebreakElement(props) {
 function ConstructChainlinkElement(props) {
     return (
         <form id="crud-form">
-            <div id="non-submit-fields">
-                <input type="hidden" name="type" value="CL"/>
-                <input type="hidden" name="url" value={props.url}/>
-                <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
-                <div className="form-group">
-                    <label htmlFor="text" id="chainlink-form-text-label" className="form-label">text</label>
+            <div id="non-submit-fields" className="field">
+                <div className="form-group field">
+                    <label className="label">Element Type</label>
+                    <input className="input is-static" name="type" value="CL" readonly/>
+                    <p className="help">this is the type of Element being instantiated</p>
+                </div>
+                <div className="form-group field">
+                    <label className="label">Element CURL</label>
+                    <input className="input is-static" name="url" value={props.url} readonly/>
+                    <p className="help">this is the unique identifier field for this element - if you are creating a new chainlink then this value will empty until the backend sends us a response</p>
+                </div>
+                <div className="form-group field">
+                    <label className="label">Element Ordering</label>
+                    <input className="input is-static" name="order" value={parseInt(props.order, 10)} readonly/>
+                    <p className="help">this is the order of this chainlink relative to others on the page</p>
+                </div>
+                <div className="form-group field">
+                    <label htmlFor="text" id="chainlink-form-text-label" className="form-label label">Text</label>
                     <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text"
-                           className="form-field"/>
+                           className="input form-field"/>
+                    <p className="help">enter a title to be used as the header name for this chainlink</p>
                 </div>
-                <div className="form-group">
-                    <input type="hidden" name="public" value="False"/>
-                    <label htmlFor="public" id="chainlink-form-public-label" className="form-label">public</label>
-                    <input type="checkbox" name="public" id="chainlink-form-public" value="True"
-                           className="form-field"/>
-                </div>
-                <div className="form-group">
+                <div className="form-group field">
                     <input type="hidden" name="archive" value="False"/>
-                    <label htmlFor="archive" id="chainlink-form-archive-label" className="form-label">archive</label>
-                    <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
-                           className="form-field"/>
+                    <input type="hidden" name="public" value="False"/>
+                    <label className="label">Access Controls</label>
+                    <div class="checkboxes">
+                        <label id="chainlink-form-public-label" className="form-label checkbox">
+                            <input type="checkbox" name="public" value="True" id="chainlink-form-archive"
+                                   className="checkbox form-field" style={{ "margin-right": "5px" }}/>
+                            Public
+                        </label>
+                        <label id="chainlink-form-archive-label" className="form-label checkbox">
+                            <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
+                                   className="checkbox form-field" style={{ "margin-right": "5px" }}/>
+                            Archive
+                        </label>
+                    </div>
+                    <p className="help">specify which viewers will be able to access the contents of this chainlink and what will happen to this chainlink if it's deleted</p>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="date" id="chainlink-form-date-label" className="form-label">date</label>
-                    <input type="input" name="date" id="chainlink-form-date" placeholder="ex: 09/19/22 13:55:26"
-                           className="form-field"/>
+                <div className="form-group field">
+                    <label htmlFor="date" id="chainlink-form-date-label" className="form-label label">Date</label>
+                    <input type="input" name="date" id="chainlink-form-date" className="input form-field"/>
+                    <p className="help">ex: 09/19/22 13:55:26</p>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="css" id="chainlink-form-css-label" className="form-label">css</label>
-                    <input type="input" name="css" id="chainlink-form-css" className="form-field"/>
+                <div className="form-group field">
+                    <label htmlFor="css" id="chainlink-form-css-label" className="form-label label">CSS</label>
+                    <input type="input" name="css" id="chainlink-form-css" className="input form-field"/>
+                    <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an advanced feature</i></p>
                 </div>
             </div>
-            <div id="element-creation-text-align-right">
-                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
+            <div id="element-creation-text-align-right field">
+                <input className="button is-success is-right" type="submit" value="CREATE"/>
             </div>
         </form>
     );
