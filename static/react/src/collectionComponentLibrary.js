@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, hydrateRoot, useRef} from "react";
 import {
     elementsEditButtonEventHandlers,
     deleteChainlink,
@@ -11,6 +11,7 @@ import {
 import {
     getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
 } from "./staticUtils";
+import { useState } from "react";
 
 /**
  * Render the row of Element creation buttons that appear at the bottom of the collection
@@ -177,6 +178,58 @@ export function ContentEditButtons(props) {
             </button>
         </React.Fragment>
     );
+}
+
+
+export function ElementDisplayAsComponents() {
+  const chainlinkDisplayRef = useRef(null);
+  const headerDisplayRef = useRef(null);
+  const footerDisplayRef = useRef(null);
+  let chainlinkDisplay = document.getElementById("chainlink-display");
+  let headerDisplay = document.getElementById("header-display");
+  let footerDisplay = document.getElementById("footer-display");
+  let chainlinkElements = [];
+  let headerElements = [];
+  let footerElements = [];
+
+   // Move existing DOM elements into React-managed div
+    let chainlinkDisplayChild = chainlinkDisplay.firstChild;
+    while (chainlinkDisplayChild) {
+        chainlinkElements.push(chainlinkDisplayChild);
+        chainlinkDisplayChild = chainlinkDisplayChild.nextSibling;
+    }
+
+    let headerDisplayChild = headerDisplay.firstChild;
+    while (headerDisplayChild) {
+        headerElements.push(headerDisplayChild);
+        headerDisplayChild = headerDisplayChild.nextSibling;
+    }
+
+    let footerDisplayChild = footerDisplay.firstChild;
+    while (footerDisplayChild) {
+        footerElements.push(footerDisplayChild);
+        footerDisplayChild = footerDisplayChild.nextSibling;
+    }
+
+  useEffect(() => {
+        for (let i = 0; i < chainlinkElements.length; i++) {
+            chainlinkDisplayRef.current.appendChild(chainlinkElements[i]);
+        }
+        for (let i = 0; i < headerElements.length; i++) {
+            headerDisplayRef.current.appendChild(headerElements[i]);
+        }
+        for (let i = 0; i < footerElements.length; i++) {
+            footerDisplayRef.current.appendChild(footerElements[i]);
+        }
+  }, []);
+
+    return (
+        <React.Fragment>
+            <div id="header-display" ref={headerDisplayRef}></div>
+            <div id="chainlink-display" ref={chainlinkDisplayRef}></div>
+            <div id="footer-display" ref={footerDisplayRef}></div>
+        </React.Fragment>
+        )
 }
 
 export function NoElements(props) {
@@ -383,6 +436,10 @@ export function ContentElement(props) {
     }
 }
 
+function Header3(props) {
+    return (<div></div>);
+};
+
 // Form components for individual Elements
 // These are forms displayed whenever a user is creating or updating an Element. Every Element has its own form. These
 // components are not exported because they are always called by ElementCreationForm.
@@ -410,38 +467,11 @@ function ConstructParagraphElement(props) {
 function ConstructCodeElement(props) {
     return (
         <form id="crud-form">
-            <textarea name="text" id="input" style={{ resize: 'none', width: '100%', height: '100%' }} defaultValue={props.value}></textarea>
-            <input type="hidden" name="url" value={props.url}/>
-            <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
-            <input type="hidden" name="type" value="CODE"/>
-            <input type="hidden" name="public" value="True"/>
-            <input type="hidden" name="css" value=""/>
-            <div id="element-creation-text-align-right">
-                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
-            </div>
-        </form>
-    );
-};
-
-// This form is instantiated whenever an H3 Element is being created
-function ConstructHeader3Element(props) {
-    return (
-        <form id="crud-form">
             <div className="form-group field">
-                <label className="label">Element Type</label>
-                <input className="input is-static" name="type" value="H3" readOnly/>
-                <p className="help">this is the type of Element being instantiated</p>
-            </div>
-            <div className="form-group field">
-                <label className="label">Element CURL</label>
-                <input className="input is-static" name="url" value={props.url} readOnly/>
-                <p className="help">this is the unique identifier field for this element - if you are creating a new
-                    chainlink then this value will empty until the backend sends us a response</p>
-            </div>
-            <div className="form-group field">
-                <label className="label">Element Ordering</label>
-                <input className="input is-static" name="order" value={parseInt(props.order, 10)} readOnly/>
-                <p className="help">this is the order of this chainlink relative to others on the page</p>
+                <label htmlFor="text" className="form-label label">Code</label>
+                <textarea autoFocus type="text" defaultValue={props.value} name="text"
+                          className="input form-field"
+                          style={{resize: 'none', width: '100%', height: '100%'}}></textarea>
             </div>
             <div className="form-group field">
                 <input type="hidden" name="archive" value="False"/>
@@ -462,17 +492,115 @@ function ConstructHeader3Element(props) {
                 <p className="help">specify which viewers will be able to access the contents of this chainlink and what
                     will happen to this chainlink if it's deleted</p>
             </div>
+            <CollapsibleCard
+                title="Read Only Fields"
+                content={
+                    <React.Fragment>
+                        <div className="form-group field">
+                            <label className="label">Element Type</label>
+                            <input className="input is-static" name="type" value="CODE" readOnly/>
+                            <p className="help">this is the type of Element being instantiated</p>
+                        </div>
+                        <div className="form-group field">
+                            <label className="label">Element CURL</label>
+                            <input className="input is-static" name="url" value={props.url} readOnly/>
+                            <p className="help">this is the unique identifier field for this element - if you are
+                                creating a new
+                                chainlink then this value will empty until the backend sends us a response</p>
+                        </div>
+                        <div className="form-group field">
+                            <label className="label">Element Ordering</label>
+                            <input className="input is-static" name="order" value={parseInt(props.order, 10)} readOnly/>
+                            <p className="help">this is the order of this chainlink relative to others on the page</p>
+                        </div>
+                    </React.Fragment>
+                }
+            />
+            <CollapsibleCard
+                title="Advanced Fields"
+                content={
+                    <React.Fragment>
+                        <div className="form-group field">
+                            <label htmlFor="css" id="header3-form-css-label" className="form-label label">CSS</label>
+                            <input type="input" name="css" id="header3-form-css" className="input form-field"/>
+                            <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an
+                                advanced feature</i></p>
+                        </div>
+                    </React.Fragment>
+                }
+            />
+            <div id="element-creation-text-align-right">
+                <input className="button is-success is-outlined" type="submit" value="CREATE"/>
+            </div>
+        </form>
+    );
+};
+
+// This form is instantiated whenever an H3 Element is being created
+function ConstructHeader3Element(props) {
+    return (
+        <form id="crud-form">
             <div className="form-group field">
                 <label htmlFor="text" id="chainlink-form-text-label" className="form-label label">Text</label>
-                <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text"
+                <input autoFocus type="text" defaultValue={props.value} name="text"
                        className="input form-field"/>
             </div>
             <div className="form-group field">
-                <label htmlFor="css" id="header3-form-css-label" className="form-label label">CSS</label>
-                <input type="input" name="css" id="header3-form-css" className="input form-field"/>
-                <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an
-                    advanced feature</i></p>
+                <input type="hidden" name="archive" value="False"/>
+                <input type="hidden" name="public" value="False"/>
+                <label className="label">Access Controls</label>
+                <div className="checkboxes">
+                    <label id="header3-form-public-label" className="form-label checkbox">
+                        <input type="checkbox" name="public" value="True" id="header3-form-archive"
+                               className="checkbox form-field" style={{"margin-right": "5px"}}/>
+                        Public
+                    </label>
+                    <label id="header3-form-archive-label" className="form-label checkbox">
+                        <input type="checkbox" name="archive" value="True" id="header3-form-archive"
+                               className="checkbox form-field is-static" style={{"margin-right": "5px"}} disabled/>
+                        Archive
+                    </label>
+                </div>
+                <p className="help">specify which viewers will be able to access the contents of this chainlink and what
+                    will happen to this chainlink if it's deleted</p>
             </div>
+            <CollapsibleCard
+                title="Read Only Fields"
+                content={
+                    <React.Fragment>
+                        <div className="form-group field">
+                            <label className="label">Element Type</label>
+                            <input className="input is-static" name="type" value="H3" readOnly/>
+                            <p className="help">this is the type of Element being instantiated</p>
+                        </div>
+                        <div className="form-group field">
+                            <label className="label">Element CURL</label>
+                            <input className="input is-static" name="url" value={props.url} readOnly/>
+                            <p className="help">this is the unique identifier field for this element - if you are
+                                creating a new
+                                chainlink then this value will empty until the backend sends us a response</p>
+                        </div>
+                        <div className="form-group field">
+                            <label className="label">Element Ordering</label>
+                            <input className="input is-static" name="order" value={parseInt(props.order, 10)} readOnly/>
+                            <p className="help">this is the order of this chainlink relative to others on the page</p>
+                        </div>
+                    </React.Fragment>
+                }
+            />
+            <CollapsibleCard
+                title="Advanced Fields"
+                content={
+                    <React.Fragment>
+                        <div className="form-group field">
+                            <label htmlFor="css" id="header3-form-css-label" className="form-label label">CSS</label>
+                            <input type="input" name="css" id="header3-form-css" className="input form-field"/>
+                            <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an
+                                advanced feature</i></p>
+                        </div>
+                    </React.Fragment>
+                }
+            />
             <div id="element-creation-text-align-right">
                 <input className="button is-success is-outlined" type="submit" value="CREATE"/>
             </div>
@@ -501,32 +629,36 @@ function ConstructLinebreakElement(props) {
     );
 };
 
+
+function CollapsibleCard({title, content}) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleCard = () => {
+        setIsOpen(!isOpen);
+    };
+
+    return (
+        <div className="card">
+            <header className="card-header">
+                <p className="card-header-title">{title}</p>
+                <button className="card-header-icon" aria-label="toggle" type="button" onClick={toggleCard}>
+                    <span className="icon">
+                        <i className={`fas ${isOpen ? "fa-angle-up" : "fa-angle-down"}`} aria-hidden="true"></i>
+                    </span>
+                </button>
+            </header>
+            <div className="card-content" style={{ display: isOpen ? "block" : "none" }}>
+                {content}
+            </div>
+        </div>
+    );
+}
+
+
 function ConstructChainlinkElement(props) {
     return (
         <form id="crud-form">
             <div id="non-submit-fields" className="field">
-                <div className="form-group field">
-                    <label className="label">Element Type</label>
-                    <input className="input is-static" name="type" value="CL" readonly/>
-                    <p className="help">this is the type of Element being instantiated</p>
-                </div>
-                <div className="form-group field">
-                    <label className="label">Element CURL</label>
-                    <input className="input is-static" name="url" value={props.url} readonly/>
-                    <p className="help">this is the unique identifier field for this element - if you are creating a new
-                        chainlink then this value will empty until the backend sends us a response</p>
-                </div>
-                <div className="form-group field">
-                    <label className="label">Element Ordering</label>
-                    <input className="input is-static" name="order" value={parseInt(props.order, 10)} readonly/>
-                    <p className="help">this is the order of this chainlink relative to others on the page</p>
-                </div>
-                <div className="form-group field">
-                    <label htmlFor="date" id="chainlink-form-date-label" className="form-label label">Date</label>
-                    <input type="input" name="date" id="chainlink-form-date" className="input form-field is-static"
-                           value="09/19/22 13:55:26" readOnly/>
-                    <p className="help">ex: 09/19/22 13:55:26</p>
-                </div>
                 <div className="form-group field">
                     <label htmlFor="text" id="chainlink-form-text-label" className="form-label label">Text</label>
                     <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text"
@@ -537,7 +669,7 @@ function ConstructChainlinkElement(props) {
                     <input type="hidden" name="archive" value="False"/>
                     <input type="hidden" name="public" value="False"/>
                     <label className="label">Access Controls</label>
-                    <div class="checkboxes">
+                    <div className="checkboxes">
                         <label id="chainlink-form-public-label" className="form-label checkbox">
                             <input type="checkbox" name="public" value="True" id="chainlink-form-archive"
                                    className="checkbox form-field" style={{"margin-right": "5px"}}/>
@@ -552,12 +684,54 @@ function ConstructChainlinkElement(props) {
                     <p className="help">specify which viewers will be able to access the contents of this chainlink and
                         what will happen to this chainlink if it's deleted</p>
                 </div>
-                <div className="form-group field">
-                    <label htmlFor="css" id="chainlink-form-css-label" className="form-label label">CSS</label>
-                    <input type="input" name="css" id="chainlink-form-css" className="input form-field"/>
-                    <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an
-                        advanced feature</i></p>
-                </div>
+                <CollapsibleCard
+                    title="Read Only Fields"
+                    content={
+                        <React.Fragment>
+                            <div className="form-group field">
+                                <label className="label">Element Type</label>
+                                <input className="input is-static" name="type" value="CL" readOnly/>
+                                <p className="help">this is the type of Element being instantiated</p>
+                            </div>
+                            <div className="form-group field">
+                                <label className="label">Element CURL</label>
+                                <input className="input is-static" name="url" value={props.url} readOnly/>
+                                <p className="help">this is the unique identifier field for this element - if you are
+                                    creating a new
+                                    chainlink then this value will empty until the backend sends us a response</p>
+                            </div>
+                            <div className="form-group field">
+                                <label className="label">Element Ordering</label>
+                                <input className="input is-static" name="order" value={parseInt(props.order, 10)}
+                                       readOnly/>
+                                <p className="help">this is the order of this chainlink relative to others on the
+                                    page</p>
+                            </div>
+                            <div className="form-group field">
+                                <label htmlFor="date" id="chainlink-form-date-label"
+                                       className="form-label label">Date</label>
+                                <input type="input" name="date" id="chainlink-form-date"
+                                       className="input form-field is-static"
+                                       value="09/19/22 13:55:26" readOnly/>
+                                <p className="help">ex: 09/19/22 13:55:26</p>
+                            </div>
+                        </React.Fragment>
+                        }
+                    />
+                <CollapsibleCard
+                    title="Advanced Fields"
+                    content={
+                        <React.Fragment>
+                            <div className="form-group field">
+                                <label htmlFor="css" id="chainlink-form-css-label" className="form-label label">CSS</label>
+                                <input type="input" name="css" id="chainlink-form-css" className="input form-field"/>
+                                <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an
+                                    advanced feature</i></p>
+                            </div>
+                        </React.Fragment>
+                    }
+                />
+
             </div>
             <div id="element-creation-text-align-right field">
                 <input className="button is-success is-right" type="submit" value="CREATE"/>

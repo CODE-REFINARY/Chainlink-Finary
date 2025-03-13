@@ -28,7 +28,7 @@
     </div>
 </div>
 
-<!-- Article content is always displayed in #chainlink-display -->
+<!-- Article content is always displayed in #element-display -->
 <div id="element-display" class="section is-medium" template="collection">
     <div id="header-display">
         <div id="header-elements">
@@ -43,10 +43,9 @@
                     <div id="header-placeholder"></div>
                 </div>
     </div>
-    <div id="chainlink-display">
         <!-- Chainlink Elements comprise the "meat" of the page. These elements are logically connected to the current
         host Article or Chainlink. It is in this way (and this way only) that they are related to each other. -->
-        <div id="chainlink-elements">
+        <div id="chainlink-display">
             {% for chainlink in chainlinks %}
                 <section class="section is-medium chainlink">
                     <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper title is-2" tag="chainlink">
@@ -79,19 +78,26 @@
                         {% empty %}
                             <!--<div id="no-contents" class="no-elements">&ltno content&gt</div>-->
                     {% endfor %}
+                {% if forloop.last %}
+                    <!-- Elements under the add-buttons element are buttons used to create content on the page -->
+                    <!-- Element creation forms will be created under this div. -->
+                    <div id="form-anchor"></div>
+                    <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
+                        <!-- The chainlink add button is placed under this div -->
+                        <div id="chainlink-placeholder" class="grid"></div>
+                    </div>
+                {% endif %}
                 </section>
                 {% empty %}
-                    <!--<div id="no-chainlinks" class="no-elements">&ltno content&gt</div>-->
+                    <!-- Elements under the add-buttons element are buttons used to create content on the page -->
+                    <!-- Element creation forms will be created under this div. -->
+                    <div id="form-anchor"></div>
+                    <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
+                        <!-- The chainlink add button is placed under this div -->
+                        <div id="chainlink-placeholder" class="grid"></div>
+                    </div>
             {% endfor %}
         </div>
-        <!-- Elements under the add-buttons element are buttons used to create content on the page -->
-        <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
-            <!-- The chainlink add button is placed under this div -->
-            <div id="chainlink-placeholder" class="grid"></div>
-            <!-- All buttons used to create content is stored under this parent div -->
-            <div id="content-placeholder"></div>
-        </div>
-    </div>
     <div id="footer-display">
         <div id="footer-elements">
             {% if footers %}

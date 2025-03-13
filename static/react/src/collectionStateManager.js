@@ -1,6 +1,6 @@
 /* React imports */
 import React from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot, useRef, useEffect } from "react-dom/client";
 import { TagType, Element, Collection, Chainlink, Content, Header, Footer } from "./elementClassDefinitions.js"
 import {
         ChainlinkEditButtons,
@@ -10,7 +10,7 @@ import {
         CreateBodyEditButtons, CreateFooterEditButtons,
         CreateHeaderEditButtons,
         ElementCreationForm, ElementDeletionForm, ChainlinkDeletionForm,
-        NoElements
+        NoElements, ElementDisplayAsComponents
 } from "./collectionComponentLibrary.js"
 import {
         getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
@@ -221,7 +221,8 @@ document.addEventListener("DOMContentLoaded", function() {
  * @returns {null}
  */
 export function initialize() {
-
+        refresh();
+        hydrateRoot(document.getElementById("element-display"), <ElementDisplayAsComponents />);
         refresh();
 }
 
@@ -271,7 +272,7 @@ export function refresh() {
         });
 
         // Remove or add the "MISSING" marker for the Collection.
-        const chainlinkElements = document.getElementById("chainlink-elements");
+        const chainlinkElements = document.getElementById("chainlink-display");
         const headerElements = document.getElementById("header-elements");
         const footerElements = document.getElementById("footer-elements");
         let noClMarker = document.getElementById("missing-body");
@@ -390,6 +391,7 @@ export function refresh() {
         showDiagnostics();
 }
 
+
 function showDiagnostics() {
         console.log("collectionUrl: " + collectionUrl.value);
         console.log("isArticle: " + isArticle.value);
@@ -470,7 +472,7 @@ function instantiateElement(element, index, children) {
         let adjacentElement = null;                                             // the element right before the element to be inserted
 
         if (chainlinkTypes.includes(element.type)) {
-                const parentElement = document.getElementById("chainlink-elements");
+                const parentElement = document.getElementById("chainlink-display");
                 const firstChild = parentElement.firstChild;
                 const container = document.createElement("section");
                 const root = createRoot(container);
@@ -542,7 +544,8 @@ export function makeForm(type) {
         // html elements to create
         const container = document.createElement("div");
         const root = createRoot(container);
-        const chainlink = document.getElementById("chainlink-elements").lastElementChild;
+        const chainlink = document.getElementById("chainlink-display").lastElementChild;
+        let formAnchor = document.getElementById("form-anchor");
 
         // fields to pass to addElement for Element creation
         let element = undefined;
@@ -553,11 +556,11 @@ export function makeForm(type) {
 
         // If we are making this form for the creation of a chainlink element
         if (chainlinkTypes.includes(type)) {
-                const list = document.getElementById('chainlink-elements');
+                //const list = document.getElementById('chainlink-display');
                 container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
                 root.render(<ElementCreationForm placeholder="enter chainlink content" type={type} order={order}/>);
-                list.appendChild(container);
+                formAnchor.appendChild(container);
         }
 
         // If we are making this form for the creation of a chainlink-display element that is not a chainlink.
@@ -593,7 +596,8 @@ export function makeForm(type) {
 
                 container.id = "content-creation-form";
                 root.render(<ElementCreationForm placeholder="enter header content" type={type} url={url} order={order}/>);
-                chainlink.appendChild(container);
+                //chainlink.appendChild(container);
+                formAnchor.appendChild(container);
         }
 
         // Otherwise if we are making this form for the creation of a header element.
