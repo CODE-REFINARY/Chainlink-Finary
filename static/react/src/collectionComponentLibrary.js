@@ -232,6 +232,14 @@ export function ElementDisplayAsComponents() {
         )
 }
 
+export function ChainlinkDisplayAsComponents() {
+    return (
+        <React.Fragment>
+            <Chainlink curl="asdf7sa80f7sadfjkj" order={0} text="This is a chainlink" />
+        </React.Fragment>
+    )
+}
+
 export function NoElements(props) {
     return (
         <React.Fragment>
@@ -436,8 +444,73 @@ export function ContentElement(props) {
     }
 }
 
-function Header3(props) {
-    return (<div></div>);
+export function Chainlink(props) {
+    let chainlinkId = "chainlink-" + props.curl + "-" + props.order
+    return (
+        <section className="section is-medium chainlink">
+            <div
+                id={chainlinkId}
+                className="chainlink-wrapper title is-2"
+                tag="chainlink"
+                index={69}
+            >
+                <h2>
+                    <span className="chainlink-order">#4</span>
+                    <span className="chainlink-inner-content" style={{}}>{props.text}</span>
+                    <a
+                        className="inline-url header-url"
+                        href="/patchwork/chainlink/0c192402c3ce5dbcb3025ac189db8da56bf37cffb1052d6f53404a10ad980a5a.html"
+                    >
+                        &gt;&gt;&gt;0c192402c
+                    </a>
+                    <span className="chainlink-date">Sep 19, 2022, 1:55 PM PDT</span>
+                </h2>
+            <ChainlinkEditButtons1 curl={props.curl} order={props.order} />
+            </div>
+            <Header3 curl={props.curl} order={0} text="This is a header 3"/>
+        </section>
+
+    );
+}
+
+function ChainlinkEditButtons1(props) {
+    let chainlinkId = "chainlink-" + props.curl + "-" + props.order
+    return (
+        <div className="chainlink-buttons-wrapper">
+            <button className="doc-action-copy-title button is-small is-info">copy</button>
+            <button className="cl-edit-btn button is-small is-warning" target={chainlinkId}
+                    onClick={() => editChainlink(chainlinkId)}>edit
+            </button>
+            <button className="cl-del-btn button is-small is-danger" target={chainlinkId}
+                    onClick={() => deleteChainlink(chainlinkId)}>delete
+            </button>
+        </div>
+    );
+}
+
+export function ContentEditButtons1(props) {
+    let chainlinkId = "content-" + props.curl + "-" + props.order
+    return (
+        <div className="context-buttons-wrapper">
+            <button className="doc-action-copy-title button is-small is-info">copy</button>
+            <button className="cont-edit-btn button is-small is-warning" target={chainlinkId}
+                    onClick={() => editContent(chainlinkId)}>edit
+            </button>
+            <button className="cont-del-btn button is-small is-danger" target={chainlinkId}
+                    onClick={() => deleteContent(chainlinkId)}>edit
+            </button>
+        </div>
+    );
+}
+
+export function Header3(props) {
+    let contentId = "content-" + props.curl + "-" + props.order
+    return (
+        <div id={contentId} className="title is-3 content-wrapper" tag="H3" index={12}>
+            <h3 className="inner-content">{props.text}</h3>
+            <ContentEditButtons1 curl={props.curl} order={props.order}/>
+        </div>
+    );
 };
 
 // Form components for individual Elements

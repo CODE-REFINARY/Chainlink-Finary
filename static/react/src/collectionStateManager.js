@@ -10,7 +10,7 @@ import {
         CreateBodyEditButtons, CreateFooterEditButtons,
         CreateHeaderEditButtons,
         ElementCreationForm, ElementDeletionForm, ChainlinkDeletionForm,
-        NoElements, ElementDisplayAsComponents
+        NoElements, ElementDisplayAsComponents, ChainlinkDisplayAsComponents
 } from "./collectionComponentLibrary.js"
 import {
         getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
@@ -36,6 +36,7 @@ let headerFormIsActive;
 let footerFormIsActive;
 let collectionTitleDefined;
 let cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default, it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
+let elementsComponent = undefined;
 
 /* Static Variables */
 const bodyElementClassNames = ["chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify body Elements
@@ -222,7 +223,10 @@ document.addEventListener("DOMContentLoaded", function() {
  */
 export function initialize() {
         refresh();
-        hydrateRoot(document.getElementById("element-display"), <ElementDisplayAsComponents />);
+        //elementsComponent = createRoot(document.getElementById("element-display"));
+        //elementsComponent.render(<ElementDisplayAsComponents />);
+        elementsComponent = createRoot(document.getElementById("chainlink-display"));
+        elementsComponent.render(<ChainlinkDisplayAsComponents />);
         refresh();
 }
 

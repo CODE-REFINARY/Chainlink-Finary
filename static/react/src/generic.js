@@ -7,5 +7,5 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Add the event listeners above for keystrokes
         window.addEventListener("keydown", parseKeyDown);
-        instantiateEditButtons();
+        //instantiateEditButtons();
 });
