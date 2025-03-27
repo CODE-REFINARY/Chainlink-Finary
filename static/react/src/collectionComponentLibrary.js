@@ -236,6 +236,7 @@ export function ChainlinkDisplayAsComponents() {
     return (
         <React.Fragment>
             <Chainlink curl="asdf7sa80f7sadfjkj" order={0} text="This is a chainlink" />
+            <CreateBodyEditButtons1 url="contenet-706eca4f062c5d8d1ef9a942ec287ff5a3a6a17a36a7a2dd44fc0fbf52205f1b-34" bitmask="11" />
         </React.Fragment>
     )
 }
@@ -468,6 +469,9 @@ export function Chainlink(props) {
             <ChainlinkEditButtons1 curl={props.curl} order={props.order} />
             </div>
             <Header3 curl={props.curl} order={0} text="This is a header 3"/>
+            <Linebreak curl={props.curl} order={1} />
+            <Code curl={props.curl} order={2} text="this is codeeeee" />
+            <Paragraph curl={props.curl} order={3} text="this is a paragraph" />
         </section>
 
     );
@@ -487,6 +491,128 @@ function ChainlinkEditButtons1(props) {
         </div>
     );
 }
+
+export function CreateBodyEditButtons1(props) {
+
+    // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
+    // is being shown or not.
+    const [showElementCreationForm, setShowElementCreationForm] = useState(false);
+    const [elementType, setElementType] = useState("");
+
+    const handleClick = (type) => {
+        setElementType(type)
+        setShowElementCreationForm(true); // Set the state to true to show the element creation form
+    };
+    const handleHide = () => setShowElementCreationForm(false); // Set the state to false to hide the element creation form
+    let chainlinkButton;
+    let restOfButtons;
+
+    if (props.bitmask[0] === "1") {
+        chainlinkButton = (
+            <button id="add-cl-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("CL")}>&lt;n&gt; chainlink</button>
+        );
+
+    } else if (props.bitmask[0] === "0") {
+        chainlinkButton = (
+            <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; chainlink</button>
+        );
+    }
+
+    if (props.bitmask[1] === "1") {
+        restOfButtons = (
+            <React.Fragment>
+                <button id="add-p-btn" className="button is-rounded is-black cell add-buttons" onClick={() => handleClick("P")}>&lt;p&gt; paragraph
+                </button>
+                <button id="add-h3-btn" className="button is-rounded is-primary cell add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
+                <button id="add-code-btn" className="button is-rounded is-success cell add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
+                </button>
+                <button id="add-br-btn" className="button is-rounded is-warning cell add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak
+                </button>
+                <button id="add-li-btn" className="button is-rounded is-white cell add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
+                <button id="add-link-btn" className="button is-rounded is-link cell add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
+                </button>
+                <button id="add-img-btn" className="button is-rounded is-info cell add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
+                <button id="add-note-btn" className="button is-rounded is-dark cell add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
+                </button>
+            </React.Fragment>
+        );
+
+    } else if (props.bitmask[1] === "0") {
+        restOfButtons = (
+            <React.Fragment>
+                <button className="cell button inactive-add-buttons" disabled>&lt;p&gt; paragraph</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;h&gt; header</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;c&gt; code</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;b&gt; linebreak</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;l&gt; list</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;q&gt; link</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;i&gt; img</button>
+                <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; note</button>
+            </React.Fragment>
+        );
+    }
+
+    return (
+        <div id="chainlink-placeholder" className="grid">
+            {showElementCreationForm && <ElementCreationForm1 onHide={handleHide} placeholder="enter content" method="POST" type={elementType} url={props.url} order={0} />}
+            {chainlinkButton}
+            {restOfButtons}
+        </div>
+    );
+}
+
+export function ElementCreationForm1(props) {
+
+    useEffect(() => {
+        refresh();
+    })
+
+    if (props.type === 'H3') {
+        return (
+            <React.Fragment>
+                <ConstructHeader3Element value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        );
+    } else if (props.type === 'CODE') {
+        return (
+            <React.Fragment>
+                <ConstructCodeElement value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        );
+    } else if (props.type === 'P') {
+        return (
+            <React.Fragment>
+                <ConstructParagraphElement value={props.value} type={props.type} url={props.url} order={props.order} onHide={props.onHide} method={props.method} />
+            </React.Fragment>
+        );
+    } else if (props.type === 'BR') {
+        return (
+            <React.Fragment>
+                <ConstructLinebreakElement value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        );
+    } else if (props.type == "CL") {
+        return (
+            <React.Fragment>
+                <ConstructChainlinkElement value={props.value} type={props.type} url={props.url} order={props.order}
+                                           value={props.value} date={props.date} css={props.css} onHide={props.onHide} method={props.method} />
+            </React.Fragment>
+        )
+    } else if (props.type == "H1") {
+        return (
+            <React.Fragment>
+                <ConstructHeader1Element value={props.value} type={props.type} url={props.url} order={props.order}/>
+            </React.Fragment>
+        )
+    } else if (props.type == "COL") {
+        return (
+            <React.Fragment>
+                <ConstructColElement/>
+            </React.Fragment>
+        )
+    }
+}
+
 
 export function ContentEditButtons1(props) {
     let chainlinkId = "content-" + props.curl + "-" + props.order
@@ -513,14 +639,66 @@ export function Header3(props) {
     );
 };
 
+
+export function Linebreak(props) {
+    let contentId = "content-" + props.curl + "-" + props.order
+    return (
+        <div id={contentId} className="content-wrapper" tag="BR" index={12}>
+            <span className="pb-6 pt-6 inner-content br">
+                <i>&lt;!-- linebreak insert --&gt;</i>
+            </span>
+            <ContentEditButtons1 curl={props.curl} order={props.order}/>
+        </div>
+    );
+};
+
+export function Code(props) {
+    let contentId = "content-" + props.curl + "-" + props.order
+    return (
+        <div id={contentId} className="content-wrapper" tag="CODE" index={12}>
+            <code className="code inner-content">{props.text}</code>
+            <ContentEditButtons1 curl={props.curl} order={props.order}/>
+        </div>
+    );
+};
+
+export function Paragraph(props) {
+    let contentId = "content-" + props.curl + "-" + props.order
+    return (
+        <div id={contentId} className="content-wrapper" tag="P" index={12}>
+            <p className="inner-content">{props.text}</p>
+            <ContentEditButtons1 curl={props.curl} order={props.order}/>
+        </div>
+    );
+}
+
 // Form components for individual Elements
 // These are forms displayed whenever a user is creating or updating an Element. Every Element has its own form. These
 // components are not exported because they are always called by ElementCreationForm.
 
 // This form is instantiated whenever a new Paragraph is being created
 function ConstructParagraphElement(props) {
+    const handleSubmit = (e) => {
+        e.preventDefault(); // Prevent page refresh
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const values = Object.fromEntries(formData.entries());
+
+        console.log("Form Data:", values); // Access all values here
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open(props.method, window.location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(values));
+
+        props.onHide();
+    };
     return (
-        <form id="crud-form">
+        <form onSubmit={handleSubmit} id="crud-form">
             <input autoFocus type="text" id="input" placeholder="enter paragraph content" name="text"
                    defaultValue={props.value}/>
             <input type="hidden" name="url" value={props.url}/>
@@ -553,12 +731,12 @@ function ConstructCodeElement(props) {
                 <div className="checkboxes">
                     <label id="header3-form-public-label" className="form-label checkbox">
                         <input type="checkbox" name="public" value="True" id="header3-form-archive"
-                               className="checkbox form-field" style={{"margin-right": "5px"}}/>
+                               className="checkbox form-field" style={{"marginRight": "5px"}}/>
                         Public
                     </label>
                     <label id="header3-form-archive-label" className="form-label checkbox">
                         <input type="checkbox" name="archive" value="True" id="header3-form-archive"
-                               className="checkbox form-field is-static" style={{"margin-right": "5px"}} disabled/>
+                               className="checkbox form-field is-static" style={{"marginRight": "5px"}} disabled/>
                         Archive
                     </label>
                 </div>
@@ -625,12 +803,12 @@ function ConstructHeader3Element(props) {
                 <div className="checkboxes">
                     <label id="header3-form-public-label" className="form-label checkbox">
                         <input type="checkbox" name="public" value="True" id="header3-form-archive"
-                               className="checkbox form-field" style={{"margin-right": "5px"}}/>
+                               className="checkbox form-field" style={{"marginRight": "5px"}}/>
                         Public
                     </label>
                     <label id="header3-form-archive-label" className="form-label checkbox">
                         <input type="checkbox" name="archive" value="True" id="header3-form-archive"
-                               className="checkbox form-field is-static" style={{"margin-right": "5px"}} disabled/>
+                               className="checkbox form-field is-static" style={{"marginRight": "5px"}} disabled/>
                         Archive
                     </label>
                 </div>
@@ -727,10 +905,28 @@ function CollapsibleCard({title, content}) {
     );
 }
 
-
 function ConstructChainlinkElement(props) {
+    const handleSubmit = (e) => {
+        e.preventDefault(); // Prevent page refresh
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const values = Object.fromEntries(formData.entries());
+
+        console.log("Form Data:", values); // Access all values here
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open(props.method, window.location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(values));
+
+        props.onHide();
+    };
     return (
-        <form id="crud-form">
+        <form onSubmit={handleSubmit} id="crud-form">
             <div id="non-submit-fields" className="field">
                 <div className="form-group field">
                     <label htmlFor="text" id="chainlink-form-text-label" className="form-label label">Text</label>
@@ -745,12 +941,12 @@ function ConstructChainlinkElement(props) {
                     <div className="checkboxes">
                         <label id="chainlink-form-public-label" className="form-label checkbox">
                             <input type="checkbox" name="public" value="True" id="chainlink-form-archive"
-                                   className="checkbox form-field" style={{"margin-right": "5px"}}/>
+                                   className="checkbox form-field" style={{"marginRight": "5px"}}/>
                             Public
                         </label>
                         <label id="chainlink-form-archive-label" className="form-label checkbox">
                             <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
-                                   className="checkbox form-field" style={{"margin-right": "5px"}}/>
+                                   className="checkbox form-field" style={{"marginRight": "5px"}}/>
                             Archive
                         </label>
                     </div>
