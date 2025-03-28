@@ -1,4 +1,5 @@
-import React, {useEffect, hydrateRoot, useRef} from "react";
+import React, {useEffect, createContext, useContext, useRef } from "react";
+import { createRoot } from "react-dom/client";
 import {
     elementsEditButtonEventHandlers,
     deleteChainlink,
@@ -12,6 +13,8 @@ import {
     getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
 } from "./staticUtils";
 import { useState } from "react";
+
+const CursorContext = createContext(null);
 
 /**
  * Render the row of Element creation buttons that appear at the bottom of the collection
@@ -233,14 +236,58 @@ export function ElementDisplayAsComponents() {
 }
 
 export function ChainlinkDisplayAsComponents() {
+    let chainlinks = document.querySelectorAll(".chainlink");
+    let chainlinkElements = [];
+    let lastChainlinkUrl = null;
+    let lastElementOrder = -1;
+    let lastChainlinkOrder = -1;
+    let lastChainlinkText = null;
+    chainlinks.forEach((chainlink) => {
+        let innerElements = [];
+        Array.from(chainlink.children).forEach((element) => {
+            if (element.getAttribute("tag") === "chainlink") {
+                lastChainlinkUrl = getUrlFromId(element.id);
+                lastChainlinkOrder = getOrderFromId(element.id);
+                lastChainlinkText = element.querySelector(".chainlink-inner-content").textContent;
+                lastElementOrder = -1; // reset the element order to null once we've added a chainlink. A value of -1 says there's no child elements yet
+            }
+            else if (element.getAttribute("tag") === "H3") {
+                lastElementOrder = getOrderFromId(element.id);
+                innerElements.push(<Header3 curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} order={lastElementOrder} />);
+            }
+            else if (element.getAttribute("tag") === "P") {
+                lastElementOrder = getOrderFromId(element.id);
+                innerElements.push(<Paragraph curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} order={lastElementOrder} />);
+            }
+            else if (element.getAttribute("tag") === "CODE") {
+                lastElementOrder = getOrderFromId(element.id);
+                innerElements.push(<Code curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} order={lastElementOrder} />);
+            }
+            else if (element.getAttribute("tag") === "BR") {
+                lastElementOrder = getOrderFromId(element.id);
+                innerElements.push(<Linebreak curl={getUrlFromId(element.id)} order={getOrderFromId(element.id)} />);
+            }
+        })
+        // push this chainlink to the list of chainlinks to render. We pass all child elements to the chainlink component
+        // view the children prop. Once done, the innerElements array is cleared out so that it can be populated for the next
+        // chainlink. We stored the chainlink url and the order of the last element not only so that it can be referenced in
+        // the creation of this chainlink but also so that it can be referenced when setting the cursor which is always initialized
+        // to point to the location of the very last element which, when we are finished, will be the last element in the body
+        // of the collection.
+        chainlinkElements.push(<Chainlink curl={lastChainlinkUrl} order={lastChainlinkOrder} text={lastChainlinkText} children={innerElements} />);
+    });
+    console.log(lastElementOrder);
+    const [cursor, setCursor] = useState({url: lastChainlinkUrl, chainlinkOrder: lastChainlinkOrder, elementOrder: lastElementOrder});
     return (
         <React.Fragment>
-            <Chainlink curl="asdf7sa80f7sadfjkj" order={0} text="This is a chainlink" />
-            <CreateBodyEditButtons1 url="contenet-706eca4f062c5d8d1ef9a942ec287ff5a3a6a17a36a7a2dd44fc0fbf52205f1b-34" bitmask="11" />
+            {chainlinkElements}
+            <CursorContext.Provider value={{cursor, setCursor}}>
+                <CreateBodyEditButtons1 />
+            </CursorContext.Provider>
         </React.Fragment>
     )
 }
-
+//            <Chainlink curl="asdf7sa80f7sadfjkj" order={0} text="This is a chainlink" />
 export function NoElements(props) {
     return (
         <React.Fragment>
@@ -453,7 +500,6 @@ export function Chainlink(props) {
                 id={chainlinkId}
                 className="chainlink-wrapper title is-2"
                 tag="chainlink"
-                index={69}
             >
                 <h2>
                     <span className="chainlink-order">#4</span>
@@ -468,14 +514,16 @@ export function Chainlink(props) {
                 </h2>
             <ChainlinkEditButtons1 curl={props.curl} order={props.order} />
             </div>
-            <Header3 curl={props.curl} order={0} text="This is a header 3"/>
-            <Linebreak curl={props.curl} order={1} />
-            <Code curl={props.curl} order={2} text="this is codeeeee" />
-            <Paragraph curl={props.curl} order={3} text="this is a paragraph" />
+            {props.children}
         </section>
 
     );
 }
+/*
+<Header3 curl={props.curl} order={0} text="This is a header 3"/>
+<Linebreak curl={props.curl} order={1} />
+<Code curl={props.curl} order={2} text="this is codeeeee" />
+<Paragraph curl={props.curl} order={3} text="this is a paragraph" />*/
 
 function ChainlinkEditButtons1(props) {
     let chainlinkId = "chainlink-" + props.curl + "-" + props.order
@@ -492,74 +540,75 @@ function ChainlinkEditButtons1(props) {
     );
 }
 
-export function CreateBodyEditButtons1(props) {
+    export function CreateBodyEditButtons1(props) {
 
-    // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
-    // is being shown or not.
-    const [showElementCreationForm, setShowElementCreationForm] = useState(false);
-    const [elementType, setElementType] = useState("");
+        // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
+        // is being shown or not.
+        const [showElementCreationForm, setShowElementCreationForm] = useState(false);
+        const [elementType, setElementType] = useState("");
+        const { cursor, setCursor } = useContext(CursorContext);
 
-    const handleClick = (type) => {
-        setElementType(type)
-        setShowElementCreationForm(true); // Set the state to true to show the element creation form
-    };
-    const handleHide = () => setShowElementCreationForm(false); // Set the state to false to hide the element creation form
-    let chainlinkButton;
-    let restOfButtons;
+        const handleClick = (type) => {
+            setElementType(type)
+            setShowElementCreationForm(true); // Set the state to true to show the element creation form
+        };
+        const handleHide = () => setShowElementCreationForm(false); // Set the state to false to hide the element creation form
+        let chainlinkButton;
+        let restOfButtons;
 
-    if (props.bitmask[0] === "1") {
-        chainlinkButton = (
-            <button id="add-cl-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("CL")}>&lt;n&gt; chainlink</button>
-        );
+        if (showElementCreationForm == false) {
+            chainlinkButton = (
+                <button id="add-cl-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("CL")}>&lt;n&gt; chainlink</button>
+            );
 
-    } else if (props.bitmask[0] === "0") {
-        chainlinkButton = (
-            <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; chainlink</button>
+        } else if (showElementCreationForm == true) {
+            chainlinkButton = (
+                <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; chainlink</button>
+            );
+        }
+        console.log(cursor.elementOrder)
+        if (!(cursor.elementOrder == -1 && cursor.chainlinkOrder == -1)) {
+            restOfButtons = (
+                <React.Fragment>
+                    <button id="add-p-btn" className="button is-rounded is-black cell add-buttons" onClick={() => handleClick("P")}>&lt;p&gt; paragraph
+                    </button>
+                    <button id="add-h3-btn" className="button is-rounded is-primary cell add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
+                    <button id="add-code-btn" className="button is-rounded is-success cell add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
+                    </button>
+                    <button id="add-br-btn" className="button is-rounded is-warning cell add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak
+                    </button>
+                    <button id="add-li-btn" className="button is-rounded is-white cell add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
+                    <button id="add-link-btn" className="button is-rounded is-link cell add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
+                    </button>
+                    <button id="add-img-btn" className="button is-rounded is-info cell add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
+                    <button id="add-note-btn" className="button is-rounded is-dark cell add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
+                    </button>
+                </React.Fragment>
+            );
+
+        } else {
+            restOfButtons = (
+                <React.Fragment>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;p&gt; paragraph</button>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;h&gt; header</button>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;c&gt; code</button>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;b&gt; linebreak</button>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;l&gt; list</button>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;q&gt; link</button>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;i&gt; img</button>
+                    <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; note</button>
+                </React.Fragment>
+            );
+        }
+
+        return (
+            <div id="chainlink-placeholder" className="grid">
+                {showElementCreationForm && <ElementCreationForm1 onHide={handleHide} placeholder="enter content" method="POST" type={elementType} />}
+                {chainlinkButton}
+                {restOfButtons}
+            </div>
         );
     }
-
-    if (props.bitmask[1] === "1") {
-        restOfButtons = (
-            <React.Fragment>
-                <button id="add-p-btn" className="button is-rounded is-black cell add-buttons" onClick={() => handleClick("P")}>&lt;p&gt; paragraph
-                </button>
-                <button id="add-h3-btn" className="button is-rounded is-primary cell add-buttons" onClick={() => makeForm('H3')}>&lt;h&gt; header</button>
-                <button id="add-code-btn" className="button is-rounded is-success cell add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
-                </button>
-                <button id="add-br-btn" className="button is-rounded is-warning cell add-buttons" onClick={() => makeForm('BR')}>&lt;b&gt; linebreak
-                </button>
-                <button id="add-li-btn" className="button is-rounded is-white cell add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
-                <button id="add-link-btn" className="button is-rounded is-link cell add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
-                </button>
-                <button id="add-img-btn" className="button is-rounded is-info cell add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
-                <button id="add-note-btn" className="button is-rounded is-dark cell add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
-                </button>
-            </React.Fragment>
-        );
-
-    } else if (props.bitmask[1] === "0") {
-        restOfButtons = (
-            <React.Fragment>
-                <button className="cell button inactive-add-buttons" disabled>&lt;p&gt; paragraph</button>
-                <button className="cell button inactive-add-buttons" disabled>&lt;h&gt; header</button>
-                <button className="cell button inactive-add-buttons" disabled>&lt;c&gt; code</button>
-                <button className="cell button inactive-add-buttons" disabled>&lt;b&gt; linebreak</button>
-                <button className="cell button inactive-add-buttons" disabled>&lt;l&gt; list</button>
-                <button className="cell button inactive-add-buttons" disabled>&lt;q&gt; link</button>
-                <button className="cell button inactive-add-buttons" disabled>&lt;i&gt; img</button>
-                <button className="cell button inactive-add-buttons" disabled>&lt;n&gt; note</button>
-            </React.Fragment>
-        );
-    }
-
-    return (
-        <div id="chainlink-placeholder" className="grid">
-            {showElementCreationForm && <ElementCreationForm1 onHide={handleHide} placeholder="enter content" method="POST" type={elementType} url={props.url} order={0} />}
-            {chainlinkButton}
-            {restOfButtons}
-        </div>
-    );
-}
 
 export function ElementCreationForm1(props) {
 
@@ -582,7 +631,7 @@ export function ElementCreationForm1(props) {
     } else if (props.type === 'P') {
         return (
             <React.Fragment>
-                <ConstructParagraphElement value={props.value} type={props.type} url={props.url} order={props.order} onHide={props.onHide} method={props.method} />
+                <ConstructParagraphElement value={props.value} type={props.type} onHide={props.onHide} method={props.method} />
             </React.Fragment>
         );
     } else if (props.type === 'BR') {
@@ -665,7 +714,7 @@ export function Code(props) {
 export function Paragraph(props) {
     let contentId = "content-" + props.curl + "-" + props.order
     return (
-        <div id={contentId} className="content-wrapper" tag="P" index={12}>
+        <div id={contentId} className="content-wrapper" tag="P">
             <p className="inner-content">{props.text}</p>
             <ContentEditButtons1 curl={props.curl} order={props.order}/>
         </div>
@@ -678,6 +727,10 @@ export function Paragraph(props) {
 
 // This form is instantiated whenever a new Paragraph is being created
 function ConstructParagraphElement(props) {
+    // The first thing we do is acquire the cursor variable. This is supplied as part of the context. Knowing where
+    // the cursor is allowing us to know where to insert this Element (whether it is new, it might just be being
+    // edited). We also want to update the cursor if we are inserting a new Element
+    const { cursor, setCursor } = useContext(CursorContext);
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
 
@@ -695,14 +748,29 @@ function ConstructParagraphElement(props) {
         xhr.responseType = "json";
         xhr.send(JSON.stringify(values));
 
+        // Render the paragraph
+        const container = document.createElement("div");
+        container.id = "delete-this-bullshit-div";
+        let anchor = null;
+        console.log("content-" + cursor.url + "-" + cursor.elementOrder);
+        if (cursor.elementOrder == -1) {
+            anchor = document.getElementById("chainlink-" + cursor.url + "-" + cursor.chainlinkOrder);
+        } else {
+            anchor = document.getElementById("content-" + cursor.url + "-" + cursor.elementOrder);
+        }
+        anchor.insertAdjacentElement("afterend", container);
+        const root = createRoot(container);
+
+        root.render(<Paragraph text={values.text} order={values.order} curl={getUrlFromId(values.url)} />);
+        setCursor({url: cursor.url, elementOrder: cursor.elementOrder + 1, chainlinkOrder: cursor.chainlinkOrder});
         props.onHide();
     };
     return (
         <form onSubmit={handleSubmit} id="crud-form">
             <input autoFocus type="text" id="input" placeholder="enter paragraph content" name="text"
                    defaultValue={props.value}/>
-            <input type="hidden" name="url" value={props.url}/>
-            <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+            <input type="hidden" name="url" value={"content-" + cursor.url + "-" + (cursor.elementOrder + 1)}/>
+            <input type="hidden" name="order" value={cursor.elementOrder + 1}/>
             <input type="hidden" name="type" value="P"/>
             <input type="hidden" name="public" value="True"/>
             <input type="hidden" name="css" value=""/>
