@@ -221,13 +221,15 @@ document.addEventListener("DOMContentLoaded", function() {
  *
  * @returns {null}
  */
-export function initialize() {
-        refresh();
-        //elementsComponent = createRoot(document.getElementById("element-display"));
-        //elementsComponent.render(<ElementDisplayAsComponents />);
-        elementsComponent = createRoot(document.getElementById("chainlink-display"));
-        elementsComponent.render(<ChainlinkDisplayAsComponents />);
-        refresh();
+export function initialize(edit) {
+        let editingEnabled = edit;
+        if (editingEnabled == true) {
+                refresh();
+                elementsComponent = createRoot(document.getElementById("chainlink-display"));
+                elementsComponent.render(<ChainlinkDisplayAsComponents/>);
+                window.addEventListener("keydown", parseKeyDown);
+                refresh();
+        }
 }
 
 export function storeEditButtonHandlers(editFunction, deleteFunction) {
@@ -253,6 +255,7 @@ export function refresh() {
                         }
                 }
         }
+
 
         // Update the Chainlink Manifest links with any new chainlinks that were potentially added.
         let list = document.getElementById("chainlink-manifest-entries");
@@ -354,6 +357,13 @@ export function refresh() {
                 }
         }
 
+
+
+
+        // Everything below this (about the edit buttons) should probably be removed. This won't be used probably
+        // because it will be handled by the react components themselves.
+
+
         // This variable is a string consisting of a set number of bits each of which indicates that a specific button
         // group should be enabled or disabled. The first bit is for the header buttons.
         let editButtonsBitmask = "";
@@ -390,7 +400,7 @@ export function refresh() {
 
         // Set the actual button enabling/disabling into motion. This is what does the actual work for setting/unsetting
         // the edit buttons as active or not.
-        bodyEditButtons.value = editButtonsBitmask;
+        //bodyEditButtons.value = editButtonsBitmask;
 
         showDiagnostics();
 }
@@ -964,7 +974,7 @@ export function deleteContent(target) {
 
         container.id = "content-delete-form";
         container.setAttribute("index", wrapper.getAttribute("index"));
-        root.render(<ElementDeletionForm type={tag} furl={wrapper.id} />);
+        root.render(<ElementDeletionForm type={tag} curl={wrapper.id} />);
         wrapper.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {

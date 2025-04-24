@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'Patchwork',
     'YACalendar',
     'CFScrape',
+    'blog',
     'django_celery_beat',
     "whitenoise.runserver_nostatic",
 ]

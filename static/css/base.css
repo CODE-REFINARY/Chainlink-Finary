@@ -358,11 +358,11 @@ div.combination {
 .chainlink-wrapper:hover .chainlink-buttons-wrapper {
     display: block;
 }
-.chainlink-wrapper:hover h2 {
+/*.chainlink-wrapper:hover h2 {
     border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
-}
+}*/
 
 .chainlink-buttons-wrapper {
     text-align: right;
@@ -377,11 +377,11 @@ div.combination {
 .content-wrapper:hover .context-buttons-wrapper {
     display: block;
 }
-.content-wrapper:hover .inner-content {
+/*.content-wrapper:hover .inner-content {
     border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
-}
+}*/
 .context-buttons-wrapper button, .chainlink-buttons-wrapper button, #fence-context-buttons button {
     width: 7.5%;
 }

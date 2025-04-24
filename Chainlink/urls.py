@@ -21,8 +21,8 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('Patchwork.urls')),
-    path('patchwork/', include('Patchwork.urls')),
+    path('collections/', include('Patchwork.urls')),
+    path('blog/', include('blog.urls')),
     path('yacalendar/', include('YACalendar.urls')),
 ]
 

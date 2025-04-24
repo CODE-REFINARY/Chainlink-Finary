@@ -7,7 +7,7 @@ import {
     editChainlink,
     editContent, instantiateEditButtons,
     makeForm, removeEditButtons,
-    renameDoc, refresh, storeEditButtonHandlers
+    refresh, storeEditButtonHandlers, parseKeyDown
 } from "./collectionStateManager";
 import {
     getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
@@ -257,7 +257,7 @@ export function ChainlinkDisplayAsComponents() {
             }
             else if (element.getAttribute("tag") === "P") {
                 lastElementOrder = getOrderFromId(element.id);
-                innerElements.push(<Paragraph curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} order={lastElementOrder} />);
+                innerElements.push(<Paragraph render_outer_div={true} curl={getUrlFromId(element.id)} text="DDDDDDDD" /*text={element.querySelector(".inner-content").textContent}*/ order={lastElementOrder} />);
             }
             else if (element.getAttribute("tag") === "CODE") {
                 lastElementOrder = getOrderFromId(element.id);
@@ -276,7 +276,6 @@ export function ChainlinkDisplayAsComponents() {
         // of the collection.
         chainlinkElements.push(<Chainlink curl={lastChainlinkUrl} order={lastChainlinkOrder} text={lastChainlinkText} children={innerElements} />);
     });
-    console.log(lastElementOrder);
     const [cursor, setCursor] = useState({url: lastChainlinkUrl, chainlinkOrder: lastChainlinkOrder, elementOrder: lastElementOrder});
     return (
         <React.Fragment>
@@ -364,7 +363,7 @@ export function ElementDeletionForm(props) {
     return (
         <React.Fragment>
             <form id="crud-form">
-                <input type="hidden" name="furl" value={props.furl}/>
+                <input type="hidden" name="furl" value={props.curl}/>
                 <input type="hidden" name="tag" value={props.type}/>
                 {props.type === "CL" ? <div className="form-group">
                     <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
@@ -713,12 +712,21 @@ export function Code(props) {
 
 export function Paragraph(props) {
     let contentId = "content-" + props.curl + "-" + props.order
-    return (
-        <div id={contentId} className="content-wrapper" tag="P">
-            <p className="inner-content">{props.text}</p>
-            <ContentEditButtons1 curl={props.curl} order={props.order}/>
-        </div>
-    );
+    if (props.render_outer_div === true) {
+        return (
+            <div className="content-wrapper" id={contentId} tag="P">
+                <p className="inner-content">{props.text}</p>
+                <ContentEditButtons1 curl={props.curl} order={props.order} />
+            </div>
+        );
+    } else {
+        return (
+            <React.Fragment>
+                <p className="inner-content">{props.text}</p>
+                <ContentEditButtons1 curl={props.curl} order={props.order}/>
+            </React.Fragment>
+        );
+    }
 }
 
 // Form components for individual Elements
@@ -738,8 +746,6 @@ function ConstructParagraphElement(props) {
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
 
-        console.log("Form Data:", values); // Access all values here
-
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open(props.method, window.location.href, true);
@@ -750,9 +756,10 @@ function ConstructParagraphElement(props) {
 
         // Render the paragraph
         const container = document.createElement("div");
-        container.id = "delete-this-bullshit-div";
+        container.setAttribute("tag", "P"); // Set the tag attribute to P for paragraph
+        container.setAttribute("id", "content-" + getUrlFromId(values.url) + "-" + values.order); // Set an id for the container
+        container.setAttribute("class", "content-wrapperrff"); // Set the class
         let anchor = null;
-        console.log("content-" + cursor.url + "-" + cursor.elementOrder);
         if (cursor.elementOrder == -1) {
             anchor = document.getElementById("chainlink-" + cursor.url + "-" + cursor.chainlinkOrder);
         } else {
@@ -761,7 +768,7 @@ function ConstructParagraphElement(props) {
         anchor.insertAdjacentElement("afterend", container);
         const root = createRoot(container);
 
-        root.render(<Paragraph text={values.text} order={values.order} curl={getUrlFromId(values.url)} />);
+        root.render(<Paragraph render_outer_div={false} text={values.text} order={values.order} curl={getUrlFromId(values.url)} />);
         setCursor({url: cursor.url, elementOrder: cursor.elementOrder + 1, chainlinkOrder: cursor.chainlinkOrder});
         props.onHide();
     };

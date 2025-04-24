@@ -34,8 +34,6 @@
         <div id="header-elements">
             {% if collection.title %}
                 <h1 class="header-element-wrapper" id="collection-title" style="{{ collection.title.css }}">{{ collection.title.text }}</h1>
-            {% else %}
-                <div id="missing-header" class="no-elements">&ltHEADER CONTENT MISSING&gt</div>
             {% endif %}
         </div>
                 <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
@@ -50,8 +48,10 @@
                         <h2>
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
                             <span class="chainlink-inner-content" style="{{ chainlink.0.css }}">{{ chainlink.0.text }}</span>
-                            <a class="inline-url header-url" href={% url "chainlink" key=chainlink.0.url %}>>>>{{ chainlink.0.url|slice:"0:9" }}</a>
                             <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
+                            {%  if chainlink.0.external %}
+                            <a class="inline-url header-url" href={{ chainlink.0.external }}>>>>{{ chainlink.0.external|cut:"https://"|cut:"http://"|slice:":35" }}{% if chainlink.0.external|cut:"https://"|cut:"http://"|length > 35 %}...{% endif %}</a>
+                            {% endif %}
                         </h2>
                     </div>
                     {% for body_element in chainlink.1 %}
@@ -81,8 +81,6 @@
                     <!-- Element creation forms will be created under this div. -->
                     <div id="form-anchor"></div>
                     <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
-                        <!-- The chainlink add button is placed under this div -->
-                        <div id="chainlink-placeholder" class="grid"></div>
                     </div>
                 {% endif %}
                 </section>
@@ -91,8 +89,6 @@
                     <!-- Element creation forms will be created under this div. -->
                     <div id="form-anchor"></div>
                     <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
-                        <!-- The chainlink add button is placed under this div -->
-                        <div id="chainlink-placeholder" class="grid"></div>
                     </div>
             {% endfor %}
         </div>
@@ -102,8 +98,6 @@
                 {% for footer in footers %}
                     <p id="doc-footer" class="footer-element-wrapper" style="{{ footer.css }}">{{ footer.content.text }}</p>
                 {% endfor %}
-            {% else %}
-                <div id="missing-footer" class="no-elements">&ltFOOTER CONTENT MISSING&gt</div>
             {% endif %}
         </div>
         <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>
