@@ -60,7 +60,8 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 );
 
 @use "bulma/sass/layout/section" with(
-  $section-padding-medium: 2.4rem 0rem,
+  $section-padding: 0.9rem 0rem,
+  $section-padding-medium: 2.0rem 0rem,
   $section-padding-large: 5rem 0rem,
 );
 
@@ -160,6 +161,6 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
   font-style: italic;
 }
 
-#crud-form {
-
+.header-element-wrapper {
+  text-align: center;
 }

@@ -18,7 +18,7 @@ body {
 /* ////////////////////////// INDEX PAGE STUFF BEGIN ////////////////////////// */
 
 /*  */
-#collection-title {
+/*#collection-title {
 	font-family: Audiowide;
 	font-weight: 100;
 	background-color: #334756;
@@ -26,7 +26,7 @@ body {
 	color: whitesmoke;
 	font-size: xx-large;
 	padding: 10px;
-}
+}*/
 
 /* This is the h1 element that appears on the index page */
 .index-title {

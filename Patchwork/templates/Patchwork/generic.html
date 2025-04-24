@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{% static 'css/bluesky.css' %}">
 {% endif %}
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
-<div id="config-display" class="section is-medium">
+<div id="config-display" class="">
     <div id="chainlink-manifest" class="menu">
         <h2 class="menu-label">Chainlink Manifest</h2>
         <ul id="chainlink-manifest-entries" class="menu-list">
@@ -31,9 +31,9 @@
 <!-- Article content is always displayed in #element-display -->
 <div id="element-display" class="section is-medium" template="collection">
     <div id="header-display">
-        <div id="header-elements">
+        <div id="header-elements" class="section is-medium">
             {% if collection.title %}
-                <h1 class="header-element-wrapper" id="collection-title" style="{{ collection.title.css }}">{{ collection.title.text }}</h1>
+                <h1 class="header-element-wrapper title is-1" id="collection-title" style="{{ collection.title.css }}">{{ collection.title.text }}</h1>
             {% endif %}
         </div>
                 <div class="element-creation-buttons" {% if not user.is_authenticated %}style="display: none"{% endif %}>

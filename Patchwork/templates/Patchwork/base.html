@@ -128,7 +128,7 @@
         </header>
             <main class="section is-medium">
                 {% block tabbed_buttons %}
-                    <nav id="tabbed-buttons" class="section is-medium pt-0">
+                    <nav id="tabbed-buttons" class="">
                         {% for collection in collections %}
                             {% if user.is_authenticated %}
                                 {% if collection.public == True %}
