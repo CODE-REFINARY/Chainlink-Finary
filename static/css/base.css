@@ -458,7 +458,7 @@ div.combination {
 	/*! border-radius: 12px; */
 }
 
-.content-wrapper .br {
+/*.content-wrapper .br {
     font-family: sans-serif;
 	display: block;
 	padding-top: calc(var(--chainlink-display-inner-content-padding-vertical) * 2.5);
@@ -466,7 +466,7 @@ div.combination {
 	color: cadetblue;
     font-size: xx-small;
     text-align: center;
-}
+}*/
 
 /*.content-wrapper p, #footer-elements p {
 	display: block;

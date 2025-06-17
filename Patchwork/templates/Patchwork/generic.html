@@ -69,7 +69,7 @@
                         </div>
                         {% elif body_element.content.tag == 'BR' %}
                         <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="BR">
-                            <span class="pb-6 pt-6 inner-content br" style="{{ body_element.css }}"><i>&#60;!-- linebreak insert --&#62;</i></span>
+                            <span class="pb-6 pt-6 inner-content br" style="display: block; {{ body_element.css }}"><figure class="image is-16x16" style="float: right;"><img src="{% static 'images/enter.png' %}" alt="Description of image"></figure></span>
                         </div>
                         {% elif body_element.tag == 'delimiter' %}
                         {% endif %}

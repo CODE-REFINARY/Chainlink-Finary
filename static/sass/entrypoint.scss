@@ -53,18 +53,20 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
   $title-color: $title-color,
   $title-family: $family-primary,
   $title-weight: bold,
+  $title-line-height: 0.7,
   $subtitle-color: $subtitle-color,
   $subtitle-weight: normal,
   $subtitle-size: 1.25em,
   $subtitle-family: $family-secondary,
 );
 
-@use "bulma/sass/layout/section" with(
+@use "bulma/sass/layout/section" with (
   $section-padding: 0.9rem 0rem,
   $section-padding-medium: 2.0rem 0rem,
   $section-padding-large: 5rem 0rem,
 );
 
+@forward "bulma/sass/elements/image";
 @forward "bulma/sass/grid/grid";
 @forward "bulma/sass/base";
 @forward "bulma/sass/components/card";
@@ -163,4 +165,14 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 
 .header-element-wrapper {
   text-align: center;
+}
+
+// These are the little date and external url items that appear next to each chainlink. I want them not to be broken
+// up on smaller pages.
+.chainlink-date, .header-url {
+  white-space: nowrap;
+}
+
+body {
+    margin: 2% 20% 1% 20%;
 }
