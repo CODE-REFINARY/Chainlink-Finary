@@ -4,8 +4,10 @@ FROM python:3.11.11-bookworm
 WORKDIR /code
 
 # Set Environment Variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/code" \
+    DJANGO_SETTINGS_MODULE="Chainlink.settings"
 
 # Install dependencies
 COPY requirements.txt /code

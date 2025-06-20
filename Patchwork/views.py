@@ -469,6 +469,10 @@ def generic(request, url=None):
             collections = Collection.objects.filter(public=True)
         collection_titles = Header.objects.all()
 
+        # Get the query string edit argument from the url. This argument gets passed to the template so that the
+        # template knows to render in edit mode.
+        edit = request.GET.get('edit', 'false')
+
         # Chainlink and Body data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
         chainlinks = []
@@ -491,6 +495,7 @@ def generic(request, url=None):
             "collection": collection,
             "header": header,
             "footers": footers,
+            "edit": edit,
             "view": "generic"
         })
 

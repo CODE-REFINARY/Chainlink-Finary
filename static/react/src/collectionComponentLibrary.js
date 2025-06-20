@@ -245,6 +245,7 @@ export function ChainlinkDisplayAsComponents() {
     chainlinks.forEach((chainlink) => {
         let innerElements = [];
         Array.from(chainlink.children).forEach((element) => {
+            console.log(element);
             if (element.getAttribute("tag") === "chainlink") {
                 lastChainlinkUrl = getUrlFromId(element.id);
                 lastChainlinkOrder = getOrderFromId(element.id);
@@ -257,7 +258,7 @@ export function ChainlinkDisplayAsComponents() {
             }
             else if (element.getAttribute("tag") === "P") {
                 lastElementOrder = getOrderFromId(element.id);
-                innerElements.push(<Paragraph render_outer_div={true} curl={getUrlFromId(element.id)} text="DDDDDDDD" /*text={element.querySelector(".inner-content").textContent}*/ order={lastElementOrder} />);
+                innerElements.push(<Paragraph render_outer_div={true} curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} /*text={element.querySelector(".inner-content").textContent}*/ order={lastElementOrder} />);
             }
             else if (element.getAttribute("tag") === "CODE") {
                 lastElementOrder = getOrderFromId(element.id);

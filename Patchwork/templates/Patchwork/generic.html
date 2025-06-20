@@ -3,6 +3,10 @@
 {% block content %}
 <input type="hidden" id="collection-url" value="{{ collection.url }}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
+{% if edit == "true" %}
+    <link rel="stylesheet" href="{% static 'css/edit-mode.css' %}">
+    <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
+{% endif %}
 {% if collection.theme == "patchwork" %}
     <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 {% elif collection.theme == "peshay" %}
@@ -12,7 +16,6 @@
 {% elif collection.theme == "bluesky" %}
     <link rel="stylesheet" href="{% static 'css/bluesky.css' %}">
 {% endif %}
-<script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 <div id="config-display" class="">
     <div id="chainlink-manifest" class="menu">
         <h2 class="menu-label">Chainlink Manifest</h2>
@@ -69,7 +72,7 @@
                         </div>
                         {% elif body_element.content.tag == 'BR' %}
                         <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="BR">
-                            <span class="pb-6 pt-6 inner-content br" style="display: block; {{ body_element.css }}"><figure class="image is-16x16" style="float: right;"><img src="{% static 'images/enter.png' %}" alt="Description of image"></figure></span>
+                            <span class="pb-5 pt-5 inner-content br" style="display: block; {{ body_element.css }}"><figure class="image is-16x16" style="float: right;"><img src="{% static 'images/enter.png' %}" alt="Description of image"></figure></span>
                         </div>
                         {% elif body_element.tag == 'delimiter' %}
                         {% endif %}

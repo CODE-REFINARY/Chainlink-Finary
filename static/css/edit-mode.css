@@ -1,0 +1,5 @@
+.content-wrapper:hover .inner-content, .chainlink-wrapper:hover h2 {
+    border-width: 1px;
+    border-style: solid;
+    color: rgb(208, 68, 35);
+}

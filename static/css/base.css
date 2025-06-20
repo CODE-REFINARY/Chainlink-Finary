@@ -12,18 +12,7 @@
 
 /* /////////////// Media Queries /////////////// */
 
-@media (min-width: 601px) and (max-width: 1000px) {
-	#tabbed-buttons {
-		text-align: center !important;
-	}
-	#tabbed-buttons button, a {
-		width: 33.333% !important;
-		height: 45px !important;
-		margin-top: 30px !important;
-		margin-bottom: 30px !important;
-		font-size: 18px !important;
-	}
-}
+@media (min-width: 601px) and (max-width: 1000px) {}
 
 /* /////////////// Custom Fonts /////////////// */
 
