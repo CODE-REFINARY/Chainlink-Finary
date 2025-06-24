@@ -28,6 +28,7 @@ let articleIsEmpty;
 let chainlinkIsEmpty;
 let bodyEditButtons;
 let numBodyElements;        // the number of Elements rendered on the page
+//numChainlinkElements;
 let numFooterElements;
 let numHeaderElements;
 let bodyFormIsActive;
@@ -43,6 +44,7 @@ const bodyElementClassNames = ["chainlink-wrapper", "content-wrapper"]; // defin
 const contentElementClassNames = ["content-wrapper"];
 const headerElementClassNames = ["header-element-wrapper"];
 const footerElementClassNames = ["footer-element-wrapper"];
+const chainlinkElementNames = ["chainlink"];
 const formClassNames = ["content-creation-form"];
 
 // These constants define the internal names used to identify different Element types. These should be used to ensure
@@ -65,6 +67,15 @@ const footerTypes = ["EN", "FTRLI"];
 // Collections are web pages that contain content. A user-friendly synonym might be "article" as a Collection is a web
 // page that often contains similar items that an article would have.
 const collectionTypes = ["COL"];
+
+// This dynamic variable indicates the number of currently rendered chainlink elements.
+export const numChainlinkElements = {
+    get value() {
+        const selector = chainlinkElementNames.map(tagValue => `[tag="${tagValue}"]`).join(', ');
+        const elements = document.querySelectorAll(selector);
+        return elements.length;
+    }
+};
 
 // Set up state variables after DOM is ready to be read
 document.addEventListener("DOMContentLoaded", function() {
@@ -194,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         // contentButtons indicates the existence of buttons that create text on the page
-        bodyEditButtons = {
+        /*bodyEditButtons = {
                 _value: false,
                 bodyRoot: createRoot(document.getElementById("chainlink-placeholder")),
                 headerRoot: createRoot(document.getElementById("header-placeholder")),
@@ -210,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 this.footerRoot.render(<CreateFooterEditButtons bitmask={this._value.substring(3, 4)}/>);
                         }
                 }
-        };
+        };*/
 
         let colForm = document.getElementById("add-col-form");
         colForm.addEventListener("submit", (event)=>{event.preventDefault(); makeForm("COL")});
@@ -413,6 +424,7 @@ function showDiagnostics() {
         console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
         console.log("articleIsEmpty: " + (numBodyElements.value === 0).toString());
         console.log("numElements: " + numBodyElements.value);
+        console.log("numChainlinks: " + numChainlinkElements.value);
 }
 
 /**

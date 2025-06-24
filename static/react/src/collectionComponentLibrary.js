@@ -7,7 +7,8 @@ import {
     editChainlink,
     editContent, instantiateEditButtons,
     makeForm, removeEditButtons,
-    refresh, storeEditButtonHandlers, parseKeyDown
+    refresh, storeEditButtonHandlers, parseKeyDown,
+    numChainlinkElements
 } from "./collectionStateManager";
 import {
     getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
@@ -504,12 +505,7 @@ export function Chainlink(props) {
                 <h2>
                     <span className="chainlink-order">#4</span>
                     <span className="chainlink-inner-content" style={{}}>{props.text}</span>
-                    <a
-                        className="inline-url header-url"
-                        href="/patchwork/chainlink/0c192402c3ce5dbcb3025ac189db8da56bf37cffb1052d6f53404a10ad980a5a.html"
-                    >
-                        &gt;&gt;&gt;0c192402c
-                    </a>
+                    <a className="inline-url header-url" href="www.example.com">&gt;&gt;&gt;www.example.com</a>
                     <span className="chainlink-date">Sep 19, 2022, 1:55 PM PDT</span>
                 </h2>
             <ChainlinkEditButtons1 curl={props.curl} order={props.order} />
@@ -982,6 +978,15 @@ function CollapsibleCard({title, content}) {
 }
 
 function ConstructChainlinkElement(props) {
+    // If we're creating a brand new chainlink then the element order will be equal to the number of chainlink elements (which means that the new chainlink will be added to the back).
+    // Otherwise, if we're editing a chainlink then it's order gets passed down via a prop.
+    let chainlinkOrder = 0; // this variable indicates the order of the chainlink.
+    if (props.order === undefined || props.order === null) {
+        chainlinkOrder = numChainlinkElements.value;
+    } else {
+        chainlinkOrder = parseInt(props.order, 10);
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
 
@@ -1047,7 +1052,7 @@ function ConstructChainlinkElement(props) {
                             </div>
                             <div className="form-group field">
                                 <label className="label">Element Ordering</label>
-                                <input className="input is-static" name="order" value={parseInt(props.order, 10)}
+                                <input className="input is-static" name="order" value={chainlinkOrder}
                                        readOnly/>
                                 <p className="help">this is the order of this chainlink relative to others on the
                                     page</p>
