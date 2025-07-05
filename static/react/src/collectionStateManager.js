@@ -27,8 +27,7 @@ let isChainlink;
 let articleIsEmpty;
 let chainlinkIsEmpty;
 let bodyEditButtons;
-let numBodyElements;        // the number of Elements rendered on the page
-//numChainlinkElements;
+//let numBodyElements;        // the number of Elements rendered on the page
 let numFooterElements;
 let numHeaderElements;
 let bodyFormIsActive;
@@ -45,6 +44,7 @@ const contentElementClassNames = ["content-wrapper"];
 const headerElementClassNames = ["header-element-wrapper"];
 const footerElementClassNames = ["footer-element-wrapper"];
 const chainlinkElementNames = ["chainlink"];
+const bodyElementNames = ["P", "CODE", "BR", "H3", "LI", "LINK", "NOTE", "IMG", "chainlink"];
 const formClassNames = ["content-creation-form"];
 
 // These constants define the internal names used to identify different Element types. These should be used to ensure
@@ -75,6 +75,15 @@ export const numChainlinkElements = {
         const elements = document.querySelectorAll(selector);
         return elements.length;
     }
+};
+
+// variable indicates the number of elements currently rendered on the screen
+export const numBodyElements = {
+        get value() {
+                const selector = bodyElementNames.map(tagValue => `[tag="${tagValue}"]`).join(', ');
+                const elements = document.querySelectorAll(selector);
+                return (Array.from(elements).length);
+        }
 };
 
 // Set up state variables after DOM is ready to be read
@@ -155,15 +164,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                 }
         }
-
-        // variable indicates the number of elements currently rendered on the screen
-        numBodyElements = {
-                get value() {
-                        const selector = bodyElementClassNames.map(className => `.${className}`).join(', ');
-                        const elements = document.querySelectorAll(selector);
-                        return (Array.from(elements).length);
-                }
-        };
 
         // variable indicates the number of elements currently rendered on the screen
         numHeaderElements = {
@@ -843,6 +843,11 @@ export function deleteDoc() {
                 }
         }
 }
+
+export function deleteChainlink1(target) {
+        console.log("deleteChainlink1 called with target: " + target);
+}
+
 
 export function deleteChainlink(target) {
 

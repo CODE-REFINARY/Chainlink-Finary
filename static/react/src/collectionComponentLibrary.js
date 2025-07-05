@@ -1,12 +1,12 @@
 import React, {useEffect, createContext, useContext, useRef } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, createPortal } from "react-dom";
 import {
     elementsEditButtonEventHandlers,
     deleteChainlink,
     deleteContent,
     editChainlink,
     editContent, instantiateEditButtons,
-    makeForm, removeEditButtons,
+    makeForm, removeEditButtons, deleteChainlink1,
     refresh, storeEditButtonHandlers, parseKeyDown,
     numChainlinkElements
 } from "./collectionStateManager";
@@ -184,7 +184,6 @@ export function ContentEditButtons(props) {
     );
 }
 
-
 export function ElementDisplayAsComponents() {
   const chainlinkDisplayRef = useRef(null);
   const headerDisplayRef = useRef(null);
@@ -243,6 +242,8 @@ export function ChainlinkDisplayAsComponents() {
     let lastElementOrder = -1;
     let lastChainlinkOrder = -1;
     let lastChainlinkText = null;
+    let lastChainlinkDate = null;
+    let lastChainlinkExternalUrl = null;
     chainlinks.forEach((chainlink) => {
         let innerElements = [];
         Array.from(chainlink.children).forEach((element) => {
@@ -251,6 +252,11 @@ export function ChainlinkDisplayAsComponents() {
                 lastChainlinkUrl = getUrlFromId(element.id);
                 lastChainlinkOrder = getOrderFromId(element.id);
                 lastChainlinkText = element.querySelector(".chainlink-inner-content").textContent;
+                lastChainlinkDate = element.querySelector(".chainlink-date").textContent;
+                lastChainlinkExternalUrl = element.querySelector(".header-url")?.getAttribute("href") ?? null;
+                if (lastChainlinkExternalUrl && lastChainlinkExternalUrl.length > 35) {
+                  lastChainlinkExternalUrl = lastChainlinkExternalUrl.slice(0, 35) + "...";
+                }
                 lastElementOrder = -1; // reset the element order to null once we've added a chainlink. A value of -1 says there's no child elements yet
             }
             else if (element.getAttribute("tag") === "H3") {
@@ -276,19 +282,20 @@ export function ChainlinkDisplayAsComponents() {
         // the creation of this chainlink but also so that it can be referenced when setting the cursor which is always initialized
         // to point to the location of the very last element which, when we are finished, will be the last element in the body
         // of the collection.
-        chainlinkElements.push(<Chainlink curl={lastChainlinkUrl} order={lastChainlinkOrder} text={lastChainlinkText} children={innerElements} />);
+        chainlinkElements.push(<Chainlink curl={lastChainlinkUrl} order={lastChainlinkOrder} text={lastChainlinkText} children={innerElements} date={lastChainlinkDate} external={lastChainlinkExternalUrl} />);
     });
     const [cursor, setCursor] = useState({url: lastChainlinkUrl, chainlinkOrder: lastChainlinkOrder, elementOrder: lastElementOrder});
     return (
         <React.Fragment>
             {chainlinkElements}
+            <div id="landingzone"></div>
             <CursorContext.Provider value={{cursor, setCursor}}>
                 <CreateBodyEditButtons1 />
             </CursorContext.Provider>
         </React.Fragment>
     )
 }
-//            <Chainlink curl="asdf7sa80f7sadfjkj" order={0} text="This is a chainlink" />
+
 export function NoElements(props) {
     return (
         <React.Fragment>
@@ -494,35 +501,108 @@ export function ContentElement(props) {
 }
 
 export function Chainlink(props) {
-    let chainlinkId = "chainlink-" + props.curl + "-" + props.order
+    let furl = "chainlink-" + props.curl + "-" + props.order
+    const [showChainlinkDeleteForm, setShowChainlinkDeleteForm] = useState(false);
+    const [showChainlinkEditForm, setShowChainlinkEditForm] = useState(false);
+    const handleDeleteSubmit = (e) => {
+        e.preventDefault(); // Prevent page refresh
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const values = Object.fromEntries(formData.entries());
+
+        console.log("Chainlink Deletion Form Data:", values); // Access all values here
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", window.location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(values));
+
+        setShowChainlinkDeleteForm(false);
+    };
     return (
         <section className="section is-medium chainlink">
-            <div
-                id={chainlinkId}
-                className="chainlink-wrapper title is-2"
-                tag="chainlink"
-            >
+            <div id={furl} className="chainlink-wrapper title is-2" tag="chainlink">
                 <h2>
-                    <span className="chainlink-order">#4</span>
+                    <span className="chainlink-order">#-1</span>
                     <span className="chainlink-inner-content" style={{}}>{props.text}</span>
-                    <a className="inline-url header-url" href="www.example.com">&gt;&gt;&gt;www.example.com</a>
-                    <span className="chainlink-date">Sep 19, 2022, 1:55 PM PDT</span>
+                    <a className="inline-url header-url" href={props.external}>&gt;&gt;&gt;{props.external}</a>
+                    <span className="chainlink-date">{props.date}</span>
                 </h2>
-            <ChainlinkEditButtons1 curl={props.curl} order={props.order} />
+            <ChainlinkEditButtons1 curl={props.curl} order={props.order} chainlinkDeleteFormState={[showChainlinkDeleteForm, setShowChainlinkDeleteForm]} />
             </div>
+            {showChainlinkDeleteForm && (
+                <form id="crud-form" onSubmit={handleDeleteSubmit}>
+                    <input type="hidden" name="curl" value={props.curl}/>
+                    <input type="hidden" name="order" value={parseInt(props.order, 10)}/>
+                    <input type="hidden" name="tag" value="CL"/>
+
+                    <div className="form-group field">
+                        <label htmlFor="text" id="chainlink-form-delete-label" className="form-label label">Are you sure
+                            you want to delete this Chainlink?</label>
+                        <p className="help">this action can't be undone.</p>
+                    </div>
+                    <div className="form-group field">
+                        <input type="hidden" name="archive" value="False"/>
+                        <label className="label">Access Controls</label>
+                        <div className="checkboxes">
+                            <label id="chainlink-form-archive-label" className="form-label checkbox">
+                                <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
+                                       className="checkbox form-field" style={{"marginRight": "5px"}}/>
+                                Archive
+                            </label>
+                        </div>
+                        <p className="help">Checking this box will ensure that this Chainlink is stored in your archive section (graveyard).</p>
+                    </div>
+                    <CollapsibleCard
+                        title="Read Only Fields"
+                        content={
+                            <React.Fragment>
+                                <div className="form-group field">
+                                    <label className="label">Element Type</label>
+                                    <input className="input is-static" name="type" value="CL" readOnly/>
+                                    <p className="help">this is the type of Element being deleted. In this case it's a
+                                        chainlink</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label className="label">Element CURL</label>
+                                    <input className="input is-static" name="furl" value={furl} readOnly/>
+                                    <p className="help">"furl" stands for "full url". This is the complete identifier
+                                        for this element. It contains the type (chainlink), curl (custom url), and
+                                        ordering for this chainlink in the collection.</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label className="label">Element Ordering</label>
+                                    <input className="input is-static" name="order" value={props.order}
+                                           readOnly/>
+                                    <p className="help">This is the order of this Chainlink on the page.</p>
+                                </div>
+                            </React.Fragment>
+                        }
+                    />
+                    <div id="element-creation-text-align-right field">
+                        <input className="button is-success is-right" type="submit" value="DELETE"/>
+                    </div>
+                </form>
+            )}
             {props.children}
         </section>
 
     );
 }
+
 /*
-<Header3 curl={props.curl} order={0} text="This is a header 3"/>
-<Linebreak curl={props.curl} order={1} />
-<Code curl={props.curl} order={2} text="this is codeeeee" />
-<Paragraph curl={props.curl} order={3} text="this is a paragraph" />*/
+<Header3 furl={props.furl} order={0} text="This is a header 3"/>
+<Linebreak furl={props.furl} order={1} />
+<Code furl={props.furl} order={2} text="this is codeeeee" />
+<Paragraph furl={props.furl} order={3} text="this is a paragraph" />*/
 
 function ChainlinkEditButtons1(props) {
-    let chainlinkId = "chainlink-" + props.curl + "-" + props.order
+    let chainlinkId = "chainlink-" + props.curl + "-" + props.order;
+    const [showChainlinkDeleteFormState, setChainlinkDeleteFormState] = props.chainlinkDeleteFormState;
     return (
         <div className="chainlink-buttons-wrapper">
             <button className="doc-action-copy-title button is-small is-info">copy</button>
@@ -530,19 +610,19 @@ function ChainlinkEditButtons1(props) {
                     onClick={() => editChainlink(chainlinkId)}>edit
             </button>
             <button className="cl-del-btn button is-small is-danger" target={chainlinkId}
-                    onClick={() => deleteChainlink(chainlinkId)}>delete
+                    onClick={() => setChainlinkDeleteFormState(true)}>delete
             </button>
         </div>
     );
 }
 
-    export function CreateBodyEditButtons1(props) {
+export function CreateBodyEditButtons1(props) {
 
-        // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
-        // is being shown or not.
-        const [showElementCreationForm, setShowElementCreationForm] = useState(false);
-        const [elementType, setElementType] = useState("");
-        const { cursor, setCursor } = useContext(CursorContext);
+    // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
+    // is being shown or not.
+    const [showElementCreationForm, setShowElementCreationForm] = useState(false);
+    const [elementType, setElementType] = useState("");
+    const { cursor, setCursor } = useContext(CursorContext);
 
         const handleClick = (type) => {
             setElementType(type)
@@ -598,10 +678,12 @@ function ChainlinkEditButtons1(props) {
         }
 
         return (
-            <div id="chainlink-placeholder" className="grid">
-                {showElementCreationForm && <ElementCreationForm1 onHide={handleHide} placeholder="enter content" method="POST" type={elementType} />}
-                {chainlinkButton}
-                {restOfButtons}
+            <div id="chainlink-placeholder">
+                {<ElementCreationForm1 onHide={handleHide} elementCreationFormState={[showElementCreationForm, setShowElementCreationForm]} placeholder="enter content" method="POST" type={elementType} />}
+                <div className="grid">
+                    {chainlinkButton}
+                    {restOfButtons}
+                </div>
             </div>
         );
     }
@@ -611,7 +693,6 @@ export function ElementCreationForm1(props) {
     useEffect(() => {
         refresh();
     })
-
     if (props.type === 'H3') {
         return (
             <React.Fragment>
@@ -639,8 +720,7 @@ export function ElementCreationForm1(props) {
     } else if (props.type == "CL") {
         return (
             <React.Fragment>
-                <ConstructChainlinkElement value={props.value} type={props.type} url={props.url} order={props.order}
-                                           value={props.value} date={props.date} css={props.css} onHide={props.onHide} method={props.method} />
+                <ConstructChainlinkElement value={props.value} type={props.type} url={props.url} order={props.order} date={props.date} css={props.css} onHide={props.onHide} method={props.method} elementCreationFormState={props.elementCreationFormState} />
             </React.Fragment>
         )
     } else if (props.type == "H1") {
@@ -657,7 +737,6 @@ export function ElementCreationForm1(props) {
         )
     }
 }
-
 
 export function ContentEditButtons1(props) {
     let chainlinkId = "content-" + props.curl + "-" + props.order
@@ -683,7 +762,6 @@ export function Header3(props) {
         </div>
     );
 };
-
 
 export function Linebreak(props) {
     let contentId = "content-" + props.curl + "-" + props.order
@@ -952,7 +1030,6 @@ function ConstructLinebreakElement(props) {
     );
 };
 
-
 function CollapsibleCard({title, content}) {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -987,6 +1064,10 @@ function ConstructChainlinkElement(props) {
         chainlinkOrder = parseInt(props.order, 10);
     }
 
+    const [showFormState, setFormState] = props.elementCreationFormState;
+    const [portalItems, setPortalItems] = useState([]);
+
+
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
 
@@ -1004,89 +1085,99 @@ function ConstructChainlinkElement(props) {
         xhr.responseType = "json";
         xhr.send(JSON.stringify(values));
 
-        props.onHide();
+
+        const newComponent = <Chainlink curl={"dummy-value"} order={values.order} text={values.text} />;
+        setPortalItems((prev) => [...prev, newComponent]);
+
+        setFormState(false);
+
     };
     return (
-        <form onSubmit={handleSubmit} id="crud-form">
-            <div id="non-submit-fields" className="field">
-                <div className="form-group field">
-                    <label htmlFor="text" id="chainlink-form-text-label" className="form-label label">Text</label>
-                    <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text"
-                           className="input form-field"/>
-                    <p className="help">enter a title to be used as the header name for this chainlink</p>
-                </div>
-                <div className="form-group field">
-                    <input type="hidden" name="archive" value="False"/>
-                    <input type="hidden" name="public" value="False"/>
-                    <label className="label">Access Controls</label>
-                    <div className="checkboxes">
-                        <label id="chainlink-form-public-label" className="form-label checkbox">
-                            <input type="checkbox" name="public" value="True" id="chainlink-form-archive"
-                                   className="checkbox form-field" style={{"marginRight": "5px"}}/>
-                            Public
-                        </label>
-                        <label id="chainlink-form-archive-label" className="form-label checkbox">
-                            <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
-                                   className="checkbox form-field" style={{"marginRight": "5px"}}/>
-                            Archive
-                        </label>
-                    </div>
-                    <p className="help">specify which viewers will be able to access the contents of this chainlink and
-                        what will happen to this chainlink if it's deleted</p>
-                </div>
-                <CollapsibleCard
-                    title="Read Only Fields"
-                    content={
-                        <React.Fragment>
-                            <div className="form-group field">
-                                <label className="label">Element Type</label>
-                                <input className="input is-static" name="type" value="CL" readOnly/>
-                                <p className="help">this is the type of Element being instantiated</p>
+        <>
+            {showFormState && <form onSubmit={handleSubmit} id="crud-form">
+                    <div id="non-submit-fields" className="field">
+                        <div className="form-group field">
+                            <label htmlFor="text" id="chainlink-form-text-label" className="form-label label">Text</label>
+                            <input autoFocus type="text" id="input chainlink-form-text" defaultValue={props.value} name="text"
+                                   className="input form-field"/>
+                            <p className="help">enter a title to be used as the header name for this chainlink</p>
+                        </div>
+                        <div className="form-group field">
+                            <input type="hidden" name="archive" value="False"/>
+                            <input type="hidden" name="public" value="False"/>
+                            <label className="label">Access Controls</label>
+                            <div className="checkboxes">
+                                <label id="chainlink-form-public-label" className="form-label checkbox">
+                                    <input type="checkbox" name="public" value="True" id="chainlink-form-archive"
+                                           className="checkbox form-field" style={{"marginRight": "5px"}}/>
+                                    Public
+                                </label>
+                                <label id="chainlink-form-archive-label" className="form-label checkbox">
+                                    <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
+                                           className="checkbox form-field" style={{"marginRight": "5px"}}/>
+                                    Archive
+                                </label>
                             </div>
-                            <div className="form-group field">
-                                <label className="label">Element CURL</label>
-                                <input className="input is-static" name="url" value={props.url} readOnly/>
-                                <p className="help">this is the unique identifier field for this element - if you are
-                                    creating a new
-                                    chainlink then this value will empty until the backend sends us a response</p>
-                            </div>
-                            <div className="form-group field">
-                                <label className="label">Element Ordering</label>
-                                <input className="input is-static" name="order" value={chainlinkOrder}
-                                       readOnly/>
-                                <p className="help">this is the order of this chainlink relative to others on the
-                                    page</p>
-                            </div>
-                            <div className="form-group field">
-                                <label htmlFor="date" id="chainlink-form-date-label"
-                                       className="form-label label">Date</label>
-                                <input type="input" name="date" id="chainlink-form-date"
-                                       className="input form-field is-static"
-                                       value="09/19/22 13:55:26" readOnly/>
-                                <p className="help">ex: 09/19/22 13:55:26</p>
-                            </div>
-                        </React.Fragment>
-                        }
-                    />
-                <CollapsibleCard
-                    title="Advanced Fields"
-                    content={
-                        <React.Fragment>
-                            <div className="form-group field">
-                                <label htmlFor="css" id="chainlink-form-css-label" className="form-label label">CSS</label>
-                                <input type="input" name="css" id="chainlink-form-css" className="input form-field"/>
-                                <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an
-                                    advanced feature</i></p>
-                            </div>
-                        </React.Fragment>
-                    }
-                />
+                            <p className="help">specify which viewers will be able to access the contents of this chainlink and
+                                what will happen to this chainlink if it's deleted</p>
+                        </div>
+                        <CollapsibleCard
+                            title="Read Only Fields"
+                            content={
+                                <React.Fragment>
+                                    <div className="form-group field">
+                                        <label className="label">Element Type</label>
+                                        <input className="input is-static" name="type" value="CL" readOnly/>
+                                        <p className="help">this is the type of Element being instantiated</p>
+                                    </div>
+                                    <div className="form-group field">
+                                        <label className="label">Element CURL</label>
+                                        <input className="input is-static" name="url" value={props.url} readOnly/>
+                                        <p className="help">this is the unique identifier field for this element - if you are
+                                            creating a new
+                                            chainlink then this value will empty until the backend sends us a response</p>
+                                    </div>
+                                    <div className="form-group field">
+                                        <label className="label">Element Ordering</label>
+                                        <input className="input is-static" name="order" value={chainlinkOrder}
+                                               readOnly/>
+                                        <p className="help">this is the order of this chainlink relative to others on the
+                                            page</p>
+                                    </div>
+                                    <div className="form-group field">
+                                        <label htmlFor="date" id="chainlink-form-date-label"
+                                               className="form-label label">Date</label>
+                                        <input type="input" name="date" id="chainlink-form-date"
+                                               className="input form-field is-static"
+                                               value="09/19/22 13:55:26" readOnly/>
+                                        <p className="help">ex: 09/19/22 13:55:26</p>
+                                    </div>
+                                </React.Fragment>
+                                }
+                            />
+                        <CollapsibleCard
+                            title="Advanced Fields"
+                            content={
+                                <React.Fragment>
+                                    <div className="form-group field">
+                                        <label htmlFor="css" id="chainlink-form-css-label" className="form-label label">CSS</label>
+                                        <input type="input" name="css" id="chainlink-form-css" className="input form-field"/>
+                                        <p className="help">optionally include custom CSS to apply to the header <i>NOTE: This is an
+                                            advanced feature</i></p>
+                                    </div>
+                                </React.Fragment>
+                            }
+                        />
 
-            </div>
-            <div id="element-creation-text-align-right field">
-                <input className="button is-success is-right" type="submit" value="CREATE"/>
-            </div>
-        </form>
+                    </div>
+                    <div id="element-creation-text-align-right field">
+                        <input className="button is-success is-right" type="submit" value="CREATE"/>
+                    </div>
+                </form>}
+            {portalItems.map((el, index) =>
+                createPortal(el, document.getElementById('landingzone'))
+            )}
+        </>
     );
 };
 

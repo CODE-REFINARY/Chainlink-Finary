@@ -140,13 +140,6 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
   border: 1px solid #333; /* Border to define the block */
 }
 
-.grid {
-  border-radius: 10px;
-  background-color: rgb(243, 244, 246);
-  padding: 10px;
-  border-radius: 12px;
-}
-
 .cell {
   font-family: Audiowide;
   -background-color: #334756;
@@ -175,4 +168,11 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 
 body {
     margin: 2% 20% 1% 20%;
+}
+
+#chainlink-placeholder {
+    border-radius: 10px;
+    background-color: rgb(243, 244, 246);
+    padding: 10px;
+    border-radius: 12px;
 }

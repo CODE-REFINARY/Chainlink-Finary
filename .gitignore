@@ -56,4 +56,6 @@ celerybeat-schedule
 /.tmp.driveupload
 
 # fuck these dumb little guys
-**/.DS_Store
+*/.DS_Store
+
+*.css.map
