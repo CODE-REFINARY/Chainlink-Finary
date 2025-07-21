@@ -223,8 +223,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
         };*/
 
-        let colForm = document.getElementById("add-col-form");
-        colForm.addEventListener("submit", (event)=>{event.preventDefault(); makeForm("COL")});
+        //let colForm = document.getElementById("add-col-form");
+        //colForm.addEventListener("submit", (event)=>{event.preventDefault(); makeForm("COL")});
 });
 
 /**
@@ -492,7 +492,7 @@ function dispatchAjaxAndAwaitResponse(requestMethod, url, element) {
  * assuming that parameter is a Chainlink).
  * @returns {null}
  */
-function instantiateElement(element, index, children) {
+/*function instantiateElement(element, index, children) {
         let previousElementIndex = index - 1;                                 // the index of the Element directly before the Element to be created
         let previousElement = null;                                             // the Element directly before the Element that will be created
         let adjacentElement = null;                                             // the element right before the element to be inserted
@@ -544,13 +544,13 @@ function instantiateElement(element, index, children) {
                         parentElement = adjacentElement;                                // the chainlink will be the parent of this new Element
                         firstChild = parentElement.firstChild;                          // get the original first child of the Chainlink
                         parentElement.insertBefore(container, firstChild);              // insert the 
-                }*/
+                }
                 adjacentElement.insertAdjacentElement("afterend", container);
                 /*else
-                        parentElement.appendChild(container);*/
+                        parentElement.appendChild(container);
                 root.render(<ContentElement type={element.type} text={element.text} />);
         }
-}
+}*/
 
 /*  JS public functions */
 
@@ -560,7 +560,7 @@ function instantiateElement(element, index, children) {
  * @param {string} type - string representation of the type of element that the edit form will be created for
  * @returns {null}
  */
-export function makeForm(type) {
+/*export function makeForm(type) {
         const currentDateTime = new Date().toISOString();
         const _listener = function (e) { escape(e, _listener, null) };
 
@@ -658,10 +658,10 @@ export function makeForm(type) {
                 addColButton.appendChild(container);
         }
 
-        /*
+
         For the form submit event listener we will grab the values from the form and simply send those values out
         as http request headers via the addElement() function.
-         */
+
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
 
@@ -679,7 +679,7 @@ export function makeForm(type) {
                 window.removeEventListener("keydown", _listener);
                 refresh();
         });
-}
+}*/
 
 /**œ
  * Callback function used for when the user presses the Esc key while an input dialogue is open
@@ -737,7 +737,7 @@ export function createFence() {
  */
 
 // Keypress parsing function for moving the page up and down
-export function parseKeyDown(e) {
+/*export function parseKeyDown(e) {
 
         // exit if the ctrl (windows) or command (mac) key is currently being pressed.
         // This code is necessary to allow user to enter Ctr-C/Cmd-C without triggering a hotkey-ed dialogue window.
@@ -774,7 +774,7 @@ export function parseKeyDown(e) {
                         makeForm('BR');
                         break;
         }
-}
+}*/
 
 export function deleteButtons() {
         document.getElementById('add-buttons').remove();

@@ -184,7 +184,7 @@ export function ContentEditButtons(props) {
     );
 }
 
-export function ElementDisplayAsComponents() {
+/*export function ElementDisplayAsComponents() {
   const chainlinkDisplayRef = useRef(null);
   const headerDisplayRef = useRef(null);
   const footerDisplayRef = useRef(null);
@@ -233,7 +233,7 @@ export function ElementDisplayAsComponents() {
             <div id="footer-display" ref={footerDisplayRef}></div>
         </React.Fragment>
         )
-}
+}*/
 
 export function ChainlinkDisplayAsComponents() {
     let chainlinks = document.querySelectorAll(".chainlink");
@@ -606,12 +606,8 @@ function ChainlinkEditButtons1(props) {
     return (
         <div className="chainlink-buttons-wrapper">
             <button className="doc-action-copy-title button is-small is-info">copy</button>
-            <button className="cl-edit-btn button is-small is-warning" target={chainlinkId}
-                    onClick={() => editChainlink(chainlinkId)}>edit
-            </button>
-            <button className="cl-del-btn button is-small is-danger" target={chainlinkId}
-                    onClick={() => setChainlinkDeleteFormState(true)}>delete
-            </button>
+            <button className="cl-edit-btn button is-small is-warning" target={chainlinkId} onClick={() => editChainlink(chainlinkId)}>edit</button>
+            <button className="cl-del-btn button is-small is-danger" target={chainlinkId} onClick={() => setChainlinkDeleteFormState(true)}>delete</button>
         </div>
     );
 }
@@ -678,7 +674,7 @@ export function CreateBodyEditButtons1(props) {
         }
 
         return (
-            <div id="chainlink-placeholder">
+            <div id="crud-form">
                 {<ElementCreationForm1 onHide={handleHide} elementCreationFormState={[showElementCreationForm, setShowElementCreationForm]} placeholder="enter content" method="POST" type={elementType} />}
                 <div className="grid">
                     {chainlinkButton}
