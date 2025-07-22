@@ -1086,7 +1086,7 @@ export function deleteContent(target) {
  * @param {string} target - this string indicates the id of the chainlink element to edit
  * @returns {null}
  */
-export function editChainlink(target) {
+/*export function editChainlink(target) {
         const chainlink = document.getElementById(target);
         const text = chainlink.querySelector(".chainlink-inner-content").textContent;
         const order = getOrderFromId(chainlink.id);
@@ -1153,7 +1153,7 @@ export function editChainlink(target) {
         });
         chainlink.remove();
         refresh();
-}
+}*/
 
 /**
  * Edit the target Body. Instantiate a form to allow the user to edit this text.
