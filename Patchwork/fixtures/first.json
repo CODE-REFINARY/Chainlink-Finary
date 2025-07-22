@@ -1,0 +1,19 @@
+[
+  {
+    "model": "Patchwork.body",
+    "pk": 1,
+    "fields": {
+      "chainlink": 142,
+      "order": 10,
+      "public": true,
+      "css": ""
+    }
+  },
+  {
+    "model": "Patchwork.paragraph",
+    "pk": 1,
+    "fields": {
+      "text": "This is a sample paragraph added via fixture."
+    }
+  }
+]

@@ -144,6 +144,7 @@ class Chainlink(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=True)
     text = models.CharField(max_length=200)  # Header element for this chainlink
     url = models.CharField(max_length=75)  # relative url for the chainlink
+    external = models.URLField(max_length=200, null=True, blank=True)  # URL for external link
     # The user may decide to archive a chainlink which sets this boolean. By default, a created Chainlink is not
     # archived. If a chainlink is archived then it cannot be deleted except with access to the database. An archived
     # chainlink will not be deleted if its Collection is deleted. This means that other Collections that reference
@@ -153,7 +154,7 @@ class Chainlink(models.Model):
         default=0)  # integer value specifying which order on the collection this chainlink appears
     public = models.BooleanField(default=False)  # Indicate whether this chainlink will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this chainlink. May or may not be visible
-    css = models.CharField(max_length=10000, null=False, default="")
+    css = models.CharField(max_length=10000, null=False, blank=True, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
@@ -172,7 +173,7 @@ class Body(models.Model):
     chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
     order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
     public = models.BooleanField(default=True)
-    css = models.CharField(max_length=10000, null=False, default="")
+    css = models.CharField(max_length=10000, null=False, blank=True, default="")
     @property
     def content(self):  # This field is how you access the child content element that's associated with this element.
         if hasattr(self, "paragraph"):
@@ -315,7 +316,7 @@ class List(Body):
 class Header(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
-    css = models.CharField(max_length=10000, null=False, default="")
+    css = models.CharField(max_length=10000, null=False, blank=True, default="")
     @property
     def content(self):  # This field is how you access the child content element that's associated with this element.
         if hasattr(self, "header1"):
@@ -356,7 +357,7 @@ class HeaderBanner(Header):
 class Footer(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
-    css = models.CharField(max_length=10000, null=True, default="")
+    css = models.CharField(max_length=10000, null=False, blank=True, default="")
     @property
     def content(self):  # This field is how you access the child content element that's associated with this element.
         if hasattr(self, "endnote"):

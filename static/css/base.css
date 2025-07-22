@@ -1,29 +1,18 @@
 /* SEE reset.css FOR ALL OTHER CSS RULES */
 
 /* /////////////// Custom Vars /////////////// */
-
+/*
 :root {
 	--x-large-for-courier: 1.6rem;
 	--main-body-inner-content-padding-horizontal: 1rem;
 	--main-body-inner-content-padding-vertical: 1rem;
 	--chainlink-display-inner-content-padding-horizontal: 5%;
 	--chainlink-display-inner-content-padding-vertical: 3px;
-}
+}*/
 
 /* /////////////// Media Queries /////////////// */
 
-@media (min-width: 601px) and (max-width: 1000px) {
-	#tabbed-buttons {
-		text-align: center !important;
-	}
-	#tabbed-buttons button, a {
-		width: 33.333% !important;
-		height: 45px !important;
-		margin-top: 30px !important;
-		margin-bottom: 30px !important;
-		font-size: 18px !important;
-	}
-}
+@media (min-width: 601px) and (max-width: 1000px) {}
 
 /* /////////////// Custom Fonts /////////////// */
 
@@ -153,21 +142,22 @@
 
 
 main {
-	border-radius: 12px;
-	background-color: #2C2E43;
-	padding-bottom: calc(var(--main-body-inner-content-padding-vertical));
-	-padding-left: 1cm;
-	-padding-right: 1cm;
-	-padding-top: 1.3rem;
-	-padding-bottom: 1.3rem;
-	-padding-top: 0.3cm;
-	-padding-bottom: 1cm;
+	/*! border-radius: 12px; */
+	/*! -background-color: #2C2E43; */
+	/*! padding-bottom: calc(var(--main-body-inner-content-padding-vertical)); */
+	/*! -padding-left: 1cm; */
+	/*! -padding-right: 1cm; */
+	/*! -padding-top: 1.3rem; */
+	/*! -padding-bottom: 1.3rem; */
+	/*! -padding-top: 0.3cm; */
+	/*! -padding-bottom: 1cm; */
 }
 
 a:active {
 	color: #800080;
 }
 
+/*
 header h1 {
     font-family: Audiowide;
     font-weight: 100;
@@ -176,18 +166,16 @@ header h1 {
 	color: whitesmoke;
 	font-size: xx-large;
     padding: 10px;
-}
+}*/
 
 
 /* Construction Banner */
+
+/*
 h6.under-construction {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: large;
-	font-weight: 600;
-    display: block;
+    -font-family: 'Courier New', Courier, monospace;
     text-align: center;
-	padding: 3em 5% 1rem 5%;
-	color: rgb(208, 68, 35)
+	-padding: 3em 5% 1rem 5%;
 }
 img.under-construction {
     display: block;
@@ -200,7 +188,7 @@ h1, section > p, section > h2, section > ul, section > code, .text-section > p, 
     border-width: 5px;
     border-color: transparent;
     border-radius: 12px;
-}
+} */
 
 .text-section {
 	max-width: 65%;
@@ -246,23 +234,23 @@ h1, section > p, section > h2, section > ul, section > code, .text-section > p, 
 }
 
 section > ul {
-	padding-left: 2rem;
+	/*! padding-left: 2rem; */
 }
 
 ol {
-	list-style-type: number;
-	list-style-position: inside;
+	-list-style-type: number;
+	-list-style-position: inside;
 }
 
 section > ul > li > a {
-	text-decoration: none;
-	color: whitesmoke;
-	font-style: italic;
+	/*! text-decoration: none; */
+	/*! color: whitesmoke; */
+	/*! font-style: italic; */
 }
 
 section > ul > li > a:hover {
-	text-decoration: underline;
-	background-color: #334756ec;
+	-text-decoration: underline;
+	-background-color: #334756ec;
 }
 
 div.combination {
@@ -313,20 +301,18 @@ div.combination {
 /* Style settings for the oval nav buttons at the top of the document */
 
 #tabbed-buttons {
-	padding-top: calc(var(--main-body-inner-content-padding-vertical) * 2);
-	padding-bottom: var(--main-body-inner-content-padding-vertical);
-	padding-left: var(--main-body-inner-content-padding-horizontal);
-	padding-right: var(--main-body-inner-content-padding-horizontal);
-	border-radius: 12px;
-	background-image: linear-gradient(180deg, #b4000000 0%, #2c2e43 0%);
-    font-size: 0;
-	text-align: right;
+	/*! padding-top: calc(var(--main-body-inner-content-padding-vertical) * 2); */
+	/*! padding-bottom: var(--main-body-inner-content-padding-vertical); */
+	/*! padding-left: var(--main-body-inner-content-padding-horizontal); */
+	/*! padding-right: var(--main-body-inner-content-padding-horizontal); */
+	/*! #border-radius: 12px; */
+	/*! #background-image: linear-gradient(180deg, #b4000000 0%, #2c2e43 0%); */
 	display: flex;
 	flex-direction: row-reverse;
 	flex-wrap: wrap;
 }
 
-.tabbed-buttons {
+/*.tabbed-buttons {
 	font-family: 'Courier New', Courier, monospace;
 	font-weight:bolder;
 	position: static;
@@ -343,16 +329,16 @@ div.combination {
 	margin: 0em;
 	border-style: outset;
 	padding: 6px;
-}
+}*/
 
-.tabbed-buttons:hover {
+/*.tabbed-buttons:hover {
 	background-color: #2a3946;
 	text-decoration: underline;
-}
+}*/
 
-.private-collection {
+/*.private-collection {
     color: red;
-}
+}*/
 
 /* chainlink display elements - chainlinks */
 
@@ -361,11 +347,11 @@ div.combination {
 .chainlink-wrapper:hover .chainlink-buttons-wrapper {
     display: block;
 }
-.chainlink-wrapper:hover h2 {
+/*.chainlink-wrapper:hover h2 {
     border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
-}
+}*/
 
 .chainlink-buttons-wrapper {
     text-align: right;
@@ -380,25 +366,25 @@ div.combination {
 .content-wrapper:hover .context-buttons-wrapper {
     display: block;
 }
-.content-wrapper:hover .inner-content {
+/*.content-wrapper:hover .inner-content {
     border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
-}
+}*/
 .context-buttons-wrapper button, .chainlink-buttons-wrapper button, #fence-context-buttons button {
     width: 7.5%;
 }
 
 /* The styles here are for the navbars that appear on the generic patchwork pages. There's an edit navbar, actions, navbar
  etc. */
-.navbar {
+/*.cf-navbar {
 	background-color: #acacacd5;
 	margin-bottom: 30px;
 	border-radius: 15px;
 	padding: 7px;
-}
+}*/
 
-.navbar h2 {
+/*.cf-navbar h2 {
 	font-style: italic;
     font-family: 'Courier New', Courier, monospace;
     font-size: small;
@@ -406,7 +392,7 @@ div.combination {
 	font-weight: lighter;
 	margin-top: 1px;
 	margin-bottom: 4px;
-}
+}*/
 
 #uppger-navigation ul li {
 	margin-top: 0px;
@@ -437,7 +423,7 @@ div.combination {
 
 
 /* text elements */
-.content-wrapper h3 {
+/*.content-wrapper h3 {
 	display: block;
 	font-family: 'Courier';
 	font-weight: 300;
@@ -447,21 +433,21 @@ div.combination {
 	display: inline-block;
 	background-color: #000000;
 	-border-radius: 0.4em;
-}
+}*/
 
 .content-wrapper code {
-	font-family: monospace;
-	display: block;
-	overflow-wrap: break-word;
-	color: #8ecd95;
-	background-color: #0d0208;
-	-border-width: 5px !important;
-	-border-radius: 3px !important;
-	line-height: 1.2em;
-	border-radius: 12px;
+	/*! font-family: monospace; */
+	/*! display: block; */
+	/*! overflow-wrap: break-word; */
+	/*! color: #8ecd95; */
+	/*! background-color: #0d0208; */
+	/*! -border-width: 5px !important; */
+	/*! -border-radius: 3px !important; */
+	/*! line-height: 1.2em; */
+	/*! border-radius: 12px; */
 }
 
-.content-wrapper .br {
+/*.content-wrapper .br {
     font-family: sans-serif;
 	display: block;
 	padding-top: calc(var(--chainlink-display-inner-content-padding-vertical) * 2.5);
@@ -469,9 +455,9 @@ div.combination {
 	color: cadetblue;
     font-size: xx-small;
     text-align: center;
-}
+}*/
 
-.content-wrapper p, #footer-elements p {
+/*.content-wrapper p, #footer-elements p {
 	display: block;
 	font-family: Audiowide;
 	background-color: #2C394B;
@@ -480,7 +466,7 @@ div.combination {
 	letter-spacing: .00em;
 	font-size: 12px;
 	border-radius: 12px;
-}
+}*/
 
 
 /* ////////////// "Pages" List ////////////// */
@@ -498,19 +484,15 @@ div.combination {
 	cursor: not-allowed;
 }
 
-.activated-page-list-element {
-
-}
-
-.activated-page-list-element a {
+/*.activated-page-list-element a {
 	text-decoration: none;
 	font-family: 'Courier New';
 	font-size: 14px;
 	font-weight: bolder;
 	color: rgb(208, 68, 35);
-}
+}*/
 
-.activated-page-list-element a:hover {
+/*.activated-page-list-element a:hover {
 	text-decoration: underline;
 }
 
@@ -519,12 +501,12 @@ div.combination {
 	border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
-}
+}*/
 
 
 /* ////////////// "Actions" List ////////////// */
 
-.activated-action-list-element input[type="submit"], .activated-edit-list-element input[type="submit"] {
+/*.activated-action-list-element input[type="submit"], .activated-edit-list-element input[type="submit"] {
 	font-family: Audiowide;
 	font-weight:bolder;
 	position: static;
@@ -538,13 +520,13 @@ div.combination {
 	font-size: 12px;
 	white-space: nowrap;
     word-break: keep-all;
-}
+}*/
 
 .deactivated-action-list-element {
 
 }
 
-.deactivated-action-list-element input[type="submit"], .deactivated-edit-list-element input[type="submit"] {
+/*.deactivated-action-list-element input[type="submit"], .deactivated-edit-list-element input[type="submit"] {
 	font-family: Audiowide;
 	position: static;
 	-background-color: #343537;
@@ -558,10 +540,11 @@ div.combination {
 	white-space: nowrap;
     word-break: keep-all;
 	cursor: not-allowed;
-}
+}*/
 
 /* /////////////// The help text that appears to clarify buttons/links to users /////////////// */
 
+/*
 .help-text {
 	font-style: italic;
     font-family: 'Courier New', Courier, monospace;
@@ -569,7 +552,7 @@ div.combination {
     color: dimgrey;
 	font-weight: lighter;
 	margin-left: 12px;
-}
+}*/
 
 
 /* /////////////// Specific IDs /////////////// */
@@ -588,6 +571,7 @@ div.combination {
 
 }
 
+/*
 .form-label {
     float: left;
 }
@@ -600,4 +584,4 @@ div.combination {
 	padding: 7px 7px 7px 7px;
 	display: block;
 	margin-bottom: 15px;
-}
+}*/

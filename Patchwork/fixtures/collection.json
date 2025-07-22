@@ -1,0 +1,295 @@
+[
+{
+  "model": "Patchwork.account",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "landing_page_collection": null
+  }
+},
+{
+  "model": "Patchwork.collection",
+  "pk": 24,
+  "fields": {
+    "public": true,
+    "date": "2025-04-23T04:23:43Z",
+    "url": "georgedubinin",
+    "title": 5,
+    "theme": "patchwork"
+  }
+},
+{
+  "model": "Patchwork.collection",
+  "pk": 25,
+  "fields": {
+    "public": true,
+    "date": "2025-06-17T05:59:59Z",
+    "url": "fav",
+    "title": null,
+    "theme": "bluesky"
+  }
+},
+{
+  "model": "Patchwork.chainlink",
+  "pk": 142,
+  "fields": {
+    "collection": 24,
+    "text": "Welcome",
+    "url": "welcome",
+    "external": "https://www.investopedia.com/terms/f/financial-statements.asp",
+    "archive": true,
+    "order": 0,
+    "public": true,
+    "date": "2025-04-23T04:24:26Z",
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.chainlink",
+  "pk": 144,
+  "fields": {
+    "collection": 24,
+    "text": "Embedded Excel File Virus",
+    "url": "virus-ahk",
+    "external": "https://www.trendmicro.com/en_us/research/19/d/potential-targeted-attack-uses-autohotkey-and-malicious-script-embedded-in-excel-file-to-avoid-detection.html",
+    "archive": false,
+    "order": 1,
+    "public": true,
+    "date": "2025-06-17T02:44:21Z",
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.chainlink",
+  "pk": 145,
+  "fields": {
+    "collection": 25,
+    "text": "first",
+    "url": "first",
+    "external": "http://www.example.com",
+    "archive": false,
+    "order": 0,
+    "public": true,
+    "date": "2025-06-17T06:19:18Z",
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.body",
+  "pk": 431,
+  "fields": {
+    "chainlink": 142,
+    "order": 0,
+    "public": true,
+    "css": ""
+  }
+},
+  {
+  "model": "Patchwork.body",
+  "pk": 432,
+  "fields": {
+    "chainlink": 142,
+    "order": 2,
+    "public": true,
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.body",
+  "pk": 433,
+  "fields": {
+    "chainlink": 142,
+    "order": 1,
+    "public": true,
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.body",
+  "pk": 434,
+  "fields": {
+    "chainlink": 142,
+    "order": 4,
+    "public": true,
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.body",
+  "pk": 435,
+  "fields": {
+    "chainlink": 142,
+    "order": 3,
+    "public": true,
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.body",
+  "pk": 436,
+  "fields": {
+    "chainlink": 145,
+    "order": 0,
+    "public": true,
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.body",
+  "pk": 437,
+  "fields": {
+    "chainlink": 145,
+    "order": 0,
+    "public": true,
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.paragraph",
+  "pk": 431,
+  "fields": {
+    "text": "Welcome to my website."
+  }
+},
+{
+  "model": "Patchwork.paragraph",
+  "pk": 432,
+  "fields": {
+    "text": "ddd"
+  }
+},
+{
+  "model": "Patchwork.paragraph",
+  "pk": 437,
+  "fields": {
+    "text": "greatttt"
+  }
+},
+{
+  "model": "Patchwork.linebreak",
+  "pk": 433,
+  "fields": {
+    "height": "single"
+  }
+},
+{
+  "model": "Patchwork.linebreak",
+  "pk": 435,
+  "fields": {
+    "height": "single"
+  }
+},
+{
+  "model": "Patchwork.linebreak",
+  "pk": 436,
+  "fields": {
+    "height": "single"
+  }
+},
+{
+  "model": "Patchwork.header3",
+  "pk": 434,
+  "fields": {
+    "text": "Second Header2 Element Test"
+  }
+},
+{
+  "model": "Patchwork.header",
+  "pk": 5,
+  "fields": {
+    "collection": 24,
+    "order": 0,
+    "css": ""
+  }
+},
+{
+  "model": "Patchwork.header1",
+  "pk": 5,
+  "fields": {
+    "text": "FIRST ARTICLE"
+  }
+},
+{
+  "model": "django_celery_beat.intervalschedule",
+  "pk": 1,
+  "fields": {
+    "every": 2,
+    "period": "minutes"
+  }
+},
+{
+  "model": "django_celery_beat.crontabschedule",
+  "pk": 1,
+  "fields": {
+    "minute": "0",
+    "hour": "4",
+    "day_of_month": "*",
+    "month_of_year": "*",
+    "day_of_week": "*",
+    "timezone": "US/Pacific"
+  }
+},
+{
+  "model": "django_celery_beat.periodictasks",
+  "pk": 1,
+  "fields": {
+    "last_update": "2024-08-31T01:13:53.275Z"
+  }
+},
+{
+  "model": "django_celery_beat.periodictask",
+  "pk": 1,
+  "fields": {
+    "name": "celery.backend_cleanup",
+    "task": "celery.backend_cleanup",
+    "interval": null,
+    "crontab": 1,
+    "solar": null,
+    "clocked": null,
+    "args": "[]",
+    "kwargs": "{}",
+    "queue": null,
+    "exchange": null,
+    "routing_key": null,
+    "headers": "{}",
+    "priority": null,
+    "expires": null,
+    "expire_seconds": 43200,
+    "one_off": false,
+    "start_time": null,
+    "enabled": true,
+    "last_run_at": null,
+    "total_run_count": 0,
+    "date_changed": "2024-08-31T01:12:08.481Z",
+    "description": ""
+  }
+},
+{
+  "model": "django_celery_beat.periodictask",
+  "pk": 2,
+  "fields": {
+    "name": "send nav test",
+    "task": "CFScrape.tasks.emailListOfNewCruisesMissingNav",
+    "interval": 1,
+    "crontab": null,
+    "solar": null,
+    "clocked": null,
+    "args": "[]",
+    "kwargs": "{}",
+    "queue": null,
+    "exchange": null,
+    "routing_key": null,
+    "headers": "{}",
+    "priority": null,
+    "expires": null,
+    "expire_seconds": null,
+    "one_off": false,
+    "start_time": "2024-08-31T01:01:07Z",
+    "enabled": false,
+    "last_run_at": null,
+    "total_run_count": 5,
+    "date_changed": "2024-08-31T01:13:53.274Z",
+    "description": ""
+  }
+}
+]

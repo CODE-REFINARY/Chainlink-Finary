@@ -1,0 +1,13 @@
+[
+  {
+  "model": "Patchwork.collection",
+  "pk": 50,
+  "fields": {
+    "public": true,
+    "date": "2025-06-20T05:59:59Z",
+    "url": "test-page",
+    "title": null,
+    "theme": "bluesky"
+  }
+}
+  ]

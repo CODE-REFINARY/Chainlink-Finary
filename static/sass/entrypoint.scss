@@ -1,0 +1,178 @@
+// Set your brand colors
+$metallic-blue: #334756;
+$light-gray: #acacacd5;
+$light-gray-hover-contrast: #838383;
+$navy-blue: #19354b;
+$gray-may: #a8a8a8;
+$foggy-blue: #63839b;
+$danger-red: #cc2a20;
+$cf-border-radius: 15px;
+$light-mode: #f3f4f6;
+
+$bulma-block-spacing: 3rem;
+
+// Set the 5 font families that Bulma recognizes
+$family-primary: "Chakra Petch";
+$family-secondary: "Genos";
+$family-sans-serif: "Michroma";
+$family-monospace: "Share Tech Mono";
+$family-code: "Michroma";
+$family-serif: 'Courier New';
+
+$title-color: hsl(221deg,14%,14%);
+$subtitle-color: hsl(221deg,14%,48%);
+
+$menu-hover-shade: hsl(221,14%,calc(100% + -5%));
+
+
+// Override global Sass variables from the /utilities folder
+@use "bulma/sass/utilities" with (
+  $family-primary: '"Nunito", sans-serif',
+  $primary: $gray-may,
+  $link: $metallic-blue,
+  $control-border-width: 3px,
+  $danger: $danger-red
+);
+
+// Override Sass variables from the /form folder
+@use "bulma/sass/form" with (
+  $input-shadow: none
+);
+
+@use "bulma/sass/elements/button" with (
+  $button-family: $family-monospace,
+);
+
+@use "bulma/sass/components/menu" with (
+  $menu-label-font-size: 1.1em,
+  $menu-label-spacing: 0.05em,
+  $menu-label-letter-spacing: 0.05em,
+);
+
+@use "bulma/sass/elements/title" with (
+  $title-color: $title-color,
+  $title-family: $family-primary,
+  $title-weight: bold,
+  $title-line-height: 0.7,
+  $subtitle-color: $subtitle-color,
+  $subtitle-weight: normal,
+  $subtitle-size: 1.25em,
+  $subtitle-family: $family-secondary,
+);
+
+@use "bulma/sass/layout/section" with (
+  $section-padding: 0.9rem 0rem,
+  $section-padding-medium: 2.0rem 0rem,
+  $section-padding-large: 5rem 0rem,
+);
+
+@forward "bulma/sass/elements/image";
+@forward "bulma/sass/grid/grid";
+@forward "bulma/sass/base";
+@forward "bulma/sass/components/card";
+@forward "bulma/sass/components/message";
+@forward "bulma/sass/components/navbar";
+@forward "bulma/sass/elements/icon";
+@forward "bulma/sass/elements/content";
+@forward "bulma/sass/elements/notification";
+@forward "bulma/sass/elements/progress";
+@forward "bulma/sass/elements/tag";
+@forward "bulma/sass/layout/footer";
+
+// Bulma Helper Styling
+@forward "bulma/sass/helpers/spacing";
+
+// Import the themes so that all CSS variables have a value
+@forward "bulma/sass/themes";
+
+// Import the Google Font
+@import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Genos:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet');
+
+:root {
+  --bulma-block-spacing: 2rem;
+}
+
+.menu {
+  -background-color: $light-gray;
+  border-radius: $cf-border-radius;
+}
+
+.menu-list a {
+  background-color: inherit;
+  font-size: small;
+  font-family: $family-monospace;
+}
+
+.menu-list a:hover {
+  background-color: $menu-hover-shade;
+}
+
+.menu-label {
+  font-family: $family-secondary;
+  font-weight: normal;
+  color: $subtitle-color;
+}
+
+.tag {
+  font-family: $family-serif;
+  font-style: italic;
+  font-color: $metallic-blue;
+  font-weight: lighter;
+  -background-color: $gray-may;
+  margin-left: 12px;
+}
+
+.code {
+  display: block;
+  background-color: #1e1e1e; /* Dark theme background */
+  color: #d4d4d4; /* Light gray text */
+  font-family: 'Fira Code', 'Courier New', monospace; /* Monospaced font for code */
+  font-size: 14px; /* Adjust to your preference */
+  line-height: 1.5; /* Better readability */
+  padding: 16px; /* Inner spacing */
+  border-radius: 8px; /* Rounded corners */
+  overflow-x: auto; /* Horizontal scroll for long code */
+  white-space: pre; /* Preserve whitespace and indentation */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a lifted effect */
+  border: 1px solid #333; /* Border to define the block */
+}
+
+.cell {
+  font-family: Audiowide;
+  -background-color: #334756;
+  -color: #f5f5f5;
+  -height: 30px;
+  -border-radius: 5px;
+}
+
+// This sets the background color of static form input elements to make them look disabled without actually using
+// the disabled html attribute.
+.input.is-static {
+  background-color: hsl(220, 14.3%, 95.9%);
+  color: hsl(221deg,14%,48%);
+  font-style: italic;
+}
+
+.header-element-wrapper {
+  text-align: center;
+}
+
+// These are the little date and external url items that appear next to each chainlink. I want them not to be broken
+// up on smaller pages.
+.chainlink-date, .header-url {
+  white-space: nowrap;
+}
+
+body {
+    margin: 2% 20% 1% 20%;
+}
+
+.crud-form {
+    border-radius: 10px;
+    background-color: rgb(243, 244, 246);
+    padding: 10px;
+    border-radius: 12px;
+}

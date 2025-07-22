@@ -1,6 +1,6 @@
 /* React imports */
 import React from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot, useRef, useEffect } from "react-dom/client";
 import { TagType, Element, Collection, Chainlink, Content, Header, Footer } from "./elementClassDefinitions.js"
 import {
         ChainlinkEditButtons,
@@ -10,7 +10,7 @@ import {
         CreateBodyEditButtons, CreateFooterEditButtons,
         CreateHeaderEditButtons,
         ElementCreationForm, ElementDeletionForm, ChainlinkDeletionForm,
-        NoElements
+        NoElements, ElementDisplayAsComponents, ChainlinkDisplayAsComponents
 } from "./collectionComponentLibrary.js"
 import {
         getOrderFromId, getUrlFromId, formatDateString, getPrefixFromId, getMatchedChildren
@@ -27,7 +27,7 @@ let isChainlink;
 let articleIsEmpty;
 let chainlinkIsEmpty;
 let bodyEditButtons;
-let numBodyElements;        // the number of Elements rendered on the page
+//let numBodyElements;        // the number of Elements rendered on the page
 let numFooterElements;
 let numHeaderElements;
 let bodyFormIsActive;
@@ -36,12 +36,15 @@ let headerFormIsActive;
 let footerFormIsActive;
 let collectionTitleDefined;
 let cursor;             // the cursor is a positive integer representing the position at which new Elements will be created. By default, it's equal to numElements (which is to say it's positioned at the end of the Element list). Cursor values are indices of elements and when a new element is created, that elements new index will be what the cursor was right before it was created (after which the cursor value will increment)
+let elementsComponent = undefined;
 
 /* Static Variables */
 const bodyElementClassNames = ["chainlink-wrapper", "content-wrapper"]; // define the set of classnames that identify body Elements
 const contentElementClassNames = ["content-wrapper"];
 const headerElementClassNames = ["header-element-wrapper"];
 const footerElementClassNames = ["footer-element-wrapper"];
+const chainlinkElementNames = ["chainlink"];
+const bodyElementNames = ["P", "CODE", "BR", "H3", "LI", "LINK", "NOTE", "IMG", "chainlink"];
 const formClassNames = ["content-creation-form"];
 
 // These constants define the internal names used to identify different Element types. These should be used to ensure
@@ -64,6 +67,24 @@ const footerTypes = ["EN", "FTRLI"];
 // Collections are web pages that contain content. A user-friendly synonym might be "article" as a Collection is a web
 // page that often contains similar items that an article would have.
 const collectionTypes = ["COL"];
+
+// This dynamic variable indicates the number of currently rendered chainlink elements.
+export const numChainlinkElements = {
+    get value() {
+        const selector = chainlinkElementNames.map(tagValue => `[tag="${tagValue}"]`).join(', ');
+        const elements = document.querySelectorAll(selector);
+        return elements.length;
+    }
+};
+
+// variable indicates the number of elements currently rendered on the screen
+export const numBodyElements = {
+        get value() {
+                const selector = bodyElementNames.map(tagValue => `[tag="${tagValue}"]`).join(', ');
+                const elements = document.querySelectorAll(selector);
+                return (Array.from(elements).length);
+        }
+};
 
 // Set up state variables after DOM is ready to be read
 document.addEventListener("DOMContentLoaded", function() {
@@ -145,15 +166,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // variable indicates the number of elements currently rendered on the screen
-        numBodyElements = {
-                get value() {
-                        const selector = bodyElementClassNames.map(className => `.${className}`).join(', ');
-                        const elements = document.querySelectorAll(selector);
-                        return (Array.from(elements).length);
-                }
-        };
-
-        // variable indicates the number of elements currently rendered on the screen
         numHeaderElements = {
                 get value() {
                         const selector = headerElementClassNames.map(className => `.${className}`).join(', ');
@@ -193,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         // contentButtons indicates the existence of buttons that create text on the page
-        bodyEditButtons = {
+        /*bodyEditButtons = {
                 _value: false,
                 bodyRoot: createRoot(document.getElementById("chainlink-placeholder")),
                 headerRoot: createRoot(document.getElementById("header-placeholder")),
@@ -209,10 +221,10 @@ document.addEventListener("DOMContentLoaded", function() {
                                 this.footerRoot.render(<CreateFooterEditButtons bitmask={this._value.substring(3, 4)}/>);
                         }
                 }
-        };
+        };*/
 
-        let colForm = document.getElementById("add-col-form");
-        colForm.addEventListener("submit", (event)=>{event.preventDefault(); makeForm("COL")});
+        //let colForm = document.getElementById("add-col-form");
+        //colForm.addEventListener("submit", (event)=>{event.preventDefault(); makeForm("COL")});
 });
 
 /**
@@ -220,9 +232,15 @@ document.addEventListener("DOMContentLoaded", function() {
  *
  * @returns {null}
  */
-export function initialize() {
-
-        refresh();
+export function initialize(edit) {
+        let editingEnabled = edit;
+        if (editingEnabled == true) {
+                refresh();
+                elementsComponent = createRoot(document.getElementById("chainlink-display"));
+                elementsComponent.render(<ChainlinkDisplayAsComponents/>);
+                window.addEventListener("keydown", parseKeyDown);
+                refresh();
+        }
 }
 
 export function storeEditButtonHandlers(editFunction, deleteFunction) {
@@ -249,6 +267,7 @@ export function refresh() {
                 }
         }
 
+
         // Update the Chainlink Manifest links with any new chainlinks that were potentially added.
         let list = document.getElementById("chainlink-manifest-entries");
         let chainlinks = document.querySelectorAll(".chainlink-wrapper");
@@ -271,7 +290,7 @@ export function refresh() {
         });
 
         // Remove or add the "MISSING" marker for the Collection.
-        const chainlinkElements = document.getElementById("chainlink-elements");
+        const chainlinkElements = document.getElementById("chainlink-display");
         const headerElements = document.getElementById("header-elements");
         const footerElements = document.getElementById("footer-elements");
         let noClMarker = document.getElementById("missing-body");
@@ -349,6 +368,13 @@ export function refresh() {
                 }
         }
 
+
+
+
+        // Everything below this (about the edit buttons) should probably be removed. This won't be used probably
+        // because it will be handled by the react components themselves.
+
+
         // This variable is a string consisting of a set number of bits each of which indicates that a specific button
         // group should be enabled or disabled. The first bit is for the header buttons.
         let editButtonsBitmask = "";
@@ -385,10 +411,11 @@ export function refresh() {
 
         // Set the actual button enabling/disabling into motion. This is what does the actual work for setting/unsetting
         // the edit buttons as active or not.
-        bodyEditButtons.value = editButtonsBitmask;
+        //bodyEditButtons.value = editButtonsBitmask;
 
         showDiagnostics();
 }
+
 
 function showDiagnostics() {
         console.log("collectionUrl: " + collectionUrl.value);
@@ -397,6 +424,7 @@ function showDiagnostics() {
         console.log("chainlinkIsEmpty: " + chainlinkIsEmpty.value);
         console.log("articleIsEmpty: " + (numBodyElements.value === 0).toString());
         console.log("numElements: " + numBodyElements.value);
+        console.log("numChainlinks: " + numChainlinkElements.value);
 }
 
 /**
@@ -464,13 +492,13 @@ function dispatchAjaxAndAwaitResponse(requestMethod, url, element) {
  * assuming that parameter is a Chainlink).
  * @returns {null}
  */
-function instantiateElement(element, index, children) {
+/*function instantiateElement(element, index, children) {
         let previousElementIndex = index - 1;                                 // the index of the Element directly before the Element to be created
         let previousElement = null;                                             // the Element directly before the Element that will be created
         let adjacentElement = null;                                             // the element right before the element to be inserted
 
         if (chainlinkTypes.includes(element.type)) {
-                const parentElement = document.getElementById("chainlink-elements");
+                const parentElement = document.getElementById("chainlink-display");
                 const firstChild = parentElement.firstChild;
                 const container = document.createElement("section");
                 const root = createRoot(container);
@@ -516,13 +544,13 @@ function instantiateElement(element, index, children) {
                         parentElement = adjacentElement;                                // the chainlink will be the parent of this new Element
                         firstChild = parentElement.firstChild;                          // get the original first child of the Chainlink
                         parentElement.insertBefore(container, firstChild);              // insert the 
-                }*/
+                }
                 adjacentElement.insertAdjacentElement("afterend", container);
                 /*else
-                        parentElement.appendChild(container);*/
+                        parentElement.appendChild(container);
                 root.render(<ContentElement type={element.type} text={element.text} />);
         }
-}
+}*/
 
 /*  JS public functions */
 
@@ -532,7 +560,7 @@ function instantiateElement(element, index, children) {
  * @param {string} type - string representation of the type of element that the edit form will be created for
  * @returns {null}
  */
-export function makeForm(type) {
+/*export function makeForm(type) {
         const currentDateTime = new Date().toISOString();
         const _listener = function (e) { escape(e, _listener, null) };
 
@@ -542,7 +570,8 @@ export function makeForm(type) {
         // html elements to create
         const container = document.createElement("div");
         const root = createRoot(container);
-        const chainlink = document.getElementById("chainlink-elements").lastElementChild;
+        const chainlink = document.getElementById("chainlink-display").lastElementChild;
+        let formAnchor = document.getElementById("form-anchor");
 
         // fields to pass to addElement for Element creation
         let element = undefined;
@@ -553,11 +582,11 @@ export function makeForm(type) {
 
         // If we are making this form for the creation of a chainlink element
         if (chainlinkTypes.includes(type)) {
-                const list = document.getElementById('chainlink-elements');
+                //const list = document.getElementById('chainlink-display');
                 container.id = "chainlink-creation-form";
                 order = document.getElementById("chainlink-display").childElementCount - 1;
                 root.render(<ElementCreationForm placeholder="enter chainlink content" type={type} order={order}/>);
-                list.appendChild(container);
+                formAnchor.appendChild(container);
         }
 
         // If we are making this form for the creation of a chainlink-display element that is not a chainlink.
@@ -593,7 +622,8 @@ export function makeForm(type) {
 
                 container.id = "content-creation-form";
                 root.render(<ElementCreationForm placeholder="enter header content" type={type} url={url} order={order}/>);
-                chainlink.appendChild(container);
+                //chainlink.appendChild(container);
+                formAnchor.appendChild(container);
         }
 
         // Otherwise if we are making this form for the creation of a header element.
@@ -628,10 +658,10 @@ export function makeForm(type) {
                 addColButton.appendChild(container);
         }
 
-        /*
+
         For the form submit event listener we will grab the values from the form and simply send those values out
         as http request headers via the addElement() function.
-         */
+
         container.addEventListener("submit", function(event) {
                 event.preventDefault();
 
@@ -649,7 +679,7 @@ export function makeForm(type) {
                 window.removeEventListener("keydown", _listener);
                 refresh();
         });
-}
+}*/
 
 /**œ
  * Callback function used for when the user presses the Esc key while an input dialogue is open
@@ -707,7 +737,7 @@ export function createFence() {
  */
 
 // Keypress parsing function for moving the page up and down
-export function parseKeyDown(e) {
+/*export function parseKeyDown(e) {
 
         // exit if the ctrl (windows) or command (mac) key is currently being pressed.
         // This code is necessary to allow user to enter Ctr-C/Cmd-C without triggering a hotkey-ed dialogue window.
@@ -744,7 +774,7 @@ export function parseKeyDown(e) {
                         makeForm('BR');
                         break;
         }
-}
+}*/
 
 export function deleteButtons() {
         document.getElementById('add-buttons').remove();
@@ -813,6 +843,11 @@ export function deleteDoc() {
                 }
         }
 }
+
+export function deleteChainlink1(target) {
+        console.log("deleteChainlink1 called with target: " + target);
+}
+
 
 export function deleteChainlink(target) {
 
@@ -956,7 +991,7 @@ export function deleteContent(target) {
 
         container.id = "content-delete-form";
         container.setAttribute("index", wrapper.getAttribute("index"));
-        root.render(<ElementDeletionForm type={tag} furl={wrapper.id} />);
+        root.render(<ElementDeletionForm type={tag} curl={wrapper.id} />);
         wrapper.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {
@@ -1051,7 +1086,7 @@ export function deleteContent(target) {
  * @param {string} target - this string indicates the id of the chainlink element to edit
  * @returns {null}
  */
-export function editChainlink(target) {
+/*export function editChainlink(target) {
         const chainlink = document.getElementById(target);
         const text = chainlink.querySelector(".chainlink-inner-content").textContent;
         const order = getOrderFromId(chainlink.id);
@@ -1118,7 +1153,7 @@ export function editChainlink(target) {
         });
         chainlink.remove();
         refresh();
-}
+}*/
 
 /**
  * Edit the target Body. Instantiate a form to allow the user to edit this text.

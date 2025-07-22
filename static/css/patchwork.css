@@ -10,15 +10,14 @@
 /* ////////////////////////// PATCHWORK BACKGROUND ////////////////////////// */
 
 body {
-    background-image: url('../images/groove-minimal-lengthy.jpg');
+    -background-image: url('../images/groove-minimal-lengthy.jpg');
     background-repeat: y-repeat;
-	margin: 2% 20% 1% 20%;
 }
 
 /* ////////////////////////// INDEX PAGE STUFF BEGIN ////////////////////////// */
 
 /*  */
-#collection-title {
+/*#collection-title {
 	font-family: Audiowide;
 	font-weight: 100;
 	background-color: #334756;
@@ -26,7 +25,7 @@ body {
 	color: whitesmoke;
 	font-size: xx-large;
 	padding: 10px;
-}
+}*/
 
 /* This is the h1 element that appears on the index page */
 .index-title {
@@ -36,7 +35,7 @@ body {
 
 
 /* chainlink header styling */
-.chainlink-wrapper h2 {
+/*.chainlink-wrapper h2 {
 	font-family: Audiowide;
 	font-weight: 100;
 	font-size: x-large;
@@ -49,11 +48,11 @@ body {
     background-color: #334756;
     padding: 7px;
     border-radius: 12px;
-}
+}*/
 
 /* These are h2 elements that appear on the index page */
 .section-header {
-    font-family: Audiowide;
+    -font-family: Audiowide;
 }
 
 .index-paragraph {
@@ -69,20 +68,6 @@ body {
 #header-display {
 }
 
-#chainlink-display {
-    background-color: #2c2e43;
-}
-
-
-
-/* Page Edit Buttons */
-.element-creation-buttons {
-	text-align: left;
-	background-color: #19354b;
-	padding: 5px 5px 5px 5px;
-	border: 3px solid #33475640;
-	border-radius: 12px;
-}
 
 .no-elements {
     text-align: center;
@@ -95,42 +80,8 @@ body {
     padding: 5px;
 }
 
-.add-buttons {
-	-font-family: 'Courier New', Courier, monospace;
-	font-family: Audiowide;
-	position: static;
-	background-color: #334756;
-	color: #f5f5f5;
-	height: 30px;
-	cursor: pointer;
-	border-radius: 10px;
-	border-color: #b0b0b057;
-	-width: 20%;
-	-min-width: 125px;
-	font-size: 12px;
-	white-space: nowrap;
-    word-break: keep-all;
-}
-.inactive-add-buttons {
-	font-family: Audiowide;
-	position: static;
-	background-color: #343537;
-	color: #f5f5f5;
-	height: 30px;
-	cursor: pointer;
-	border-radius: 10px;
-	border-color: #b0b0b057;
-	-width: 20%;
-	-min-width: 125px;
-	font-size: 12px;
-	white-space: nowrap;
-    word-break: keep-all;
-}
-.add-buttons:hover {
-	background-color: #2a3946;
-	text-decoration: underline;
-}
 
+/*
 #add-cl-btn {
     background-color: rgb(208 68 35 / 46%);
 }
@@ -145,19 +96,20 @@ body {
 }
 #add-br-btn{
     background-color: #63839b;
-}
+}*/
 
 /* Element Form Creation */
 #content-creation-form, #chainlink-creation-form, #chainlink-edit-form, #content-edit-form, #footer-creation-form, #header-creation-form, #content-delete-form {
-    background-color: #00000061;
-    border-radius: 3px;
-    border-width: 4px;
-    border-color: #343537;
-    border-style: groove;
-    padding-top: var(--main-body-inner-content-padding-vertical);
-    padding-bottom: var(--main-body-inner-content-padding-vertical);
-    padding-left: var(--main-body-inner-content-padding-horizontal);
-    padding-right: var(--main-body-inner-content-padding-horizontal);
+    /*! background-color: #00000061; */
+    /*! border-radius: 3px; */
+    /*! border-width: 4px; */
+    /*! border-color: #343537; */
+    /*! border-style: groove; */
+    /*! height: 12rem; */
+    /*! padding-top: var(--main-body-inner-content-padding-vertical); */
+    /*! padding-bottom: var(--main-body-inner-content-padding-vertical); */
+    /*! padding-left: var(--main-body-inner-content-padding-horizontal); */
+    /*! padding-right: var(--main-body-inner-content-padding-horizontal); */
 }
 #content-creation-form > form {
 
@@ -190,7 +142,7 @@ body {
     text-align: right;
 }
 
-#element-creation-submit {
+/*#element-creation-submit {
     display: inline-block;
     font-family: Audiowide;
     position: static;
@@ -205,45 +157,15 @@ body {
     font-size: 12px;
     white-space: nowrap;
     word-break: keep-all;
-}
+}*/
 
 #element-creation-submit:hover {
     background-color: #2c39438f;
 }
 
 /* config display section */
-#config-display {
-    padding-top: var(--main-body-inner-content-padding-vertical);
-    padding-bottom: var(--main-body-inner-content-padding-vertical);
-    padding-right: var(--main-body-inner-content-padding-horizontal);
-    padding-left: var(--main-body-inner-content-padding-horizontal);
-    /* display: flex; */
-    justify-content: space-evenly;
-}
-#config-display ul {
-    display: inline-block;
-    vertical-align:top;
-    /* background-color: #2C394B; */
-    list-style-type: none;
-    -
-    width: calc(100% / 3);
-    height: min-content;
-    border-style: solid;
-    border-left-width: 5px;
-    border-right-width: 5px;
-    border-top-width: 10px;
-    border-bottom-width: 10px;
-    border-color: transparent;
-    border-radius: 12px;
-}
-#config-display h2 {
-    color: whitesmoke;
-    /* background-color: #2C394B; */
-    font-family: Audiowide;
-    font-weight: 100;
-    /* margin-bottom: 5px; */
-    /* margin-top: 0px; */
-}
+
+
 #chainlink-manifest > li {
     color: whitesmoke;
     font-family: monospace;
@@ -339,13 +261,9 @@ body {
 /* ////////////////////////// FORM ELEMENTS ////////////////////////// */
 
 .form-label {
-    color: var(--form-text-color);
+    /*! color: var(--form-text-color); */
 }
 
 .form-group {
-    background-color: var(--form-field-background-color);
-}
-
-.form-field {
-
+    /*! background-color: var(--form-field-background-color); */
 }

@@ -18,7 +18,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
 from datetime import datetime
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, FieldDoesNotExist
 from django.db import models
 
 
@@ -362,7 +362,7 @@ def db_update(table, url, order, payload):
         value = change_list[key]
 
         if hasattr(target, key):
-            if key == "url":
+            if key == "furl":
                 value = get_url_from_id(value)
             try:
                 value = cast_value(target._meta.get_field(key), value)
@@ -372,6 +372,8 @@ def db_update(table, url, order, payload):
                 target.save()
             except ValidationError:
                 print("Validation Error: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
+            except FieldDoesNotExist:
+                print("FieldDoesNotExistError: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
 
 
 def db_try_title(table, try_title):
@@ -469,6 +471,10 @@ def generic(request, url=None):
             collections = Collection.objects.filter(public=True)
         collection_titles = Header.objects.all()
 
+        # Get the query string edit argument from the url. This argument gets passed to the template so that the
+        # template knows to render in edit mode.
+        edit = request.GET.get('edit', 'false')
+
         # Chainlink and Body data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
         chainlinks = []
@@ -491,6 +497,7 @@ def generic(request, url=None):
             "collection": collection,
             "header": header,
             "footers": footers,
+            "edit": edit,
             "view": "generic"
         })
 
@@ -520,13 +527,13 @@ def generic(request, url=None):
         if Tag == TagType.COLLECTION:
             db_update(Collection, url, None, target_update)
         elif Tag == TagType.CHAINLINK:
-            db_update(Chainlink, get_url_from_id(payload_json["url"]), None, payload)
+            db_update(Chainlink, get_url_from_id(payload_json["furl"]), None, payload)
         elif inheritsBody(Tag):
-            db_update(Body, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
+            db_update(Body, get_url_from_id(payload_json["furl"]), get_order_from_id(payload_json["furl"]), payload)
         elif inheritsHeader(Tag):
-            db_update(Header, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
+            db_update(Header, get_url_from_id(payload_json["furl"]), get_order_from_id(payload_json["furl"]), payload)
         elif inheritsFooter(Tag):
-            db_update(Footer, get_url_from_id(payload_json["url"]), get_order_from_id(payload_json["url"]), payload)
+            db_update(Footer, get_url_from_id(payload_json["furl"]), get_order_from_id(payload_json["furl"]), payload)
 
     return render(request, "Patchwork/index.html", {})
 
