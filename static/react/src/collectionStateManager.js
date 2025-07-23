@@ -235,11 +235,11 @@ document.addEventListener("DOMContentLoaded", function() {
 export function initialize(edit) {
         let editingEnabled = edit;
         if (editingEnabled == true) {
-                refresh();
+                //refresh();
                 elementsComponent = createRoot(document.getElementById("chainlink-display"));
                 elementsComponent.render(<ChainlinkDisplayAsComponents/>);
-                window.addEventListener("keydown", parseKeyDown);
-                refresh();
+                //window.addEventListener("keydown", parseKeyDown);
+                //refresh();
         }
 }
 

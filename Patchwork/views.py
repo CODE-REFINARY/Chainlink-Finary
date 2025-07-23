@@ -65,6 +65,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         cl.url = db_try_url(TagType.CHAINLINK)
         cl.public = json_data["public"]
         cl.archive = json_data["archive"]
+        cl.external = json_data["external"]
         cl.css = json_data["css"]
 
         if json_data["date"]:
