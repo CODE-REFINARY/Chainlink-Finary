@@ -184,6 +184,64 @@ export function ContentEditButtons(props) {
     );
 }
 
+function convertISO8601_to_intl(dateString) {
+  // Try to parse the date
+  const parsedDate = new Date(dateString);
+
+  // Check if the parsed date is valid
+  const isValidDate = !isNaN(parsedDate.getTime());
+
+  // Check if the input string resembles an ISO 8601 format
+  const isISO8601 = /^\d{4}-\d{2}-\d{2}T/.test(dateString);
+
+  // If both checks pass, format the date nicely
+  if (isValidDate && isISO8601) {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZoneName: 'short'
+    }).format(parsedDate);
+  }
+
+  // Otherwise, return the original string
+  return dateString;
+}
+
+function truncateLink(truncateLink) {
+    if (truncateLink && truncateLink.length > 35) {
+        return truncateLink.slice(0, 35) + "...";
+    }
+    return truncateLink;
+}
+
+function formatUrl(input) {
+  if (!input || typeof input !== 'string') return '';
+
+  // Trim whitespace
+  let url = input.trim();
+
+  // Ignore completely invalid entries
+  if (url.length < 4) return '';
+
+  // Add https:// if missing
+  if (!/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+  }
+
+  try {
+    // Validate URL by trying to construct a new URL object
+    const formatted = new URL(url);
+    return formatted.href;
+  } catch (e) {
+    // Invalid URL format
+    return '';
+  }
+}
+
 /*export function ElementDisplayAsComponents() {
   const chainlinkDisplayRef = useRef(null);
   const headerDisplayRef = useRef(null);
@@ -327,9 +385,6 @@ export function ChainlinkDisplayAsComponents() {
           const text = element.querySelector(".chainlink-inner-content")?.textContent || "";
           const date = element.querySelector(".chainlink-date")?.textContent || "";
           let external = element.querySelector(".header-url")?.getAttribute("href") ?? null;
-          if (external && external.length > 35) {
-            external = external.slice(0, 35) + "...";
-          }
 
           Object.assign(chainlinkObj, { url, order, text, date, external });
 
@@ -429,6 +484,30 @@ const getFormattedDateTime = () => {
 
   return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
 };
+
+function convertToLongDate(dateStr) {
+  // Parse the date string
+  const [datePart, timePart] = dateStr.split(" ");
+  const [month, day, yearShort] = datePart.split("/").map(Number);
+  const [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+  // Create full 4-digit year
+  const fullYear = yearShort + 2000;
+
+  // Create a Date object (local time)
+  const dateObj = new Date(fullYear, month - 1, day, hours, minutes, seconds);
+
+  // Format using toLocaleString
+  return dateObj.toLocaleString("en-US", {
+    timeZoneName: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
 
 export function NoElements(props) {
     return (
@@ -639,6 +718,10 @@ export function Chainlink(props) {
     const chainlink = getChainlinkElements.find(item => item.url === props.url);
     let furl = "chainlink-" + chainlink.url + "-" + chainlink.order;
 
+    let old_text = chainlink.text;
+    let old_order = chainlink.order;
+    let old_external = chainlink.external || "";
+
     const [showChainlinkDeleteForm, setShowChainlinkDeleteForm] = useState(false);
     const [showChainlinkEditForm, setShowChainlinkEditForm] = useState(false);
     const handleDeleteSubmit = (e) => {
@@ -668,18 +751,24 @@ export function Chainlink(props) {
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
 
-        console.log("Chainlink Edit Form Data:", values); // Access all values here
+        // check if the user pressed submit button without updating anything. If so then don't send the request since
+        // nothing would change and there's no reason to burden the server.
+        if (!(values.text == old_text && values.order == old_order && values.external == old_external)) {
 
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        let xhr = new XMLHttpRequest();
-        xhr.open("PUT", window.location.href, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.responseType = "json";
-        xhr.send(JSON.stringify(values));
+            console.log("Chainlink Edit Form Data:", values); // Access all values here
 
-        // This line of code updates the chainlink in the list by identifying it by its URL and then updated specific fields
-        setChainlinkElements(prevList => prevList.map(item => item.url === chainlink.url ? { ...item, text: values.text, order: values.order, date: values.date, external: values.external } : item));
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            let xhr = new XMLHttpRequest();
+            xhr.open("PUT", window.location.href, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.responseType = "json";
+            xhr.send(JSON.stringify(values));
+
+            // This line of code updates the chainlink in the list by identifying it by its URL and then updated specific fields
+            setChainlinkElements(prevList => prevList.map(item => item.url === chainlink.url ? { ...item, text: values.text, order: values.order, date: values.date, external: values.external } : item));
+        }
+
         setShowChainlinkEditForm(false);
     };
     return (
@@ -688,8 +777,8 @@ export function Chainlink(props) {
                 <h2>
                     <span className="chainlink-order">#{chainlink.order}</span>
                     <span className="chainlink-inner-content" style={{}}>{chainlink.text}</span>
-                    {chainlink.external && (<a className="inline-url header-url" href={chainlink.external}>&gt;&gt;&gt;{chainlink.external}</a>)}
-                    <span className="chainlink-date">{chainlink.date}</span>
+                    {chainlink.external && (<a className="inline-url header-url" href={formatUrl(chainlink.external)}>&gt;&gt;&gt;{truncateLink(chainlink.external)}</a>)}
+                    <span className="chainlink-date">{convertISO8601_to_intl(chainlink.date)}</span>
                 </h2>
             <ChainlinkEditButtons1 chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} url={chainlink.url} chainlinkDeleteFormState={[showChainlinkDeleteForm, setShowChainlinkDeleteForm]} chainlinkEditFormState={[showChainlinkEditForm, setShowChainlinkEditForm]} />
             </div>
@@ -768,7 +857,7 @@ export function Chainlink(props) {
                     <div className="form-group field">
                         <label htmlFor="external" id="chainlink-form-text-label" className="form-label label">External
                             URL</label>
-                        <input type="text" id="input chainlink-form-text" name="external" className="input form-field"/>
+                        <input type="text" defaultValue={chainlink.external} id="input chainlink-form-text" name="external" className="input form-field"/>
                         <p className="help">enter the external url for this chainlink</p>
                     </div>
                     <div className="form-group field">
@@ -800,7 +889,7 @@ export function Chainlink(props) {
                                            className="form-label label">Date</label>
                                     <input type="input" name="date" id="chainlink-form-date"
                                            className="input form-field is-static"
-                                           value={getFormattedDateTime()} readOnly/>
+                                           value={new Date().toISOString()} readOnly/>
                                     <p className="help">This value represents the creation time of this Element. It is
                                         automatically set and updated whenever this element is updated.</p>
                                 </div>
@@ -1389,7 +1478,7 @@ function ConstructChainlinkElement(props) {
                                            className="form-label label">Date</label>
                                     <input type="input" name="date" id="chainlink-form-date"
                                            className="input form-field is-static"
-                                           value={getFormattedDateTime()} readOnly/>
+                                           value={new Date().toISOString()} readOnly/>
                                     <p className="help">This value represents the creation time of this Element. It is automatically set and updated whenever this element is updated.</p>
                                 </div>
                             </React.Fragment>

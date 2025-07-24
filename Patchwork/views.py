@@ -68,12 +68,11 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         cl.external = json_data["external"]
         cl.css = json_data["css"]
 
-        if json_data["date"]:
-            try:
-                cl.date = datetime.strptime(json_data["date"], '%m/%d/%y %H:%M:%S')
-            except ValueError:
-                print("The user supplied a bad date so instead I will use the current date and time.")
-                cl.date = timezone.now()
+        try:
+            cl.date = json_data["date"]
+        except ValueError:
+            print("The user supplied a bad date so instead I will use the current date and time.")
+            cl.date = timezone.now()
 
         # write objects to the database
         cl.save()
