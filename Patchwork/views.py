@@ -79,7 +79,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         cl.save()
 
         # return the request with the url updated with the url assigned to this chainlink
-        json_data["url"] = "chainlink-" + cl.url + "-" + str(cl.order)
+        json_data["url"] = cl.url
         json_data["order"] = cl.order
 
     elif tag == TagType.PARAGRAPH:

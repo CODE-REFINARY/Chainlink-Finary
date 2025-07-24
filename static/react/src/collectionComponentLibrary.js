@@ -405,7 +405,6 @@ export function ChainlinkDisplayAsComponents() {
               external={item.external}
               date={item.date}
               order={item.order}
-              children={item.content}
               chainlinkElementsState={[getChainlinkElements, setChainlinkElements]}
             />
           ))
@@ -416,6 +415,20 @@ export function ChainlinkDisplayAsComponents() {
     </React.Fragment>
   );
 }
+
+const getFormattedDateTime = () => {
+  const now = new Date();
+  const pad = (n) => n.toString().padStart(2, '0');
+
+  const month = pad(now.getMonth() + 1); // getMonth is zero-based
+  const day = pad(now.getDate());
+  const year = now.getFullYear().toString().slice(-2);
+  const hours = pad(now.getHours());
+  const minutes = pad(now.getMinutes());
+  const seconds = pad(now.getSeconds());
+
+  return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+};
 
 export function NoElements(props) {
     return (
@@ -626,7 +639,6 @@ export function Chainlink(props) {
     const chainlink = getChainlinkElements.find(item => item.url === props.url);
     let furl = "chainlink-" + chainlink.url + "-" + chainlink.order;
 
-    const [showChainlink, setShowChainlink] = useState(true);
     const [showChainlinkDeleteForm, setShowChainlinkDeleteForm] = useState(false);
     const [showChainlinkEditForm, setShowChainlinkEditForm] = useState(false);
     const handleDeleteSubmit = (e) => {
@@ -636,8 +648,6 @@ export function Chainlink(props) {
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
 
-        console.log("Chainlink Deletion Form Data:", values); // Access all values here
-
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let xhr = new XMLHttpRequest();
         xhr.open("DELETE", window.location.href, true);
@@ -646,10 +656,9 @@ export function Chainlink(props) {
         xhr.responseType = "json";
         xhr.send(JSON.stringify(values));
 
+        // This line updates the state to remove the deleted chainlink from the list. It identifies the chainlink by its URL.
         setChainlinkElements(prevList => prevList.filter(item => item.url !== chainlink.url));
 
-        //setShowChainlinkDeleteForm(false);
-        //setShowChainlink(false); // This deletes the chainlink on the front end
     };
 
     const handleEditSubmit = (e) => {
@@ -669,133 +678,141 @@ export function Chainlink(props) {
         xhr.responseType = "json";
         xhr.send(JSON.stringify(values));
 
-        //setChainlinkTextValue(values.text);
-        const updateChainlinkByUrl = (urlToFind, newText, newOrder) => {
-            setChainlinkElements(prevList =>
-                prevList.map(item => item.url === urlToFind ? { ...item, text: newText, order: newOrder } : item)
-            );
-        };
-        updateChainlinkByUrl(chainlink.url, values.text, values.order);
+        // This line of code updates the chainlink in the list by identifying it by its URL and then updated specific fields
+        setChainlinkElements(prevList => prevList.map(item => item.url === chainlink.url ? { ...item, text: values.text, order: values.order, date: values.date, external: values.external } : item));
         setShowChainlinkEditForm(false);
     };
     return (
-        showChainlink && (
-            <section className="section is-medium chainlink">
-                <div id={furl} className="chainlink-wrapper title is-2" tag="chainlink">
-                    <h2>
-                        <span className="chainlink-order">#-1</span>
-                        <span className="chainlink-inner-content" style={{}}>{chainlink.text}</span>
-                        <a className="inline-url header-url" href={chainlink.external}>&gt;&gt;&gt;{chainlink.external}</a>
-                        <span className="chainlink-date">{chainlink.date}</span>
-                    </h2>
-                <ChainlinkEditButtons1 chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} url={chainlink.url} chainlinkDeleteFormState={[showChainlinkDeleteForm, setShowChainlinkDeleteForm]} chainlinkEditFormState={[showChainlinkEditForm, setShowChainlinkEditForm]} />
-                </div>
-                {showChainlinkDeleteForm && (
-                    <form className="crud-form" onSubmit={handleDeleteSubmit}>
-                        <input type="hidden" name="curl" value={chainlink.url}/>
-                        <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
-                        <input type="hidden" name="tag" value="CL"/>
+        <section className="section is-medium chainlink">
+            <div id={furl} className="chainlink-wrapper title is-2" tag="chainlink">
+                <h2>
+                    <span className="chainlink-order">#{chainlink.order}</span>
+                    <span className="chainlink-inner-content" style={{}}>{chainlink.text}</span>
+                    {chainlink.external && (<a className="inline-url header-url" href={chainlink.external}>&gt;&gt;&gt;{chainlink.external}</a>)}
+                    <span className="chainlink-date">{chainlink.date}</span>
+                </h2>
+            <ChainlinkEditButtons1 chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} url={chainlink.url} chainlinkDeleteFormState={[showChainlinkDeleteForm, setShowChainlinkDeleteForm]} chainlinkEditFormState={[showChainlinkEditForm, setShowChainlinkEditForm]} />
+            </div>
+            {showChainlinkDeleteForm && (
+                <form className="crud-form" onSubmit={handleDeleteSubmit}>
+                    <input type="hidden" name="curl" value={chainlink.url}/>
+                    <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
+                    <input type="hidden" name="tag" value="CL"/>
 
-                        <div className="form-group field">
-                            <label htmlFor="text" id="chainlink-form-delete-label" className="form-label label">Are you sure
-                                you want to delete this Chainlink?</label>
-                            <p className="help">this action can't be undone.</p>
+                    <div className="form-group field">
+                        <label htmlFor="text" id="chainlink-form-delete-label" className="form-label label">Are you sure
+                            you want to delete this Chainlink?</label>
+                        <p className="help">this action can't be undone.</p>
+                    </div>
+                    <div className="form-group field">
+                        <input type="hidden" name="archive" value="False"/>
+                        <label className="label">Access Controls</label>
+                        <div className="checkboxes">
+                            <label id="chainlink-form-archive-label" className="form-label checkbox">
+                                <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
+                                       className="checkbox form-field" style={{"marginRight": "5px"}}/>
+                                Archive
+                            </label>
                         </div>
-                        <div className="form-group field">
-                            <input type="hidden" name="archive" value="False"/>
-                            <label className="label">Access Controls</label>
-                            <div className="checkboxes">
-                                <label id="chainlink-form-archive-label" className="form-label checkbox">
-                                    <input type="checkbox" name="archive" value="True" id="chainlink-form-archive"
-                                           className="checkbox form-field" style={{"marginRight": "5px"}}/>
-                                    Archive
-                                </label>
-                            </div>
-                            <p className="help">Checking this box will ensure that this Chainlink is stored in your archive section (graveyard).</p>
-                        </div>
-                        <CollapsibleCard
-                            title="Read Only Fields"
-                            content={
-                                <React.Fragment>
-                                    <div className="form-group field">
-                                        <label className="label">Element Type</label>
-                                        <input className="input is-static" name="type" value="CL" readOnly/>
-                                        <p className="help">this is the type of Element being deleted. In this case it's a
-                                            chainlink</p>
-                                    </div>
-                                    <div className="form-group field">
-                                        <label className="label">Element CURL</label>
-                                        <input className="input is-static" name="furl" value={furl} readOnly/>
-                                        <p className="help">"furl" stands for "full url". This is the complete identifier
-                                            for this element. It contains the type (chainlink), curl (custom url), and
-                                            ordering for this chainlink in the collection.</p>
-                                    </div>
-                                    <div className="form-group field">
-                                        <label className="label">Element Ordering</label>
-                                        <input className="input is-static" name="order" value={chainlink.order}
-                                               readOnly/>
-                                        <p className="help">This is the order of this Chainlink on the page.</p>
-                                    </div>
-                                </React.Fragment>
-                            }
-                        />
-                        <div id="element-creation-text-align-right field">
-                            <input className="button is-success is-right" type="submit" value="DELETE"/>
-                        </div>
-                    </form>
-                )}
-                {showChainlinkEditForm && (
-                    <form className="crud-form" onSubmit={handleEditSubmit}>
-                        <input type="hidden" name="curl" value={chainlink.url}/>
-                        <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
-                        <input type="hidden" name="tag" value="CL"/>
-                        <div className="form-group field">
-                            <label htmlFor="text" id="chainlink-form-delete-label" className="form-label label">Modify
-                                this chainlink</label>
-                        </div>
-                        <div className="form-group field">
-                            <label htmlFor="text" id="chainlink-form-text-label"
-                                   className="form-label label">Text</label>
-                            <input autoFocus type="text" id="input chainlink-form-text"
-                                   defaultValue={chainlink.text}
-                                   name="text"
-                                   className="input form-field"/>
-                            <p className="help">enter a title to be used as the header name for this chainlink</p>
-                        </div>
-                        <div className="form-group field">
-                            <label className="label">Element Ordering</label>
-                            <input className="input" type="text" name="order" defaultValue={chainlink.order}/>
-                            <p className="help">This is the order of this Chainlink on the page.</p>
-                        </div>
-                        <CollapsibleCard
-                            title="Read Only Fields"
-                            content={
-                                <React.Fragment>
-                                    <div className="form-group field">
-                                        <label className="label">Element Type</label>
-                                        <input className="input is-static" name="type" value="CL" readOnly/>
-                                        <p className="help">this is the type of Element being deleted. In this case it's
-                                            a
-                                            chainlink</p>
-                                    </div>
-                                    <div className="form-group field">
-                                        <label className="label">Element CURL</label>
-                                        <input className="input is-static" name="furl" value={furl} readOnly/>
-                                        <p className="help">"furl" stands for "full url". This is the complete
-                                            identifier
-                                            for this element. It contains the type (chainlink), curl (custom url), and
-                                            ordering for this chainlink in the collection.</p>
-                                    </div>
-                                </React.Fragment>
-                            }
-                        />
-                        <div id="element-creation-text-align-right field">
-                            <input className="button is-success is-right" type="submit" value="UPDATE"/>
-                        </div>
-                    </form>
-                )}
-            </section>
-        )
+                        <p className="help">Checking this box will ensure that this Chainlink is stored in your archive section (graveyard).</p>
+                    </div>
+                    <CollapsibleCard
+                        title="Read Only Fields"
+                        content={
+                            <React.Fragment>
+                                <div className="form-group field">
+                                    <label className="label">Element Type</label>
+                                    <input className="input is-static" name="type" value="CL" readOnly/>
+                                    <p className="help">this is the type of Element being deleted. In this case it's a
+                                        chainlink</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label className="label">Element CURL</label>
+                                    <input className="input is-static" name="furl" value={furl} readOnly/>
+                                    <p className="help">"furl" stands for "full url". This is the complete identifier
+                                        for this element. It contains the type (chainlink), curl (custom url), and
+                                        ordering for this chainlink in the collection.</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label className="label">Element Ordering</label>
+                                    <input className="input is-static" name="order" value={chainlink.order}
+                                           readOnly/>
+                                    <p className="help">This is the order of this Chainlink on the page.</p>
+                                </div>
+                            </React.Fragment>
+                        }
+                    />
+                    <div id="element-creation-text-align-right field">
+                        <input className="button is-success is-right" type="submit" value="DELETE"/>
+                    </div>
+                </form>
+            )}
+            {showChainlinkEditForm && (
+                <form className="crud-form" onSubmit={handleEditSubmit}>
+                    <input type="hidden" name="curl" value={chainlink.url}/>
+                    <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
+                    <input type="hidden" name="tag" value="CL"/>
+                    <div className="form-group field">
+                        <label htmlFor="text" id="chainlink-form-delete-label" className="form-label label">Modify
+                            this chainlink</label>
+                    </div>
+                    <div className="form-group field">
+                        <label htmlFor="text" id="chainlink-form-text-label"
+                               className="form-label label">Text</label>
+                        <input autoFocus type="text" id="input chainlink-form-text"
+                               defaultValue={chainlink.text}
+                               name="text"
+                               className="input form-field"/>
+                        <p className="help">enter a title to be used as the header name for this chainlink</p>
+                    </div>
+                    <div className="form-group field">
+                        <label htmlFor="external" id="chainlink-form-text-label" className="form-label label">External
+                            URL</label>
+                        <input type="text" id="input chainlink-form-text" name="external" className="input form-field"/>
+                        <p className="help">enter the external url for this chainlink</p>
+                    </div>
+                    <div className="form-group field">
+                        <label className="label">Element Ordering</label>
+                        <input className="input" type="text" name="order" defaultValue={chainlink.order}/>
+                        <p className="help">This is the order of this Chainlink on the page.</p>
+                    </div>
+                    <CollapsibleCard
+                        title="Read Only Fields"
+                        content={
+                            <React.Fragment>
+                                <div className="form-group field">
+                                    <label className="label">Element Type</label>
+                                    <input className="input is-static" name="type" value="CL" readOnly/>
+                                    <p className="help">this is the type of Element being deleted. In this case it's
+                                        a
+                                        chainlink</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label className="label">Element CURL</label>
+                                    <input className="input is-static" name="furl" value={furl} readOnly/>
+                                    <p className="help">"furl" stands for "full url". This is the complete
+                                        identifier
+                                        for this element. It contains the type (chainlink), curl (custom url), and
+                                        ordering for this chainlink in the collection.</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label htmlFor="date" id="chainlink-form-date-label"
+                                           className="form-label label">Date</label>
+                                    <input type="input" name="date" id="chainlink-form-date"
+                                           className="input form-field is-static"
+                                           value={getFormattedDateTime()} readOnly/>
+                                    <p className="help">This value represents the creation time of this Element. It is
+                                        automatically set and updated whenever this element is updated.</p>
+                                </div>
+                            </React.Fragment>
+                        }
+                    />
+                    <div id="element-creation-text-align-right field">
+                        <input className="button is-success is-right" type="submit" value="UPDATE"/>
+                    </div>
+                </form>
+            )}
+        </section>
     );
 }
 
@@ -1293,11 +1310,19 @@ function ConstructChainlinkElement(props) {
         xhr.send(JSON.stringify(values));
 
 
-        const newComponent = <Chainlink chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} curl={"dummy-value"} order={values.order} text={values.text} />;
-        //setChainlinkElements(prev => [...prev, newComponent]);
-
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const newComponent = {
+                    url: xhr.response.url,
+                    external: xhr.response.external,
+                    text: xhr.response.text,
+                    order: xhr.response.order,
+                    date: xhr.response.date,
+                }
+                setChainlinkElements(prevList => [...prevList, newComponent]);
+            }
+        }
         setFormState(false);
-
     };
     return (
         <>
@@ -1364,8 +1389,8 @@ function ConstructChainlinkElement(props) {
                                            className="form-label label">Date</label>
                                     <input type="input" name="date" id="chainlink-form-date"
                                            className="input form-field is-static"
-                                           value="09/19/22 13:55:26" readOnly/>
-                                    <p className="help">ex: 09/19/22 13:55:26</p>
+                                           value={getFormattedDateTime()} readOnly/>
+                                    <p className="help">This value represents the creation time of this Element. It is automatically set and updated whenever this element is updated.</p>
                                 </div>
                             </React.Fragment>
                         }
