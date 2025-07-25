@@ -236,6 +236,11 @@ export function initialize(edit) {
         let editingEnabled = edit;
         if (editingEnabled == true) {
                 //refresh();
+                // delete the chainlink manifest entries before you create a root out of the dispplay. This is done because
+                // we're gonna make chainlink manifest dynamic and we need to get rid of the old entries that were rendered server-side
+                // before we render with react because we don't want react to manipulate the dom directly.
+                let el = document.getElementById("chainlink-manifest-entries");
+                while (el.firstChild) { el.removeChild(el.firstChild);}
                 elementsComponent = createRoot(document.getElementById("chainlink-display"));
                 elementsComponent.render(<ChainlinkDisplayAsComponents/>);
                 //window.addEventListener("keydown", parseKeyDown);
@@ -254,7 +259,7 @@ export function storeEditButtonHandlers(editFunction, deleteFunction) {
  */
 export function refresh() {
         // Assign indices to all elements in the collection/chainlink body
-        let index = 0;
+        /*let index = 0;
         const allElements = document.querySelectorAll('#chainlink-display *');
         for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
@@ -266,10 +271,10 @@ export function refresh() {
                         }
                 }
         }
-
+*/
 
         // Update the Chainlink Manifest links with any new chainlinks that were potentially added.
-        let list = document.getElementById("chainlink-manifest-entries");
+        /*let list = document.getElementById("chainlink-manifest-entries");
         let chainlinks = document.querySelectorAll(".chainlink-wrapper");
         let chainlinkInfo = []
         while (list.firstChild) {
@@ -287,8 +292,8 @@ export function refresh() {
                 link.setAttribute("href", "#" + element[1]);
                 listItem.appendChild(link);
                 list.appendChild(listItem);
-        });
-
+        });*/
+/*
         // Remove or add the "MISSING" marker for the Collection.
         const chainlinkElements = document.getElementById("chainlink-display");
         const headerElements = document.getElementById("header-elements");
@@ -413,7 +418,7 @@ export function refresh() {
         // the edit buttons as active or not.
         //bodyEditButtons.value = editButtonsBitmask;
 
-        showDiagnostics();
+        showDiagnostics();*/
 }
 
 

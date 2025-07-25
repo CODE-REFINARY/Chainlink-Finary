@@ -242,129 +242,12 @@ function formatUrl(input) {
   }
 }
 
-/*export function ElementDisplayAsComponents() {
-  const chainlinkDisplayRef = useRef(null);
-  const headerDisplayRef = useRef(null);
-  const footerDisplayRef = useRef(null);
-  let chainlinkDisplay = document.getElementById("chainlink-display");
-  let headerDisplay = document.getElementById("header-display");
-  let footerDisplay = document.getElementById("footer-display");
-  let chainlinkElements = [];
-  let headerElements = [];
-  let footerElements = [];
-
-   // Move existing DOM elements into React-managed div
-    let chainlinkDisplayChild = chainlinkDisplay.firstChild;
-    while (chainlinkDisplayChild) {
-        chainlinkElements.push(chainlinkDisplayChild);
-        chainlinkDisplayChild = chainlinkDisplayChild.nextSibling;
-    }
-
-    let headerDisplayChild = headerDisplay.firstChild;
-    while (headerDisplayChild) {
-        headerElements.push(headerDisplayChild);
-        headerDisplayChild = headerDisplayChild.nextSibling;
-    }
-
-    let footerDisplayChild = footerDisplay.firstChild;
-    while (footerDisplayChild) {
-        footerElements.push(footerDisplayChild);
-        footerDisplayChild = footerDisplayChild.nextSibling;
-    }
-
-  useEffect(() => {
-        for (let i = 0; i < chainlinkElements.length; i++) {
-            chainlinkDisplayRef.current.appendChild(chainlinkElements[i]);
-        }
-        for (let i = 0; i < headerElements.length; i++) {
-            headerDisplayRef.current.appendChild(headerElements[i]);
-        }
-        for (let i = 0; i < footerElements.length; i++) {
-            footerDisplayRef.current.appendChild(footerElements[i]);
-        }
-  }, []);
-
-    return (
-        <React.Fragment>
-            <div id="header-display" ref={headerDisplayRef}></div>
-            <div id="chainlink-display" ref={chainlinkDisplayRef}></div>
-            <div id="footer-display" ref={footerDisplayRef}></div>
-        </React.Fragment>
-        )
-}*/
-
-/*export function ChainlinkDisplayAsComponents() {
-    let chainlinks = document.querySelectorAll(".chainlink");
-    let chainlinkElements = [];
-    const [getChainlinkElements, setChainlinkElements] = useState([]);
-    let lastChainlinkUrl = null;
-    let lastElementOrder = -1;
-    let lastChainlinkOrder = -1;
-    let lastChainlinkText = null;
-    let lastChainlinkDate = null;
-    let lastChainlinkExternalUrl = null;
-    chainlinks.forEach((chainlink) => {
-        let chainlinkObj = {};
-        let innerElements = [];
-        Array.from(chainlink.children).forEach((element) => {
-            console.log(element);
-            if (element.getAttribute("tag") === "chainlink") {
-                chainlinkObj.url = getUrlFromId(element.id);
-                chainlinkObj.order = getOrderFromId(element.id);
-                chainlinkObj.text = element.querySelector(".chainlink-inner-content").textContent;
-                chainlinkObj.date = element.querySelector(".chainlink-date").textContent;
-                chainlinkObj.external = element.querySelector(".header-url")?.getAttribute("href") ?? null;
-                if (chainlinkObj.external && chainlinkObj.external.length > 35) {
-                  chainlinkObj.external = chainlinkObj.external.slice(0, 35) + "...";
-                }
-                lastElementOrder = -1; // reset the element order to null once we've added a chainlink. A value of -1 says there's no child elements yet
-            }
-            else if (element.getAttribute("tag") === "H3") {
-                lastElementOrder = getOrderFromId(element.id);
-                innerElements.push(<Header3 curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} order={lastElementOrder} />);
-            }
-            else if (element.getAttribute("tag") === "P") {
-                lastElementOrder = getOrderFromId(element.id);
-                innerElements.push(<Paragraph render_outer_div={true} curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} order={lastElementOrder} />);
-            }
-            else if (element.getAttribute("tag") === "CODE") {
-                lastElementOrder = getOrderFromId(element.id);
-                innerElements.push(<Code curl={getUrlFromId(element.id)} text={element.querySelector(".inner-content").textContent} order={lastElementOrder} />);
-            }
-            else if (element.getAttribute("tag") === "BR") {
-                lastElementOrder = getOrderFromId(element.id);
-                innerElements.push(<Linebreak curl={getUrlFromId(element.id)} order={getOrderFromId(element.id)} />);
-            }
-        })
-        // push this chainlink to the list of chainlinks to render. We pass all child elements to the chainlink component
-        // view the children prop. Once done, the innerElements array is cleared out so that it can be populated for the next
-        // chainlink. We stored the chainlink url and the order of the last element not only so that it can be referenced in
-        // the creation of this chainlink but also so that it can be referenced when setting the cursor which is always initialized
-        // to point to the location of the very last element which, when we are finished, will be the last element in the body
-        // of the collection.
-        chainlinkObj.content = innerElements;
-        chainlinkElements.push(chainlinkObj);
-        //getChainlinkElements.push(<Chainlink chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} curl={lastChainlinkUrl} order={lastChainlinkOrder} text={lastChainlinkText} children={innerElements} date={lastChainlinkDate} external={lastChainlinkExternalUrl} />);
-    });
-    setChainlinkElements(chainlinkElements);
-    console.log(getChainlinkElements.sort((a, b) => a.order - b.order));
-    const [cursor, setCursor] = useState({url: lastChainlinkUrl, chainlinkOrder: lastChainlinkOrder, elementOrder: lastElementOrder});
-    return (
-        <React.Fragment>
-            {
-                getChainlinkElements.sort((a, b) => a.order - b.order).map(item => (<Chainlink url={item.url} text={item.text} external={item.external} date={item.date} order={item.order} />))
-            }
-            <CursorContext.Provider value={{cursor, setCursor}}>
-                <CreateBodyEditButtons1 chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} />
-            </CursorContext.Provider>
-        </React.Fragment>
-    )
-}*/
-
 export function ChainlinkDisplayAsComponents() {
   const [getChainlinkElements, setChainlinkElements] = useState([]);
   const [cursor, setCursor] = useState({ url: null, chainlinkOrder: -1, elementOrder: -1 });
   const chainlinks = document.querySelectorAll(".chainlink");
+
+  let chainlinkManifestDomElement = document.getElementById("chainlink-manifest-entries");
 
   useEffect(() => {
     let chainlinkElements = [];
@@ -449,6 +332,17 @@ export function ChainlinkDisplayAsComponents() {
 
   return (
     <React.Fragment>
+        {createPortal(
+          getChainlinkElements
+            .sort((a, b) => a.order - b.order)
+            .map(item => (
+                <li>
+                    <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;&gt;{item.text}
+                    </a>
+                </li>
+            )),
+          chainlinkManifestDomElement
+        )}
       {
         getChainlinkElements
           .sort((a, b) => a.order - b.order)
@@ -626,40 +520,6 @@ export function ChainlinkDeletionForm(props) {
     );
 }
 
-/*xport function ChainlinkElement(props) {
-
-    useEffect(() => {
-        // insert all child elements of this Chainlink now the Chainlink has been rendered
-        if (props.children != null && props.children.length !== 0) {           // if the children parameter is not null then add append them to the Chainlink element
-            let chainlink = document.getElementById(props.url).parentElement;       // This object represents the Chainlink that was just rendered
-            for (let i = 0; i < props.children.length; i++) {
-                chainlink.appendChild(props.children[i].cloneNode(true)); // Append every child to the Chainlink
-            }
-        }
-        refresh();   // Now that the Chainlink and its children are instantiated assign indices
-        removeEditButtons();
-        instantiateEditButtons();
-    }, []);
-
-    return (
-        <React.Fragment>
-            <div id={props.url} className="chainlink-wrapper" tag="CL">
-                <h2>
-                    <span className="chainlink-order">{"#" + getOrderFromId(props.url).toString()}</span>
-                    <span className="chainlink-inner-content">
-                                                {props.text}
-                                        </span>
-                    <a className="inline-url header-url"
-                       href={"/patchwork/chainlink/" + getUrlFromId(props.url) + ".html"}>
-                        {">>>" + getUrlFromId(props.url).substring(0, 9)}
-                    </a>
-                    <span className="chainlink-date">{formatDateString(props.date)}</span>
-                </h2>
-            </div>
-        </React.Fragment>
-    );
-}*/
-
 /**
  * Create a Content Element. The type of Element to instantiate is specified by `props.type`.
  */
@@ -773,7 +633,7 @@ export function Chainlink(props) {
     };
     return (
         <section className="section is-medium chainlink">
-            <div id={furl} className="chainlink-wrapper title is-2" tag="chainlink">
+            <div id={chainlink.url} className="chainlink-wrapper title is-2" tag="chainlink">
                 <h2>
                     <span className="chainlink-order">#{chainlink.order}</span>
                     <span className="chainlink-inner-content" style={{}}>{chainlink.text}</span>

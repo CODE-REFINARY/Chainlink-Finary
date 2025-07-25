@@ -126,9 +126,9 @@
                 {% endif %}
             </nav>
         </header>
-            <main class="section is-medium">
+            <main class="">
                 {% block tabbed_buttons %}
-                    <nav id="tabbed-buttons" class="">
+                    <nav id="tabbed-buttons" class="section is-medium">
                         {% for collection in collections %}
                             {% if user.is_authenticated %}
                                 {% if collection.public == True %}

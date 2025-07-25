@@ -262,11 +262,11 @@ div.combination {
 
 /* Sections Padding and Dimension Settings */
 #header-display, #chainlink-display, #footer-display {
-    -text-align: center;
-    padding-top: var(--main-body-inner-content-padding-vertical);
-	padding-bottom: var(--main-body-inner-content-padding-vertical);
-	padding-left: var(--main-body-inner-content-padding-horizontal);
-	padding-right: var(--main-body-inner-content-padding-horizontal);
+    /*! -text-align: center; */
+    /*! padding-top: var(--main-body-inner-content-padding-vertical); */
+	/*! padding-bottom: var(--main-body-inner-content-padding-vertical); */
+	/*! padding-left: var(--main-body-inner-content-padding-horizontal); */
+	/*! padding-right: var(--main-body-inner-content-padding-horizontal); */
 }
 
 
