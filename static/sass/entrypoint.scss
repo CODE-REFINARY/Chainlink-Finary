@@ -180,3 +180,9 @@ body {
 .header-url, .chainlink-date {
     margin-left: 10px;
 }
+
+.form-submit-buttons {
+    display: flex;
+    justify-content: right;
+    gap: 0.5rem;
+}

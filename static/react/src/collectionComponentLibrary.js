@@ -716,7 +716,8 @@ export function Chainlink(props) {
                     <div className="form-group field">
                         <label htmlFor="external" id="chainlink-form-text-label" className="form-label label">External
                             URL</label>
-                        <input type="text" defaultValue={chainlink.external} id="input chainlink-form-text" name="external" className="input form-field"/>
+                        <input type="text" defaultValue={chainlink.external} id="input chainlink-form-text"
+                               name="external" className="input form-field"/>
                         <p className="help">enter the external url for this chainlink</p>
                     </div>
                     <div className="form-group field">
@@ -751,8 +752,9 @@ export function Chainlink(props) {
                             </React.Fragment>
                         }
                     />
-                    <div id="element-creation-text-align-right field">
-                        <input className="button is-success is-right" type="submit" value="UPDATE"/>
+                    <div className="form-submit-buttons" id="element-creation-text-align-right field">
+                        <input className="button is-dark" type="reset" onClick={() => setShowChainlinkEditForm(false)} value="CANCEL"/>
+                        <input className="button is-success" type="submit" value="UPDATE"/>
                     </div>
                 </form>
             )}
