@@ -276,22 +276,17 @@ def db_store(payload, parent, is_landing_page=False, user=None):
     return json.dumps(json_data)
 
 
-def db_remove(tag, furl, order):
+def db_remove(tag, url, order):
     """
     Delete data from the database.
 
     :param tag: This is the tag of the element
-    :param furl: This stands for "Full-Url" and this is a url that specifies the type of element and and its order and
+    :param url: This stands for "Full-Url" and this is a url that specifies the type of element and and its order and
     can be used to uniquely identify the element.
     :param order: This is an int identifier used in tandem with url to identify Body type targets. It is this field
     # that will get updated for all subsequent Body elements so that there is no gap in the element ordering
     """
-    # Anything except for a Collection is identified via a furl
-    if tag != TagType.HEADER1:
-        prefix, url, order = unpack_furl(furl)
-    else:
-        # If the user is trying to delete a Collection then the furl will be just a regular url since Collections don't have furls
-        url = furl
+    # Anything except for a Collection is identified via a url
 
     if tag == TagType.HEADER1:
         target = Collection.objects.get(url=url)
@@ -305,19 +300,20 @@ def db_remove(tag, furl, order):
 
     elif tag == TagType.CHAINLINK:
         target = Chainlink.objects.get(url=url)
-        parent_article = target.collection
+        #parent_article = target.collection
         #print("Delete Chainlink Target" + target)
         #print("Delete Parent Collection" + parent_article)
-        parent_article_count = Chainlink.objects.filter(collection=parent_article).count()
-        print("Parent Collection: " + str(parent_article_count))
-        for i in range(order + 1, parent_article_count):
-            next_pos_els = Chainlink.objects.filter(collection=parent_article, order=i)
-            for obj in next_pos_els:
-                obj.order -= 1
-                obj.save()
-        parent_article.save()
+        #parent_article_count = Chainlink.objects.filter(collection=parent_article).count()
+        #print("Parent Collection: " + str(parent_article_count))
+        #for i in range(order + 1, parent_article_count):
+        #    next_pos_els = Chainlink.objects.filter(collection=parent_article, order=i)
+        #    for obj in next_pos_els:
+        #        obj.order -= 1
+        #        obj.save()
+        #parent_article.save()
 
     elif inheritsBody(tag):
+
         parent_chainlink = Chainlink.objects.get(url=url)
         parent_chainlink_count = Body.objects.filter(chainlink=parent_chainlink).count()
         print(parent_chainlink_count)
@@ -362,7 +358,7 @@ def db_update(table, url, order, payload):
         value = change_list[key]
 
         if hasattr(target, key):
-            if key == "furl":
+            if key == "url":
                 value = get_url_from_id(value)
             try:
                 value = cast_value(target._meta.get_field(key), value)
@@ -514,9 +510,10 @@ def generic(request, url=None):
     elif request.method == "DELETE":
         payload = request.body
         payload_json = json.loads(payload)
-        furl = payload_json["furl"]
+        url = payload_json["url"]
+        order = payload_json["order"]
         tag = TagType(payload_json["tag"])
-        db_remove(tag, furl, None)
+        db_remove(tag, url, order)
 
     elif request.method == "PUT":
         #target_id = request.headers["url"]
@@ -527,13 +524,13 @@ def generic(request, url=None):
         if Tag == TagType.COLLECTION:
             db_update(Collection, url, None, target_update)
         elif Tag == TagType.CHAINLINK:
-            db_update(Chainlink, get_url_from_id(payload_json["furl"]), None, payload)
+            db_update(Chainlink, payload_json["url"], None, payload)
         elif inheritsBody(Tag):
-            db_update(Body, get_url_from_id(payload_json["furl"]), get_order_from_id(payload_json["furl"]), payload)
+            db_update(Body, payload_json["url"], payload_json["order"], payload)
         elif inheritsHeader(Tag):
-            db_update(Header, get_url_from_id(payload_json["furl"]), get_order_from_id(payload_json["furl"]), payload)
+            db_update(Header, payload_json["url"], payload_json["order"], payload)
         elif inheritsFooter(Tag):
-            db_update(Footer, get_url_from_id(payload_json["furl"]), get_order_from_id(payload_json["furl"]), payload)
+            db_update(Footer, payload_json["url"], payload_json["order"], payload)
 
     return render(request, "Patchwork/index.html", {})
 
@@ -571,7 +568,7 @@ def chainlink(request, key):
     elif request.method == 'DELETE':
         match TagType(request.headers["type"]):
             case TagType.CHAINLINK:
-                db_remove(Chainlink, request.headers["target"], None)
+                db_remove(Chainlink, request.headers["target"], request.headers["target"])
             case TagType.CONTENT:
                 db_remove(Body, get_url_from_id(request.headers["target"]),
                           get_order_from_id(request.headers["target"]))
@@ -723,10 +720,10 @@ def aux_generate(request, is_landing_page, user=None):
 
 def unpack_furl(furl):
     """
-    Unpack the input furl (full-url) string and return a 3-tuple containing the 3 distinct elements of the furl (prefix, url, and order)
-    A furl always contains 2 dashes which separate these 3 components. The prefix indicates the type of element (chainlink, content, header, or footer).
+    Unpack the input url (full-url) string and return a 3-tuple containing the 3 distinct elements of the url (prefix, url, and order)
+    A url always contains 2 dashes which separate these 3 components. The prefix indicates the type of element (chainlink, content, header, or footer).
     The url is the unique identifier of the parent element (in the case of content, header, or footer) and the order indicates the order of the element
-    relative to other elements that have the same parent. If the input string is not a furl then it gets quietly returned back.
+    relative to other elements that have the same parent. If the input string is not a url then it gets quietly returned back.
     """
     if not isinstance(furl, str):
         raise TypeError("The argument must be a string")

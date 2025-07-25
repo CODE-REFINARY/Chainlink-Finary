@@ -2,6 +2,12 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
+import random, string
+
+
+def generate_random_key(length=14):
+    chars = string.ascii_letters + string.digits  # a-zA-Z0-9
+    return ''.join(random.choices(chars, k=length))
 
 
 class Account(models.Model):
@@ -131,10 +137,7 @@ class Collection(models.Model):
         return returnme
 
 
-class Chainlink(models.Model):
-    key = models.BigAutoField(primary_key=True)  # primary key
-    tag = TagType.CHAINLINK  # all chainlinks are displayed in <h2>
-
+class Body(models.Model):
     # Chainlinks are always associated with a Collection at creation. This link is defined in this field. If the
     # associated Collection is deleted then a Chainlink is typically deleted. However, if the Chainlink archive field
     # is set to True then the Chainlink should not be deleted. In this case the Chainlink will be orphaned and will
@@ -142,40 +145,22 @@ class Chainlink(models.Model):
     # so we'll implement checks and user prompts to warn users against accidentally orphaning Chainlinks that other
     # Collections are referencing.
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=True)
-    text = models.CharField(max_length=200)  # Header element for this chainlink
-    url = models.CharField(max_length=75)  # relative url for the chainlink
-    external = models.URLField(max_length=200, null=True, blank=True)  # URL for external link
+    # We do not want body elements to be orphaned. Every body element must be associated with a Chainlink, otherwise
+    # we have no way of displaying it.
+    #chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
+    order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
+    public = models.BooleanField(default=True)
+    date = models.DateTimeField(default=timezone.now)  # Creation date for this chainlink. May or may not be visible
     # The user may decide to archive a chainlink which sets this boolean. By default, a created Chainlink is not
     # archived. If a chainlink is archived then it cannot be deleted except with access to the database. An archived
     # chainlink will not be deleted if its Collection is deleted. This means that other Collections that reference
     # this chainlink via Link elements will not be affected by the Chainlink's Collection being deleted.
     archive = models.BooleanField(default=False)
-    order = models.BigIntegerField(
-        default=0)  # integer value specifying which order on the collection this chainlink appears
-    public = models.BooleanField(default=False)  # Indicate whether this chainlink will be shareable
-    date = models.DateTimeField(default=timezone.now)  # Creation date for this chainlink. May or may not be visible
-    css = models.CharField(max_length=10000, null=False, blank=True, default="")
-    def __str__(self):
-        returnme = ""
-        returnme += "Order: " + str(self.order) + " | "
-        returnme += "Date: " + str(self.date) + " | "
-        returnme += "Public: " + str(self.public) + " | "
-        returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
-        returnme += "Text: " + "%.35s" % self.text
-        return returnme
-
-
-class Body(models.Model):
-
-    # We do not want body elements to be orphaned. Every body element must be associated with a Chainlink, otherwise
-    # we have no way of displaying it.
-    chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
-    order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
-    public = models.BooleanField(default=True)
     css = models.CharField(max_length=10000, null=False, blank=True, default="")
     @property
     def content(self):  # This field is how you access the child content element that's associated with this element.
+        if hasattr(self, "chainlink"):
+            return self.chainlink
         if hasattr(self, "paragraph"):
             return self.paragraph
         elif hasattr(self, "code"):
@@ -202,7 +187,35 @@ class Body(models.Model):
         return returnme
 
 
+class Chainlink(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+        null=True,  # <- allow null temporarily
+    )
+    tag = TagType.CHAINLINK  # all chainlinks are displayed in <h2>
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
+    text = models.CharField(max_length=200)  # Header element for this chainlink
+    external = models.URLField(max_length=200, null=True, blank=True)  # URL for external link
+    def __str__(self):
+        returnme = ""
+        returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
+        returnme += "Tag: " + str(self.tag) + " | "
+        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Text: " + "%.35s" % self.text
+        return returnme
+
+
 class Paragraph(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.PARAGRAPH
     text = models.CharField(max_length=1000000, default="")
     def __str__(self):
@@ -215,6 +228,12 @@ class Paragraph(Body):
 
 
 class Code(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.CODE
     text = models.CharField(max_length=1000000, default="")
     def __str__(self):
@@ -227,6 +246,12 @@ class Code(Body):
 
 
 class Linebreak(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.LINEBREAK
     # Originally there were 3 choices for the height: a "single", a "double", and a "maximum" spacing option
     height = models.CharField(max_length=100, choices=HeightSpacing.choices, default="")
@@ -239,6 +264,12 @@ class Linebreak(Body):
 
 
 class Header3(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.HEADER3
     text = models.CharField(max_length=10000, default="")
     def __str__(self):
@@ -251,6 +282,12 @@ class Header3(Body):
 
 
 class Image(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.IMAGE
 
     # This field tells us where images
@@ -268,6 +305,12 @@ class Image(Body):
 
 
 class Note(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.NOTE
     text = models.CharField(max_length=100000, default="")
     # This type field is for specifying how the note section should look. These are inspired (read also `ripped off`
@@ -284,6 +327,12 @@ class Note(Body):
 
 
 class Link(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.LINK
     # If the Chainlink that's linked here is deleted we don't want this record to be gone either. Instead, we want to
     # alert the user and let them decide whether to keep this Element or not.
@@ -303,6 +352,12 @@ class Link(Body):
 
 
 class List(Body):
+    body_ptr = models.OneToOneField(
+        Body,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.LIST
     content = models.JSONField()
     def __str__(self):
@@ -332,6 +387,12 @@ class Header(models.Model):
 
 
 class Header1(Header):
+    header_ptr = models.OneToOneField(
+        Header,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.HEADER1
     text = models.CharField(max_length=10000)
     def __str__(self):
@@ -344,6 +405,12 @@ class Header1(Header):
 
 
 class HeaderBanner(Header):
+    header_ptr = models.OneToOneField(
+        Header,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.HEADER_BANNER
     content = models.JSONField()
     def __str__(self):
@@ -375,6 +442,12 @@ class Footer(models.Model):
 # This is just a paragraph that appears in the footer section of the Collection. The options available here are
 # pretty much identical to what you get when you create a regular paragraph in a Chainlink.
 class Endnote(Footer):
+    footer_ptr = models.OneToOneField(
+        Footer,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.ENDNOTE
     text = models.CharField(max_length=10000)
     def __str__(self):
@@ -389,6 +462,12 @@ class Endnote(Footer):
 # This is a list of items that appear in the footer section of a Collection. This list is supposed to be very
 # customizable with things like the ability to display the contents vertically or horizontally.
 class FooterList(Footer):
+    footer_ptr = models.OneToOneField(
+        Footer,
+        on_delete=models.CASCADE,
+        parent_link=True,
+    )
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.FOOTER_LIST
     content = models.JSONField()
     def __str__(self):

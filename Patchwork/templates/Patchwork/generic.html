@@ -22,7 +22,7 @@
         <ul id="chainlink-manifest-entries" class="menu-list">
             {% if chainlinks %}
                 {% for chainlink in chainlinks %}
-                    <li><a class="inline-url" href="#chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}">>>>{{ chainlink.0.text }}</a></li>
+                    <li><a class="inline-url" href="#{{ chainlink.0.url }}">>>>{{ chainlink.0.text }}</a></li>
                 {% endfor %}
             {% else %}
                 <li><i>&#60;list empty&#62;</i></li>
@@ -47,7 +47,7 @@
         <div id="chainlink-display" class="section is-medium">
             {% for chainlink in chainlinks %}
                 <section class="section is-medium chainlink">
-                    <div id="chainlink-{{ chainlink.0.url }}-{{ chainlink.0.order }}" class="chainlink-wrapper title is-2" tag="chainlink">
+                    <div id="{{ chainlink.0.url }}" order={{chainlink.0.order}} class="chainlink-wrapper title is-2" tag="chainlink">
                         <h2>
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
                             <span class="chainlink-inner-content" style="{{ chainlink.0.css }}">{{ chainlink.0.text }}</span>
@@ -59,19 +59,19 @@
                     </div>
                     {% for body_element in chainlink.1 %}
                         {% if body_element.content.tag == "P" %}
-                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="P">
+                        <div id="{{ chainlink.0.url }}" order={{chainlink.0.order}} class="content-wrapper" tag="P">
                             <p class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</p>
                         </div>
                         {% elif body_element.content.tag == 'CODE' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="CODE">
+                        <div id="{{ chainlink.0.url }}" order={{chainlink.0.order}} class="content-wrapper" tag="CODE">
                             <code class="code inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</code>
                         </div>
                         {% elif body_element.content.tag == 'H3' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="title is-3 content-wrapper" tag="H3">
+                        <div id="{{ chainlink.0.url }}" order={{chainlink.0.order}} class="title is-3 content-wrapper" tag="H3">
                             <h3 class="inner-content" style="{{ body_element.css }}">{{ body_element.content.text }}</h3>
                         </div>
                         {% elif body_element.content.tag == 'BR' %}
-                        <div id="content-{{ chainlink.0.url }}-{{ body_element.content.order }}" class="content-wrapper" tag="BR">
+                        <div id="{{ chainlink.0.url }}" order={{chainlink.0.order}} class="content-wrapper" tag="BR">
                             <span class="pb-5 pt-5 inner-content br" style="display: block; {{ body_element.css }}"><figure class="image is-16x16" style="float: right;"><img src="{% static 'images/enter.png' %}" alt="Description of image"></figure></span>
                         </div>
                         {% elif body_element.tag == 'delimiter' %}

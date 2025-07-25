@@ -996,7 +996,7 @@ export function deleteContent(target) {
 
         container.id = "content-delete-form";
         container.setAttribute("index", wrapper.getAttribute("index"));
-        root.render(<ElementDeletionForm type={tag} curl={wrapper.id} />);
+        root.render(<ElementDeletionForm type={tag} url={wrapper.id} />);
         wrapper.insertAdjacentElement("afterend", container);
 
         container.addEventListener("submit", function(event) {

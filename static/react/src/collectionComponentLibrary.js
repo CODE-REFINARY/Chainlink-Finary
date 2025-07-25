@@ -263,8 +263,8 @@ export function ChainlinkDisplayAsComponents() {
         const tag = element.getAttribute("tag");
 
         if (tag === "chainlink") {
-          const url = getUrlFromId(element.id);
-          const order = getOrderFromId(element.id);
+          const url = element.id;
+          const order = parseInt(element.getAttribute("order"), 10);
           const text = element.querySelector(".chainlink-inner-content")?.textContent || "";
           const date = element.querySelector(".chainlink-date")?.textContent || "";
           let external = element.querySelector(".header-url")?.getAttribute("href") ?? null;
@@ -278,7 +278,7 @@ export function ChainlinkDisplayAsComponents() {
           innerElements.push(
             <Header3
               key={element.id}
-              curl={getUrlFromId(element.id)}
+              url={getUrlFromId(element.id)}
               text={element.querySelector(".inner-content")?.textContent || ""}
               order={getOrderFromId(element.id)}
             />
@@ -289,7 +289,7 @@ export function ChainlinkDisplayAsComponents() {
             <Paragraph
               key={element.id}
               render_outer_div={true}
-              curl={getUrlFromId(element.id)}
+              url={getUrlFromId(element.id)}
               text={element.querySelector(".inner-content")?.textContent || ""}
               order={getOrderFromId(element.id)}
             />
@@ -299,7 +299,7 @@ export function ChainlinkDisplayAsComponents() {
           innerElements.push(
             <Code
               key={element.id}
-              curl={getUrlFromId(element.id)}
+              url={getUrlFromId(element.id)}
               text={element.querySelector(".inner-content")?.textContent || ""}
               order={getOrderFromId(element.id)}
             />
@@ -309,7 +309,7 @@ export function ChainlinkDisplayAsComponents() {
           innerElements.push(
             <Linebreak
               key={element.id}
-              curl={getUrlFromId(element.id)}
+              url={getUrlFromId(element.id)}
               order={getOrderFromId(element.id)}
             />
           );
@@ -479,7 +479,7 @@ export function ElementDeletionForm(props) {
     return (
         <React.Fragment>
             <form className="crud-form">
-                <input type="hidden" name="furl" value={props.curl}/>
+                <input type="hidden" name="url" value={props.url}/>
                 <input type="hidden" name="tag" value={props.type}/>
                 {props.type === "CL" ? <div className="form-group">
                     <label htmlFor="archive content" id="chainlink-delete-form-archive-content"
@@ -644,7 +644,7 @@ export function Chainlink(props) {
             </div>
             {showChainlinkDeleteForm && (
                 <form className="crud-form" onSubmit={handleDeleteSubmit}>
-                    <input type="hidden" name="curl" value={chainlink.url}/>
+                    <input type="hidden" name="url" value={chainlink.url}/>
                     <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
                     <input type="hidden" name="tag" value="CL"/>
 
@@ -676,11 +676,10 @@ export function Chainlink(props) {
                                         chainlink</p>
                                 </div>
                                 <div className="form-group field">
-                                    <label className="label">Element CURL</label>
-                                    <input className="input is-static" name="furl" value={furl} readOnly/>
+                                    <label className="label">Element URL</label>
+                                    <input className="input is-static" name="url" value={chainlink.url} readOnly/>
                                     <p className="help">"furl" stands for "full url". This is the complete identifier
-                                        for this element. It contains the type (chainlink), curl (custom url), and
-                                        ordering for this chainlink in the collection.</p>
+                                        for this element.</p>
                                 </div>
                                 <div className="form-group field">
                                     <label className="label">Element Ordering</label>
@@ -698,7 +697,7 @@ export function Chainlink(props) {
             )}
             {showChainlinkEditForm && (
                 <form className="crud-form" onSubmit={handleEditSubmit}>
-                    <input type="hidden" name="curl" value={chainlink.url}/>
+                    <input type="hidden" name="url" value={chainlink.url}/>
                     <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
                     <input type="hidden" name="tag" value="CL"/>
                     <div className="form-group field">
@@ -737,12 +736,8 @@ export function Chainlink(props) {
                                         chainlink</p>
                                 </div>
                                 <div className="form-group field">
-                                    <label className="label">Element CURL</label>
-                                    <input className="input is-static" name="furl" value={furl} readOnly/>
-                                    <p className="help">"furl" stands for "full url". This is the complete
-                                        identifier
-                                        for this element. It contains the type (chainlink), curl (custom url), and
-                                        ordering for this chainlink in the collection.</p>
+                                    <label className="label">Element URL</label>
+                                    <input className="input is-static" name="url" value={chainlink.url} readOnly/>
                                 </div>
                                 <div className="form-group field">
                                     <label htmlFor="date" id="chainlink-form-date-label"
@@ -766,10 +761,10 @@ export function Chainlink(props) {
 }
 
 /*
-<Header3 furl={props.furl} order={0} text="This is a header 3"/>
-<Linebreak furl={props.furl} order={1} />
-<Code furl={props.furl} order={2} text="this is codeeeee" />
-<Paragraph furl={props.furl} order={3} text="this is a paragraph" />*/
+<Header3 url={props.url} order={0} text="This is a header 3"/>
+<Linebreak url={props.url} order={1} />
+<Code url={props.url} order={2} text="this is codeeeee" />
+<Paragraph url={props.url} order={3} text="this is a paragraph" />*/
 
 function ChainlinkEditButtons1(props) {
     const [getChainlinkElements, setChainlinkElements] = props.chainlinkElementsState;
@@ -911,7 +906,7 @@ export function ElementCreationForm1(props) {
 }
 
 export function ContentEditButtons1(props) {
-    let chainlinkId = "content-" + props.curl + "-" + props.order
+    let chainlinkId = "content-" + props.url + "-" + props.order
     return (
         <div className="context-buttons-wrapper">
             <button className="doc-action-copy-title button is-small is-info">copy</button>
