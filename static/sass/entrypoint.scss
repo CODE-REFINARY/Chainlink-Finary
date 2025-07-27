@@ -186,3 +186,18 @@ body {
     justify-content: right;
     gap: 0.5rem;
 }
+
+.chainlink-buttons-wrapper {
+    display: none;
+}
+
+.chainlink-wrapper:hover .chainlink-buttons-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left-buttons,
+.right-buttons {
+  display: flex;
+}

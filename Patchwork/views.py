@@ -39,29 +39,27 @@ class HttpRequestWrapper(HttpRequest):
     ###################### database accessors ######################
 
 
-def db_store(payload, parent, is_landing_page=False, user=None):
+def db_store(payload, collection, is_landing_page=False, user=None):
     """
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
     :param payload: JSON payload specifying the properties of the Element to write to the database
     :param is_landing_page: This boolean flag indicates whether this page should be set as the landing page for the site. If this flag is set then the LANDING_PAGE_URL global variable is set equal to the generated url for the page
-    :param parent (optional): String indicating the url of the parent object of the Element to store. Body uses the url of its Chainlink and thus this parameter is not needed for elements of type Body. In this case, this parameter is only used if no URL is specified in the JSON payload.
+    :param collection (optional): String indicating the url of the collection object of the Element to store. Body uses the url of its Chainlink and thus this parameter is not needed for elements of type Body. In this case, this parameter is only used if no URL is specified in the JSON payload.
     :param user: The user object indicates the currently logged in user. This argument is used to set the landing page field for the logged in user if the is_landing_page parameter is set to True
     """
     # Parse the stringified json in the argument so that the payload can be read and written to the database
     json_data = json.loads(payload)
     # Read the type of Element to store
-    tag = TagType(json_data["type"])
+    tag = TagType(json_data["tag"])
 
     if tag == TagType.CHAINLINK:
         # Create a representation of the Chainlink object to write to the database
         cl = Chainlink()
-        # Update the parent object to indicate that it has a new child
-        collection = Collection.objects.get(url=parent)
-        articleCount = Chainlink.objects.filter(collection=collection).count()
-        # chainlink order starts at 0
-        cl.order = articleCount
+        # Update the collection object to indicate that it has a new child
+        collection = Collection.objects.get(url=collection)
+        cl.order = json_data["order"]
         cl.collection = collection
-        cl.text = db_try_title(Chainlink, json_data["text"])
+        cl.text = json_data["text"]
         cl.url = db_try_url(TagType.CHAINLINK)
         cl.public = json_data["public"]
         cl.archive = json_data["archive"]
@@ -80,155 +78,9 @@ def db_store(payload, parent, is_landing_page=False, user=None):
         # return the request with the url updated with the url assigned to this chainlink
         json_data["url"] = cl.url
         json_data["order"] = cl.order
+        json_data["tag"] = TagType.CHAINLINK
 
-    elif tag == TagType.PARAGRAPH:
-        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
-        numElements = Body.objects.filter(chainlink=chainlink).count()
-        content = Paragraph()
-        content.chainlink = chainlink
-        content.order = json_data["order"]
-        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
-            # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(int(json_data["order"]) + 1, numElements):
-                try:
-                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
-                    # field for all elements after this one
-                except Body.DoesNotExist:
-                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
-                    # Find the next existing Body after the one to be added.
-                    for j in range(i + 1, numElements):
-                        try:
-                            # Subtract from this first future element an amount equal to distance we had to travel to
-                            # get to this element.
-                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
-                            break
-                        except Body.DoesNotExist:
-                            continue
-        content.text = json_data["text"]
-        content.public = json_data["public"]
-        content.save()
-        json_data["order"] = content.order
-
-    elif tag == TagType.LINEBREAK:
-        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
-        numElements = Body.objects.filter(chainlink=chainlink).count()
-        content = Linebreak()
-        content.chainlink = chainlink
-        content.order = json_data["order"]
-        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
-            # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(int(json_data["order"]) + 1, numElements):
-                try:
-                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
-                    # field for all elements after this one
-                except Body.DoesNotExist:
-                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
-                    # Find the next existing Body after the one to be added.
-                    for j in range(i + 1, numElements):
-                        try:
-                            # Subtract from this first future element an amount equal to distance we had to travel to
-                            # get to this element.
-                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
-                            break
-                        except Body.DoesNotExist:
-                            continue
-        content.public = json_data["public"]
-        content.save()
-        json_data["order"] = content.order
-
-    elif tag == TagType.CODE:
-        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
-        numElements = Body.objects.filter(chainlink=chainlink).count()
-        content = Code()
-        content.chainlink = chainlink
-        content.order = json_data["order"]
-        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
-            # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(int(json_data["order"]) + 1, numElements):
-                try:
-                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
-                    # field for all elements after this one
-                except Body.DoesNotExist:
-                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
-                    # Find the next existing Body after the one to be added.
-                    for j in range(i + 1, numElements):
-                        try:
-                            # Subtract from this first future element an amount equal to distance we had to travel to
-                            # get to this element.
-                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
-                            break
-                        except Body.DoesNotExist:
-                            continue
-        content.text = json_data["text"]
-        content.public = json_data["public"]
-        content.save()
-        json_data["order"] = content.order
-
-    elif tag == TagType.HEADER3:
-        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
-        numElements = Body.objects.filter(chainlink=chainlink).count()
-        content = Header3()
-        content.chainlink = chainlink
-        content.order = json_data["order"]
-        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
-            # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(int(json_data["order"]) + 1, numElements):
-                try:
-                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
-                    # field for all elements after this one
-                except Body.DoesNotExist:
-                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
-                    # Find the next existing Body after the one to be added.
-                    for j in range(i + 1, numElements):
-                        try:
-                            # Subtract from this first future element an amount equal to distance we had to travel to
-                            # get to this element.
-                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
-                            break
-                        except Body.DoesNotExist:
-                            continue
-        content.text = json_data["text"]
-        content.public = json_data["public"]
-        content.save()
-        json_data["order"] = content.order
-
-    elif tag == TagType.HEADER3 or tag == TagType.CODE or tag == TagType.LINEBREAK or tag == TagType.PARAGRAPH:
-        # Update the chainlink object that's a parent of the element to be written to the database
-        chainlink = Chainlink.objects.get(url=get_url_from_id(json_data["url"]))
-        numElements = Body.objects.filter(chainlink=chainlink).count()
-
-        # Create a representation of the Body object to write to database
-        content = Body()
-        content.chainlink = chainlink
-        content.order = json_data["order"]
-        if content.order != numElements - 1:  # If the element we are inserting is not at the end but somewhere
-            # in the beginning or middle of the Chainlink then shift all Body up in the order.
-            for i in range(int(json_data["order"]) + 1, numElements):
-                try:
-                    Body.objects.get(chainlink=chainlink, order=i).order += 1  # asynchronously update the order
-                    # field for all elements after this one
-                except Body.DoesNotExist:
-                    print("ERROR: A text element specified after the new element wasn't found. Something is wrong.")
-                    # chainlink.count -= 1  # We've discovered a missing element so the count must be off
-                    # Find the next existing Body after the one to be added.
-                    for j in range(i + 1, numElements):
-                        try:
-                            # Subtract from this first future element an amount equal to distance we had to travel to
-                            # get to this element.
-                            Body.objects.get(chainlink=chainlink, order=j).order -= (j - i)
-                            break
-                        except Body.DoesNotExist:
-                            continue
-
-        content.tag = tag
-        content.text = json_data["text"]
-        content.public = json_data["public"]
-
-        # Write changes to the database
-        chainlink.save()
-        content.save()
-        json_data["order"] = content.order
-
+    """
     elif tag == TagType.COLLECTION:
         # Create a representation of the Article as a python object
         collection = Collection()
@@ -249,25 +101,7 @@ def db_store(payload, parent, is_landing_page=False, user=None):
 
         # Set the url field now that we've assigned a url so that frontend can redirect the user to this new collection.
         json_data["url"] = collection.url
-
-    elif tag == TagType.HEADER1:
-        collection = Collection.objects.get(url=parent)
-        header = Header1()
-        header.collection = collection
-        header.text = db_try_title(Header1, json_data["text"])
-        # Any Collection can have a maximum of one HEADER1. This Collection field makes it easy to determine its title.
-        collection.title = header
-        header.save()
-        collection.save()
-
-    elif tag == TagType.ENDNOTE:
-        endnote = Endnote()
-        endnote.collection = Collection.objects.get(url=parent)
-        footerCount = Footer.objects.filter(collection=endnote.collection).count()
-        endnote.order = footerCount
-        endnote.tag = TagType.ENDNOTE
-        endnote.text = json_data["text"]
-        endnote.save()
+    """
 
     # Return the JSON payload back to be sent as an HTTP response back to the user. We do this so that we can
     # communicate to the front-end any adjustments or system updates pertinent to the user's request back to them
@@ -346,10 +180,6 @@ def db_update(table, url, order, payload):
     """
     if table == Chainlink:
         target = table.objects.get(url=url)  # Get the record that we want to modify.
-        # If the user is trying to modify the title text of the Chainlink then make sure the text is unique.
-    elif table == Body:
-        parent_chainlink = Chainlink.objects.get(url=url)
-        target = Body.objects.get(chainlink=parent_chainlink, order=order).content
     else:
         raise RuntimeError("Table not recognized.")
     change_list = json.loads(payload)
@@ -358,8 +188,6 @@ def db_update(table, url, order, payload):
         value = change_list[key]
 
         if hasattr(target, key):
-            if key == "url":
-                value = get_url_from_id(value)
             try:
                 value = cast_value(target._meta.get_field(key), value)
                 print(type(value))
@@ -520,7 +348,7 @@ def generic(request, url=None):
         #target_update = request.headers["payload"]
         payload = request.body
         payload_json = json.loads(payload)
-        Tag = TagType(payload_json["type"])
+        Tag = TagType(payload_json["tag"])
         if Tag == TagType.COLLECTION:
             db_update(Collection, url, None, target_update)
         elif Tag == TagType.CHAINLINK:
@@ -533,55 +361,6 @@ def generic(request, url=None):
             db_update(Footer, payload_json["url"], payload_json["order"], payload)
 
     return render(request, "Patchwork/index.html", {})
-
-
-@cache_control(no_cache=True, must_revalidate=True,
-               no_store=True)  # force chainlink view to get force reloaded so that form view edits appear
-def chainlink(request, key):
-    if not request.user.is_authenticated:
-        return login(request)
-    if request.method == 'GET':
-        target = get_object_or_404(Chainlink, url=key)
-        collections = Collection.objects.all()
-        contents = []
-        for cont in Body.objects.filter(chainlink=target).order_by('order'):
-            contents.append(cont)
-        return render(request, 'Patchwork/chainlink.html',
-                      {'collections': collections, 'target': target, 'contents': contents, 'url': key})
-
-    elif request.method == 'POST':
-        # get POST request json payload
-        json_data = json.loads(request.body)
-
-        type = TagType(json_data["type"])
-        try_title = json_data["text"]
-        url = json_data["url"]
-        public = json_data["public"]
-
-        if type == TagType.CHAINLINK:
-            if db_store(type, key, try_title, public):
-                return HttpResponse("CHAINLINK CREATE SUCCESS: " + url)
-        elif type == TagType.HEADER3 or type == TagType.PARAGRAPH or type == TagType.CODE or type == TagType.LINEBREAK:
-            if db_store(type, url, try_title, public):
-                return render(request, 'Patchwork/index.html', {})
-
-    elif request.method == 'DELETE':
-        match TagType(request.headers["type"]):
-            case TagType.CHAINLINK:
-                db_remove(Chainlink, request.headers["target"], request.headers["target"])
-            case TagType.CONTENT:
-                db_remove(Body, get_url_from_id(request.headers["target"]),
-                          get_order_from_id(request.headers["target"]))
-
-    elif request.method == 'PUT':
-        match TagType(request.headers["type"]):
-            case TagType.CHAINLINK:
-                db_update(Chainlink, request.headers["target"], None, request.headers["text"])
-            case TagType.CONTENT:
-                db_update(Body, get_url_from_id(request.headers["target"]),
-                          get_order_from_id(request.headers["target"]), request.headers["text"])
-
-    return render(request, 'Patchwork/login_success.html', {})
 
 
 # def generate(request, is_landing_page, user=None):
@@ -690,10 +469,6 @@ def about(request):
     return render(request, 'Patchwork/about.html', {"view": "about"})
 
 
-def beat_the_clock(request):
-    return render(request, 'Patchwork/beat-the-clock.html', {})
-
-
 def react(request):
     return render(request, 'Patchwork/react.html', {})
 
@@ -709,128 +484,13 @@ def aux_generate(request, is_landing_page, user=None):
     :param user: this is the user object corresponding to the currently logged-in user. The landing page will be set for this user.
     """
     # Create a new collection and write it to the database. The payload variable will contain the url for the collection
-    payload = json.dumps({"type": "COL"})
+    payload = json.dumps({"type": "Collection"})
     payload = db_store(payload, None, is_landing_page, user)
     if not is_landing_page:
         url = reverse("collection", kwargs={"url": json.loads(payload)["url"]})
         return redirect(url)
     else:
         return render(request, 'Patchwork/new_landing_page.html', {})
-
-
-def unpack_furl(furl):
-    """
-    Unpack the input url (full-url) string and return a 3-tuple containing the 3 distinct elements of the url (prefix, url, and order)
-    A url always contains 2 dashes which separate these 3 components. The prefix indicates the type of element (chainlink, content, header, or footer).
-    The url is the unique identifier of the parent element (in the case of content, header, or footer) and the order indicates the order of the element
-    relative to other elements that have the same parent. If the input string is not a url then it gets quietly returned back.
-    """
-    if not isinstance(furl, str):
-        raise TypeError("The argument must be a string")
-
-    end_of_prefix_idx = furl.find("-")
-    start_of_url_idx = furl.find("-") + 1
-    end_of_url_idx = furl.rfind("-")
-    start_of_order_idx = furl.rfind("-") + 1
-
-    if end_of_prefix_idx != -1:
-        prefix = furl[:end_of_prefix_idx]
-    else:
-        raise ValueError("An invalid id was specified. Make sure the supplied id contains a prefix section (either"
-                         "text or chainlink) followed by a dash followed by the url followed by a dash followed by"
-                         "the order.")
-
-    if start_of_url_idx != -1:
-        url = furl[start_of_url_idx:end_of_url_idx]
-    else:
-        raise ValueError("An invalid id was specified. The url between the dashes was malformed.")
-
-    if end_of_url_idx != -1:
-        order = int(furl[start_of_order_idx:])
-    else:
-        raise ValueError("The value specified after the second dash must be an int.")
-
-    return (prefix, url, order)
-
-
-def get_order_from_id(id):
-    """
-    Extracts and returns the order value from a chainlink/text id.
-
-    Parameters:
-    - id (str): The identifier containing the url stored between the prefix and the order values.
-
-    Returns:
-    - int: The extracted order value.
-
-    Raises:
-    - TypeError: If the input is not a string.
-    - ValueError: If the value specified after the dash is not a valid integer or if the identifier format is invalid.
-    """
-    if not isinstance(id, str):
-        raise TypeError("The argument must be a string")
-
-    last_index = id.rfind("-")
-
-    if last_index != -1:
-        order = int(id[last_index + 1:])
-        if not isinstance(order, int):
-            raise ValueError("The value specified after the dash must be an int")
-        return order
-    else:
-        raise ValueError("An invalid id was specified. Make sure the supplied id contains a dash.")
-
-
-def get_url_from_id(id):
-    """
-    Extracts and returns the url from a chainlink/text id.
-
-    Parameters:
-    - id (str): The identifier containing the url stored between the prefix and the order values.
-    Returns:
-    - str: The extracted prefix.
-
-    Raises:
-    - TypeError: If the input is not a string.
-    - ValueError: If the identifier format is invalid (doesn't contain a dash).
-    """
-    if not isinstance(id, str):
-        raise TypeError("The argument must be a string")
-
-    first_index = id.find("-") + 1
-    last_index = id.rfind("-")
-
-    if last_index != -1:
-        return id[first_index:last_index]
-    else:
-        raise ValueError("An invalid id was specified. Make sure the supplied id contains a dash.")
-
-
-def get_prefix_from_id(id):
-    """
-    Extracts and returns the prefix from a given identifier.
-
-    Parameters:
-    - id (str): The Element id
-
-    Returns:
-    - str: The extracted prefix. This is either "chainlink" or "text"
-
-    Raises:
-    - TypeError: If the input is not a string.
-    - ValueError: If the identifier format is invalid (doesn't contain a dash).
-    """
-    if not isinstance(id, str):
-        raise TypeError("The argument must be a string")
-
-    idx = id.lfind("-")
-
-    if last_index != -1:
-        return id[:idx]
-    else:
-        raise ValueError("An invalid id was specified. Make sure the supplied id contains a prefix section (either"
-                         "text or chainlink) followed by a dash followed by the url followed by a dash followed by"
-                         "the order.")
 
 
 def validate_and_return_count(element):

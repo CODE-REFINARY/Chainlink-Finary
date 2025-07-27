@@ -341,39 +341,40 @@ div.combination {
 }*/
 
 /* chainlink display elements - chainlinks */
-
+/*
 .content-wrapper {}
 .chainlink-wrapper {}
 .chainlink-wrapper:hover .chainlink-buttons-wrapper {
     display: block;
-}
+}*/
 /*.chainlink-wrapper:hover h2 {
     border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
 }*/
-
+/*
 .chainlink-buttons-wrapper {
     text-align: right;
     display: none;
-}
+}*/
 
 /* chainlink display elements - contents */
-.context-buttons-wrapper {
+/*.context-buttons-wrapper {
     text-align: right;
     display: none;
 }
 .content-wrapper:hover .context-buttons-wrapper {
     display: block;
-}
+}*/
 /*.content-wrapper:hover .inner-content {
     border-width: 1px;
     border-style: solid;
     color: rgb(208, 68, 35);
 }*/
+/*
 .context-buttons-wrapper button, .chainlink-buttons-wrapper button, #fence-context-buttons button {
     width: 7.5%;
-}
+}*/
 
 /* The styles here are for the navbars that appear on the generic patchwork pages. There's an edit navbar, actions, navbar
  etc. */

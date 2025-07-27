@@ -26,25 +26,25 @@ class Account(models.Model):
 # For example, the user dispatches an AJAX request with a "chainlink" in the payload which specifies that the created
 # database element should be a TagType.CHAINLINK.
 class TagType(models.TextChoices):
-    HEADER1 = "H1"      # The H1 appears as a title to a Collection. It is the name of the Collection and is prominently displayed as the H1 HTML element should be.
-    CHAINLINK = "CL"    # The Chainlink is similar to an HTML <h2>.
-    PARAGRAPH = "P"
-    CODE = "CODE"
-    HEADER3 = "H3"
-    LINEBREAK = "BR", _("linebreak")
-    FOOTER = "footer"
-    ENDNOTE = "EN"  # Endnotes are paragraphs that appear in the footer
-    IMAGE = "IMG", _("image")
-    LIST = "LI", _("list")
-    LINK = "LINK", _("link")
-    HEADER_BANNER = "HBNR", _("header banner")
-    FOOTER_LIST = "FTRLI", _("footer list")
-    NOTE = "NOTE", _("note")
-    COLLECTION = "COL", _("collection")
+    HEADER1 = "Header1"      # The H1 appears as a title to a Collection. It is the name of the Collection and is prominently displayed as the H1 HTML element should be.
+    CHAINLINK = "Chainlink"    # The Chainlink is similar to an HTML <h2>.
+    PARAGRAPH = "Paragraph"
+    CODE = "Code"
+    HEADER3 = "Header3"
+    LINEBREAK = "Linebreak"
+    FOOTER = "Footer"
+    ENDNOTE = "Endnote"  # Endnotes are paragraphs that appear in the footer
+    IMAGE = "Image"
+    LIST = "List"
+    LINK = "Link"
+    HEADER_BANNER = "HBNR"
+    FOOTER_LIST = "FTRLI"
+    NOTE = "Note"
+    COLLECTION = "Collection"
 
 
 def inheritsBody(tag):
-    return tag in [TagType.HEADER3, TagType.PARAGRAPH, TagType.CODE, TagType.LINEBREAK, TagType.IMAGE, TagType.LIST, TagType.LINK, TagType.NOTE]
+    return tag in [TagType.CHAINLINK, TagType.HEADER3, TagType.PARAGRAPH, TagType.CODE, TagType.LINEBREAK, TagType.IMAGE, TagType.LIST, TagType.LINK, TagType.NOTE]
 
 
 def inheritsFooter(tag):
