@@ -62,16 +62,6 @@ services:
     stdin_open: true  # Equivalent to -it (interactive)
     tty: true  # Keep the terminal open
     command: ["/opt/dart-sass/sass", "/sass/entrypoint.scss:/css/bulma.css", "--watch"]
-    #command: ["dart", "./bin/sass.dart", "/app/sass/example.scss", "/app/public/css/example.css"]
-
-  sass:
-    build:
-      dockerfile: Dockerfile.sass
-      context: .
-    volumes:
-      - .:/code
-    command:
-
 volumes:
   redis_data:
   postgres_data:

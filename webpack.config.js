@@ -5,7 +5,6 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     generic: "./static/react/src/generic.js",   // Entry for generic.js
-    chainlink: "./static/react/src/chainlink.js", // Entry for chainlink.js
   },
   output: {
     path: path.resolve(__dirname, "./static/react/static"),

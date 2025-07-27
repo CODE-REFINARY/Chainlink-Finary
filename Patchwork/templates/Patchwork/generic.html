@@ -51,7 +51,7 @@
                         <h2>
                             <span class="chainlink-order">#{{ chainlink.0.order }}</span>
                             <span class="chainlink-inner-content" style="{{ chainlink.0.css }}">{{ chainlink.0.text }}</span>
-                            <span class="chainlink-date">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
+                            <span class="chainlink-date" date="{{ chainlink.0.date|date:"c" }}">{{ chainlink.0.date|date:"M d, Y, g:i A e" }}</span>
                             {%  if chainlink.0.external %}
                             <a class="inline-url header-url" href={{ chainlink.0.external }}>>>>{{ chainlink.0.external|cut:"https://"|cut:"http://"|slice:":35" }}{% if chainlink.0.external|cut:"https://"|cut:"http://"|length > 35 %}...{% endif %}</a>
                             {% endif %}

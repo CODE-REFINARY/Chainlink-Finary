@@ -86,8 +86,8 @@ export function ChainlinkDisplayAsComponents() {
           const url = element.id;
           const order = parseInt(element.getAttribute("order"), 10);
           const text = element.querySelector(".chainlink-inner-content")?.textContent || "";
-          const date = element.querySelector(".chainlink-date")?.textContent || "";
-          let external = element.querySelector(".header-url")?.getAttribute("href") ?? null;
+          const date = element.querySelector(".chainlink-date")?.getAttribute("date") || "";
+          let external = element.querySelector(".header-url")?.getAttribute("href") || "";
 
           Object.assign(chainlinkObj, { tag, url, order, text, date, external });
 
@@ -335,10 +335,12 @@ function ConstructChainlinkElement(props) {
                     url: xhr.response.url,
                     external: xhr.response.external,
                     text: xhr.response.text,
-                    order: xhr.response.order,
+                    order: parseInt(xhr.response.order),
                     date: xhr.response.date,
                     tag: xhr.response.tag,
                 }
+                console.log(getChainlinkElements)
+                console.log(newComponent)
                 setChainlinkElements(prevList => [...prevList, newComponent]);
             }
         }
@@ -356,9 +358,16 @@ function ConstructChainlinkElement(props) {
                         <p className="help">enter a title to be used as the header name for this chainlink</p>
                     </div>
                     <div className="form-group field">
-                        <label htmlFor="external" id="chainlink-form-text-label" className="form-label label">External URL</label>
+                        <label htmlFor="external" id="chainlink-form-text-label" className="form-label label">External
+                            URL</label>
                         <input type="text" id="input chainlink-form-text" name="external" className="input form-field"/>
                         <p className="help">enter the external url for this chainlink</p>
+                    </div>
+                    <div className="form-group field">
+                        <label className="label">Element Ordering</label>
+                        <input className="input" name="order" defaultValue={getChainlinkElements.length * 100}/>
+                        <p className="help">this is the order of this chainlink relative to others on the
+                            page</p>
                     </div>
                     <div className="form-group field">
                         <input type="hidden" name="archive" value="False"/>
@@ -398,19 +407,13 @@ function ConstructChainlinkElement(props) {
                                         chainlink then this value will empty until the backend sends us a response</p>
                                 </div>
                                 <div className="form-group field">
-                                    <label className="label">Element Ordering</label>
-                                    <input className="input is-static" name="order" value={getChainlinkElements.length * 100}
-                                           readOnly/>
-                                    <p className="help">this is the order of this chainlink relative to others on the
-                                        page</p>
-                                </div>
-                                <div className="form-group field">
                                     <label htmlFor="date" id="chainlink-form-date-label"
                                            className="form-label label">Date</label>
                                     <input type="input" name="date" id="chainlink-form-date"
                                            className="input form-field is-static"
                                            value={new Date().toISOString()} readOnly/>
-                                    <p className="help">This value represents the creation time of this Element. It is automatically set and updated whenever this element is updated.</p>
+                                    <p className="help">This value represents the creation time of this Element. It is
+                                        automatically set and updated whenever this element is updated.</p>
                                 </div>
                             </React.Fragment>
                         }
@@ -433,7 +436,8 @@ function ConstructChainlinkElement(props) {
                     />
 
                 </div>
-                <div id="element-creation-text-align-right field">
+                <div className="form-submit-buttons" id="element-creation-text-align-right field">
+                    <input className="button is-dark" type="reset" onClick={() => setFormState(false)} value="CANCEL"/>
                     <input className="button is-success is-right" type="submit" value="CREATE"/>
                 </div>
             </form>}
@@ -452,6 +456,7 @@ export function NoElements(props) {
 export function Chainlink(props) {
     const [getChainlinkElements, setChainlinkElements] = props.chainlinkElementsState;
     const chainlink = getChainlinkElements.find(item => item.url === props.url);
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     let old_text = chainlink.text;
     let old_order = chainlink.order;
@@ -490,7 +495,7 @@ export function Chainlink(props) {
         // nothing would change and there's no reason to burden the server.
         if (!(values.text == old_text && values.order == old_order && values.external == old_external)) {
 
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
             let xhr = new XMLHttpRequest();
             xhr.open("PUT", window.location.href, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -535,7 +540,8 @@ export function Chainlink(props) {
                                 Archive
                             </label>
                         </div>
-                        <p className="help">Checking this box will ensure that this Chainlink is stored in your archive section (graveyard).</p>
+                        <p className="help">Checking this box will ensure that this Chainlink is stored in your archive
+                            section (graveyard).</p>
                     </div>
                     <CollapsibleCard
                         title="Read Only Fields"
@@ -562,7 +568,8 @@ export function Chainlink(props) {
                             </React.Fragment>
                         }
                     />
-                    <div id="element-creation-text-align-right field">
+                    <div className="form-submit-buttons" id="element-creation-text-align-right field">
+                        <input className="button is-dark" type="reset" onClick={() => setShowChainlinkDeleteForm(false)} value="CANCEL"/>
                         <input className="button is-success is-right" type="submit" value="DELETE"/>
                     </div>
                 </form>
@@ -572,7 +579,7 @@ export function Chainlink(props) {
                     <input type="hidden" name="url" value={chainlink.url}/>
                     <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
                     <div className="form-group field">
-                        <label htmlFor="text" id="chainlink-form-delete-label" className="form-label label">Modify
+                    <label htmlFor="text" id="chainlink-form-delete-label" className="form-label label">Modify
                             this chainlink</label>
                     </div>
                     <div className="form-group field">
@@ -642,69 +649,115 @@ function ChainlinkEditButtons1(props) {
     // This function shifts the target Element up in the order by swapping its order with the previous Element. The order values of each is swapped. This causes a re-render of the Element list
     // We also send a PUT request to the backend to update the order in the database. We do this for both Elements so that the order values for both are updated.
     function shiftUp() {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const index = getChainlinkElements.findIndex(item => item.url === props.url);
-        if (index > 0) {
-            const prev = getChainlinkElements[index - 1];
-            const current = getChainlinkElements[index];
 
-            setChainlinkElements(prevList => {
-                // Create a shallow copy of the list
-                const newList = [...prevList];
+        function sendChainlinkUpdate(chainlinkData) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                xhr.responseType = "json";
 
-                // Swap the order values
-                const tempOrder = current.order;
-                newList[index].order = prev.order;
-                newList[index - 1].order = tempOrder;
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(xhr.response);
+                    } else {
+                        reject(new Error("Request failed with status " + xhr.status));
+                    }
+                };
 
-                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                function sendChainlinkUpdate(chainlinkData) {
-                    let xhr = new XMLHttpRequest();
-                    xhr.open("PUT", window.location.href, true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                    xhr.responseType = "json";
-                    xhr.send(JSON.stringify(chainlinkData));
-                }
+                xhr.onerror = () => reject(new Error("Network error"));
+                xhr.send(JSON.stringify(chainlinkData));
+            });
+        }
 
-                sendChainlinkUpdate(newList[index]);
-                sendChainlinkUpdate(newList[index - 1]);
+        // Perform the update
+        setChainlinkElements(prevList => {
+            const newList = [...prevList];
 
-                return newList;
+            if (index === -1 || index < 1) {
+                return prevList; // Invalid state, do nothing
+            }
+
+            // Swap orders
+            const tempOrder = newList[index].order;
+            newList[index].order = newList[index - 1].order;
+            newList[index - 1].order = tempOrder;
+
+            let list_obj_copy1 = newList[index]
+            let list_obj_copy2 = newList[index - 1]
+
+            // Send updates
+            Promise.all([
+                sendChainlinkUpdate(list_obj_copy1),
+                sendChainlinkUpdate(list_obj_copy2)
+            ]).then(() => {
+                // After both succeed, commit changes to state
+                setChainlinkElements(() => newList);
+            }).catch(error => {
+                console.error("Failed to update chainlink order:", error);
             });
 
-        }
+            return prevList; // temporarily return old list to defer update
+        });
     }
 
     function shiftDown() {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const index = getChainlinkElements.findIndex(item => item.url === props.url);
-        if (index < getChainlinkElements.length - 1) {
-            const current = getChainlinkElements[index];
-            const next = getChainlinkElements[index + 1];
 
-            setChainlinkElements(prevList => {
-                const newList = [...prevList];
+        function sendChainlinkUpdate(chainlinkData) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open("PUT", window.location.href, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                xhr.responseType = "json";
 
-                // Swap the order values
-                const tempOrder = current.order;
-                newList[index].order = next.order;
-                newList[index + 1].order = tempOrder;
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(xhr.response);
+                    } else {
+                        reject(new Error("Request failed with status " + xhr.status));
+                    }
+                };
 
-                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                function sendChainlinkUpdate(chainlinkData) {
-                    let xhr = new XMLHttpRequest();
-                    xhr.open("PUT", window.location.href, true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                    xhr.responseType = "json";
-                    xhr.send(JSON.stringify(chainlinkData));
-                }
-
-                sendChainlinkUpdate(newList[index]);
-                sendChainlinkUpdate(newList[index - 1]);
-
-                return newList;
+                xhr.onerror = () => reject(new Error("Network error"));
+                xhr.send(JSON.stringify(chainlinkData));
             });
         }
+
+        // Perform the update
+        setChainlinkElements(prevList => {
+            const newList = [...prevList];
+
+            if (index === -1 || index + 1 >= newList.length) {
+                return prevList; // Invalid state, do nothing
+            }
+
+            // Swap orders
+            const tempOrder = newList[index].order;
+            newList[index].order = newList[index + 1].order;
+            newList[index + 1].order = tempOrder;
+
+            let list_obj_copy1 = newList[index]
+            let list_obj_copy2 = newList[index + 1]
+
+            // Send updates
+            Promise.all([
+                sendChainlinkUpdate(list_obj_copy1),
+                sendChainlinkUpdate(list_obj_copy2)
+            ]).then(() => {
+                // After both succeed, commit changes to state
+                setChainlinkElements(() => newList);
+            }).catch(error => {
+                console.error("Failed to update chainlink order:", error);
+            });
+
+            return prevList; // temporarily return old list to defer update
+        });
     }
     return (
         <div className="chainlink-buttons-wrapper">
