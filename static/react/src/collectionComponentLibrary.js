@@ -365,7 +365,7 @@ function ConstructChainlinkElement(props) {
                     </div>
                     <div className="form-group field">
                         <label className="label">Element Ordering</label>
-                        <input className="input" name="order" defaultValue={getChainlinkElements.length * 100}/>
+                        <input className="input" name="order" defaultValue={getChainlinkElements.length > 0 ? Math.floor((Number(getChainlinkElements[getChainlinkElements.length - 1].order) + 100) / 100) * 100 : 0}/>
                         <p className="help">this is the order of this chainlink relative to others on the
                             page</p>
                     </div>
