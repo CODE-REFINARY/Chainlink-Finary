@@ -138,23 +138,10 @@ class Collection(models.Model):
 
 
 class Body(models.Model):
-    # Chainlinks are always associated with a Collection at creation. This link is defined in this field. If the
-    # associated Collection is deleted then a Chainlink is typically deleted. However, if the Chainlink archive field
-    # is set to True then the Chainlink should not be deleted. In this case the Chainlink will be orphaned and will
-    # not be associated with a Collection. We want to avoid instances where this nullifying behavior occurs,
-    # so we'll implement checks and user prompts to warn users against accidentally orphaning Chainlinks that other
-    # Collections are referencing.
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=True)
-    # We do not want body elements to be orphaned. Every body element must be associated with a Chainlink, otherwise
-    # we have no way of displaying it.
-    #chainlink = models.ForeignKey(Chainlink, on_delete=models.CASCADE, null=True)
-    order = models.BigIntegerField(default=0)  # indicate the position of this text within the chainlink
+    order = models.BigIntegerField(default=0)
     public = models.BooleanField(default=True)
-    date = models.DateTimeField(default=timezone.now)  # Creation date for this chainlink. May or may not be visible
-    # The user may decide to archive a chainlink which sets this boolean. By default, a created Chainlink is not
-    # archived. If a chainlink is archived then it cannot be deleted except with access to the database. An archived
-    # chainlink will not be deleted if its Collection is deleted. This means that other Collections that reference
-    # this chainlink via Link elements will not be affected by the Chainlink's Collection being deleted.
+    date = models.DateTimeField(default=timezone.now)
     archive = models.BooleanField(default=False)
     css = models.CharField(max_length=10000, null=False, blank=True, default="")
     @property
@@ -188,6 +175,7 @@ class Body(models.Model):
 
 
 class Chainlink(Body):
+    """These are header elements that appear within the Collection body text."""
     body_ptr = models.OneToOneField(
         Body,
         on_delete=models.CASCADE,

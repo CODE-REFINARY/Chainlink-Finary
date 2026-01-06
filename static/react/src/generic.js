@@ -29,5 +29,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (params.get("edit") == "true") {
                 edit = true;
         };
+        // This adds edit-mode="true" to the <html> tag
+        document.documentElement.setAttribute('edit-mode', edit ? 'true' : 'false');
+        
         initialize(edit);
 });

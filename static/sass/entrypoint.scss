@@ -190,7 +190,7 @@ body {
     display: none;
 }
 
-.chainlink-wrapper:hover .chainlink-buttons-wrapper {
+.chainlink:hover .chainlink-buttons-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -199,4 +199,11 @@ body {
 .left-buttons,
 .right-buttons {
   display: flex;
+}
+
+[edit-mode="true"] .chainlink:hover {
+    padding-bottom: 0px;
+    border-width: 1px;
+    border-style: solid;
+    color: rgb(208, 68, 35);
 }

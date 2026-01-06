@@ -62,6 +62,26 @@ function formatUrl(input) {
   }
 }
 
+/**
+ * Recursively checks if an order exists in the Element array.
+ * If it does, increments by 1 and checks again.
+ */
+const getUniqueOrder = (requestedOrder, existingElements) => {
+
+    let order = parseInt(requestedOrder, 10);
+
+    // Find if any OTHER element already has this order
+    const collision = existingElements.find(el => parseInt(el.order, 10) === order);
+
+    if (collision) {
+
+        // If collision exists, increment and check again (recursive)
+        return getUniqueOrder(order + 1, existingElements);
+    }
+
+    return order;
+};
+
 export function ChainlinkDisplayAsComponents() {
   const [getChainlinkElements, setChainlinkElements] = useState([]);
   const [cursor, setCursor] = useState({ url: null, chainlinkOrder: -1, elementOrder: -1 });
@@ -321,6 +341,7 @@ function ConstructChainlinkElement(props) {
         console.log("Form Data:", values); // Access all values here
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        values.order = getUniqueOrder(values.order, getChainlinkElements);  // Automatically increment the order if there is a collision to avoid duplicate orders.
         let xhr = new XMLHttpRequest();
         xhr.open(props.method, window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -494,7 +515,7 @@ export function Chainlink(props) {
         // check if the user pressed submit button without updating anything. If so then don't send the request since
         // nothing would change and there's no reason to burden the server.
         if (!(values.text == old_text && values.order == old_order && values.external == old_external)) {
-
+            values.order = getUniqueOrder(values.order, getChainlinkElements);  // Automatically increment the order if there is a collision to avoid duplicate orders.
 
             let xhr = new XMLHttpRequest();
             xhr.open("PUT", window.location.href, true);
