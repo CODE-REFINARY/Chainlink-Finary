@@ -133,20 +133,20 @@
                             {% if user.is_authenticated %}
                                 {% if collection.public == True %}
                                     {% if collection.title %}
-                                        <a class="button is-light is-rounded is-right is-small tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
+                                        <a class="button is-light is-rounded is-right is-small tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title }}</a>
                                     {% else %}
                                         <a class="button is-light is-rounded is-right is-small tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
                                     {% endif %}
                                 {% else %}
                                     {% if collection.title %}
-                                        <a class="button is-light is-rounded is-right is-small tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}"><img src="{% static 'images/lock_icon.png' %}" alt="lock icon" style="width: 16px; height: 16px; vertical-align: middle;">{{ collection.title.text }}</a>
+                                        <a class="button is-light is-rounded is-right is-small tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}"><img src="{% static 'images/lock_icon.png' %}" alt="lock icon" style="width: 16px; height: 16px; vertical-align: middle;">{{ collection.title }}</a>
                                     {% else %}
                                         <a class="button is-light is-rounded is-right is-small tabbed-buttons private-collection" href="{% url 'collection' url=collection.url %}"><img src="{% static 'images/lock_icon.png' %}" alt="lock icon" style="width: 16px; height: 16px; vertical-align: middle;">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
                                     {% endif %}
                                 {% endif %}
                             {% else %}
                                 {% if collection.title %}
-                                    <a class="button is-light is-rounded is-right is-small tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title.text }}</a>
+                                    <a class="button is-light is-rounded is-right is-small tabbed-buttons" href="{% url 'collection' url=collection.url %}">{{ collection.title }}</a>
                                 {% else %}
                                     <a class="button is-light is-rounded is-right is-small tabbed-buttons" href="{% url 'collection' url=collection.url %}">untitled&lt{{ collection.url|slice:"0:9" }}&gt</a>
                                 {% endif %}

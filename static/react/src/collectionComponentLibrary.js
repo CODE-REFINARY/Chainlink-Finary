@@ -115,48 +115,45 @@ export function ChainlinkDisplayAsComponents() {
           lastChainlinkOrder = order;
           lastElementOrder = -1;
         } else if (tag === "Header3") {
-          innerElements.push(
-            <Header3
-              key={element.id}
-              url={getUrlFromId(element.id)}
-              text={element.querySelector(".inner-content")?.textContent || ""}
-              order={getOrderFromId(element.id)}
-            />
-          );
-          lastElementOrder = getOrderFromId(element.id);
+            let header3 = {};
+            header3.tag = tag;
+            header3.key = element.id;
+            header3.url = getUrlFromId(element.id)
+            header3.text = element.querySelector(".inner-content")?.textContent || "";
+            header3.order = getOrderFromId(element.id);
+            innerElements.push(header3);
+            lastElementOrder = getOrderFromId(element.id);
         } else if (tag === "Paragraph") {
-          innerElements.push(
-            <Paragraph
-              key={element.id}
-              render_outer_div={true}
-              url={getUrlFromId(element.id)}
-              text={element.querySelector(".inner-content")?.textContent || ""}
-              order={getOrderFromId(element.id)}
-            />
-          );
-          lastElementOrder = getOrderFromId(element.id);
+            let paragraph = {};
+            paragraph.tag = tag;
+            paragraph.key = element.id;
+            paragraph.render_outer_div = true;
+            paragraph.url = getUrlFromId(element.id);
+            paragraph.text = element.querySelector(".inner-content")?.textContent || "";
+            paragraph.order = getOrderFromId(element.id);
+            innerElements.push(paragraph);
+            lastElementOrder = getOrderFromId(element.id);
         } else if (tag === "Code") {
-          innerElements.push(
-            <Code
-              key={element.id}
-              url={getUrlFromId(element.id)}
-              text={element.querySelector(".inner-content")?.textContent || ""}
-              order={getOrderFromId(element.id)}
-            />
-          );
-          lastElementOrder = getOrderFromId(element.id);
+            let code = {};
+            code.tag = tag;
+            code.key = element.id;
+            code.url = getUrlFromId(element.id);
+            code.text = element.querySelector(".inner-content")?.textContent || "";
+            code.order = getOrderFromId(element.id);
+            innerElements.push(code);
+            lastElementOrder = getOrderFromId(element.id);
         } else if (tag === "Linebreak") {
-          innerElements.push(
-            <Linebreak
-              key={element.id}
-              url={getUrlFromId(element.id)}
-              order={getOrderFromId(element.id)}
-            />
-          );
-          lastElementOrder = getOrderFromId(element.id);
+            let linebreak = {};
+            linebreak.tag = tag;
+            linebreak.key = element.id;
+            linebreak.url = getUrlFromId(element.id);
+            linebreak.order = getOrderFromId(element.id);
+            innerElements.push(linebreak);
+            lastElementOrder = getOrderFromId(element.id);
         }
       });
 
+      chainlinkObj.children = innerElements;
       chainlinkElements.push(chainlinkObj);
     });
 
@@ -657,6 +654,23 @@ export function Chainlink(props) {
                     </div>
                 </form>
             )}
+            {chainlink.children && chainlink.children.sort((a, b) => a.order - b.order) // Sort children by order
+                .map((el) => {
+                    // Render the appropriate component based on the data structure
+                    // Note: You may need to pass the tag in your useEffect for this logic
+                    if (el.tag === "Header3") {
+                            return <Header3 />;
+                    } else if (el.tag === "Paragraph") {
+                            return <Paragraph />;
+                    } else if (el.tag === "Linebreak") {
+                            return <Linebreak />;
+                    } else if (el.tag === "Code") {
+                            return <Code />;
+                    }
+                    // Default fallback
+                    return <NoElements key={el.key} element="Body Element" />;
+                })
+            }
         </section>
     );
 }

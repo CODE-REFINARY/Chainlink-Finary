@@ -17,32 +17,20 @@ class Account(models.Model):
         return str(self.user.username)
 
 
-# Conceptually the "tags" defined here are what are referred to as "Elements" elsewhere. Element is a fairly broad
-# term but really refers to the components of a Collection. The Collection itself is an Element and so are the
-# various building blocks of that Collection including <code> sections, <h1> sections, linebreaks, and so on. These
-# are all identified via a model field that connects them to an entry from this class. What's happening here is the
-# strings that are passed in to views.py via front-end AJAX requests are matched against this list and this match
-# is used to identify and assign a type to the new Element that the AJAX request is seeking to create and instantiate.
-# For example, the user dispatches an AJAX request with a "chainlink" in the payload which specifies that the created
-# database element should be a TagType.CHAINLINK.
 class TagType(models.TextChoices):
-    HEADER1 = "Header1"      # The H1 appears as a title to a Collection. It is the name of the Collection and is prominently displayed as the H1 HTML element should be.
-    CHAINLINK = "Chainlink"    # The Chainlink is similar to an HTML <h2>.
-    PARAGRAPH = "Paragraph"
-    CODE = "Code"
-    HEADER3 = "Header3"
-    LINEBREAK = "Linebreak"
-    FOOTER = "Footer"
-    ENDNOTE = "Endnote"  # Endnotes are paragraphs that appear in the footer
-    IMAGE = "Image"
-    LIST = "List"
-    LINK = "Link"
-    HEADER_BANNER = "HBNR"
-    FOOTER_LIST = "FTRLI"
-    NOTE = "Note"
-    COLLECTION = "Collection"
+    HEADER1 = "HEADER1"      # The H1 appears as a title to a Collection. It is the name of the Collection and is prominently displayed as the H1 HTML element should be.
+    HEADER2 = "HEADER2"
+    PARAGRAPH = "PARAGRAPH"
+    CODE = "CODE"
+    HEADER3 = "HEADER3"
+    LINEBREAK = "LINEBREAK"
+    IMAGE = "IMAGE"
+    LIST = "LIST"
+    LINK = "LINK"
+    FOOTER_LIST = "FOOTER_LIST"
+    NOTE = "NOTE"
 
-
+"""
 def inheritsBody(tag):
     return tag in [TagType.CHAINLINK, TagType.HEADER3, TagType.PARAGRAPH, TagType.CODE, TagType.LINEBREAK, TagType.IMAGE, TagType.LIST, TagType.LINK, TagType.NOTE]
 
@@ -53,17 +41,15 @@ def inheritsFooter(tag):
 
 def inheritsHeader(tag):
     return tag in [TagType.HEADER_BANNER, TagType.HEADER1]
+"""
 
-
-def getTableFromTag(tag):
-    """
-    Given a TagType, returns its associated table object.
-    """
+"""def getTableFromTag(tag):
+    #Given a TagType, returns its associated table object.
     match tag:
         case TagType.HEADER1:
             return Header1
-        case TagType.CHAINLINK:
-            return Chainlink
+        case TagType.HEADER2:
+            return Header2
         case TagType.PARAGRAPH:
             return Paragraph
         case TagType.CODE:
@@ -74,24 +60,19 @@ def getTableFromTag(tag):
             return Linebreak
         case TagType.COLLECTION:
             return Collection
-        case TagType.FOOTER:
-            return Footer
-        case TagType.ENDNOTE:
-            return Endnote
         case TagType.IMAGE:
             return Image
         case TagType.LIST:
             return List
         case TagType.LINK:
             return Link
-        case TagType.HEADER_BANNER:
-            return HeaderBanner
         case TagType.FOOTER_LIST:
             return FooterList
         case TagType.NOTE:
             return Note
         case _:
             raise ValueError(f"Unrecognized tag type: {tag}")
+"""
 
 
 class Theme(models.TextChoices):
@@ -120,9 +101,8 @@ class Collection(models.Model):
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this collection
     url = models.CharField(max_length=75)  # relative url for this collection
-    title = models.ForeignKey("Header1", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")     # This
-    # is a link to the Header object that's acting as the title for this Collection. There can only be one Header object
-    # that is a title but there can be multiple Header objects associated with this Collection.
+    title = models.CharField(max_length=75)
+    css = models.CharField(max_length=10000, null=False, blank=True, default="")    # This let's you apply styles to the whole page!
     theme = models.CharField(  # specify tag to wrap text in
         max_length=100,
         choices=Theme.choices,
@@ -133,22 +113,23 @@ class Collection(models.Model):
         returnme += "Url: " + "%.10s" % self.url + " | "
         returnme += "Date: " + str(self.date) + " | "
         returnme += "Public: " + str(self.public) + " | "
-        returnme += "Title: " + str(self.title.text if self.title else "N/A")
+        returnme += "Title: " + str(self.title)
         return returnme
 
 
-class Body(models.Model):
+class Element(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=True)
     order = models.BigIntegerField(default=0)
     public = models.BooleanField(default=True)
     date = models.DateTimeField(default=timezone.now)
+    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     archive = models.BooleanField(default=False)
     css = models.CharField(max_length=10000, null=False, blank=True, default="")
     @property
     def content(self):  # This field is how you access the child content element that's associated with this element.
-        if hasattr(self, "chainlink"):
-            return self.chainlink
-        if hasattr(self, "paragraph"):
+        if hasattr(self, "header2"):
+            return self.header2
+        elif hasattr(self, "paragraph"):
             return self.paragraph
         elif hasattr(self, "code"):
             return self.code
@@ -164,27 +145,27 @@ class Body(models.Model):
             return self.note
         elif hasattr(self, "image"):
             return self.image
+        elif hasattr(self, "header1"):
+            return self.header1
+        elif hasattr(self, "footerlist"):
+            return self.footerlist
         else:
             return None
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
-        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
         returnme += "Tag: " + (self.content.tag if self.content else "N/A")
         return returnme
 
 
-class Chainlink(Body):
-    """These are header elements that appear within the Collection body text."""
-    body_ptr = models.OneToOneField(
-        Body,
+class Header2(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
-        parent_link=True,
-        null=True,  # <- allow null temporarily
+        parent_link=True
     )
-    tag = TagType.CHAINLINK  # all chainlinks are displayed in <h2>
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
-    text = models.CharField(max_length=200)  # Header element for this chainlink
+    tag = TagType.HEADER2  # all HEADER2s are displayed in <h2>
+    text = models.CharField(max_length=200)  # Header text
     external = models.URLField(max_length=200, null=True, blank=True)  # URL for external link
     def __str__(self):
         returnme = ""
@@ -192,90 +173,94 @@ class Chainlink(Body):
         returnme += "Date: " + str(self.date) + " | "
         returnme += "Public: " + str(self.public) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
-        returnme += "Text: " + "%.35s" % self.text
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Text: " + "%.35s" % str(self.text)
         return returnme
 
 
-class Paragraph(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class Paragraph(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.PARAGRAPH
     text = models.CharField(max_length=1000000, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
-        returnme += "Text: " + "%.35s" % self.text
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Text: " + "%.35s" % str(self.text)
         return returnme
 
 
-class Code(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class Code(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.CODE
     text = models.CharField(max_length=1000000, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
-        returnme += "Text: " + "%.35s" % self.text
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Text: " + "%.35s" % str(self.text)
         return returnme
 
 
-class Linebreak(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class Linebreak(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.LINEBREAK
     # Originally there were 3 choices for the height: a "single", a "double", and a "maximum" spacing option
     height = models.CharField(max_length=100, choices=HeightSpacing.choices, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Height: " + str(self.height)
         return returnme
 
 
-class Header3(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class Header3(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.HEADER3
     text = models.CharField(max_length=10000, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Chainlink: " + str(self.chainlink.text) + " | "
-        returnme += "Text: " + "%.35s" % self.text
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Text: " + "%.35s" % str(self.text)
         return returnme
 
 
-class Image(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class Image(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.IMAGE
 
     # This field tells us where images
@@ -286,76 +271,71 @@ class Image(Body):
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
-        returnme += "Image Title: " + "%.35s" % self.title
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Text: " + "%.35s" % str(self.text)
         return returnme
 
 
-class Note(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class Note(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.NOTE
     text = models.CharField(max_length=100000, default="")
     # This type field is for specifying how the note section should look. These are inspired (read also `ripped off`
     # from the options available in the Confluence Note feature which this model is inspired by.
-    height = models.CharField(max_length=100, choices=NoteType.choices, default="")
+    type = models.CharField(max_length=100, choices=NoteType.choices, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
+        returnme += "Public: " + str(self.public) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
-        returnme += "Text: " + "%.35s" % self.text
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Text: " + "%.35s" % str(self.text) + " | "
         returnme += "Note Type: " + "%.35s" % self.type
         return returnme
 
 
-class Link(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class Link(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.LINK
-    # If the Chainlink that's linked here is deleted we don't want this record to be gone either. Instead, we want to
-    # alert the user and let them decide whether to keep this Element or not.
-    linked_chainlink = models.ForeignKey(Chainlink, on_delete=models.SET_NULL, null=True)
-
-    # I've encountered situations were I want to add a clarifying note to a Chainlink because its use in another
-    # workflow requires some clarification or small adjustment. This variable is for that clarifying text.
     context_note = models.CharField(max_length=10000, null=False, default="")
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
-        returnme += "Linked Chainlink: " + "%.35s" % self.linked_chainlink.title if linked_chainlink else "N/A"
-        returnme += "Context Note: " + "%.35s" % self.context_note
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Context Note: " + "%.35s" % str(self.context_note)
         return returnme
 
 
-class List(Body):
-    body_ptr = models.OneToOneField(
-        Body,
+class List(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.LIST
     content = models.JSONField()
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
         return returnme
 
 
+"""
 class Header(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
@@ -369,30 +349,30 @@ class Header(models.Model):
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
         returnme += "Tag: " + (self.content.tag if self.content else "N/A")
         return returnme
+"""
 
 
-class Header1(Header):
-    header_ptr = models.OneToOneField(
-        Header,
+class Header1(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.HEADER1
     text = models.CharField(max_length=10000)
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
-        returnme += "Text: " + "%.35s" % self.text
+        returnme += "Collection: " + str(self.collection.title) + " | "
+        returnme += "Text: " + "%.35s" % str(self.text)
         return returnme
 
-
-class HeaderBanner(Header):
+"""
+class HeaderBanner(Body):
     header_ptr = models.OneToOneField(
         Header,
         on_delete=models.CASCADE,
@@ -405,10 +385,11 @@ class HeaderBanner(Header):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
         return returnme
+"""
 
-
+"""
 class Footer(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, null=False)
     order = models.BigIntegerField(default=0)
@@ -422,11 +403,12 @@ class Footer(models.Model):
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
         returnme += "Tag: " + (self.content.tag if self.content else "N/A")
         return returnme
+"""
 
-
+"""
 # This is just a paragraph that appears in the footer section of the Collection. The options available here are
 # pretty much identical to what you get when you create a regular paragraph in a Chainlink.
 class Endnote(Footer):
@@ -442,25 +424,25 @@ class Endnote(Footer):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
         returnme += "Text: " + "%.35s" % self.text
         return returnme
+"""
 
 
 # This is a list of items that appear in the footer section of a Collection. This list is supposed to be very
 # customizable with things like the ability to display the contents vertically or horizontally.
-class FooterList(Footer):
-    footer_ptr = models.OneToOneField(
-        Footer,
+class FooterList(Element):
+    element_ptr = models.OneToOneField(
+        Element,
         on_delete=models.CASCADE,
         parent_link=True,
     )
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     tag = TagType.FOOTER_LIST
     content = models.JSONField()
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Tag: " + str(self.tag) + " | "
-        returnme += "Collection: " + str(self.collection.title.text if self.collection.title else "N/A") + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
         return returnme

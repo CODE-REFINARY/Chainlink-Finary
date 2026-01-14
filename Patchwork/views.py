@@ -146,6 +146,7 @@ def db_remove(tag, url, order):
         #        obj.save()
         #parent_article.save()
 
+    """
     elif inheritsBody(tag):
 
         parent_chainlink = Chainlink.objects.get(url=url)
@@ -159,12 +160,7 @@ def db_remove(tag, url, order):
                 obj.order -= 1
                 obj.save()
         parent_chainlink.save()
-
-    elif inheritsHeader(tag):
-        pass
-
-    elif inheritsBody(tag):
-        pass
+    """
 
     target.delete()
 
@@ -281,19 +277,12 @@ def generic(request, url=None):
         if not request.user.is_authenticated and not collection.public:
             return render(request, "Patchwork/failure.html");
 
-        # Get the header record associated with this collection if one exists.
-        if hasattr(collection, "header"):
-            header = collection.header
-        else:
-            header = None
-
         # If the user is logged in then display all the Collections.
         if request.user.is_authenticated:
             collections = Collection.objects.all()
         else:
             # Otherwise just display the Collections that are marked public.
             collections = Collection.objects.filter(public=True)
-        collection_titles = Header.objects.all()
 
         # Get the query string edit argument from the url. This argument gets passed to the template so that the
         # template knows to render in edit mode.
@@ -301,26 +290,17 @@ def generic(request, url=None):
 
         # Chainlink and Body data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
-        chainlinks = []
+        elements = []
+        header23s = []
         # Populate the above list with tuples of the specified form by first getting the list of all Chainlinks that
         # are attached to this Article.
-        for chainlink in Chainlink.objects.filter(collection=collection.pk).order_by("order"):
-            contents = []
-            for content in Body.objects.filter(chainlink=chainlink.pk).order_by("order"):
-                contents.append(content)
-            chainlinks.append((chainlink, contents))
-
-        footers = []
-        for footer in Footer.objects.filter(collection=collection.pk).order_by("order"):
-            footers.append(footer)
+        for element in Element.objects.filter(collection=collection.pk).order_by("order"):
+            elements.append(element)
 
         return render(request, "Patchwork/generic.html", {
-            "collection_titles": collection_titles,
             "collections": collections,
-            "chainlinks": chainlinks,
+            "elements": elements,
             "collection": collection,
-            "header": header,
-            "footers": footers,
             "edit": edit,
             "view": "generic"
         })
@@ -353,12 +333,14 @@ def generic(request, url=None):
             db_update(Collection, url, None, target_update)
         elif Tag == TagType.CHAINLINK:
             db_update(Chainlink, payload_json["url"], None, payload)
+        """
         elif inheritsBody(Tag):
             db_update(Body, payload_json["url"], payload_json["order"], payload)
         elif inheritsHeader(Tag):
             db_update(Header, payload_json["url"], payload_json["order"], payload)
         elif inheritsFooter(Tag):
             db_update(Footer, payload_json["url"], payload_json["order"], payload)
+        """
 
     return render(request, "Patchwork/index.html", {})
 
