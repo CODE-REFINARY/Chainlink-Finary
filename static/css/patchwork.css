@@ -166,11 +166,11 @@ body {
 /* config display section */
 
 
-#chainlink-manifest > li {
+#element-manifest > li {
     color: whitesmoke;
     font-family: monospace;
     margin-top: 1px;
-    margin-bototm: 1px;
+    margin-bottom: 1px;
 }
 #keybindings-legend > li {
     color: whitesmoke;
@@ -178,11 +178,11 @@ body {
     margin-top: 3px;
     margin-bottom: 3px;
 }
-#chainlink-manifest > li > a {
+#element-manifest > li > a {
     text-decoration: none;
     font-size: medium;
 }
-#chainlink-manifest > li > a:hover {
+#element-manifest > li > a:hover {
     text-decoration: underline;
     color: #959595;
 }
@@ -244,14 +244,14 @@ body {
     font-size: small;
     color: purple;
 }
-.chainlink-date {
+.element-date {
     font-size: small;
     color: #e35f5f;
 }
-.chainlink-inner-text {
+.element-inner-text {
 	margin-right: 10px;
 }
-.chainlink-order {
+.element-order {
     font-size: x-small;
     color: #888888;
     margin-right: 4px;
