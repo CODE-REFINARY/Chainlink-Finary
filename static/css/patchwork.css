@@ -219,15 +219,15 @@ body {
     -border-width: 3px;
 }
 
-.chainlink:first-child .chainlink-wrapper:first-child {
+/*.chainlink:first-child .chainlink-wrapper:first-child {
     padding-top: 0px;
-}
+}*/
 
-.chainlink:last-child .chainlink-wrapper:last-child, .chainlink:last-child .content-wrapper:last-child {
+/*.chainlink:last-child .chainlink-wrapper:last-child, .chainlink:last-child .content-wrapper:last-child {
     margin-bottom: 0px;
-}
+}*/
 
-.chainlink-wrapper {}
+/*.chainlink-wrapper {}*/
 
 /* popup form creation */
 

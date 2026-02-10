@@ -32,7 +32,7 @@ body {
 
 
 /* chainlink header styling */
-.chainlink-wrapper h2 {
+/*.chainlink-wrapper h2 {
 	font-family: Audiowide;
 	font-weight: 100;
 	font-size: x-large;
@@ -45,7 +45,7 @@ body {
     background-color: #334756;
     padding: 7px;
     border-radius: 12px;
-}
+}*/
 
 /* These are h2 elements that appear on the index page */
 .section-header {

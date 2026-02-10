@@ -19,7 +19,7 @@
 <div id="config-display" class="section is-medium">
     <div id="chainlink-manifest" class="menu">
         <h2 class="menu-label">Chainlink Manifest</h2>
-        <ul id="chainlink-manifest-entries" class="menu-list">
+        <ul id="element-manifest-entries" class="menu-list">
             {% if elements %}
                 {% for element in elements %}
                     {% if element.content.tag == "HEADER2" %}
@@ -50,15 +50,8 @@
                 </div>
 
             {% elif element.content.tag == "HEADER2" %}
-                <div id="{{ element.url }}" order={{element.order}} class="title is-2 element-wrapper" tag="HEADER2">
-                    <h2>
-                        <span class="chainlink-order">#{{ element.order }}</span>
-                        <span class="chainlink-inner-content" style="{{ chainlink.0.css }}">{{ element.content.text }}</span>
-                        <span class="chainlink-date" date="{{ element.date|date:"c" }}">{{ element.date|date:"M d, Y, g:i A e" }}</span>
-                        {%  if chainlink.0.external %}
-                        <a class="inline-url header-url" href={{ element.external }}>>>>{{ element.external|cut:"https://"|cut:"http://"|slice:":35" }}{% if element.external|cut:"https://"|cut:"http://"|length > 35 %}...{% endif %}</a>
-                        {% endif %}
-                    </h2>
+                <div id="{{ element.url }}" order={{element.order}} class="element-wrapper" tag="HEADER2">
+                    <h2 class="title is-2" style="{{ chainlink.0.css }}">{{ element.content.text }}</h2>
                 </div>
 
             {% elif element.content.tag == "HEADER3" %}

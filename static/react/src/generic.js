@@ -1,9 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { ChainlinkDisplayAsComponents } from "./collectionComponentLibrary.js";
+import { ElementDisplayAsComponents } from "./collectionComponentLibrary.js";
 
 // await full DOM load before adding DB items
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
         function initialize(edit) {
                 let elementsComponent = undefined;
@@ -13,12 +13,12 @@ document.addEventListener("DOMContentLoaded", function() {
                         // delete the chainlink manifest entries before you create a root out of the dispplay. This is done because
                         // we're gonna make chainlink manifest dynamic and we need to get rid of the old entries that were rendered server-side
                         // before we render with react because we don't want react to manipulate the dom directly.
-                        let el = document.getElementById("chainlink-manifest-entries");
+                        let el = document.getElementById("element-manifest-entries");
                         while (el.firstChild) {
                                 el.removeChild(el.firstChild);
                         }
-                        elementsComponent = createRoot(document.getElementById("chainlink-display"));
-                        elementsComponent.render(<ChainlinkDisplayAsComponents/>);
+                        elementsComponent = createRoot(document.getElementById("element-display"));
+                        elementsComponent.render(<ElementDisplayAsComponents />);
                 }
         }
 
@@ -31,6 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
         };
         // This adds edit-mode="true" to the <html> tag
         document.documentElement.setAttribute('edit-mode', edit ? 'true' : 'false');
-        
+
         initialize(edit);
 });

@@ -1,5 +1,5 @@
 import React, {useEffect, createContext, useContext, useRef } from "react";
-import { createRoot, createPortal } from "react-dom";
+import { createPortal } from "react-dom";
 import { useState } from "react";
 
 const CursorContext = createContext(null);
@@ -82,122 +82,91 @@ const getUniqueOrder = (requestedOrder, existingElements) => {
     return order;
 };
 
-export function ChainlinkDisplayAsComponents() {
-  const [getChainlinkElements, setChainlinkElements] = useState([]);
-  const [cursor, setCursor] = useState({ url: null, chainlinkOrder: -1, elementOrder: -1 });
-  const chainlinks = document.querySelectorAll(".chainlink");
+export function ElementDisplayAsComponents() {
+    const [getElementList, setElementList] = useState([]);
+    const [cursor, setCursor] = useState(-1);
+    const elements = document.querySelectorAll(".element-wrapper");
 
-  let chainlinkManifestDomElement = document.getElementById("chainlink-manifest-entries");
+    let elementDisplay = document.getElementById("element-display");
+    let elementManifest = document.getElementById("element-manifest-entries");
 
-  useEffect(() => {
-    let chainlinkElements = [];
-    let lastChainlinkUrl = null;
-    let lastChainlinkOrder = -1;
-    let lastElementOrder = -1;
+    useEffect(() => {
+        let elementList = [];
 
-    chainlinks.forEach((chainlink) => {
-      let chainlinkObj = {};
-      let innerElements = [];
-
-      Array.from(chainlink.children).forEach((element) => {
+    elements.forEach((element) => {
+        let elementObj = {};
         const tag = element.getAttribute("tag");
 
-        if (tag === "Chainlink") {
-          const url = element.id;
-          const order = parseInt(element.getAttribute("order"), 10);
-          const text = element.querySelector(".chainlink-inner-content")?.textContent || "";
-          const date = element.querySelector(".chainlink-date")?.getAttribute("date") || "";
-          let external = element.querySelector(".header-url")?.getAttribute("href") || "";
+        // Shared attributes
+        const url = element.id;
+        const order = parseInt(element.getAttribute("order"), 10);
 
-          Object.assign(chainlinkObj, { tag, url, order, text, date, external });
-
-          lastChainlinkUrl = url;
-          lastChainlinkOrder = order;
-          lastElementOrder = -1;
-        } else if (tag === "Header3") {
-            let header3 = {};
-            header3.tag = tag;
-            header3.key = element.id;
-            header3.url = getUrlFromId(element.id)
-            header3.text = element.querySelector(".inner-content")?.textContent || "";
-            header3.order = getOrderFromId(element.id);
-            innerElements.push(header3);
-            lastElementOrder = getOrderFromId(element.id);
-        } else if (tag === "Paragraph") {
-            let paragraph = {};
-            paragraph.tag = tag;
-            paragraph.key = element.id;
-            paragraph.render_outer_div = true;
-            paragraph.url = getUrlFromId(element.id);
-            paragraph.text = element.querySelector(".inner-content")?.textContent || "";
-            paragraph.order = getOrderFromId(element.id);
-            innerElements.push(paragraph);
-            lastElementOrder = getOrderFromId(element.id);
-        } else if (tag === "Code") {
-            let code = {};
-            code.tag = tag;
-            code.key = element.id;
-            code.url = getUrlFromId(element.id);
-            code.text = element.querySelector(".inner-content")?.textContent || "";
-            code.order = getOrderFromId(element.id);
-            innerElements.push(code);
-            lastElementOrder = getOrderFromId(element.id);
-        } else if (tag === "Linebreak") {
-            let linebreak = {};
-            linebreak.tag = tag;
-            linebreak.key = element.id;
-            linebreak.url = getUrlFromId(element.id);
-            linebreak.order = getOrderFromId(element.id);
-            innerElements.push(linebreak);
-            lastElementOrder = getOrderFromId(element.id);
+        if (tag === "HEADER2") {
+            const text = element.querySelector("h2")?.textContent || "";
+            Object.assign(elementObj, { tag, url, order, text });
+        } else if (tag === "HEADER3") {
+            const text = element.querySelector("h3")?.textContent || "";
+            Object.assign(elementObj, { tag, url, order, text });
+        } else if (tag === "PARAGRAPH") {
+            const text = element.querySelector("p")?.textContent || "";
+            Object.assign(elementObj, { tag, url, order, text });
+        } else if (tag === "CODE") {
+            const text = element.querySelector("code")?.textContent || "";
+            Object.assign(elementObj, { tag, url, order, text });
+        } else if (tag === "LINEBREAK") {
+            Object.assign(elementObj, { tag, url, order });
+        } else {
+            // 'continue' doesn't work in forEach; use 'return' instead
+            return; 
         }
-      });
 
-      chainlinkObj.children = innerElements;
-      chainlinkElements.push(chainlinkObj);
+        elementList.push(elementObj);
     });
 
-    setChainlinkElements(chainlinkElements);
-    setCursor({
-      url: lastChainlinkUrl,
-      chainlinkOrder: lastChainlinkOrder,
-      elementOrder: lastElementOrder,
-    });
+        setElementList(elementList);
+        setCursor(elementList.length);
 
-  }, []); // Run once on mount
+    }, []); // Run once on mount
 
-  return (
-    <React.Fragment>
-        {createPortal(
-          getChainlinkElements
-            .sort((a, b) => a.order - b.order)
-            .map(item => (
-                <li>
-                    <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;&gt;{item.text}
-                    </a>
-                </li>
-            )),
-          chainlinkManifestDomElement
-        )}
-      {
-        getChainlinkElements
-          .sort((a, b) => a.order - b.order)
-          .map(item => (
-            <Chainlink
-              key={item.url}
-              url={item.url}
-              text={item.text}
-              external={item.external}
-              date={item.date}
-              order={item.order}
-              chainlinkElementsState={[getChainlinkElements, setChainlinkElements]}
-            />
-          ))
-      }
-      <CursorContext.Provider value={{ cursor, setCursor }}>
-        <CreateBodyEditButtons1 chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} />
-      </CursorContext.Provider>
-    </React.Fragment>
+    return (
+        <React.Fragment>
+            {createPortal(
+                getElementList
+                .sort((a, b) => a.order - b.order)
+                .map(item => (
+                    <li>
+                        <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;&gt;{item.text}
+                        </a>
+                    </li>
+                )),
+                elementManifest
+            )}
+            {getElementList
+                .sort((a, b) => a.order - b.order)
+                .map((item) => {
+                    // We use curly braces here, so we MUST use a return statement
+                    switch (item.tag) {
+                        case 'HEADER2':
+                            return (
+                            <Chainlink
+                                key={item.url}
+                                url={item.url}
+                                text={item.text}
+                                external={item.external}
+                                date={item.date}
+                                order={item.order}
+                                chainlinkElementsState={[getElementList, setElementList]}
+                            />
+                            );
+                        default:
+                            return null; // Always return something (or null) to avoid map errors
+                    }
+                })
+            }
+            <CursorContext.Provider value={{ cursor, setCursor }}>
+                <CreateBodyEditButtons1 chainlinkElementsState={[getElementList, setElementList]} />
+            </CursorContext.Provider>
+        </React.Fragment>
   );
 }
 

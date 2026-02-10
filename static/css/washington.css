@@ -32,7 +32,7 @@ body {
 
 
 /* chainlink header styling */
-.chainlink-wrapper h2 {
+/*.chainlink-wrapper h2 {
 	font-family: Audiowide;
 	font-weight: 100;
 	font-size: x-large;
@@ -45,7 +45,7 @@ body {
     background-color: #334756;
     padding: 7px;
     border-radius: 12px;
-}
+}*/
 
 /* These are h2 elements that appear on the index page */
 .section-header {
@@ -293,15 +293,15 @@ body {
     -border-width: 3px;
 }
 
-.chainlink:first-child .chainlink-wrapper:first-child {
+/*.chainlink:first-child .chainlink-wrapper:first-child {
     padding-top: 0px;
 }
 
 .chainlink:last-child .chainlink-wrapper:last-child, .chainlink:last-child .content-wrapper:last-child {
     margin-bottom: 0px;
-}
+}*/
 
-.chainlink-wrapper {}
+/*.chainlink-wrapper {}*/
 
 /* popup form creation */
 
