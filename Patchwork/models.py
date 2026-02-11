@@ -29,6 +29,7 @@ class TagType(models.TextChoices):
     LINK = "LINK"
     FOOTER_LIST = "FOOTER_LIST"
     NOTE = "NOTE"
+    COLLECTION = "COLLECTION"
 
 """
 def inheritsBody(tag):

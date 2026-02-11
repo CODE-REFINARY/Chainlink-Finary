@@ -31,37 +31,6 @@ function convertISO8601_to_intl(dateString) {
   return dateString;
 }
 
-function truncateLink(truncateLink) {
-    if (truncateLink && truncateLink.length > 35) {
-        return truncateLink.slice(0, 35) + "...";
-    }
-    return truncateLink;
-}
-
-function formatUrl(input) {
-  if (!input || typeof input !== 'string') return '';
-
-  // Trim whitespace
-  let url = input.trim();
-
-  // Ignore completely invalid entries
-  if (url.length < 4) return '';
-
-  // Add https:// if missing
-  if (!/^https?:\/\//i.test(url)) {
-    url = 'https://' + url;
-  }
-
-  try {
-    // Validate URL by trying to construct a new URL object
-    const formatted = new URL(url);
-    return formatted.href;
-  } catch (e) {
-    // Invalid URL format
-    return '';
-  }
-}
-
 /**
  * Recursively checks if an order exists in the Element array.
  * If it does, increments by 1 and checks again.
@@ -174,7 +143,7 @@ export function ElementDisplayAsComponents() {
                                 text={item.text}
                                 date={item.date}
                                 order={item.order}
-                                chainlinkElementsState={[getElementList, setElementList]}
+                                elementList={[getElementList, setElementList]}
                             />
                             );
                         default:
@@ -183,7 +152,7 @@ export function ElementDisplayAsComponents() {
                 })
             }
             <CursorContext.Provider value={{ cursor, setCursor }}>
-                <CreateBodyEditButtons chainlinkElementsState={[getElementList, setElementList]} />
+                <CreateBodyEditButtons elementList={[getElementList, setElementList]} />
             </CursorContext.Provider>
         </React.Fragment>
   );
@@ -194,7 +163,7 @@ export function CreateBodyEditButtons(props) {
     // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
     // is being shown or not.
     const [showElementCreationForm, setShowElementCreationForm] = useState(false);
-    const [getChainlinkElements, setChainlinkElements] = props.chainlinkElementsState;
+    const [getElementList, setElementList] = props.elementList;
     const [elementType, setElementType] = useState("");
     const { cursor, setCursor } = useContext(CursorContext);
 
@@ -203,7 +172,6 @@ export function CreateBodyEditButtons(props) {
             setShowElementCreationForm(true); // Set the state to true to show the element creation form
         };
         const handleHide = () => setShowElementCreationForm(false); // Set the state to false to hide the element creation form
-        let chainlinkButton;
         let buttonList;
 
         if (showElementCreationForm == false) {
@@ -244,7 +212,7 @@ export function CreateBodyEditButtons(props) {
 
         return (
             <div className="crud-form">
-                {<ElementCreationForm chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} onHide={handleHide} elementCreationFormState={[showElementCreationForm, setShowElementCreationForm]} placeholder="enter content" method="POST" type={elementType} />}
+                {<ElementCreationForm elementList={[getElementList, setElementList]} onHide={handleHide} elementCreationFormState={[showElementCreationForm, setShowElementCreationForm]} placeholder="enter content" method="POST" type={elementType} />}
                 <div className="grid">
                     {buttonList}
                 </div>
@@ -253,7 +221,7 @@ export function CreateBodyEditButtons(props) {
     }
 
 export function ElementCreationForm(props) {
-    const [getChainlinkElements, setChainlinkElements] = props.chainlinkElementsState;
+    const [getElementList, setElementList] = props.elementList;
 
     useEffect(() => {
     })
@@ -284,7 +252,7 @@ export function ElementCreationForm(props) {
     } else if (props.type == "HEADER2") {
         return (
             <React.Fragment>
-                <ConstructHeader2Element chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} value={props.value} type={props.type} url={props.url} order={props.order} date={props.date} css={props.css} onHide={props.onHide} method={props.method} elementCreationFormState={props.elementCreationFormState} />
+                <ConstructHeader2Element elementList={[getElementList, setElementList]} value={props.value} type={props.type} url={props.url} order={props.order} date={props.date} css={props.css} onHide={props.onHide} method={props.method} elementCreationFormState={props.elementCreationFormState} />
             </React.Fragment>
         )
     } else if (props.type == "HEADER1") {
@@ -297,7 +265,7 @@ export function ElementCreationForm(props) {
 }
 
 function ConstructHeader2Element(props) {
-    const [getChainlinkElements, setChainlinkElements] = props.chainlinkElementsState;
+    const [getElementList, setElementList] = props.elementList;
     const [showFormState, setFormState] = props.elementCreationFormState;
 
     const handleSubmit = (e) => {
@@ -310,7 +278,7 @@ function ConstructHeader2Element(props) {
         console.log("Form Data:", values); // Access all values here
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        values.order = getUniqueOrder(values.order, getChainlinkElements);  // Automatically increment the order if there is a collision to avoid duplicate orders.
+        values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
         let xhr = new XMLHttpRequest();
         xhr.open(props.method, window.location.href, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -328,9 +296,9 @@ function ConstructHeader2Element(props) {
                     date: xhr.response.date,
                     tag: xhr.response.tag,
                 }
-                console.log(getChainlinkElements)
+                console.log(getElementList)
                 console.log(newComponent)
-                setChainlinkElements(prevList => [...prevList, newComponent]);
+                setElementList(prevList => [...prevList, newComponent]);
             }
         }
         setFormState(false);
@@ -348,7 +316,7 @@ function ConstructHeader2Element(props) {
                     </div>
                     <div className="form-group field">
                         <label className="label">Element Ordering</label>
-                        <input className="input" name="order" defaultValue={getChainlinkElements.length > 0 ? Math.floor((Number(getChainlinkElements[getChainlinkElements.length - 1].order) + 100) / 100) * 100 : 0}/>
+                        <input className="input" name="order" defaultValue={getElementList.length > 0 ? Math.floor((Number(getElementList[getElementList.length - 1].order) + 100) / 100) * 100 : 0}/>
                         <p className="help">this is the order of this element relative to others on the
                             page</p>
                     </div>
@@ -437,15 +405,15 @@ export function NoElements(props) {
 }
 
 export function Header2(props) {
-    const [getChainlinkElements, setChainlinkElements] = props.chainlinkElementsState;
-    const chainlink = getChainlinkElements.find(item => item.url === props.url);
+    const [getElementList, setElementList] = props.elementList;
+    const element = getElementList.find(item => item.url === props.url);
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    let old_text = chainlink.text;
-    let old_order = chainlink.order;
+    let old_text = element.text;
+    let old_order = element.order;
 
-    const [showChainlinkDeleteForm, setShowChainlinkDeleteForm] = useState(false);
-    const [showChainlinkEditForm, setShowChainlinkEditForm] = useState(false);
+    const [showElementDeleteForm, setShowElementDeleteForm] = useState(false);
+    const [showElementEditForm, setShowElementEditForm] = useState(false);
     const handleDeleteSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
 
@@ -462,7 +430,7 @@ export function Header2(props) {
         xhr.send(JSON.stringify(values));
 
         // This line updates the state to remove the deleted element from the list. It identifies the element by its URL.
-        setChainlinkElements(prevList => prevList.filter(item => item.url !== chainlink.url));
+        setElementList(prevList => prevList.filter(item => item.url !== element.url));
 
     };
 
@@ -476,7 +444,7 @@ export function Header2(props) {
         // check if the user pressed submit button without updating anything. If so then don't send the request since
         // nothing would change and there's no reason to burden the server.
         if (!(values.text == old_text && values.order == old_order)) {
-            values.order = getUniqueOrder(values.order, getChainlinkElements);  // Automatically increment the order if there is a collision to avoid duplicate orders.
+            values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
 
             let xhr = new XMLHttpRequest();
             xhr.open("PUT", window.location.href, true);
@@ -486,25 +454,25 @@ export function Header2(props) {
             xhr.send(JSON.stringify(values));
 
             // This line of code updates the element in the list by identifying it by its URL and then updated specific fields
-            setChainlinkElements(prevList => prevList.map(item => item.url === chainlink.url ? { ...item, text: values.text, order: values.order, date: values.date } : item));
+            setElementList(prevList => prevList.map(item => item.url === element.url ? { ...item, text: values.text, order: values.order, date: values.date } : item));
         }
 
-        setShowChainlinkEditForm(false);
+        setShowElementEditForm(false);
     };
     return (
         <React.Fragment>
-            <div id={chainlink.url} className="element-wrapper section is-medium" order={chainlink.order} tag="HEADER2" date={chainlink.date}>
+            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER2" date={element.date}>
                 <h2>
-                    <span className="element-order">#{chainlink.order}</span>
-                    <span className="title is-2" style={{}}>{chainlink.text}</span>
-                    <span className="element-date">{convertISO8601_to_intl(chainlink.date)}</span>
+                    <span className="element-order">#{element.order}</span>
+                    <span className="title is-2" style={{}}>{element.text}</span>
+                    <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </h2>
-            <ChainlinkEditButtons1 chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} url={chainlink.url} chainlinkDeleteFormState={[showChainlinkDeleteForm, setShowChainlinkDeleteForm]} chainlinkEditFormState={[showChainlinkEditForm, setShowChainlinkEditForm]} />
+            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} elementDeleteFormState={[showElementDeleteForm, setShowElementDeleteForm]} elementEditFormState={[showElementEditForm, setShowElementEditForm]} />
             </div>
-            {showChainlinkDeleteForm && (
+            {showElementDeleteForm && (
                 <form className="crud-form" onSubmit={handleDeleteSubmit}>
-                    <input type="hidden" name="url" value={chainlink.url}/>
-                    <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
+                    <input type="hidden" name="url" value={element.url}/>
+                    <input type="hidden" name="order" value={parseInt(element.order, 10)}/>
 
                     <div className="form-group field">
                         <label htmlFor="text" id="element-form-delete-label" className="form-label label">Are you sure
@@ -530,19 +498,19 @@ export function Header2(props) {
                             <React.Fragment>
                                 <div className="form-group field">
                                     <label className="label">Element Tag</label>
-                                    <input className="input is-static" name="tag" value={chainlink.tag} readOnly/>
+                                    <input className="input is-static" name="tag" value={element.tag} readOnly/>
                                     <p className="help">this is the type of Element being deleted. In this case it's a
                                         element</p>
                                 </div>
                                 <div className="form-group field">
                                     <label className="label">Element URL</label>
-                                    <input className="input is-static" name="url" value={chainlink.url} readOnly/>
+                                    <input className="input is-static" name="url" value={element.url} readOnly/>
                                     <p className="help">"furl" stands for "full url". This is the complete identifier
                                         for this element.</p>
                                 </div>
                                 <div className="form-group field">
                                     <label className="label">Element Ordering</label>
-                                    <input className="input is-static" name="order" value={chainlink.order}
+                                    <input className="input is-static" name="order" value={element.order}
                                            readOnly/>
                                     <p className="help">This is the order of this element on the page.</p>
                                 </div>
@@ -550,15 +518,15 @@ export function Header2(props) {
                         }
                     />
                     <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                        <input className="button is-dark" type="reset" onClick={() => setShowChainlinkDeleteForm(false)} value="CANCEL"/>
+                        <input className="button is-dark" type="reset" onClick={() => setShowElementDeleteForm(false)} value="CANCEL"/>
                         <input className="button is-success is-right" type="submit" value="DELETE"/>
                     </div>
                 </form>
             )}
-            {showChainlinkEditForm && (
+            {showElementEditForm && (
                 <form className="crud-form" onSubmit={handleEditSubmit}>
-                    <input type="hidden" name="url" value={chainlink.url}/>
-                    <input type="hidden" name="order" value={parseInt(chainlink.order, 10)}/>
+                    <input type="hidden" name="url" value={element.url}/>
+                    <input type="hidden" name="order" value={parseInt(element.order, 10)}/>
                     <div className="form-group field">
                     <label htmlFor="text" id="element-form-delete-label" className="form-label label">Modify
                             this element</label>
@@ -567,14 +535,14 @@ export function Header2(props) {
                         <label htmlFor="text" id="element-form-text-label"
                                className="form-label label">Text</label>
                         <input autoFocus type="text" id="input element-form-text"
-                               defaultValue={chainlink.text}
+                               defaultValue={element.text}
                                name="text"
                                className="input form-field"/>
                         <p className="help">enter a title to be used as the header name for this element</p>
                     </div>
                     <div className="form-group field">
                         <label className="label">Element Ordering</label>
-                        <input className="input" type="text" name="order" defaultValue={chainlink.order}/>
+                        <input className="input" type="text" name="order" defaultValue={element.order}/>
                         <p className="help">This is the order of this element on the page.</p>
                     </div>
                     <CollapsibleCard
@@ -583,14 +551,14 @@ export function Header2(props) {
                             <React.Fragment>
                                 <div className="form-group field">
                                     <label className="label">Element Tag</label>
-                                    <input className="input is-static" name="tag" value={chainlink.tag} readOnly/>
+                                    <input className="input is-static" name="tag" value={element.tag} readOnly/>
                                     <p className="help">this is the type of Element being deleted. In this case it's
                                         a
                                         element</p>
                                 </div>
                                 <div className="form-group field">
                                     <label className="label">Element URL</label>
-                                    <input className="input is-static" name="url" value={chainlink.url} readOnly/>
+                                    <input className="input is-static" name="url" value={element.url} readOnly/>
                                 </div>
                                 <div className="form-group field">
                                     <label htmlFor="date" id="element-form-date-label"
@@ -605,12 +573,12 @@ export function Header2(props) {
                         }
                     />
                     <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                        <input className="button is-dark" type="reset" onClick={() => setShowChainlinkEditForm(false)} value="CANCEL"/>
+                        <input className="button is-dark" type="reset" onClick={() => setShowElementEditForm(false)} value="CANCEL"/>
                         <input className="button is-success" type="submit" value="UPDATE"/>
                     </div>
                 </form>
             )}
-            {chainlink.children && chainlink.children.sort((a, b) => a.order - b.order) // Sort children by order
+            {element.children && element.children.sort((a, b) => a.order - b.order) // Sort children by order
                 .map((el) => {
                     // Render the appropriate component based on the data structure
                     // Note: You may need to pass the tag in your useEffect for this logic
@@ -631,161 +599,100 @@ export function Header2(props) {
     );
 }
 
-function ChainlinkEditButtons1(props) {
-    const [getChainlinkElements, setChainlinkElements] = props.chainlinkElementsState;
-    const chainlink = getChainlinkElements.find(item => item.url === props.url);
-    const [showChainlinkDeleteFormState, setChainlinkDeleteFormState] = props.chainlinkDeleteFormState;
-    const [showChainlinkEditFormState, setChainlinkEditFormState] = props.chainlinkEditFormState;
+function ElementEditButtons(props) {
+    const [getElementList, setElementList] = props.elementList;
+    const element = getElementList.find(item => item.url === props.url);
+    const [showElementDeleteFormState, setElementDeleteFormState] = props.elementDeleteFormState;
+    const [showElementEditFormState, setElementEditFormState] = props.elementEditFormState;
 
-    // This function shifts the target Element up in the order by swapping its order with the previous Element. The order values of each is swapped. This causes a re-render of the Element list
-    // We also send a PUT request to the backend to update the order in the database. We do this for both Elements so that the order values for both are updated.
-    function shiftUp() {
+    // Helper to handle the XHR PUT request
+    function sendElementUpdate(elementData) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const index = getChainlinkElements.findIndex(item => item.url === props.url);
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", window.location.href, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.responseType = "json";
 
-        function sendChainlinkUpdate(chainlinkData) {
-            return new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.location.href, true);
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                xhr.responseType = "json";
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(xhr.response);
+                } else {
+                    reject(new Error("Request failed with status " + xhr.status));
+                }
+            };
 
-                xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(xhr.response);
-                    } else {
-                        reject(new Error("Request failed with status " + xhr.status));
-                    }
-                };
-
-                xhr.onerror = () => reject(new Error("Network error"));
-                xhr.send(JSON.stringify(chainlinkData));
-            });
-        }
-
-        // Perform the update
-        setChainlinkElements(prevList => {
-            const newList = [...prevList];
-
-            if (index === -1 || index < 1) {
-                return prevList; // Invalid state, do nothing
-            }
-
-            // Swap orders
-            const tempOrder = newList[index].order;
-            newList[index].order = newList[index - 1].order;
-            newList[index - 1].order = tempOrder;
-
-            let list_obj_copy1 = newList[index]
-            let list_obj_copy2 = newList[index - 1]
-
-            // Send updates
-            Promise.all([
-                sendChainlinkUpdate(list_obj_copy1),
-                sendChainlinkUpdate(list_obj_copy2)
-            ]).then(() => {
-                // After both succeed, commit changes to state
-                setChainlinkElements(() => newList);
-            }).catch(error => {
-                console.error("Failed to update element order:", error);
-            });
-
-            return prevList; // temporarily return old list to defer update
+            xhr.onerror = () => reject(new Error("Network error"));
+            xhr.send(JSON.stringify(elementData));
         });
     }
 
-    function shiftDown() {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const index = getChainlinkElements.findIndex(item => item.url === props.url);
+    function shiftElement(direction) {
+        // 1. Find index in the current live state
+        const index = getElementList.findIndex(item => item.url === props.url);
+        // 2. Guard Clauses: Stop execution before ANY side effects happen
+        if (index === -1) return;
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === getElementList.length - 1) return;
 
-        function sendChainlinkUpdate(chainlinkData) {
-            return new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.open("PUT", window.location.href, true);
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                xhr.responseType = "json";
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
 
-                xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(xhr.response);
-                    } else {
-                        reject(new Error("Request failed with status " + xhr.status));
-                    }
-                };
+        // 3. Create deep copies of the objects to swap
+        // This prevents the "both orders become the same" mutation bug
+        const newList = [...getElementList];
+        const itemA = { ...newList[index] };
+        const itemB = { ...newList[targetIndex] };
 
-                xhr.onerror = () => reject(new Error("Network error"));
-                xhr.send(JSON.stringify(chainlinkData));
-            });
-        }
+        // 4. Swap the order values
+        const tempOrder = itemA.order;
+        itemA.order = itemB.order;
+        itemB.order = tempOrder;
 
-        // Perform the update
-        setChainlinkElements(prevList => {
-            const newList = [...prevList];
+        // 5. Update the local array copy
+        newList[index] = itemA;
+        newList[targetIndex] = itemB;
 
-            if (index === -1 || index + 1 >= newList.length) {
-                return prevList; // Invalid state, do nothing
-            }
-
-            // Swap orders
-            const tempOrder = newList[index].order;
-            newList[index].order = newList[index + 1].order;
-            newList[index + 1].order = tempOrder;
-
-            let list_obj_copy1 = newList[index]
-            let list_obj_copy2 = newList[index + 1]
-
-            // Send updates
-            Promise.all([
-                sendChainlinkUpdate(list_obj_copy1),
-                sendChainlinkUpdate(list_obj_copy2)
-            ]).then(() => {
-                // After both succeed, commit changes to state
-                setChainlinkElements(() => newList);
-            }).catch(error => {
-                console.error("Failed to update element order:", error);
-            });
-
-            return prevList; // temporarily return old list to defer update
+        // 6. Perform network requests OUTSIDE of setElementList
+        // This ensures they only run once per click
+        Promise.all([
+            sendElementUpdate(itemA),
+            sendElementUpdate(itemB)
+        ]).then(() => {
+            // 7. Finally, update the UI state
+            setElementList(newList);
+        }).catch(error => {
+            console.error("Failed to update element order:", error);
+            // Optional: You could add an alert here to tell the user it failed
         });
     }
+
     return (
         <div className="element-buttons-wrapper">
             <div className="left-buttons">
-                <button className="cl-edit-btn button is-small is-info" target={chainlink.url}
-                        onClick={() => shiftUp()}>⬆
-                </button>
-                <button className="cl-edit-btn button is-small is-warning" target={chainlink.url}
-                        onClick={() => shiftDown()}>⬇
-                </button>
+                <button 
+                    className="cl-edit-btn button is-small is-info" 
+                    onClick={() => shiftElement('up')}
+                >⬆</button>
+                <button 
+                    className="cl-edit-btn button is-small is-warning" 
+                    onClick={() => shiftElement('down')}
+                >⬇</button>
             </div>
             <div className="right-buttons">
-                <button className="doc-action-copy-title button is-small is-info"
-                        onClick={() => navigator.clipboard.writeText(chainlink.text)}>copy
-                </button>
-                <button className="cl-edit-btn button is-small is-warning" target={chainlink.url}
-                        onClick={() => setChainlinkEditFormState(true)}>edit
-                </button>
-                <button className="cl-del-btn button is-small is-danger" target={chainlink.url}
-                        onClick={() => setChainlinkDeleteFormState(true)}>delete
-                </button>
+                <button 
+                    className="doc-action-copy-title button is-small is-info"
+                    onClick={() => navigator.clipboard.writeText(element?.text || "")}
+                >copy</button>
+                <button 
+                    className="cl-edit-btn button is-small is-warning" 
+                    onClick={() => setElementEditFormState(true)}
+                >edit</button>
+                <button 
+                    className="cl-del-btn button is-small is-danger" 
+                    onClick={() => setElementDeleteFormState(true)}
+                >delete</button>
             </div>
-        </div>
-    );
-}
-
-export function ContentEditButtons1(props) {
-    let chainlinkId = "content-" + props.url + "-" + props.order
-    return (
-        <div className="context-buttons-wrapper">
-            <button className="doc-action-copy-title button is-small is-info">copy</button>
-            <button className="cont-edit-btn button is-small is-warning" target={chainlinkId}
-                    onClick={() => editContent(chainlinkId)}>edit
-            </button>
-            <button className="cont-del-btn button is-small is-danger" target={chainlinkId}
-                    onClick={() => deleteContent(chainlinkId)}>edit
-            </button>
         </div>
     );
 }
@@ -795,7 +702,6 @@ export function Header3(props) {
     return (
         <div id={contentId} className="title is-3 content-wrapper" tag="H3" index={12}>
             <h3 className="inner-content">{props.text}</h3>
-            <ContentEditButtons1 curl={props.curl} order={props.order}/>
         </div>
     );
 };
@@ -807,7 +713,6 @@ export function Linebreak(props) {
             <span className="pb-6 pt-6 inner-content br">
                 <i>&lt;!-- linebreak insert --&gt;</i>
             </span>
-            <ContentEditButtons1 curl={props.curl} order={props.order}/>
         </div>
     );
 };
@@ -817,7 +722,6 @@ export function Code(props) {
     return (
         <div id={contentId} className="content-wrapper" tag="CODE" index={12}>
             <code className="code inner-content">{props.text}</code>
-            <ContentEditButtons1 curl={props.curl} order={props.order}/>
         </div>
     );
 };
@@ -828,14 +732,12 @@ export function Paragraph(props) {
         return (
             <div className="content-wrapper" id={contentId} tag="P">
                 <p className="inner-content">{props.text}</p>
-                <ContentEditButtons1 curl={props.curl} order={props.order} />
             </div>
         );
     } else {
         return (
             <React.Fragment>
                 <p className="inner-content">{props.text}</p>
-                <ContentEditButtons1 curl={props.curl} order={props.order}/>
             </React.Fragment>
         );
     }

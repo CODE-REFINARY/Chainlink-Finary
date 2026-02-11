@@ -52,33 +52,32 @@ def db_store(payload, collection, is_landing_page=False, user=None):
     # Read the type of Element to store
     tag = TagType(json_data["tag"])
 
-    if tag == TagType.CHAINLINK:
+    if tag == TagType.HEADER2:
         # Create a representation of the Chainlink object to write to the database
-        cl = Chainlink()
+        el = Header2()
         # Update the collection object to indicate that it has a new child
         collection = Collection.objects.get(url=collection)
-        cl.order = json_data["order"]
-        cl.collection = collection
-        cl.text = json_data["text"]
-        cl.url = db_try_url(TagType.CHAINLINK)
-        cl.public = json_data["public"]
-        cl.archive = json_data["archive"]
-        cl.external = json_data["external"]
-        cl.css = json_data["css"]
+        el.order = json_data["order"]
+        el.collection = collection
+        el.text = json_data["text"]
+        el.url = db_try_url(TagType.HEADER2)
+        el.public = json_data["public"]
+        el.archive = json_data["archive"]
+        el.css = json_data["css"]
 
         try:
-            cl.date = json_data["date"]
+            el.date = json_data["date"]
         except ValueError:
             print("The user supplied a bad date so instead I will use the current date and time.")
-            cl.date = timezone.now()
+            el.date = timezone.now()
 
         # write objects to the database
-        cl.save()
+        el.save()
 
         # return the request with the url updated with the url assigned to this chainlink
-        json_data["url"] = cl.url
-        json_data["order"] = cl.order
-        json_data["tag"] = TagType.CHAINLINK
+        json_data["url"] = el.url
+        json_data["order"] = el.order
+        json_data["tag"] = TagType.HEADER2
 
     """
     elif tag == TagType.COLLECTION:
@@ -132,8 +131,8 @@ def db_remove(tag, url, order):
                 # Collection to NULL in the database.
                 chainlink.Collection = None
 
-    elif tag == TagType.CHAINLINK:
-        target = Chainlink.objects.get(url=url)
+    elif tag == TagType.HEADER2:
+        target = Header2.objects.get(url=url)
         #parent_article = target.collection
         #print("Delete Chainlink Target" + target)
         #print("Delete Parent Collection" + parent_article)
@@ -174,7 +173,7 @@ def db_update(table, url, order, payload):
     :param order: item identifier used in tandem with url to identify Body type targets
     :param payload: string indicating changes to make to target item
     """
-    if table == Chainlink:
+    if table == Header2:
         target = table.objects.get(url=url)  # Get the record that we want to modify.
     else:
         raise RuntimeError("Table not recognized.")
@@ -331,8 +330,8 @@ def generic(request, url=None):
         Tag = TagType(payload_json["tag"])
         if Tag == TagType.COLLECTION:
             db_update(Collection, url, None, target_update)
-        elif Tag == TagType.CHAINLINK:
-            db_update(Chainlink, payload_json["url"], None, payload)
+        elif Tag == TagType.HEADER2:
+            db_update(Header2, payload_json["url"], None, payload)
         """
         elif inheritsBody(Tag):
             db_update(Body, payload_json["url"], payload_json["order"], payload)
