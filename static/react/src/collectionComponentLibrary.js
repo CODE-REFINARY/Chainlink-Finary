@@ -100,21 +100,25 @@ export function ElementDisplayAsComponents() {
         // Shared attributes
         const url = element.id;
         const order = parseInt(element.getAttribute("order"), 10);
+        const date = element.getAttribute("date")
 
-        if (tag === "HEADER2") {
+        if (tag === "HEADER1") {
+            const text = element.querySelector("h1")?.textContent || "";
+            Object.assign(elementObj, { tag, date, url, order, text });
+        } else if (tag === "HEADER2") {
             const text = element.querySelector("h2")?.textContent || "";
-            Object.assign(elementObj, { tag, url, order, text });
+            Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "HEADER3") {
             const text = element.querySelector("h3")?.textContent || "";
-            Object.assign(elementObj, { tag, url, order, text });
+            Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "PARAGRAPH") {
             const text = element.querySelector("p")?.textContent || "";
-            Object.assign(elementObj, { tag, url, order, text });
+            Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "CODE") {
             const text = element.querySelector("code")?.textContent || "";
-            Object.assign(elementObj, { tag, url, order, text });
+            Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "LINEBREAK") {
-            Object.assign(elementObj, { tag, url, order });
+            Object.assign(elementObj, { tag, date, url, order });
         } else {
             // 'continue' doesn't work in forEach; use 'return' instead
             return; 
@@ -133,12 +137,28 @@ export function ElementDisplayAsComponents() {
             {createPortal(
                 getElementList
                 .sort((a, b) => a.order - b.order)
-                .map(item => (
-                    <li>
-                        <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;&gt;{item.text}
-                        </a>
-                    </li>
-                )),
+                .map((item) => {
+                    switch(item.tag) {
+                        case 'HEADER1':
+                            return (
+                                <li>    
+                                    <a key={item.url} className="inline-url" href={`#${item.url}`}>{item.text}</a>  
+                                </li>
+                            );
+                        case 'HEADER2':
+                            return (
+                                <li>    
+                                    <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;{item.text}</a>  
+                                </li>
+                            );
+                        case 'HEADER3':
+                            return (
+                                <li>    
+                                    <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;&gt;&gt;{item.text}</a>
+                                </li>
+                            );
+                    }}
+                ),
                 elementManifest
             )}
             {getElementList
@@ -152,7 +172,6 @@ export function ElementDisplayAsComponents() {
                                 key={item.url}
                                 url={item.url}
                                 text={item.text}
-                                external={item.external}
                                 date={item.date}
                                 order={item.order}
                                 chainlinkElementsState={[getElementList, setElementList]}
@@ -304,7 +323,6 @@ function ConstructHeader2Element(props) {
             if (xhr.status >= 200 && xhr.status < 300) {
                 const newComponent = {
                     url: xhr.response.url,
-                    external: xhr.response.external,
                     text: xhr.response.text,
                     order: parseInt(xhr.response.order),
                     date: xhr.response.date,
@@ -327,12 +345,6 @@ function ConstructHeader2Element(props) {
                                name="text"
                                className="input form-field"/>
                         <p className="help">enter a title to be used as the header name for this element</p>
-                    </div>
-                    <div className="form-group field">
-                        <label htmlFor="external" id="element-form-text-label" className="form-label label">External
-                            URL</label>
-                        <input type="text" id="input element-form-text" name="external" className="input form-field"/>
-                        <p className="help">enter the external url for this element</p>
                     </div>
                     <div className="form-group field">
                         <label className="label">Element Ordering</label>
@@ -431,7 +443,6 @@ export function Header2(props) {
 
     let old_text = chainlink.text;
     let old_order = chainlink.order;
-    let old_external = chainlink.external || "";
 
     const [showChainlinkDeleteForm, setShowChainlinkDeleteForm] = useState(false);
     const [showChainlinkEditForm, setShowChainlinkEditForm] = useState(false);
@@ -464,7 +475,7 @@ export function Header2(props) {
 
         // check if the user pressed submit button without updating anything. If so then don't send the request since
         // nothing would change and there's no reason to burden the server.
-        if (!(values.text == old_text && values.order == old_order && values.external == old_external)) {
+        if (!(values.text == old_text && values.order == old_order)) {
             values.order = getUniqueOrder(values.order, getChainlinkElements);  // Automatically increment the order if there is a collision to avoid duplicate orders.
 
             let xhr = new XMLHttpRequest();
@@ -475,18 +486,17 @@ export function Header2(props) {
             xhr.send(JSON.stringify(values));
 
             // This line of code updates the element in the list by identifying it by its URL and then updated specific fields
-            setChainlinkElements(prevList => prevList.map(item => item.url === chainlink.url ? { ...item, text: values.text, order: values.order, date: values.date, external: values.external } : item));
+            setChainlinkElements(prevList => prevList.map(item => item.url === chainlink.url ? { ...item, text: values.text, order: values.order, date: values.date } : item));
         }
 
         setShowChainlinkEditForm(false);
     };
     return (
-        <section className="section is-medium">
-            <div id={chainlink.url} className="element-wrapper title is-2" tag="HEADER2">
+        <React.Fragment>
+            <div id={chainlink.url} className="element-wrapper section is-medium" order={chainlink.order} tag="HEADER2" date={chainlink.date}>
                 <h2>
                     <span className="element-order">#{chainlink.order}</span>
-                    <span className="element-inner-content" style={{}}>{chainlink.text}</span>
-                    {chainlink.external && (<a className="inline-url header-url" href={formatUrl(chainlink.external)}>&gt;&gt;&gt;{truncateLink(chainlink.external)}</a>)}
+                    <span className="title is-2" style={{}}>{chainlink.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(chainlink.date)}</span>
                 </h2>
             <ChainlinkEditButtons1 chainlinkElementsState={[getChainlinkElements, setChainlinkElements]} url={chainlink.url} chainlinkDeleteFormState={[showChainlinkDeleteForm, setShowChainlinkDeleteForm]} chainlinkEditFormState={[showChainlinkEditForm, setShowChainlinkEditForm]} />
@@ -563,13 +573,6 @@ export function Header2(props) {
                         <p className="help">enter a title to be used as the header name for this element</p>
                     </div>
                     <div className="form-group field">
-                        <label htmlFor="external" id="element-form-text-label" className="form-label label">External
-                            URL</label>
-                        <input type="text" defaultValue={chainlink.external} id="input element-form-text"
-                               name="external" className="input form-field"/>
-                        <p className="help">enter the external url for this element</p>
-                    </div>
-                    <div className="form-group field">
                         <label className="label">Element Ordering</label>
                         <input className="input" type="text" name="order" defaultValue={chainlink.order}/>
                         <p className="help">This is the order of this element on the page.</p>
@@ -624,7 +627,7 @@ export function Header2(props) {
                     return <NoElements key={el.key} element="Body Element" />;
                 })
             }
-        </section>
+        </React.Fragment>
     );
 }
 

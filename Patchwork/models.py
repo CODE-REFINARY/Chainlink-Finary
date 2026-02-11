@@ -166,7 +166,6 @@ class Header2(Element):
     )
     tag = TagType.HEADER2  # all HEADER2s are displayed in <h2>
     text = models.CharField(max_length=200)  # Header text
-    external = models.URLField(max_length=200, null=True, blank=True)  # URL for external link
     def __str__(self):
         returnme = ""
         returnme += "Order: " + str(self.order) + " | "
