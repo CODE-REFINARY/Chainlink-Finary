@@ -177,7 +177,8 @@ export function CreateBodyEditButtons(props) {
         if (showElementCreationForm == false) {
             buttonList = (
                 <React.Fragment>
-                    <button id="add-cl-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("HEADER2")}>&lt;n&gt; h2</button>
+                    <button id="add-h1-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("HEADER1")}>&lt;n&gt; h1</button>
+                    <button id="add-h2-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("HEADER2")}>&lt;n&gt; h2</button>
                     <button id="add-p-btn" className="button is-rounded is-black cell add-buttons" onClick={() => handleClick("PARAGRAPH")}>&lt;p&gt; paragraph
                     </button>
                     <button id="add-h3-btn" className="button is-rounded is-primary cell add-buttons" onClick={() => makeForm('HEADER3')}>&lt;h&gt; header</button>
@@ -211,7 +212,7 @@ export function CreateBodyEditButtons(props) {
         }
 
         return (
-            <div className="crud-form">
+            <div className="">
                 {<ElementCreationForm elementList={[getElementList, setElementList]} onHide={handleHide} elementCreationFormState={[showElementCreationForm, setShowElementCreationForm]} placeholder="enter content" method="POST" type={elementType} />}
                 <div className="grid">
                     {buttonList}
@@ -671,25 +672,25 @@ function ElementEditButtons(props) {
         <div className="element-buttons-wrapper">
             <div className="left-buttons">
                 <button 
-                    className="cl-edit-btn button is-small is-info" 
+                    className="el-edit-btn button is-small is-info" 
                     onClick={() => shiftElement('up')}
                 >⬆</button>
                 <button 
-                    className="cl-edit-btn button is-small is-warning" 
+                    className="el-edit-btn button is-small is-warning" 
                     onClick={() => shiftElement('down')}
                 >⬇</button>
             </div>
             <div className="right-buttons">
                 <button 
-                    className="doc-action-copy-title button is-small is-info"
+                    className="action-copy button is-small is-info"
                     onClick={() => navigator.clipboard.writeText(element?.text || "")}
                 >copy</button>
                 <button 
-                    className="cl-edit-btn button is-small is-warning" 
+                    className="el-edit-btn button is-small is-warning" 
                     onClick={() => setElementEditFormState(true)}
                 >edit</button>
                 <button 
-                    className="cl-del-btn button is-small is-danger" 
+                    className="el-del-btn button is-small is-danger" 
                     onClick={() => setElementDeleteFormState(true)}
                 >delete</button>
             </div>

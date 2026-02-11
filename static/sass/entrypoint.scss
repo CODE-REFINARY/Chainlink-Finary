@@ -171,10 +171,10 @@ body {
 }
 
 .crud-form {
-    border-radius: 10px;
     background-color: rgb(243, 244, 246);
     padding: 10px;
-    border-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
 }
 
 .header-url, .element-date {
@@ -190,7 +190,8 @@ body {
     display: none;
 }
 
-.element-wrapper:hover .element-buttons-wrapper {
+/* Trigger only if hovered AND the next sibling is NOT a .crud-form */
+.element-wrapper:hover:not(:has(+ .crud-form)) .element-buttons-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -201,9 +202,21 @@ body {
   display: flex;
 }
 
+
+/* Trigger 1: On Hover */
 [edit-mode="true"] .element-wrapper:hover {
     padding-bottom: 0px;
-    border-width: 1px;
+    border-width: 3px;
     border-style: solid;
-    color: rgb(208, 68, 35);
+    color: hsl(220, 14.3%, 95.9%);
+}
+
+/* Trigger 2: When the immediate next sibling is a .crud-form */
+[edit-mode="true"] .element-wrapper:has(+ .crud-form) {
+    padding-bottom: 0px;
+    border-width: 3px;
+    border-style: solid;
+    color: hsl(220, 14.3%, 95.9%);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }

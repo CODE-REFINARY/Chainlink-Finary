@@ -2,35 +2,3 @@ html {
     background-image: url('../images/bluesky-4k.png');
     background-repeat: repeat-y;
 }
-/*
-#chainlink-delete-form {
-    background-image: url('../images/delete.png');
-    border-radius: 3px;
-    border-width: 4px;
-    border-color: #343537;
-    border-style: groove;
-    padding-top: var(--main-body-inner-content-padding-vertical);
-    padding-bottom: var(--main-body-inner-content-padding-vertical);
-    padding-left: var(--main-body-inner-content-padding-horizontal);
-    padding-right: var(--main-body-inner-content-padding-horizontal);
-}
-
-#chainlink-delete-form #crud-form {
-    display: flex;
-    flex-direction: row;
-    align-content: flex-start;
-    justify-content: flex-end;
-}
-
-#chainlink-delete-form #crud-form > * {
-    padding: 5px;
-    margin-left: 1.1rem;
-    border: 2px solid black;
-    border-style: dotted;
-}
-
-input[type="checkbox"] {
-    margin: 0px 0px 0px 5px;
-}
-
- */
