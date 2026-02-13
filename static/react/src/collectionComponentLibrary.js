@@ -75,7 +75,7 @@ export function ElementDisplayAsComponents() {
             const text = element.querySelector("h1")?.textContent || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "HEADER2") {
-            const text = element.querySelector("h2")?.textContent || "";
+            const text = element.querySelector("h2 .title")?.textContent || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "HEADER3") {
             const text = element.querySelector("h3")?.textContent || "";

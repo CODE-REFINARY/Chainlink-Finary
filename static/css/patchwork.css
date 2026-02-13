@@ -244,15 +244,7 @@ body {
     font-size: small;
     color: purple;
 }
-.element-date {
-    font-size: small;
-    color: #e35f5f;
-}
-.element-order {
-    font-size: x-small;
-    color: #888888;
-    margin-right: 4px;
-}
+
 
 
 /* ////////////////////////// FORM ELEMENTS ////////////////////////// */

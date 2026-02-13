@@ -35,6 +35,32 @@
             {% endif %}
         </ul>
     </div>
+    <div id="toggle-switches" class="menu">
+        <h2 class="menu-label">View Options</h2>
+        <ul id="element-manifest-entries" class="menu-list">
+            <li>
+                <label class="switch is-outlined is-small">
+                    <input type="checkbox" value="false">
+                    <span class="check"></span>
+                    <span class="control-label">dark mode</span>
+                </label>
+            </li>
+            <li>
+                <label class="switch is-outlined is-small">
+                    <input type="checkbox" value="false">
+                    <span class="check"></span>
+                    <span class="control-label">show ordering</span>
+                </label>
+            </li>
+            <li>
+                <label class="switch is-outlined is-small">
+                    <input type="checkbox" value="false">
+                    <span class="check"></span>
+                    <span class="control-label">show dates</span>
+                </label>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <!-- Article content is always displayed in #element-display -->
@@ -52,7 +78,11 @@
 
         {% elif element.content.tag == "HEADER2" %}
             <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="HEADER2" date={{element.date.isoformat}}>
-                <h2 class="title is-2" style="{{ element.css }}">{{ element.content.text }}</h2>
+                <h2>
+                    <span class="element-order">#{{element.order}}</span>
+                    <span class="title is-2" style="{{ element.css }}">{{ element.content.text }}</span>
+                    <span class="element-date">{{element.date}}</span>
+                </h2>
             </div>
 
         {% elif element.content.tag == "HEADER3" %}
