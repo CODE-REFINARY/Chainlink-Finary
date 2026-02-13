@@ -202,25 +202,6 @@ body {
   display: flex;
 }
 
-
-/* Trigger 1: On Hover */
-[edit-mode="true"] .element-wrapper:hover {
-    padding-bottom: 0px;
-    border-width: 3px;
-    border-style: solid;
-    color: hsl(220, 14.3%, 95.9%);
-}
-
-/* Trigger 2: When the immediate next sibling is a .crud-form */
-[edit-mode="true"] .element-wrapper:has(+ .crud-form) {
-    padding-bottom: 0px;
-    border-width: 3px;
-    border-style: solid;
-    color: hsl(220, 14.3%, 95.9%);
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-}
-
 .element-date {
     font-size: small;
     color: #e35f5f;
@@ -234,4 +215,40 @@ body {
 #config-display {
     display: flex;
     justify-content: space-between;
+}
+
+
+/* Trigger 1: On Hover - Active UNLESS show-controls is explicitly "false" */
+html[edit-mode="true"]:not([show-controls="false"]) .element-wrapper:hover {
+    padding-bottom: 0px;
+    border-width: 3px;
+    border-style: solid;
+    color: hsl(220, 14.3%, 95.9%);
+}
+
+/* Trigger 2: Form Open - Active UNLESS show-controls is explicitly "false" */
+html[edit-mode="true"]:not([show-controls="false"]) .element-wrapper:has(+ .crud-form) {
+    padding-bottom: 0px;
+    border-width: 3px;
+    border-style: solid;
+    color: hsl(220, 14.3%, 95.9%);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Only hide elements if the attribute is EXPLICITLY set to "false" */
+html[show-ordering="false"] .element-order {
+    display: none !important;
+}
+
+html[show-dates="false"] .element-date {
+    display: none !important;
+}
+
+html[show-controls="false"] #element-creation {
+    display: none !important;
+}
+
+html[show-controls="false"] .element-buttons-wrapper {
+    display: none !important;
 }

@@ -212,7 +212,7 @@ export function CreateBodyEditButtons(props) {
         }
 
         return (
-            <div className="">
+            <div id="element-creation">
                 {<ElementCreationForm elementList={[getElementList, setElementList]} onHide={handleHide} elementCreationFormState={[showElementCreationForm, setShowElementCreationForm]} placeholder="enter content" method="POST" type={elementType} />}
                 <div className="grid">
                     {buttonList}
@@ -579,23 +579,6 @@ export function Header2(props) {
                     </div>
                 </form>
             )}
-            {element.children && element.children.sort((a, b) => a.order - b.order) // Sort children by order
-                .map((el) => {
-                    // Render the appropriate component based on the data structure
-                    // Note: You may need to pass the tag in your useEffect for this logic
-                    if (el.tag === "Header3") {
-                            return <Header3 />;
-                    } else if (el.tag === "Paragraph") {
-                            return <Paragraph />;
-                    } else if (el.tag === "Linebreak") {
-                            return <Linebreak />;
-                    } else if (el.tag === "Code") {
-                            return <Code />;
-                    }
-                    // Default fallback
-                    return <NoElements key={el.key} element="Body Element" />;
-                })
-            }
         </React.Fragment>
     );
 }

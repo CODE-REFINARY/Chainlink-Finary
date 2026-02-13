@@ -1,36 +1,44 @@
-import React from "react";
+import React, {useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ElementDisplayAsComponents } from "./collectionComponentLibrary.js";
+import { ViewOptionsSideMenu } from "./ancillaryComponents.js";
 
-// await full DOM load before adding DB items
+
 document.addEventListener("DOMContentLoaded", function () {
 
-        function initialize(edit) {
-                let elementsComponent = undefined;
-                let editingEnabled = edit;
-                if (editingEnabled == true) {
-                        //refresh();
-                        // delete the chainlink manifest entries before you create a root out of the dispplay. This is done because
-                        // we're gonna make chainlink manifest dynamic and we need to get rid of the old entries that were rendered server-side
-                        // before we render with react because we don't want react to manipulate the dom directly.
-                        let el = document.getElementById("element-manifest-entries");
-                        while (el.firstChild) {
-                                el.removeChild(el.firstChild);
-                        }
-                        elementsComponent = createRoot(document.getElementById("element-display"));
-                        elementsComponent.render(<ElementDisplayAsComponents />);
+    function initialize(edit) {
+        // 1. Logic for the Element Display (Content)
+        if (edit === true) {
+            let manifestEl = document.getElementById("element-manifest-entries");
+            if (manifestEl) {
+                while (manifestEl.firstChild) {
+                    manifestEl.removeChild(manifestEl.firstChild);
                 }
+            }
+            const elementsComponent = createRoot(document.getElementById("element-display"));
+            elementsComponent.render(<ElementDisplayAsComponents/>);
         }
 
+        // 2. Logic for the Side Menu (Switches)
+        const anchorElement = document.getElementById("chainlink-manifest");
+        if (anchorElement) {
+            // Create a wrapper for our React menu
+            const menuWrapper = document.createElement("div");
+            menuWrapper.id = "react-side-menu-root";
+            
+            // Insert it as the next adjacent sibling
+            anchorElement.insertAdjacentElement('afterend', menuWrapper);
 
-        let edit = false; // This variable sets whether the page shows edit controls
-        let queryString = window.location.search;
-        let params = new URLSearchParams(queryString);
-        if (params.get("edit") == "true") {
-                edit = true;
-        };
-        // This adds edit-mode="true" to the <html> tag
-        document.documentElement.setAttribute('edit-mode', edit ? 'true' : 'false');
+            const sideMenuRoot = createRoot(menuWrapper);
+            sideMenuRoot.render(<ViewOptionsSideMenu/>);
+        }
+    }
 
-        initialize(edit);
+    let queryString = window.location.search;
+    let params = new URLSearchParams(queryString);
+    let edit = params.get("edit") === "true";
+
+    document.documentElement.setAttribute('edit-mode', edit ? 'true' : 'false');
+
+    initialize(edit);
 });

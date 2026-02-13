@@ -33,7 +33,7 @@
   align-items: center;
   flex-shrink: 0;
   width: 2.75em;
-  height: 1.575em;
+  -height: 1.575em;
   padding: 0.2em;
   background: #b5b5b5;
   border-radius: 4px;

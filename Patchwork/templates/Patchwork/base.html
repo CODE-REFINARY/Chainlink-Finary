@@ -15,7 +15,7 @@
         <link rel="icon" type="image/x-icon" href="{% static 'images/lock_icon.png' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% static 'css/bulma-switch-control-min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bulma-switch-control.css' %}">
 
         <!-- Bulma CDN -->
         <link rel="stylesheet" href="{% static 'css/bulma.css' %}">
@@ -117,17 +117,26 @@
                     {% if user.is_authenticated %}
                         <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-light" type="submit" value="Edit Permissions" /></form></li>
                         <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-light" type="submit" value="Change Theme" /></form></li>
+                        <li class="activated-edit-list-element">
+                            <form method="GET">
+                                <input type="hidden" name="edit" value="true">
+                                <input class="button is-small is-responsive is-warning" 
+                                    type="submit" 
+                                    value="Edit Collection" />
+                            </form>
+                        </li>
                         <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-danger" type="submit" value="Delete Collection" /></form></li>
                     {% else %}
                         <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Edit Permissions" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
                         <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Change Theme" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                        <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Edit Collection" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
                         <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Delete Collection" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
                     {% endif %}
                 </ul>
                 {% endif %}
             </nav>
         </header>
-            <main class="">
+            <main class="main-body-content" id="main">
                 {% block tabbed_buttons %}
                     <nav id="tabbed-buttons" class="section is-medium">
                         {% for collection in collections %}
