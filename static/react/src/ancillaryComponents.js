@@ -39,13 +39,6 @@ export function ViewOptionsSideMenu({ }) {
             <ul className="menu-list">
                 <li>
                     <label className="switch is-outlined is-small">
-                        <input type="checkbox" />
-                        <span className="check"></span>
-                        <span className="control-label">dark mode</span>
-                    </label>
-                </li>
-                <li>
-                    <label className="switch is-outlined is-small">
                         <input 
                             type="checkbox" 
                             checked={showControls} 

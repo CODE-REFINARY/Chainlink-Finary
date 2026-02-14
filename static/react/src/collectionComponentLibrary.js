@@ -177,20 +177,20 @@ export function CreateBodyEditButtons(props) {
         if (showElementCreationForm == false) {
             buttonList = (
                 <React.Fragment>
-                    <button id="add-h1-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("HEADER1")}>&lt;n&gt; h1</button>
-                    <button id="add-h2-btn" className="button is-rounded is-danger cell add-buttons" onClick={() => handleClick("HEADER2")}>&lt;n&gt; h2</button>
-                    <button id="add-p-btn" className="button is-rounded is-black cell add-buttons" onClick={() => handleClick("PARAGRAPH")}>&lt;p&gt; paragraph
+                    <button id="add-h1-btn" className="button is-rounded is-emerald cell add-buttons" onClick={() => handleClick("HEADER1")}>&lt;n&gt; h1</button>
+                    <button id="add-h2-btn" className="button is-rounded is-teal-surge cell add-buttons" onClick={() => handleClick("HEADER2")}>&lt;n&gt; h2</button>
+                    <button id="add-p-btn" className="button is-rounded is-persimmon cell add-buttons" onClick={() => handleClick("PARAGRAPH")}>&lt;p&gt; paragraph
                     </button>
-                    <button id="add-h3-btn" className="button is-rounded is-primary cell add-buttons" onClick={() => makeForm('HEADER3')}>&lt;h&gt; header</button>
-                    <button id="add-code-btn" className="button is-rounded is-success cell add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
+                    <button id="add-h3-btn" className="button is-rounded is-indigo cell add-buttons" onClick={() => makeForm('HEADER3')}>&lt;h&gt; header</button>
+                    <button id="add-code-btn" className="button is-rounded is-violet cell add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
                     </button>
-                    <button id="add-br-btn" className="button is-rounded is-warning cell add-buttons" onClick={() => makeForm('LINEBREAK')}>&lt;b&gt; linebreak
+                    <button id="add-br-btn" className="button is-rounded is-jungle cell add-buttons" onClick={() => makeForm('LINEBREAK')}>&lt;b&gt; linebreak
                     </button>
-                    <button id="add-li-btn" className="button is-rounded is-white cell add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
-                    <button id="add-link-btn" className="button is-rounded is-link cell add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
+                    <button id="add-li-btn" className="button is-rounded is-charcoal cell add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
+                    <button id="add-link-btn" className="button is-rounded is-mustard cell add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
                     </button>
-                    <button id="add-img-btn" className="button is-rounded is-info cell add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
-                    <button id="add-note-btn" className="button is-rounded is-dark cell add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
+                    <button id="add-img-btn" className="button is-rounded is-sandstone cell add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
+                    <button id="add-note-btn" className="button is-rounded is-crimson cell add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
                     </button>
                 </React.Fragment>
             );

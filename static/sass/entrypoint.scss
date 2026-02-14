@@ -31,7 +31,36 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
   $primary: $gray-may,
   $link: $metallic-blue,
   $control-border-width: 3px,
-  $danger: $danger-red
+  $danger: $danger-red,
+  $custom-colors: (
+    // WARM TONES
+    "coral": (#ff6b6b, #fff),
+    "persimmon": (#ff5733, #fff),
+    "mango": (#ff8d1a, #fff),
+    "rose": (#f06292, #fff),
+    "terracotta": (#e67e22, #fff),
+    
+    // COOL TONES
+    "azure": (#0077b6, #fff),
+    "orchid": (#ba68c8, #fff),
+    "indigo": (#5c6bc0, #fff),
+    "violet": (#8e44ad, #fff),
+    "royal": (#4169e1, #fff),
+    
+    // NATURE TONES
+    "jungle": (#2ecc71, #fff),
+    "teal-surge": (#00adb5, #fff),
+    "emerald": (#1abc9c, #fff),
+    "lime": (#9ccc65, #fff),
+    "seafoam": (#4db6ac, #fff),
+    
+    // UTILITY TONES
+    "slate": (#607d8b, #fff),
+    "charcoal": (#34495e, #fff),
+    "sandstone": (#d4a373, #fff),
+    "mustard": (#e9c46a, #fff),
+    "crimson": (#9b2226, #fff)
+  )
 );
 
 // Override Sass variables from the /form folder
@@ -234,6 +263,14 @@ html[edit-mode="true"]:not([show-controls="false"]) .element-wrapper:has(+ .crud
     color: hsl(220, 14.3%, 95.9%);
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
+}
+
+/* 1. Global Rule: If edit-mode is NOT true, hide everything by default */
+html:not([edit-mode="true"]) .element-order,
+html:not([edit-mode="true"]) .element-date,
+html:not([edit-mode="true"]) #element-creation,
+html:not([edit-mode="true"]) .element-buttons-wrapper {
+    display: none !important;
 }
 
 /* Only hide elements if the attribute is EXPLICITLY set to "false" */
