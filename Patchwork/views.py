@@ -51,33 +51,59 @@ def db_store(payload, collection, is_landing_page=False, user=None):
     json_data = json.loads(payload)
     # Read the type of Element to store
     tag = TagType(json_data["tag"])
+    collection = Collection.objects.get(url=collection)
 
     if tag == TagType.HEADER2:
         # Create a representation of the Chainlink object to write to the database
         el = Header2()
         # Update the collection object to indicate that it has a new child
-        collection = Collection.objects.get(url=collection)
+
+    if tag == TagType.HEADER1:
+        el = Header1()
+
+    if tag == TagType.HEADER3:
+        el = Header1()
+
+    if tag == TagType.PARAGRAPH:
+        el = Header1()
+
+    if tag == TagType.LINEBREAK:
+        el = Linebreak()
+
+    if tag == TagType.CODE:
+        el = Code()
+        
+    # The url that we'll receive from the front-end will be empty.
+    # We find a unique url for this new element and send it back to
+    # the frontend for it to update itself with it.
+    json_data["url"] = db_generate_unique_url()
+    el.url = json_data["url"]
+
+    el.collection = collection
+
+    if json_data["order"]:
         el.order = json_data["order"]
-        el.collection = collection
+
+    if json_data["text"]:
         el.text = json_data["text"]
-        el.url = db_try_url(TagType.HEADER2)
+        
+    if json_data["public"]:
         el.public = json_data["public"]
+
+    if json_data["archive"]:
         el.archive = json_data["archive"]
+
+    if json_data["css"]:
         el.css = json_data["css"]
 
+    if json_data["date"]:
         try:
             el.date = json_data["date"]
         except ValueError:
-            print("The user supplied a bad date so instead I will use the current date and time.")
             el.date = timezone.now()
 
-        # write objects to the database
-        el.save()
-
-        # return the request with the url updated with the url assigned to this chainlink
-        json_data["url"] = el.url
-        json_data["order"] = el.order
-        json_data["tag"] = TagType.HEADER2
+    # write objects to the database
+    el.save()
 
     """
     elif tag == TagType.COLLECTION:
@@ -112,59 +138,11 @@ def db_store(payload, collection, is_landing_page=False, user=None):
 def db_remove(tag, url, order):
     """
     Delete data from the database.
-
-    :param tag: This is the tag of the element
-    :param url: This stands for "Full-Url" and this is a url that specifies the type of element and and its order and
-    can be used to uniquely identify the element.
-    :param order: This is an int identifier used in tandem with url to identify Body type targets. It is this field
-    # that will get updated for all subsequent Body elements so that there is no gap in the element ordering
     """
-    # Anything except for a Collection is identified via a url
-
-    if tag == TagType.HEADER1:
-        target = Collection.objects.get(url=url)
-        chainlinks = Chainlink.objects.get(Collection=target)
-        for chainlink in chainlinks:
-            if chainlink.archive:
-                # For any Chainlinks that are referencing the target Collection and which have been set to be archived
-                # don't delete them when the Collection is deleted. Instead, orphan them by setting their associated
-                # Collection to NULL in the database.
-                chainlink.Collection = None
-
-    elif tag == TagType.HEADER2:
-        target = Header2.objects.get(url=url)
-        #parent_article = target.collection
-        #print("Delete Chainlink Target" + target)
-        #print("Delete Parent Collection" + parent_article)
-        #parent_article_count = Chainlink.objects.filter(collection=parent_article).count()
-        #print("Parent Collection: " + str(parent_article_count))
-        #for i in range(order + 1, parent_article_count):
-        #    next_pos_els = Chainlink.objects.filter(collection=parent_article, order=i)
-        #    for obj in next_pos_els:
-        #        obj.order -= 1
-        #        obj.save()
-        #parent_article.save()
-
-    """
-    elif inheritsBody(tag):
-
-        parent_chainlink = Chainlink.objects.get(url=url)
-        parent_chainlink_count = Body.objects.filter(chainlink=parent_chainlink).count()
-        print(parent_chainlink_count)
-        print(order)
-        target = Body.objects.get(chainlink=parent_chainlink, order=order)
-        for i in range(order + 1, parent_chainlink_count):
-            next_pos_els = Body.objects.filter(chainlink=parent_chainlink, order=i)
-            for obj in next_pos_els:
-                obj.order -= 1
-                obj.save()
-        parent_chainlink.save()
-    """
-
+    target = Element.objects.get(url=url)
     target.delete()
 
-
-def db_update(table, url, order, payload):
+def db_update(payload):
     """
     Alter the contents of a database item
 
@@ -173,15 +151,14 @@ def db_update(table, url, order, payload):
     :param order: item identifier used in tandem with url to identify Body type targets
     :param payload: string indicating changes to make to target item
     """
-    if table == Header2:
-        target = table.objects.get(url=url)  # Get the record that we want to modify.
-    else:
-        raise RuntimeError("Table not recognized.")
     change_list = json.loads(payload)
+    url = change_list["url"]  # Every Element update request must have a url so that we can identify the correct Element parent object
+    target = Element.objects.get(url=url).content  # Get the record that we want to modify.
+    print(target)
+    print(payload)
     for change in change_list:
         key = change
         value = change_list[key]
-
         if hasattr(target, key):
             try:
                 value = cast_value(target._meta.get_field(key), value)
@@ -207,21 +184,16 @@ def db_try_title(table, try_title):
     return try_title
 
 
-def db_try_url(tag_type, try_url=""):
+def db_generate_unique_url():
     """
     Generate a unique url for specified record type
 
     :param tag_type: type of record this url will be used for
     :param check_url: This string is a url that's checked. If the url is tied to a record then a new url is generated and returned. Otherwise this argument is returned.
     """
-    if not try_url:
-        try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
-    if TagType.HEADER1:
-        while Collection.objects.filter(url=try_url).exists():
-            try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
-    elif TagType.CHAINLINK:
-        while Chainlink.objects.filter(url=try_url).exists():
-            try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
+    try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()[:10]
+    while Element.objects.filter(url=try_url).exists():
+        try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()[:10]
     return try_url
 
 
@@ -237,22 +209,6 @@ def db_check_url(tag_type, check_url):
     elif TagType.CHAINLINK:
         matching_record = Chainlink.objects.filter(url=check_url)
     return matching_record.exists()
-
-
-def db_generate_url(tag_type):
-    """
-    Generate a unique url for specified record type
-
-    :param tag_type: type of record this url will be used for
-    """
-    try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
-    if TagType.HEADER1:
-        while Collection.objects.filter(url=try_url).exists():
-            try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
-    elif TagType.CHAINLINK:
-        while Chainlink.objects.filter(url=try_url).exists():
-            try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()
-    return try_url
 
 
 ###################### View Methods ######################
@@ -290,7 +246,6 @@ def generic(request, url=None):
         # Chainlink and Body data to be passed into the template takes the following form:
         # (chainlink_object, [child_element_object1, child_element_object2, ...])
         elements = []
-        header23s = []
         # Populate the above list with tuples of the specified form by first getting the list of all Chainlinks that
         # are attached to this Article.
         for element in Element.objects.filter(collection=collection.pk).order_by("order"):
@@ -326,12 +281,7 @@ def generic(request, url=None):
         #target_id = request.headers["url"]
         #target_update = request.headers["payload"]
         payload = request.body
-        payload_json = json.loads(payload)
-        Tag = TagType(payload_json["tag"])
-        if Tag == TagType.COLLECTION:
-            db_update(Collection, url, None, target_update)
-        elif Tag == TagType.HEADER2:
-            db_update(Header2, payload_json["url"], None, payload)
+        db_update(payload)
         """
         elif inheritsBody(Tag):
             db_update(Body, payload_json["url"], payload_json["order"], payload)

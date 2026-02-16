@@ -92,7 +92,7 @@ export function ElementDisplayAsComponents() {
             const text = element.querySelector("h3")?.textContent || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "PARAGRAPH") {
-            const text = element.querySelector("p")?.textContent || "";
+            const text = element.querySelector("pre")?.textContent || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "CODE") {
             const text = element.querySelector("code")?.textContent || "";
@@ -200,6 +200,17 @@ export function ElementDisplayAsComponents() {
                                 elementList={[getElementList, setElementList]}
                             />
                         );
+                        case 'PARAGRAPH':
+                            return (
+                            <Paragraph
+                                key={item.url}
+                                url={item.url}
+                                text={item.text}
+                                date={item.date}
+                                order={item.order}
+                                elementList={[getElementList, setElementList]}
+                            />
+                            );
                         default:
                             return null; // Always return something (or null) to avoid map errors
                     }
@@ -212,7 +223,7 @@ export function ElementDisplayAsComponents() {
   );
 }
 
-export function CreateBodyEditButtons(props) {
+function CreateBodyEditButtons(props) {
 
     // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
     // is being shown or not.
@@ -275,7 +286,7 @@ export function CreateBodyEditButtons(props) {
         );
     }
 
-export function ElementCreationForm(props) {
+function ElementCreationForm(props) {
     const [getElementList, setElementList] = props.elementList;
 
     useEffect(() => {
@@ -448,7 +459,7 @@ function ConstructHeader2Element(props) {
     );
 };
 
-export function NoElements(props) {
+function NoElements(props) {
     return (
         <React.Fragment>
             &lt;{props.element} CONTENT MISSING&gt;
@@ -466,9 +477,9 @@ function Header1(props) {
     return (
         <React.Fragment>
             <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER1" date={element.date}>
-                <h1>
+                <h1 className="header1-element">
                     <span className="element-order">#{element.order}</span>
-                    <span className="header1-element title is-1" style={element.css}>{element.text}</span>
+                    <span className="title is-1" style={element.css}>{element.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </h1>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
@@ -479,7 +490,7 @@ function Header1(props) {
     );
 };
 
-export function Header2(props) {
+function Header2(props) {
     const [getElementList, setElementList] = props.elementList;
     const element = getElementList.find(item => item.url === props.url);
 
@@ -517,6 +528,27 @@ function Header3(props) {
                     <span className="title is-3" style={element.css}>{element.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </h3>
+            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
+            </div>
+            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+        </React.Fragment>
+    );
+};
+
+function Paragraph(props) {
+    const [getElementList, setElementList] = props.elementList;
+    const element = getElementList.find(item => item.url === props.url);
+
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = useState(false);
+    const [getShowElementEditForm, setShowElementEditForm] = useState(false);
+
+    return (
+        <React.Fragment>
+            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="PARAGRAPH" date={element.date}>
+                <span className="element-order">#{element.order}</span>
+                <pre><span className="" style={element.css}>{element.text}</span></pre>
+                <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
             {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
@@ -808,7 +840,7 @@ function EditElementForm({element, elementList, showElementEditForm}) {
             <label htmlFor="text" id="element-form-delete-label" className="form-label label">Modify
                     this element</label>
             </div>
-            {"text" in element &&
+            {["HEADER1", "HEADER2", "HEADER3"].includes(String(element.tag)) &&
                 <div className="form-group field">
                     <label htmlFor="text" id="element-form-text-label"
                             className="form-label label">Text</label>
@@ -816,6 +848,19 @@ function EditElementForm({element, elementList, showElementEditForm}) {
                             defaultValue={element.text}
                             name="text"
                             className="input form-field"/>
+                    <p className="help">enter a title to be used as the header name for this element</p>
+                </div>
+            }
+            {["CODE", "PARAGRAPH"].includes(String(element.tag)) &&
+                <div className="form-group field">
+                    <label htmlFor="text" id="element-form-text-label"
+                            className="form-label label">Text</label>
+                    <textarea autoFocus type="text" id="input element-form-text"
+                            rows="3"
+                            defaultValue={element.text}
+                            name="text"
+                            className="textarea input form-field">
+                    </textarea>
                     <p className="help">enter a title to be used as the header name for this element</p>
                 </div>
             }

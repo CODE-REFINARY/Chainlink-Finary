@@ -39,10 +39,10 @@
 
 <!-- Article content is always displayed in #element-display -->
 <div id="element-display" template="collection" class="">
-{% for element in elements %}
+    {% for element in elements %}
         {% if element.content.tag == "PARAGRAPH" %}
             <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="PARAGRAPH" date={{element.date.isoformat}}>
-                <p class="" style="{{ element.css }}">{{ element.content.text }}</p>
+                <pre class="test" style="{{ element.css }}">{{ element.content.text }}</pre>
             </div>
 
         {% elif element.content.tag == "HEADER1" %}

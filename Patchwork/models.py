@@ -31,6 +31,7 @@ class TagType(models.TextChoices):
     NOTE = "NOTE"
     COLLECTION = "COLLECTION"
 
+
 """
 def inheritsBody(tag):
     return tag in [TagType.CHAINLINK, TagType.HEADER3, TagType.PARAGRAPH, TagType.CODE, TagType.LINEBREAK, TagType.IMAGE, TagType.LIST, TagType.LINK, TagType.NOTE]
@@ -126,35 +127,23 @@ class Element(models.Model):
     url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
     archive = models.BooleanField(default=False)
     css = models.CharField(max_length=10000, null=False, blank=True, default="")
+
     @property
-    def content(self):  # This field is how you access the child content element that's associated with this element.
-        if hasattr(self, "header2"):
-            return self.header2
-        elif hasattr(self, "paragraph"):
-            return self.paragraph
-        elif hasattr(self, "code"):
-            return self.code
-        elif hasattr(self, "linebreak"):
-            return self.linebreak
-        elif hasattr(self, "header3"):
-            return self.header3
-        elif hasattr(self, "link"):
-            return self.link
-        elif hasattr(self, "list"):
-            return self.list
-        elif hasattr(self, "note"):
-            return self.note
-        elif hasattr(self, "image"):
-            return self.image
-        elif hasattr(self, "header1"):
-            return self.header1
-        elif hasattr(self, "footerlist"):
-            return self.footerlist
-        else:
-            return None
+    def content(self):
+        """
+        Dynamically finds the child object (Code, Header2, etc.) 
+        linked to this Element via OneToOne inheritance.
+        """
+        for rel in self._meta.related_objects:
+            if rel.one_to_one and hasattr(self, rel.get_accessor_name()):
+                return getattr(self, rel.get_accessor_name())
+        return None
+    
     def __str__(self):
         returnme = ""
+        returnme += "Url: " + str(self.url) + " | "
         returnme += "Order: " + str(self.order) + " | "
+        returnme += "Date: " + str(self.date) + " | "
         returnme += "Tag: " + (self.content.tag if self.content else "N/A")
         return returnme
 
