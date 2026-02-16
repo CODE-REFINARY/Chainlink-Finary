@@ -3,6 +3,17 @@ import { createPortal } from "react-dom";
 import { useState } from "react";
 
 const CursorContext = createContext(null);
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+const ELEMENT_REGISTRY = {
+    HEADER1: { label: "h1", color: "is-emerald", fields: ["text"] },
+    HEADER2: { label: "h2", color: "is-teal-surge", fields: ["text", "css"] },
+    HEADER3: { label: "h3", color: "is-indigo", fields: ["text"] },
+    PARAGRAPH: { label: "paragraph", color: "is-persimmon", fields: ["text"] },
+    CODE: { label: "code", color: "is-violet", fields: ["text"] },
+    LINEBREAK: { label: "linebreak", color: "is-jungle", fields: [] },
+    // Add others as needed...
+};
 
 function convertISO8601_to_intl(dateString) {
   // Try to parse the date
@@ -68,7 +79,7 @@ export function ElementDisplayAsComponents() {
 
         // Shared attributes
         const url = element.id;
-        const order = parseInt(element.getAttribute("order"), 10);
+        const order = parseInt(element.getAttribute("order"), 10);  
         const date = element.getAttribute("date")
 
         if (tag === "HEADER1") {
@@ -146,6 +157,49 @@ export function ElementDisplayAsComponents() {
                                 elementList={[getElementList, setElementList]}
                             />
                             );
+                        case 'HEADER3':
+                            return (
+                            <Header3
+                                key={item.url}
+                                url={item.url}
+                                text={item.text}
+                                date={item.date}
+                                order={item.order}
+                                elementList={[getElementList, setElementList]}
+                            />
+                            );
+                        case 'HEADER1':
+                            return (
+                            <Header1
+                                key={item.url}
+                                url={item.url}
+                                text={item.text}
+                                date={item.date}
+                                order={item.order}
+                                elementList={[getElementList, setElementList]}
+                            />
+                            );
+                        case 'CODE':
+                            return (
+                            <Code
+                                key={item.url}
+                                url={item.url}
+                                text={item.text}
+                                date={item.date}
+                                order={item.order}
+                                elementList={[getElementList, setElementList]}
+                            />
+                        );
+                        case 'LINEBREAK':
+                            return (
+                            <Linebreak
+                                key={item.url}
+                                url={item.url}
+                                date={item.date}
+                                order={item.order}
+                                elementList={[getElementList, setElementList]}
+                            />
+                        );
                         default:
                             return null; // Always return something (or null) to avoid map errors
                     }
@@ -276,9 +330,6 @@ function ConstructHeader2Element(props) {
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
 
-        console.log("Form Data:", values); // Access all values here
-
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
         let xhr = new XMLHttpRequest();
         xhr.open(props.method, window.location.href, true);
@@ -405,193 +456,129 @@ export function NoElements(props) {
     );
 }
 
+function Header1(props) {
+    const [getElementList, setElementList] = props.elementList;
+    const element = getElementList.find(item => item.url === props.url);
+
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = useState(false);
+    const [getShowElementEditForm, setShowElementEditForm] = useState(false);
+
+    return (
+        <React.Fragment>
+            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER1" date={element.date}>
+                <h1>
+                    <span className="element-order">#{element.order}</span>
+                    <span className="header1-element title is-1" style={element.css}>{element.text}</span>
+                    <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
+                </h1>
+            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
+            </div>
+            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+        </React.Fragment>
+    );
+};
+
 export function Header2(props) {
     const [getElementList, setElementList] = props.elementList;
     const element = getElementList.find(item => item.url === props.url);
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    let old_text = element.text;
-    let old_order = element.order;
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = useState(false);
+    const [getShowElementEditForm, setShowElementEditForm] = useState(false);
 
-    const [showElementDeleteForm, setShowElementDeleteForm] = useState(false);
-    const [showElementEditForm, setShowElementEditForm] = useState(false);
-    const handleDeleteSubmit = (e) => {
-        e.preventDefault(); // Prevent page refresh
-
-        const form = e.target;
-        const formData = new FormData(form);
-        const values = Object.fromEntries(formData.entries());
-
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        let xhr = new XMLHttpRequest();
-        xhr.open("DELETE", window.location.href, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.responseType = "json";
-        xhr.send(JSON.stringify(values));
-
-        // This line updates the state to remove the deleted element from the list. It identifies the element by its URL.
-        setElementList(prevList => prevList.filter(item => item.url !== element.url));
-
-    };
-
-    const handleEditSubmit = (e) => {
-        e.preventDefault(); // Prevent page refresh
-
-        const form = e.target;
-        const formData = new FormData(form);
-        const values = Object.fromEntries(formData.entries());
-
-        // check if the user pressed submit button without updating anything. If so then don't send the request since
-        // nothing would change and there's no reason to burden the server.
-        if (!(values.text == old_text && values.order == old_order)) {
-            values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
-
-            let xhr = new XMLHttpRequest();
-            xhr.open("PUT", window.location.href, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.setRequestHeader('X-CSRFToken', csrftoken);
-            xhr.responseType = "json";
-            xhr.send(JSON.stringify(values));
-
-            // This line of code updates the element in the list by identifying it by its URL and then updated specific fields
-            setElementList(prevList => prevList.map(item => item.url === element.url ? { ...item, text: values.text, order: values.order, date: values.date } : item));
-        }
-
-        setShowElementEditForm(false);
-    };
     return (
         <React.Fragment>
             <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER2" date={element.date}>
                 <h2>
                     <span className="element-order">#{element.order}</span>
-                    <span className="title is-2" style={{}}>{element.text}</span>
+                    <span className="title is-2" style={element.css}>{element.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </h2>
-            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} elementDeleteFormState={[showElementDeleteForm, setShowElementDeleteForm]} elementEditFormState={[showElementEditForm, setShowElementEditForm]} />
+            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
-            {showElementDeleteForm && (
-                <form className="crud-form" onSubmit={handleDeleteSubmit}>
-                    <input type="hidden" name="url" value={element.url}/>
-                    <input type="hidden" name="order" value={parseInt(element.order, 10)}/>
-
-                    <div className="form-group field">
-                        <label htmlFor="text" id="element-form-delete-label" className="form-label label">Are you sure
-                            you want to delete this element?</label>
-                        <p className="help">this action can't be undone.</p>
-                    </div>
-                    <div className="form-group field">
-                        <input type="hidden" name="archive" value="False"/>
-                        <label className="label">Access Controls</label>
-                        <div className="checkboxes">
-                            <label id="element-form-archive-label" className="form-label checkbox">
-                                <input type="checkbox" name="archive" value="True" id="element-form-archive"
-                                       className="checkbox form-field" style={{"marginRight": "5px"}}/>
-                                Archive
-                            </label>
-                        </div>
-                        <p className="help">Checking this box will ensure that this element is stored in your archive
-                            section (graveyard).</p>
-                    </div>
-                    <CollapsibleCard
-                        title="Read Only Fields"
-                        content={
-                            <React.Fragment>
-                                <div className="form-group field">
-                                    <label className="label">Element Tag</label>
-                                    <input className="input is-static" name="tag" value={element.tag} readOnly/>
-                                    <p className="help">this is the type of Element being deleted. In this case it's a
-                                        element</p>
-                                </div>
-                                <div className="form-group field">
-                                    <label className="label">Element URL</label>
-                                    <input className="input is-static" name="url" value={element.url} readOnly/>
-                                    <p className="help">"furl" stands for "full url". This is the complete identifier
-                                        for this element.</p>
-                                </div>
-                                <div className="form-group field">
-                                    <label className="label">Element Ordering</label>
-                                    <input className="input is-static" name="order" value={element.order}
-                                           readOnly/>
-                                    <p className="help">This is the order of this element on the page.</p>
-                                </div>
-                            </React.Fragment>
-                        }
-                    />
-                    <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                        <input className="button is-dark" type="reset" onClick={() => setShowElementDeleteForm(false)} value="CANCEL"/>
-                        <input className="button is-success is-right" type="submit" value="DELETE"/>
-                    </div>
-                </form>
-            )}
-            {showElementEditForm && (
-                <form className="crud-form" onSubmit={handleEditSubmit}>
-                    <input type="hidden" name="url" value={element.url}/>
-                    <input type="hidden" name="order" value={parseInt(element.order, 10)}/>
-                    <div className="form-group field">
-                    <label htmlFor="text" id="element-form-delete-label" className="form-label label">Modify
-                            this element</label>
-                    </div>
-                    <div className="form-group field">
-                        <label htmlFor="text" id="element-form-text-label"
-                               className="form-label label">Text</label>
-                        <input autoFocus type="text" id="input element-form-text"
-                               defaultValue={element.text}
-                               name="text"
-                               className="input form-field"/>
-                        <p className="help">enter a title to be used as the header name for this element</p>
-                    </div>
-                    <div className="form-group field">
-                        <label className="label">Element Ordering</label>
-                        <input className="input" type="text" name="order" defaultValue={element.order}/>
-                        <p className="help">This is the order of this element on the page.</p>
-                    </div>
-                    <CollapsibleCard
-                        title="Read Only Fields"
-                        content={
-                            <React.Fragment>
-                                <div className="form-group field">
-                                    <label className="label">Element Tag</label>
-                                    <input className="input is-static" name="tag" value={element.tag} readOnly/>
-                                    <p className="help">this is the type of Element being deleted. In this case it's
-                                        a
-                                        element</p>
-                                </div>
-                                <div className="form-group field">
-                                    <label className="label">Element URL</label>
-                                    <input className="input is-static" name="url" value={element.url} readOnly/>
-                                </div>
-                                <div className="form-group field">
-                                    <label htmlFor="date" id="element-form-date-label"
-                                           className="form-label label">Date</label>
-                                    <input type="input" name="date" id="element-form-date"
-                                           className="input form-field is-static"
-                                           value={new Date().toISOString()} readOnly/>
-                                    <p className="help">This value represents the creation time of this Element. It is
-                                        automatically set and updated whenever this element is updated.</p>
-                                </div>
-                            </React.Fragment>
-                        }
-                    />
-                    <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                        <input className="button is-dark" type="reset" onClick={() => setShowElementEditForm(false)} value="CANCEL"/>
-                        <input className="button is-success" type="submit" value="UPDATE"/>
-                    </div>
-                </form>
-            )}
+            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
         </React.Fragment>
     );
 }
 
+function Header3(props) {
+    const [getElementList, setElementList] = props.elementList;
+    const element = getElementList.find(item => item.url === props.url);
+
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = useState(false);
+    const [getShowElementEditForm, setShowElementEditForm] = useState(false);
+
+    return (
+        <React.Fragment>
+            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER3" date={element.date}>
+                <h3>
+                    <span className="element-order">#{element.order}</span>
+                    <span className="title is-3" style={element.css}>{element.text}</span>
+                    <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
+                </h3>
+            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
+            </div>
+            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+        </React.Fragment>
+    );
+};
+
+function Code(props) {
+    const [getElementList, setElementList] = props.elementList;
+    const element = getElementList.find(item => item.url === props.url);
+
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = useState(false);
+    const [getShowElementEditForm, setShowElementEditForm] = useState(false);
+
+    return (
+        <React.Fragment>
+            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="CODE" date={element.date}>
+                <div>
+                    <span className="element-order">#{element.order}</span>
+                    <span className="code" style={element.css}>{element.text}</span>
+                    <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
+                </div>
+            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
+            </div>
+            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+        </React.Fragment>
+    );
+};
+
+function Linebreak(props) {
+    const [getElementList, setElementList] = props.elementList;
+    const element = getElementList.find(item => item.url === props.url);
+
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = useState(false);
+    const [getShowElementEditForm, setShowElementEditForm] = useState(false);
+
+    return (
+        <React.Fragment>
+            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="LINEBREAK" date={element.date}>
+                <div>
+                    <span className="element-order">#{element.order}</span>
+                    <span className="pb-5 pt-5 br" style={{display: "block"}}><figure className="image is-16x16" style={{float: "right"}}><img src="/static/images/enter.png" alt="Description of image" /></figure></span>
+                    <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
+                </div>
+            <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
+            </div>
+            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+        </React.Fragment>
+    );
+};
+
 function ElementEditButtons(props) {
     const [getElementList, setElementList] = props.elementList;
     const element = getElementList.find(item => item.url === props.url);
-    const [showElementDeleteFormState, setElementDeleteFormState] = props.elementDeleteFormState;
-    const [showElementEditFormState, setElementEditFormState] = props.elementEditFormState;
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = props.showElementDeleteForm;
+    const [getShowElementEditForm, setShowElementEditForm] = props.showElementEditForm;
 
     // Helper to handle the XHR PUT request
     function sendElementUpdate(elementData) {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open("PUT", window.location.href, true);
@@ -670,61 +657,15 @@ function ElementEditButtons(props) {
                 >copy</button>
                 <button 
                     className="el-edit-btn button is-small is-warning" 
-                    onClick={() => setElementEditFormState(true)}
+                    onClick={() => setShowElementEditForm(true)}
                 >edit</button>
                 <button 
                     className="el-del-btn button is-small is-danger" 
-                    onClick={() => setElementDeleteFormState(true)}
+                    onClick={() => setShowElementDeleteForm(true)}
                 >delete</button>
             </div>
         </div>
     );
-}
-
-export function Header3(props) {
-    let contentId = "content-" + props.curl + "-" + props.order
-    return (
-        <div id={contentId} className="title is-3 content-wrapper" tag="H3" index={12}>
-            <h3 className="inner-content">{props.text}</h3>
-        </div>
-    );
-};
-
-export function Linebreak(props) {
-    let contentId = "content-" + props.curl + "-" + props.order
-    return (
-        <div id={contentId} className="content-wrapper" tag="BR" index={12}>
-            <span className="pb-6 pt-6 inner-content br">
-                <i>&lt;!-- linebreak insert --&gt;</i>
-            </span>
-        </div>
-    );
-};
-
-export function Code(props) {
-    let contentId = "content-" + props.curl + "-" + props.order
-    return (
-        <div id={contentId} className="content-wrapper" tag="CODE" index={12}>
-            <code className="code inner-content">{props.text}</code>
-        </div>
-    );
-};
-
-export function Paragraph(props) {
-    let contentId = "content-" + props.curl + "-" + props.order
-    if (props.render_outer_div === true) {
-        return (
-            <div className="content-wrapper" id={contentId} tag="P">
-                <p className="inner-content">{props.text}</p>
-            </div>
-        );
-    } else {
-        return (
-            <React.Fragment>
-                <p className="inner-content">{props.text}</p>
-            </React.Fragment>
-        );
-    }
 }
 
 function CollapsibleCard({title, content}) {
@@ -748,5 +689,174 @@ function CollapsibleCard({title, content}) {
                 {content}
             </div>
         </div>
+    );
+}
+
+function DeleteElementForm({element, elementList, showElementDeleteForm}) {
+    const [getElementList, setElementList] = elementList;
+    const [getShowElementDeleteForm, setShowElementDeleteForm] = showElementDeleteForm;
+
+    const handleDeleteSubmit = (e) => {
+        e.preventDefault(); // Prevent page refresh
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const values = Object.fromEntries(formData.entries());
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", window.location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(values));
+
+        // This line updates the state to remove the deleted element from the list. It identifies the element by its URL.
+        setElementList(prevList => prevList.filter(item => item.url !== element.url));
+
+    };
+
+    return (
+        <form className="crud-form" onSubmit={handleDeleteSubmit}>
+            <input type="hidden" name="url" value={element.url}/>
+            <input type="hidden" name="order" value={parseInt(element.order, 10)}/>
+
+            <div className="form-group field">
+                <label htmlFor="text" id="element-form-delete-label" className="form-label label">Are you sure
+                    you want to delete this element?</label>
+                <p className="help">this action can't be undone.</p>
+            </div>
+            <div className="form-group field">
+                <input type="hidden" name="archive" value="False"/>
+                <label className="label">Access Controls</label>
+                <div className="checkboxes">
+                    <label id="element-form-archive-label" className="form-label checkbox">
+                        <input type="checkbox" name="archive" value="True" id="element-form-archive"
+                                className="checkbox form-field" style={{"marginRight": "5px"}}/>
+                        Archive
+                    </label>
+                </div>
+                <p className="help">Checking this box will ensure that this element is stored in your archive
+                    section (graveyard).</p>
+            </div>
+            <CollapsibleCard
+                title="Read Only Fields"
+                content={
+                    <React.Fragment>
+                        <div className="form-group field">
+                            <label className="label">Element Tag</label>
+                            <input className="input is-static" name="tag" value={element.tag} readOnly/>
+                            <p className="help">this is the type of Element being deleted. In this case it's a
+                                element</p>
+                        </div>
+                        <div className="form-group field">
+                            <label className="label">Element URL</label>
+                            <input className="input is-static" name="url" value={element.url} readOnly/>
+                            <p className="help">"furl" stands for "full url". This is the complete identifier
+                                for this element.</p>
+                        </div>
+                        <div className="form-group field">
+                            <label className="label">Element Ordering</label>
+                            <input className="input is-static" name="order" value={element.order}
+                                    readOnly/>
+                            <p className="help">This is the order of this element on the page.</p>
+                        </div>
+                    </React.Fragment>
+                }
+            />
+            <div className="form-submit-buttons" id="element-creation-text-align-right field">
+                <input className="button is-dark" type="reset" onClick={() => setShowElementDeleteForm(false)} value="CANCEL"/>
+                <input className="button is-success is-right" type="submit" value="DELETE"/>
+            </div>
+        </form>
+    )
+}
+
+function EditElementForm({element, elementList, showElementEditForm}) {
+
+    const [getElementList, setElementList] = elementList;
+    const [getShowElementEditForm, setShowElementEditForm] = showElementEditForm;
+
+    const handleEditSubmit = (e) => {
+        e.preventDefault(); // Prevent page refresh
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const values = Object.fromEntries(formData.entries());
+
+        // check if the user pressed submit button without updating anything. If so then don't send the request since
+        // nothing would change and there's no reason to burden the server.
+        values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("PUT", window.location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(values));
+
+        // This line of code updates the element in the list by identifying it by its URL and then updated specific fields
+        setElementList(prevList => prevList.map(item => item.url === element.url ? { ...item, text: values.text, order: values.order, date: values.date } : item));
+
+        setShowElementEditForm(false);
+    };
+
+    return (
+        <form className="crud-form" onSubmit={handleEditSubmit}>
+            <input type="hidden" name="url" value={element.url}/>
+            <input type="hidden" name="order" value={parseInt(element.order, 10)}/>
+            <div className="form-group field">
+            <label htmlFor="text" id="element-form-delete-label" className="form-label label">Modify
+                    this element</label>
+            </div>
+            {"text" in element &&
+                <div className="form-group field">
+                    <label htmlFor="text" id="element-form-text-label"
+                            className="form-label label">Text</label>
+                    <input autoFocus type="text" id="input element-form-text"
+                            defaultValue={element.text}
+                            name="text"
+                            className="input form-field"/>
+                    <p className="help">enter a title to be used as the header name for this element</p>
+                </div>
+            }
+            {"order" in element &&
+            <div className="form-group field">
+                <label className="label">Element Ordering</label>
+                <input className="input" type="text" name="order" defaultValue={element.order}/>
+                <p className="help">This is the order of this element on the page.</p>
+            </div>
+            }
+            <CollapsibleCard
+                title="Read Only Fields"
+                content={
+                    <React.Fragment>
+                        <div className="form-group field">
+                            <label className="label">Element Tag</label>
+                            <input className="input is-static" name="tag" value={element.tag} readOnly/>
+                            <p className="help">this is the type of Element being deleted. In this case it's
+                                a
+                                element</p>
+                        </div>
+                        <div className="form-group field">
+                            <label className="label">Element URL</label>
+                            <input className="input is-static" name="url" value={element.url} readOnly/>
+                        </div>
+                        <div className="form-group field">
+                            <label htmlFor="date" id="element-form-date-label"
+                                    className="form-label label">Date</label>
+                            <input type="input" name="date" id="element-form-date"
+                                    className="input form-field is-static"
+                                    value={new Date().toISOString()} readOnly/>
+                            <p className="help">This value represents the creation time of this Element. It is
+                                automatically set and updated whenever this element is updated.</p>
+                        </div>
+                    </React.Fragment>
+                }
+            />
+            <div className="form-submit-buttons" id="element-creation-text-align-right field">
+                <input className="button is-dark" type="reset" onClick={() => setShowElementEditForm(false)} value="CANCEL"/>
+                <input className="button is-success" type="submit" value="UPDATE"/>
+            </div>
+        </form>
     );
 }
