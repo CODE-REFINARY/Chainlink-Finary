@@ -5,16 +5,6 @@ import { useState } from "react";
 const CursorContext = createContext(null);
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-const ELEMENT_REGISTRY = {
-    HEADER1: { label: "h1", color: "is-emerald", fields: ["text"] },
-    HEADER2: { label: "h2", color: "is-teal-surge", fields: ["text", "css"] },
-    HEADER3: { label: "h3", color: "is-indigo", fields: ["text"] },
-    PARAGRAPH: { label: "paragraph", color: "is-persimmon", fields: ["text"] },
-    CODE: { label: "code", color: "is-violet", fields: ["text"] },
-    LINEBREAK: { label: "linebreak", color: "is-jungle", fields: [] },
-    // Add others as needed...
-};
-
 function convertISO8601_to_intl(dateString) {
   // Try to parse the date
   const parsedDate = new Date(dateString);
@@ -41,6 +31,38 @@ function convertISO8601_to_intl(dateString) {
   // Otherwise, return the original string
   return dateString;
 }
+
+function safeCssToObj(cssString) {
+    // 1. Guard against null, undefined, or non-strings
+    if (!cssString || typeof cssString !== 'string') return {};
+
+    try {
+        return cssString
+            .split(';')
+            .reduce((acc, rule) => {
+                // 2. Filter out empty strings from trailing semicolons
+                if (!rule.trim()) return acc;
+
+                const [key, ...valueParts] = rule.split(':');
+                
+                // 3. Ensure both key and value exist
+                if (key && valueParts.length > 0) {
+                    const trimmedKey = key.trim();
+                    const value = valueParts.join(':').trim(); // join handles URLs like 'url(http://...)'
+
+                    if (trimmedKey && value) {
+                        // 4. Convert kebab-case to camelCase for React
+                        const camelKey = trimmedKey.replace(/-./g, (match) => match[1].toUpperCase());
+                        acc[camelKey] = value;
+                    }
+                }
+                return acc;
+            }, {});
+    } catch (error) {
+        console.error("Malformed CSS string provided to safeCssToObj:", cssString, error);
+        return {}; // Fallback to empty object to prevent React crash
+    }
+};
 
 /**
  * Recursively checks if an order exists in the Element array.
@@ -227,36 +249,31 @@ function CreateBodyEditButtons(props) {
 
     // This hook remembers if the element creation form should be remembered. It's a switch that will help us keep track if the form
     // is being shown or not.
-    const [showElementCreationForm, setShowElementCreationForm] = useState(false);
+    const [getShowElementCreateForm, setShowElementCreateForm] = useState(false);
     const [getElementList, setElementList] = props.elementList;
     const [elementType, setElementType] = useState("");
     const { cursor, setCursor } = useContext(CursorContext);
 
         const handleClick = (type) => {
             setElementType(type)
-            setShowElementCreationForm(true); // Set the state to true to show the element creation form
+            setShowElementCreateForm(true); // Set the state to true to show the element creation form
         };
-        const handleHide = () => setShowElementCreationForm(false); // Set the state to false to hide the element creation form
+
         let buttonList;
 
-        if (showElementCreationForm == false) {
+        if (getShowElementCreateForm == false) {
             buttonList = (
                 <React.Fragment>
-                    <button id="add-h1-btn" className="button is-rounded is-emerald cell add-buttons" onClick={() => handleClick("HEADER1")}>&lt;n&gt; h1</button>
-                    <button id="add-h2-btn" className="button is-rounded is-teal-surge cell add-buttons" onClick={() => handleClick("HEADER2")}>&lt;n&gt; h2</button>
-                    <button id="add-p-btn" className="button is-rounded is-persimmon cell add-buttons" onClick={() => handleClick("PARAGRAPH")}>&lt;p&gt; paragraph
-                    </button>
-                    <button id="add-h3-btn" className="button is-rounded is-indigo cell add-buttons" onClick={() => makeForm('HEADER3')}>&lt;h&gt; header</button>
-                    <button id="add-code-btn" className="button is-rounded is-violet cell add-buttons" onClick={() => makeForm('CODE')}>&lt;c&gt; code
-                    </button>
-                    <button id="add-br-btn" className="button is-rounded is-jungle cell add-buttons" onClick={() => makeForm('LINEBREAK')}>&lt;b&gt; linebreak
-                    </button>
-                    <button id="add-li-btn" className="button is-rounded is-charcoal cell add-buttons" onClick={() => makeForm('LI')}>&lt;l&gt; list</button>
-                    <button id="add-link-btn" className="button is-rounded is-mustard cell add-buttons" onClick={() => makeForm('LINK')}>&lt;q&gt; link
-                    </button>
-                    <button id="add-img-btn" className="button is-rounded is-sandstone cell add-buttons" onClick={() => makeForm('IMG')}>&lt;i&gt; img</button>
-                    <button id="add-note-btn" className="button is-rounded is-crimson cell add-buttons" onClick={() => makeForm('NOTE')}>&lt;n&gt; note
-                    </button>
+                    <button id="add-h1-btn" className="button is-rounded is-emerald cell add-buttons" onClick={() => handleClick("HEADER1")}>h1</button>
+                    <button id="add-h2-btn" className="button is-rounded is-teal-surge cell add-buttons" onClick={() => handleClick("HEADER2")}>h2</button>
+                    <button id="add-h3-btn" className="button is-rounded is-indigo cell add-buttons" onClick={() => handleClick('HEADER3')}>h3</button>
+                    <button id="add-p-btn" className="button is-rounded is-persimmon cell add-buttons" onClick={() => handleClick("PARAGRAPH")}>paragraph</button>
+                    <button id="add-code-btn" className="button is-rounded is-violet cell add-buttons" onClick={() => handleClick('CODE')}>code</button>
+                    <button id="add-br-btn" className="button is-rounded is-jungle cell add-buttons" onClick={() => handleClick('LINEBREAK')}>linebreak</button>
+                    <button id="add-li-btn" className="button is-rounded is-charcoal cell add-buttons" onClick={() => handleClick('LI')}>list</button>
+                    <button id="add-link-btn" className="button is-rounded is-mustard cell add-buttons" onClick={() => handleClick('LINK')}>link</button>
+                    <button id="add-img-btn" className="button is-rounded is-sandstone cell add-buttons" onClick={() => handleClick('IMG')}>img</button>
+                    <button id="add-note-btn" className="button is-rounded is-crimson cell add-buttons" onClick={() => handleClick('NOTE')}>note</button>
                 </React.Fragment>
             );
 
@@ -278,7 +295,7 @@ function CreateBodyEditButtons(props) {
 
         return (
             <div id="element-creation">
-                {<ElementCreationForm elementList={[getElementList, setElementList]} onHide={handleHide} elementCreationFormState={[showElementCreationForm, setShowElementCreationForm]} placeholder="enter content" method="POST" type={elementType} />}
+                {<ElementCreateForm tag={elementType} elementList={[getElementList, setElementList]} showElementCreateForm={[getShowElementCreateForm, setShowElementCreateForm]} />}
                 <div className="grid">
                     {buttonList}
                 </div>
@@ -286,178 +303,6 @@ function CreateBodyEditButtons(props) {
         );
     }
 
-function ElementCreationForm(props) {
-    const [getElementList, setElementList] = props.elementList;
-
-    useEffect(() => {
-    })
-    if (props.type === 'HEADER3') {
-        return (
-            <React.Fragment>
-                <ConstructHeader3Element value={props.value} type={props.type} url={props.url} order={props.order}/>
-            </React.Fragment>
-        );
-    } else if (props.type === 'CODE') {
-        return (
-            <React.Fragment>
-                <ConstructCodeElement value={props.value} type={props.type} url={props.url} order={props.order}/>
-            </React.Fragment>
-        );
-    } else if (props.type === 'PARAGRAPH') {
-        return (
-            <React.Fragment>
-                <ConstructParagraphElement value={props.value} type={props.type} onHide={props.onHide} method={props.method} />
-            </React.Fragment>
-        );
-    } else if (props.type === 'LINEBREAK') {
-        return (
-            <React.Fragment>
-                <ConstructLinebreakElement value={props.value} type={props.type} url={props.url} order={props.order}/>
-            </React.Fragment>
-        );
-    } else if (props.type == "HEADER2") {
-        return (
-            <React.Fragment>
-                <ConstructHeader2Element elementList={[getElementList, setElementList]} value={props.value} type={props.type} url={props.url} order={props.order} date={props.date} css={props.css} onHide={props.onHide} method={props.method} elementCreationFormState={props.elementCreationFormState} />
-            </React.Fragment>
-        )
-    } else if (props.type == "HEADER1") {
-        return (
-            <React.Fragment>
-                <ConstructHeader1Element value={props.value} type={props.type} url={props.url} order={props.order}/>
-            </React.Fragment>
-        )
-    }
-}
-
-function ConstructHeader2Element(props) {
-    const [getElementList, setElementList] = props.elementList;
-    const [showFormState, setFormState] = props.elementCreationFormState;
-
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Prevent page refresh
-
-        const form = e.target;
-        const formData = new FormData(form);
-        const values = Object.fromEntries(formData.entries());
-
-        values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
-        let xhr = new XMLHttpRequest();
-        xhr.open(props.method, window.location.href, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.responseType = "json";
-        xhr.send(JSON.stringify(values));
-
-
-        xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                const newComponent = {
-                    url: xhr.response.url,
-                    text: xhr.response.text,
-                    order: parseInt(xhr.response.order),
-                    date: xhr.response.date,
-                    tag: xhr.response.tag,
-                }
-                console.log(getElementList)
-                console.log(newComponent)
-                setElementList(prevList => [...prevList, newComponent]);
-            }
-        }
-        setFormState(false);
-    };
-    return (
-        <>
-            {showFormState && <form onSubmit={handleSubmit} className="crud-form">
-                <div id="non-submit-fields" className="field">
-                    <div className="form-group field">
-                        <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
-                        <input autoFocus type="text" id="input element-form-text"
-                               name="text"
-                               className="input form-field"/>
-                        <p className="help">enter a title to be used as the header name for this element</p>
-                    </div>
-                    <div className="form-group field">
-                        <label className="label">Element Ordering</label>
-                        <input className="input" name="order" defaultValue={getElementList.length > 0 ? Math.floor((Number(getElementList[getElementList.length - 1].order) + 100) / 100) * 100 : 0}/>
-                        <p className="help">this is the order of this element relative to others on the
-                            page</p>
-                    </div>
-                    <div className="form-group field">
-                        <input type="hidden" name="archive" value="False"/>
-                        <input type="hidden" name="public" value="False"/>
-                        <label className="label">Access Controls</label>
-                        <div className="checkboxes">
-                            <label id="element-form-public-label" className="form-label checkbox">
-                                <input type="checkbox" name="public" value="True" id="element-form-archive"
-                                       className="checkbox form-field" style={{"marginRight": "5px"}}/>
-                                Public
-                            </label>
-                            <label id="element-form-archive-label" className="form-label checkbox">
-                                <input type="checkbox" name="archive" value="True" id="element-form-archive"
-                                       className="checkbox form-field" style={{"marginRight": "5px"}}/>
-                                Archive
-                            </label>
-                        </div>
-                        <p className="help">specify which viewers will be able to access the contents of this element
-                            and
-                            what will happen to this element if it's deleted</p>
-                    </div>
-                    <CollapsibleCard
-                        title="Read Only Fields"
-                        content={
-                            <React.Fragment>
-                                <div className="form-group field">
-                                    <label className="label">Element Tag</label>
-                                    <input className="input is-static" name="tag" value="HEADER2" readOnly/>
-                                    <p className="help">this is the type of Element being instantiated</p>
-                                </div>
-                                <div className="form-group field">
-                                    <label className="label">Element URL</label>
-                                    <input className="input is-static" name="url" value={props.url} readOnly/>
-                                    <p className="help">this is the unique identifier field for this element - if you
-                                        are
-                                        creating a new
-                                        element then this value will be empty until the backend sends us a response</p>
-                                </div>
-                                <div className="form-group field">
-                                    <label htmlFor="date" id="element-form-date-label"
-                                           className="form-label label">Date</label>
-                                    <input type="input" name="date" id="element-form-date"
-                                           className="input form-field is-static"
-                                           value={new Date().toISOString()} readOnly/>
-                                    <p className="help">This value represents the creation time of this Element. It is
-                                        automatically set and updated whenever this element is updated.</p>
-                                </div>
-                            </React.Fragment>
-                        }
-                    />
-                    <CollapsibleCard
-                        title="Advanced Fields"
-                        content={
-                            <React.Fragment>
-                                <div className="form-group field">
-                                    <label htmlFor="css" id="element-form-css-label"
-                                           className="form-label label">CSS</label>
-                                    <input type="input" name="css" id="element-form-css"
-                                           className="input form-field"/>
-                                    <p className="help">optionally include custom CSS to apply to the header <i>NOTE:
-                                        This is an
-                                        advanced feature</i></p>
-                                </div>
-                            </React.Fragment>
-                        }
-                    />
-
-                </div>
-                <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                    <input className="button is-dark" type="reset" onClick={() => setFormState(false)} value="CANCEL"/>
-                    <input className="button is-success is-right" type="submit" value="CREATE"/>
-                </div>
-            </form>}
-        </>
-    );
-};
 
 function NoElements(props) {
     return (
@@ -479,13 +324,13 @@ function Header1(props) {
             <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER1" date={element.date}>
                 <h1 className="header1-element">
                     <span className="element-order">#{element.order}</span>
-                    <span className="title is-1" style={element.css}>{element.text}</span>
+                    <span className="title is-1" style={safeCssToObj(element.css)}>{element.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </h1>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
-            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
-            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+            {getShowElementDeleteForm && <ElementDeleteForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <ElementEditForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
         </React.Fragment>
     );
 };
@@ -502,13 +347,13 @@ function Header2(props) {
             <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER2" date={element.date}>
                 <h2>
                     <span className="element-order">#{element.order}</span>
-                    <span className="title is-2" style={element.css}>{element.text}</span>
+                    <span className="title is-2" style={safeCssToObj(element.css)}>{element.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </h2>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
-            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
-            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+            {getShowElementDeleteForm && <ElementDeleteForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <ElementEditForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
         </React.Fragment>
     );
 }
@@ -525,13 +370,13 @@ function Header3(props) {
             <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER3" date={element.date}>
                 <h3>
                     <span className="element-order">#{element.order}</span>
-                    <span className="title is-3" style={element.css}>{element.text}</span>
+                    <span className="title is-3" style={safeCssToObj(element.css)}>{element.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </h3>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
-            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
-            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+            {getShowElementDeleteForm && <ElementDeleteForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <ElementEditForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
         </React.Fragment>
     );
 };
@@ -547,12 +392,12 @@ function Paragraph(props) {
         <React.Fragment>
             <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="PARAGRAPH" date={element.date}>
                 <span className="element-order">#{element.order}</span>
-                <pre><span className="" style={element.css}>{element.text}</span></pre>
+                <pre><span className="" style={safeCssToObj(element.css)}>{element.text}</span></pre>
                 <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
-            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
-            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+            {getShowElementDeleteForm && <ElementDeleteForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <ElementEditForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
         </React.Fragment>
     );
 };
@@ -569,13 +414,13 @@ function Code(props) {
             <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="CODE" date={element.date}>
                 <div>
                     <span className="element-order">#{element.order}</span>
-                    <span className="code" style={element.css}>{element.text}</span>
+                    <span className="code" style={safeCssToObj(element.css)}>{element.text}</span>
                     <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
                 </div>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
-            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
-            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+            {getShowElementDeleteForm && <ElementDeleteForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <ElementEditForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
         </React.Fragment>
     );
 };
@@ -597,8 +442,8 @@ function Linebreak(props) {
                 </div>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
-            {getShowElementDeleteForm && <DeleteElementForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
-            {getShowElementEditForm && <EditElementForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
+            {getShowElementDeleteForm && <ElementDeleteForm element={element} elementList={[getElementList, setElementList]} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} />}
+            {getShowElementEditForm && <ElementEditForm element={element} elementList={[getElementList, setElementList]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />}
         </React.Fragment>
     );
 };
@@ -724,7 +569,7 @@ function CollapsibleCard({title, content}) {
     );
 }
 
-function DeleteElementForm({element, elementList, showElementDeleteForm}) {
+function ElementDeleteForm({element, elementList, showElementDeleteForm}) {
     const [getElementList, setElementList] = elementList;
     const [getShowElementDeleteForm, setShowElementDeleteForm] = showElementDeleteForm;
 
@@ -803,7 +648,7 @@ function DeleteElementForm({element, elementList, showElementDeleteForm}) {
     )
 }
 
-function EditElementForm({element, elementList, showElementEditForm}) {
+function ElementEditForm({element, elementList, showElementEditForm}) {
 
     const [getElementList, setElementList] = elementList;
     const [getShowElementEditForm, setShowElementEditForm] = showElementEditForm;
@@ -826,8 +671,10 @@ function EditElementForm({element, elementList, showElementEditForm}) {
         xhr.responseType = "json";
         xhr.send(JSON.stringify(values));
 
-        // This line of code updates the element in the list by identifying it by its URL and then updated specific fields
-        setElementList(prevList => prevList.map(item => item.url === element.url ? { ...item, text: values.text, order: values.order, date: values.date } : item));
+        // This line merges ALL fields from 'values' into the matching item automatically
+        setElementList(prevList => prevList.map(item => 
+            item.url === element.url ? { ...item, ...values } : item
+        ));
 
         setShowElementEditForm(false);
     };
@@ -903,5 +750,154 @@ function EditElementForm({element, elementList, showElementEditForm}) {
                 <input className="button is-success" type="submit" value="UPDATE"/>
             </div>
         </form>
+    );
+}
+
+function ElementCreateForm({tag, elementList, showElementCreateForm}) {
+
+    const [getElementList, setElementList] = elementList;
+    const [getShowElementCreateForm, setShowElementCreateForm] = showElementCreateForm;
+
+    const handleSubmit = (e) => {
+        e.preventDefault(); // Prevent page refresh
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const values = Object.fromEntries(formData.entries());
+
+        values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", window.location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        xhr.responseType = "json";
+        xhr.send(JSON.stringify(values));
+
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // 1. Automatically clone all fields from the response
+                const newComponent = { ...xhr.response };
+
+                // 2. Specific fix-ups (like ensuring order is a number)
+                if (newComponent.order) {
+                    newComponent.order = parseInt(newComponent.order, 10);
+                }
+
+                console.log("Existing List:", getElementList);
+                console.log("New Component:", newComponent);
+
+                // 3. Update the state
+                setElementList(prevList => [...prevList, newComponent]);
+            }
+        }
+        
+        setShowElementCreateForm(false);
+    };
+
+        return (
+        <>
+            {getShowElementCreateForm && <form onSubmit={handleSubmit} className="crud-form">
+                <div id="non-submit-fields" className="field">
+                    {["HEADER1", "HEADER2", "HEADER3"].includes(String(tag)) &&
+                        <div className="form-group field">
+                            <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
+                            <input autoFocus type="text" id="input element-form-text"
+                                name="text"
+                                className="input form-field"/>
+                            <p className="help">enter the text for this header.</p>
+                        </div>
+                    }
+                    {["CODE", "PARAGRAPH"].includes(String(tag)) &&
+                        <div className="form-group field">
+                            <label htmlFor="text" id="element-form-text-label"
+                                    className="form-label label">Text</label>
+                            <textarea autoFocus type="text" id="input element-form-text"
+                                    rows="3"
+                                    defaultValue=""
+                                    name="text"
+                                    className="textarea input form-field">
+                            </textarea>
+                            <p className="help">enter the text content for this element.</p>
+                        </div>
+                    }
+                    <div className="form-group field">
+                        <label className="label">Element Ordering</label>
+                        <input className="input" name="order" defaultValue={getElementList.length > 0 ? Math.floor((Number(getElementList[getElementList.length - 1].order) + 100) / 100) * 100 : 0}/>
+                        <p className="help">this is the order of this element relative to others on the
+                            page</p>
+                    </div>
+                    <div className="form-group field">
+                        <input type="hidden" name="archive" value="False"/>
+                        <input type="hidden" name="public" value="False"/>
+                        <label className="label">Access Controls</label>
+                        <div className="checkboxes">
+                            <label id="element-form-public-label" className="form-label checkbox">
+                                <input type="checkbox" name="public" value="True" id="element-form-archive"
+                                       className="checkbox form-field" style={{"marginRight": "5px"}}/>
+                                Public
+                            </label>
+                            <label id="element-form-archive-label" className="form-label checkbox">
+                                <input type="checkbox" name="archive" value="True" id="element-form-archive"
+                                       className="checkbox form-field" style={{"marginRight": "5px"}}/>
+                                Archive
+                            </label>
+                        </div>
+                        <p className="help">specify which viewers will be able to access the contents of this element
+                            and
+                            what will happen to this element if it's deleted</p>
+                    </div>
+                    <CollapsibleCard
+                        title="Read Only Fields"
+                        content={
+                            <React.Fragment>
+                                <div className="form-group field">
+                                    <label className="label">Element Tag</label>
+                                    <input className="input is-static" name="tag" value={tag} readOnly/>
+                                    <p className="help">this is the type of Element being instantiated</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label className="label">Element URL</label>
+                                    <input className="input is-static" name="url" value="" readOnly/>
+                                    <p className="help">this is the unique identifier field for this element - if you
+                                        are
+                                        creating a new
+                                        element then this value will be empty until the backend sends us a response</p>
+                                </div>
+                                <div className="form-group field">
+                                    <label htmlFor="date" id="element-form-date-label"
+                                           className="form-label label">Date</label>
+                                    <input type="input" name="date" id="element-form-date"
+                                           className="input form-field is-static"
+                                           value={new Date().toISOString()} readOnly/>
+                                    <p className="help">This value represents the creation time of this Element. It is
+                                        automatically set and updated whenever this element is updated.</p>
+                                </div>
+                            </React.Fragment>
+                        }
+                    />
+                    <CollapsibleCard
+                        title="Advanced Fields"
+                        content={
+                            <React.Fragment>
+                                <div className="form-group field">
+                                    <label htmlFor="css" id="element-form-css-label"
+                                           className="form-label label">CSS</label>
+                                    <input type="input" name="css" id="element-form-css"
+                                           className="input form-field"/>
+                                    <p className="help">optionally include custom CSS to apply to the header <i>NOTE:
+                                        This is an
+                                        advanced feature</i></p>
+                                </div>
+                            </React.Fragment>
+                        }
+                    />
+
+                </div>
+                <div className="form-submit-buttons" id="element-creation-text-align-right field">
+                    <input className="button is-dark" type="reset" onClick={() => setShowElementCreateForm(false)} value="CANCEL"/>
+                    <input className="button is-success is-right" type="submit" value="CREATE"/>
+                </div>
+            </form>}
+        </>
     );
 }

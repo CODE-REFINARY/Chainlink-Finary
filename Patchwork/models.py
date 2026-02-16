@@ -142,6 +142,7 @@ class Element(models.Model):
     def __str__(self):
         returnme = ""
         returnme += "Url: " + str(self.url) + " | "
+        returnme += "Collection: " + str(self.collection.title) + " | "
         returnme += "Order: " + str(self.order) + " | "
         returnme += "Date: " + str(self.date) + " | "
         returnme += "Tag: " + (self.content.tag if self.content else "N/A")

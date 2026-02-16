@@ -65,7 +65,7 @@ def db_store(payload, collection, is_landing_page=False, user=None):
         el = Header1()
 
     if tag == TagType.PARAGRAPH:
-        el = Header1()
+        el = Paragraph()
 
     if tag == TagType.LINEBREAK:
         el = Linebreak()
@@ -76,35 +76,40 @@ def db_store(payload, collection, is_landing_page=False, user=None):
     # The url that we'll receive from the front-end will be empty.
     # We find a unique url for this new element and send it back to
     # the frontend for it to update itself with it.
+
     json_data["url"] = db_generate_unique_url()
     el.url = json_data["url"]
 
     el.collection = collection
 
-    if json_data["order"]:
+    # Use .get() to safely check for keys
+    if json_data.get("order") is not None:
         el.order = json_data["order"]
 
-    if json_data["text"]:
+    if json_data.get("text"):
         el.text = json_data["text"]
         
-    if json_data["public"]:
+    if json_data.get("public") is not None:
         el.public = json_data["public"]
 
-    if json_data["archive"]:
+    if json_data.get("archive") is not None:
         el.archive = json_data["archive"]
 
-    if json_data["css"]:
+    if json_data.get("css"):
         el.css = json_data["css"]
 
-    if json_data["date"]:
+    # Date handling with a fallback
+    raw_date = json_data.get("date")
+    if raw_date:
         try:
-            el.date = json_data["date"]
-        except ValueError:
+            el.date = raw_date
+        except (ValueError, TypeError):
             el.date = timezone.now()
+    else:
+        el.date = timezone.now()
 
     # write objects to the database
     el.save()
-
     """
     elif tag == TagType.COLLECTION:
         # Create a representation of the Article as a python object
