@@ -1,9 +1,31 @@
-import React, {useEffect, createContext, useContext, useRef } from "react";
+import React, {useEffect, createContext, useContext, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useState } from "react";
 
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 const CursorContext = createContext(null);
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+function QuillEditor({ value, onChange }) {
+    const modules = useMemo(() => ({
+        toolbar: [
+            ['bold', 'italic', 'underline', 'link'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['clean']
+        ],
+    }), []);
+
+    return (
+        <ReactQuill 
+            theme="snow" 
+            value={value} 
+            onChange={onChange} // This is vital!
+            modules={modules}
+        />
+    );
+}
 
 function convertISO8601_to_intl(dateString) {
   // Try to parse the date
@@ -114,7 +136,7 @@ export function ElementDisplayAsComponents() {
             const text = element.querySelector("h3")?.textContent || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "PARAGRAPH") {
-            const text = element.querySelector("pre")?.textContent || "";
+            const text = element.querySelector("p")?.textContent || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "CODE") {
             const text = element.querySelector("code")?.textContent || "";
@@ -390,9 +412,9 @@ function Paragraph(props) {
 
     return (
         <React.Fragment>
-            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="PARAGRAPH" date={element.date}>
+            <div id={element.url} style={safeCssToObj(element.css)} className="element-wrapper section is-medium" order={element.order} tag="PARAGRAPH" date={element.date}>
                 <span className="element-order">#{element.order}</span>
-                <pre><span className="" style={safeCssToObj(element.css)}>{element.text}</span></pre>
+                <div className="content" dangerouslySetInnerHTML={{ __html: element.text }}></div>
                 <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
@@ -652,6 +674,10 @@ function ElementEditForm({element, elementList, showElementEditForm}) {
 
     const [getElementList, setElementList] = elementList;
     const [getShowElementEditForm, setShowElementEditForm] = showElementEditForm;
+    const [getParagraphFormValue, setParagraphFormValue] = useState(element.text || "");
+
+    // This variable stores the target element's order before the update so that we can track if it's order was changed.
+    let original_order = element.order
 
     const handleEditSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
@@ -662,7 +688,9 @@ function ElementEditForm({element, elementList, showElementEditForm}) {
 
         // check if the user pressed submit button without updating anything. If so then don't send the request since
         // nothing would change and there's no reason to burden the server.
-        values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
+        if (original_order != values.order) {
+            values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
+        }
 
         let xhr = new XMLHttpRequest();
         xhr.open("PUT", window.location.href, true);
@@ -698,7 +726,7 @@ function ElementEditForm({element, elementList, showElementEditForm}) {
                     <p className="help">enter a title to be used as the header name for this element</p>
                 </div>
             }
-            {["CODE", "PARAGRAPH"].includes(String(element.tag)) &&
+            {["CODE"].includes(String(element.tag)) &&
                 <div className="form-group field">
                     <label htmlFor="text" id="element-form-text-label"
                             className="form-label label">Text</label>
@@ -708,6 +736,27 @@ function ElementEditForm({element, elementList, showElementEditForm}) {
                             name="text"
                             className="textarea input form-field">
                     </textarea>
+                    <p className="help">enter a title to be used as the header name for this element</p>
+                </div>
+            }
+            {["PARAGRAPH"].includes(String(element.tag)) &&
+                <div className="form-group field">
+                    <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
+                    {/* 1. The Rich Text Editor (Visible to User) */}
+                    <QuillEditor 
+                        value={getParagraphFormValue} 
+                        onChange={(html) => {
+                            // This ensures your React state stays updated as they type
+                            setParagraphFormValue(html);
+                        }} 
+                    />
+
+                    {/* 2. The Hidden Input (Visible to the Form/XHR) */}
+                    <input 
+                        type="hidden" 
+                        name="text" 
+                        value={getParagraphFormValue} 
+                    />
                     <p className="help">enter a title to be used as the header name for this element</p>
                 </div>
             }

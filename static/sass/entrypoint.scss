@@ -289,3 +289,10 @@ html[show-controls="false"] #element-creation {
 html[show-controls="false"] .element-buttons-wrapper {
     display: none !important;
 }
+
+pre {
+    white-space: pre-wrap;       /* Preserves spaces/tabs but wraps text */
+    word-wrap: break-word;       /* Forces long strings (like URLs) to break */
+    overflow-x: hidden;          /* Safety net: hides any accidental horizontal spill */
+    max-width: 100%;             /* Ensures it never exceeds the parent's width */
+}

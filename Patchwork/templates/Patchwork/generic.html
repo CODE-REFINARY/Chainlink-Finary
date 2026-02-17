@@ -42,7 +42,7 @@
     {% for element in elements %}
         {% if element.content.tag == "PARAGRAPH" %}
             <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="PARAGRAPH" date={{element.date.isoformat}}>
-                <pre class="test" style="{{ element.css }}">{{ element.content.text }}</pre>
+                <p class="test" style="{{ element.css }}">{{ element.content.text }}</p>
             </div>
 
         {% elif element.content.tag == "HEADER1" %}
