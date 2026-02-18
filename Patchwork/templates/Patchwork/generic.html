@@ -41,17 +41,17 @@
 <div id="element-display" template="collection" class="">
     {% for element in elements %}
         {% if element.content.tag == "PARAGRAPH" %}
-            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="PARAGRAPH" date={{element.date.isoformat}}>
-                <p class="test" style="{{ element.css }}">{{ element.content.text }}</p>
+            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper" tag="PARAGRAPH" date={{element.date.isoformat}}>
+                <div class="content paragraphElement" style="{{ element.css }}">{{ element.content.text|safe }}</div>
             </div>
 
         {% elif element.content.tag == "HEADER1" %}
-            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="HEADER1" date={{element.date.isoformat}}>
+            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper" tag="HEADER1" date={{element.date.isoformat}}>
                 <h1 class="header1-element title is-1" style="{{ element.css }}">{{ element.content.text }}</h1>
             </div>
 
         {% elif element.content.tag == "HEADER2" %}
-            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="HEADER2" date={{element.date.isoformat}}>
+            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper" tag="HEADER2" date={{element.date.isoformat}}>
                 <h2>
                     <span class="element-order">#{{element.order}}</span>
                     <span class="title is-2" style="{{ element.css }}">{{ element.content.text }}</span>
@@ -60,18 +60,18 @@
             </div>
 
         {% elif element.content.tag == "HEADER3" %}
-            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="HEADER3" date={{element.date.isoformat}}>
+            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper" tag="HEADER3" date={{element.date.isoformat}}>
                 <h3 class="title is-3" style="{{ element.css }}">{{ element.content.text }}</h3>
             </div>
 
         {% elif element.content.tag == 'CODE' %}
-            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="CODE" date={{element.date.isoformat}}>
+            <div id="{{ element.url }}" order={{element.order}} class="element-wrapper" tag="CODE" date={{element.date.isoformat}}>
                 <code class="code" style="{{ element.css }}">{{ element.content.text }}</code>
             </div>
 
         {% elif element.content.tag == 'LINEBREAK' %}
-        <div id="{{ element.url }}" order={{element.order}} class="element-wrapper section is-medium" tag="LINEBREAK" date={{element.date.isoformat}}>
-            <span class="pb-5 pt-5 br" style="display: block; {{ element.css }}"><figure class="image is-16x16" style="float: right;"><img src="{% static 'images/enter.png' %}" alt="Description of image"></figure></span>
+        <div id="{{ element.url }}" order={{element.order}} class="element-wrapper" tag="LINEBREAK" date={{element.date.isoformat}}>
+            <span class="pb-5 pt-5 br" style="display: block; {{ element.css }}"><figure class="linebreak-enter-icon image is-16x16" style="float: right;"><img src="{% static 'images/enter.png' %}" alt="Description of image"></figure></span>
         </div>
         {% endif %}
         {% if forloop.last %}

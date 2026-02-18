@@ -90,8 +90,9 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 );
 
 @use "bulma/sass/layout/section" with (
-  $section-padding: 0.9rem 0rem,
-  $section-padding-medium: 1.3rem 0rem,
+  $section-padding: 0.5rem 0rem,
+  $section-padding-desktop: 0.5rem 0rem,
+  $section-padding-medium: 0.8rem 0rem,
   $section-padding-large: 5rem 0rem,
 );
 
@@ -273,6 +274,10 @@ html:not([edit-mode="true"]) .element-buttons-wrapper {
     display: none !important;
 }
 
+html:not([edit-mode="true"]) .linebreak-enter-icon {
+  display: none
+}
+
 /* Only hide elements if the attribute is EXPLICITLY set to "false" */
 html[show-ordering="false"] .element-order {
     display: none !important;
@@ -296,3 +301,25 @@ pre {
     overflow-x: hidden;          /* Safety net: hides any accidental horizontal spill */
     max-width: 100%;             /* Ensures it never exceeds the parent's width */
 }
+
+.paragraphElement {
+  color: black;
+  font-family: nyt-imperial,georgia,'times new roman',times,serif;
+}
+
+$tag-margins: (
+  "HEADER1": 2rem 0rem,
+  "HEADER2": 0.7rem 0rem,
+  "HEADER3": 0.6rem 0rem,
+  "PARAGRAPH": 0.5rem 0rem,
+  "LINEBREAK": 2rem 0rem,
+  "CODE": 0.5rem 0rem,
+);
+
+// Generate the rules automatically
+@each $tag, $margin in $tag-margins {
+  .element-wrapper[tag="#{$tag}"] {
+    margin: $margin !important;
+  }
+}
+

@@ -39,17 +39,6 @@ export function ViewOptionsSideMenu({ }) {
             <ul className="menu-list">
                 <li>
                     <label className="switch is-outlined is-small">
-                        <input 
-                            type="checkbox" 
-                            checked={showControls} 
-                            onChange={() => handleToggle('controls', showControls, setShowControls)}
-                        />
-                        <span className="check"></span>
-                        <span className="control-label">show controls</span>
-                    </label>
-                </li>
-                <li>
-                    <label className="switch is-outlined is-small">
                         <input type="checkbox"
                             checked={showOrdering} 
                             onChange={() => handleToggle('ordering', showOrdering, setShowOrdering)}
@@ -66,6 +55,17 @@ export function ViewOptionsSideMenu({ }) {
                         />
                         <span className="check"></span>
                         <span className="control-label">show dates</span>
+                    </label>
+                </li>
+                <li>
+                    <label className="switch is-outlined is-small">
+                        <input 
+                            type="checkbox" 
+                            checked={showControls} 
+                            onChange={() => handleToggle('controls', showControls, setShowControls)}
+                        />
+                        <span className="check"></span>
+                        <span className="control-label">show controls</span>
                     </label>
                 </li>
             </ul>

@@ -13,7 +13,7 @@ function QuillEditor({ value, onChange }) {
         toolbar: [
             ['bold', 'italic', 'underline', 'link'],
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            ['clean']
+            ['code-block']
         ],
     }), []);
 
@@ -136,7 +136,7 @@ export function ElementDisplayAsComponents() {
             const text = element.querySelector("h3")?.textContent || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "PARAGRAPH") {
-            const text = element.querySelector("p")?.textContent || "";
+            const text = element.querySelector("div")?.outerHTML || "";
             Object.assign(elementObj, { tag, date, url, order, text });
         } else if (tag === "CODE") {
             const text = element.querySelector("code")?.textContent || "";
@@ -343,7 +343,7 @@ function Header1(props) {
 
     return (
         <React.Fragment>
-            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER1" date={element.date}>
+            <div id={element.url} className="element-wrapper" order={element.order} tag="HEADER1" date={element.date}>
                 <h1 className="header1-element">
                     <span className="element-order">#{element.order}</span>
                     <span className="title is-1" style={safeCssToObj(element.css)}>{element.text}</span>
@@ -366,7 +366,7 @@ function Header2(props) {
 
     return (
         <React.Fragment>
-            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER2" date={element.date}>
+            <div id={element.url} className="element-wrapper" order={element.order} tag="HEADER2" date={element.date}>
                 <h2>
                     <span className="element-order">#{element.order}</span>
                     <span className="title is-2" style={safeCssToObj(element.css)}>{element.text}</span>
@@ -389,7 +389,7 @@ function Header3(props) {
 
     return (
         <React.Fragment>
-            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="HEADER3" date={element.date}>
+            <div id={element.url} className="element-wrapper" order={element.order} tag="HEADER3" date={element.date}>
                 <h3>
                     <span className="element-order">#{element.order}</span>
                     <span className="title is-3" style={safeCssToObj(element.css)}>{element.text}</span>
@@ -412,9 +412,9 @@ function Paragraph(props) {
 
     return (
         <React.Fragment>
-            <div id={element.url} style={safeCssToObj(element.css)} className="element-wrapper section is-medium" order={element.order} tag="PARAGRAPH" date={element.date}>
+            <div id={element.url} style={safeCssToObj(element.css)} className="element-wrapper" order={element.order} tag="PARAGRAPH" date={element.date}>
                 <span className="element-order">#{element.order}</span>
-                <div className="content" dangerouslySetInnerHTML={{ __html: element.text }}></div>
+                <div className="content paragraphElement" dangerouslySetInnerHTML={{ __html: element.text }}></div>
                 <span className="element-date">{convertISO8601_to_intl(element.date)}</span>
             <ElementEditButtons elementList={[getElementList, setElementList]} url={element.url} showElementDeleteForm={[getShowElementDeleteForm, setShowElementDeleteForm]} showElementEditForm={[getShowElementEditForm, setShowElementEditForm]} />
             </div>
@@ -433,7 +433,7 @@ function Code(props) {
 
     return (
         <React.Fragment>
-            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="CODE" date={element.date}>
+            <div id={element.url} className="element-wrapper" order={element.order} tag="CODE" date={element.date}>
                 <div>
                     <span className="element-order">#{element.order}</span>
                     <span className="code" style={safeCssToObj(element.css)}>{element.text}</span>
@@ -456,7 +456,7 @@ function Linebreak(props) {
 
     return (
         <React.Fragment>
-            <div id={element.url} className="element-wrapper section is-medium" order={element.order} tag="LINEBREAK" date={element.date}>
+            <div id={element.url} className="element-wrapper" order={element.order} tag="LINEBREAK" date={element.date}>
                 <div>
                     <span className="element-order">#{element.order}</span>
                     <span className="pb-5 pt-5 br" style={{display: "block"}}><figure className="image is-16x16" style={{float: "right"}}><img src="/static/images/enter.png" alt="Description of image" /></figure></span>
