@@ -8,12 +8,12 @@ import 'react-quill/dist/quill.snow.css';
 const CursorContext = createContext(null);
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-function QuillEditor({ value, onChange }) {
+function ParagraphQuillEditor({ value, onChange }) {
     const modules = useMemo(() => ({
         toolbar: [
             ['bold', 'italic', 'underline', 'link'],
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            ['code-block']
+            ['code']
         ],
     }), []);
 
@@ -21,7 +21,7 @@ function QuillEditor({ value, onChange }) {
         <ReactQuill 
             theme="snow" 
             value={value} 
-            onChange={onChange} // This is vital!
+            onChange={onChange}
             modules={modules}
         />
     );
@@ -675,6 +675,7 @@ function ElementEditForm({element, elementList, showElementEditForm}) {
     const [getElementList, setElementList] = elementList;
     const [getShowElementEditForm, setShowElementEditForm] = showElementEditForm;
     const [getParagraphFormValue, setParagraphFormValue] = useState(element.text || "");
+    const [getCodeFormValue, setCodeFormValue] = useState(element.text || "");
 
     // This variable stores the target element's order before the update so that we can track if it's order was changed.
     let original_order = element.order
@@ -727,23 +728,28 @@ function ElementEditForm({element, elementList, showElementEditForm}) {
                 </div>
             }
             {["CODE"].includes(String(element.tag)) &&
-                <div className="form-group field">
+                <div className="form-group field ">
                     <label htmlFor="text" id="element-form-text-label"
                             className="form-label label">Text</label>
-                    <textarea autoFocus type="text" id="input element-form-text"
-                            rows="3"
-                            defaultValue={element.text}
-                            name="text"
-                            className="textarea input form-field">
-                    </textarea>
-                    <p className="help">enter a title to be used as the header name for this element</p>
+                    <div className="textarea-wrapper" data-replicated-value={getCodeFormValue}>
+                        <textarea autoFocus type="text" id="input element-form-text"
+                                style={{ backgroundColor: '#282c34', color: '#abb2bf' }}
+                                defaultValue={getCodeFormValue}
+                                value={getCodeFormValue}
+                                onChange={(e) => setCodeFormValue(e.target.value)}
+                                name="text"
+                                className="textarea input form-field"
+                                rows="1">
+                        </textarea>
+                    </div>
+                    <p className="help">enter the text content for this element.</p>
                 </div>
             }
             {["PARAGRAPH"].includes(String(element.tag)) &&
                 <div className="form-group field">
                     <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
                     {/* 1. The Rich Text Editor (Visible to User) */}
-                    <QuillEditor 
+                    <ParagraphQuillEditor 
                         value={getParagraphFormValue} 
                         onChange={(html) => {
                             // This ensures your React state stays updated as they type
@@ -806,6 +812,8 @@ function ElementCreateForm({tag, elementList, showElementCreateForm}) {
 
     const [getElementList, setElementList] = elementList;
     const [getShowElementCreateForm, setShowElementCreateForm] = showElementCreateForm;
+    const [getParagraphFormValue, setParagraphFormValue] = useState("");
+    const [getCodeFormValue, setCodeFormValue] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
@@ -856,17 +864,43 @@ function ElementCreateForm({tag, elementList, showElementCreateForm}) {
                             <p className="help">enter the text for this header.</p>
                         </div>
                     }
-                    {["CODE", "PARAGRAPH"].includes(String(tag)) &&
-                        <div className="form-group field">
+                    {["CODE"].includes(String(tag)) &&
+                        <div className="form-group field ">
                             <label htmlFor="text" id="element-form-text-label"
                                     className="form-label label">Text</label>
-                            <textarea autoFocus type="text" id="input element-form-text"
-                                    rows="3"
-                                    defaultValue=""
-                                    name="text"
-                                    className="textarea input form-field">
-                            </textarea>
+                            <div className="textarea-wrapper" data-replicated-value={getCodeFormValue}>
+                                <textarea autoFocus type="text" id="input element-form-text"
+                                        style={{ backgroundColor: '#282c34', color: '#abb2bf' }}
+                                        defaultValue={getCodeFormValue}
+                                        value={getCodeFormValue}
+                                        onChange={(e) => setCodeFormValue(e.target.value)}
+                                        name="text"
+                                        className="textarea input form-field"
+                                        rows="3">
+                                </textarea>
+                            </div>
                             <p className="help">enter the text content for this element.</p>
+                        </div>
+                    }
+                    {["PARAGRAPH"].includes(String(tag)) &&
+                        <div className="form-group field">
+                            <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
+                            {/* 1. The Rich Text Editor (Visible to User) */}
+                            <ParagraphQuillEditor 
+                                value={getParagraphFormValue} 
+                                onChange={(html) => {
+                                    // This ensures your React state stays updated as they type
+                                    setParagraphFormValue(html);
+                                }} 
+                            />
+
+                            {/* 2. The Hidden Input (Visible to the Form/XHR) */}
+                            <input 
+                                type="hidden" 
+                                name="text" 
+                                value={getParagraphFormValue} 
+                            />
+                            <p className="help">enter a title to be used as the header name for this element</p>
                         </div>
                     }
                     <div className="form-group field">

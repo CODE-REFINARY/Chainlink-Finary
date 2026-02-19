@@ -323,3 +323,59 @@ $tag-margins: (
   }
 }
 
+p a {
+  color: #0000EE;
+}
+
+/* Match the thickness and rounding of Bulma's 'input' class */
+.ql-toolbar.ql-snow, 
+.ql-container.ql-snow {
+    border: 2px solid #dbdbdb !important; /* Thicker borders */
+    transition: border-color 0.2s;
+}
+
+/* Round the top of the toolbar */
+.ql-toolbar.ql-snow {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom: none !important; /* Prevent double-border in the middle */
+    background-color: #f5f5f5;      /* Light background for the "control" look */
+}
+
+/* Round the bottom of the editor box */
+.ql-container.ql-snow {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    font-size: 1rem; /* Matches Bulma's standard input font size */
+}
+
+/* Bulma Focus Effect: Change border color when typing */
+.ql-container.ql-snow:focus-within,
+.ql-container.ql-snow:hover {
+    border-color: #00d1b2 !important; /* Bulma Primary (Turquoise) */
+}
+
+.ql-editor {
+    font-family: inherit; 
+    min-height: 150px; /* Give users room to breathe */
+    line-height: 1.5;   /* Matches Bulma's readability standards */
+}
+
+
+.textarea-wrapper {
+  display: grid;
+  &::after {
+    /* This mirrors the content of the textarea exactly */
+    content: attr(data-replicated-value) " ";
+    white-space: pre-wrap;
+    visibility: hidden;
+  }
+  
+  textarea, &::after {
+    /* Both sit in the exact same grid cell */
+    grid-area: 1 / 1 / 2 / 2;
+    font: inherit; /* Crucial: fonts must match exactly */
+    padding: 0.5rem;
+    border: 1px solid black;
+  }
+}
