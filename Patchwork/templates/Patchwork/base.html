@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" url="{{collection.url}}">
     <head>
         <title>Chainlink Finary</title>
 
@@ -111,28 +111,11 @@
                         {% endif %}
                         <li class="deactivated-action-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Convert to PDF" disabled><span class="help-text tag is-light is-info is-normal">(display this Collection as a PDF - feature not yet implemented)</span></form></li>
                     {% endblock %}
-                </ul>
-                <h2 class="menu-label">Edit an existing collection</h2>
-                <ul class="menu-list">
-                    {% if user.is_authenticated %}
-                        <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-light" type="submit" value="Edit Permissions" /></form></li>
-                        <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-light" type="submit" value="Change Theme" /></form></li>
-                        <li class="activated-edit-list-element">
-                            <form method="GET">
-                                <input type="hidden" name="edit" value="true">
-                                <input class="button is-small is-responsive is-warning" 
-                                    type="submit" 
-                                    value="Edit Collection" />
-                            </form>
-                        </li>
-                        <li class="activated-edit-list-element"><form><input class="button is-small is-responsive is-danger" type="submit" value="Delete Collection" /></form></li>
-                    {% else %}
-                        <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Edit Permissions" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
-                        <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Change Theme" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
-                        <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Edit Collection" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
-                        <li class="deactivated-edit-list-element"><form><input class="button is-static is-small is-responsive is-light" type="submit" value="Delete Collection" disabled><span class="help-text tag is-light is-info is-normal">(you must be logged in and have permission to edit this Collection)</span></form></li>
+                </ul>           
+                {% if user.is_authenticated %}
+                <h2 class="menu-label">Edit Collection</h2>
+                <ul class="menu-list" id="collection-controls"></ul>
                     {% endif %}
-                </ul>
                 {% endif %}
             </nav>
         </header>

@@ -28,6 +28,8 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 // Override global Sass variables from the /utilities folder
 @use "bulma/sass/utilities" with (
   $family-primary: '"Nunito", sans-serif',
+  $size-2: 2rem,  // Default is 2.5rem
+  $size-3: 1.4rem, // Default is 2rem
   $primary: $gray-may,
   $link: $metallic-blue,
   $control-border-width: 3px,
@@ -86,7 +88,7 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
   $subtitle-color: $subtitle-color,
   $subtitle-weight: normal,
   $subtitle-size: 1.25em,
-  $subtitle-family: $family-secondary,
+  $subtitle-family: $family-secondary
 );
 
 @use "bulma/sass/layout/section" with (
@@ -310,7 +312,7 @@ pre {
 $tag-margins: (
   "HEADER1": 2rem 0rem,
   "HEADER2": 0.7rem 0rem,
-  "HEADER3": 0.6rem 0rem,
+  "HEADER3": 1.6rem 0rem 0.8rem 0rem,
   "PARAGRAPH": 0.5rem 0rem,
   "LINEBREAK": 2rem 0rem,
   "CODE": 0.5rem 0rem,
@@ -378,4 +380,8 @@ p a {
     padding: 0.5rem;
     border: 1px solid black;
   }
+}
+
+.paragraphElement p {
+  margin: 0px !important;
 }

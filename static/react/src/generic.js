@@ -1,7 +1,7 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ElementDisplayAsComponents } from "./collectionComponentLibrary.js";
-import { ViewOptionsSideMenu } from "./ancillaryComponents.js";
+import { ViewOptionsSideMenu, CollectionEditForm, CollectionDeleteForm, CollectionCreateForm } from "./ancillaryComponents.js";
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -32,6 +32,26 @@ document.addEventListener("DOMContentLoaded", function () {
             const sideMenuRoot = createRoot(menuWrapper);
             sideMenuRoot.render(<ViewOptionsSideMenu/>);
         }
+
+        const CollectionManager = () => {
+            // Define your state at the top of the component
+            const [showCreate, setShowCreate] = useState(false);
+            const [showEdit, setShowEdit] = useState(false);
+            const [showDelete, setShowDelete] = useState(false);
+
+            return (
+                <>
+                    <CollectionCreateForm show={showCreate} setShow={setShowCreate} />
+                    <CollectionEditForm show={showEdit} setShow={setShowEdit} />
+                    <CollectionDeleteForm show={showDelete} setShow={setShowDelete} />
+                </>
+            );
+        };
+
+        const collectionControlsList = document.getElementById("collection-controls");
+        const root = createRoot(collectionControlsList);
+
+        root.render(<CollectionManager />);
     }
 
     let queryString = window.location.search;

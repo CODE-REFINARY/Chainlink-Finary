@@ -53,16 +53,16 @@ def db_store(payload, collection, is_landing_page=False, user=None):
     tag = TagType(json_data["tag"])
     collection = Collection.objects.get(url=collection)
 
+    if tag == TagType.HEADER1:
+        el = Header1()
+
     if tag == TagType.HEADER2:
         # Create a representation of the Chainlink object to write to the database
         el = Header2()
         # Update the collection object to indicate that it has a new child
 
-    if tag == TagType.HEADER1:
-        el = Header1()
-
     if tag == TagType.HEADER3:
-        el = Header1()
+        el = Header3()
 
     if tag == TagType.PARAGRAPH:
         el = Paragraph()
