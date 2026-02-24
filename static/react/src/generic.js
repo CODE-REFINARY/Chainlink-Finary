@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ElementDisplayAsComponents } from "./collectionComponentLibrary.js";
-import { ViewOptionsSideMenu, CollectionEditForm, CollectionDeleteForm, CollectionCreateForm } from "./ancillaryComponents.js";
+import { ViewOptionsSideMenu, CollectionEditForm, CollectionDeleteForm, CollectionCreateForm, EnterEditModeButton, ExitEditModeButton } from "./ancillaryComponents.js";
 
 
 document.addEventListener("DOMContentLoaded", function () {
 
     function initialize(edit) {
-        // 1. Logic for the Element Display (Content)
+        // Logic for the Element Display (Content)
         if (edit === true) {
             let manifestEl = document.getElementById("element-manifest-entries");
             if (manifestEl) {
@@ -17,20 +17,21 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             const elementsComponent = createRoot(document.getElementById("element-display"));
             elementsComponent.render(<ElementDisplayAsComponents/>);
-        }
 
-        // 2. Logic for the Side Menu (Switches)
-        const anchorElement = document.getElementById("chainlink-manifest");
-        if (anchorElement) {
-            // Create a wrapper for our React menu
-            const menuWrapper = document.createElement("div");
-            menuWrapper.id = "react-side-menu-root";
-            
-            // Insert it as the next adjacent sibling
-            anchorElement.insertAdjacentElement('afterend', menuWrapper);
 
-            const sideMenuRoot = createRoot(menuWrapper);
-            sideMenuRoot.render(<ViewOptionsSideMenu/>);
+            // Logic for the Side Menu (Switches)
+            const anchorElement = document.getElementById("chainlink-manifest");
+            if (anchorElement) {
+                // Create a wrapper for our React menu
+                const menuWrapper = document.createElement("div");
+                menuWrapper.id = "react-side-menu-root";
+                
+                // Insert it as the next adjacent sibling
+                anchorElement.insertAdjacentElement('afterend', menuWrapper);
+
+                const sideMenuRoot = createRoot(menuWrapper);
+                sideMenuRoot.render(<ViewOptionsSideMenu/>);
+            }
         }
 
         const CollectionManager = () => {
@@ -39,13 +40,22 @@ document.addEventListener("DOMContentLoaded", function () {
             const [showEdit, setShowEdit] = useState(false);
             const [showDelete, setShowDelete] = useState(false);
 
-            return (
-                <>
-                    <CollectionCreateForm show={showCreate} setShow={setShowCreate} />
-                    <CollectionEditForm show={showEdit} setShow={setShowEdit} />
-                    <CollectionDeleteForm show={showDelete} setShow={setShowDelete} />
-                </>
-            );
+            if (edit === true) {
+                return (
+                    <>
+                        <ExitEditModeButton />
+                        <CollectionEditForm show={showEdit} setShow={setShowEdit} />
+                        <CollectionDeleteForm show={showDelete} setShow={setShowDelete} />
+                    </>
+                );
+            } else {
+                return (
+                    <>
+                        <CollectionCreateForm show={showCreate} setShow={setShowCreate} />
+                        <EnterEditModeButton />
+                    </>
+                );
+            }
         };
 
         const collectionControlsList = document.getElementById("collection-controls");
@@ -57,6 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let queryString = window.location.search;
     let params = new URLSearchParams(queryString);
     let edit = params.get("edit") === "true";
+
 
     document.documentElement.setAttribute('edit-mode', edit ? 'true' : 'false');
 

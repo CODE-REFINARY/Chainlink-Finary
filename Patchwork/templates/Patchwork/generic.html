@@ -3,10 +3,8 @@
 {% block content %}
 <input type="hidden" id="collection-url" value="{{ collection.url }}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
-{% if edit == "true" %}
-    <link rel="stylesheet" href="{% static 'css/edit-mode.css' %}">
-    <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
-{% endif %}
+<link rel="stylesheet" href="{% static 'css/edit-mode.css' %}">
+<script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 {% if collection.theme == "patchwork" %}
     <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
 {% elif collection.theme == "peshay" %}
