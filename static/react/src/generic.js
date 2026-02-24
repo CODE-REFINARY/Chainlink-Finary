@@ -7,19 +7,24 @@ import { ViewOptionsSideMenu, CollectionEditForm, CollectionDeleteForm, Collecti
 document.addEventListener("DOMContentLoaded", function () {
 
     function initialize(edit) {
+
         // Logic for the Element Display (Content)
         if (edit === true) {
+
+            // This turns the bookmarks into a dynamic component
             let manifestEl = document.getElementById("element-manifest-entries");
             if (manifestEl) {
                 while (manifestEl.firstChild) {
                     manifestEl.removeChild(manifestEl.firstChild);
                 }
             }
+
+            // This is the big call: the one that actually rebuilds all body elements.
             const elementsComponent = createRoot(document.getElementById("element-display"));
             elementsComponent.render(<ElementDisplayAsComponents/>);
 
 
-            // Logic for the Side Menu (Switches)
+            // Logic for the Side Menu (toggles and buttons)
             const anchorElement = document.getElementById("chainlink-manifest");
             if (anchorElement) {
                 // Create a wrapper for our React menu
@@ -43,9 +48,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (edit === true) {
                 return (
                     <>
+                        <CollectionCreateForm show={showCreate} setShow={setShowCreate} />
                         <ExitEditModeButton />
-                        <CollectionEditForm show={showEdit} setShow={setShowEdit} />
-                        <CollectionDeleteForm show={showDelete} setShow={setShowDelete} />
                     </>
                 );
             } else {

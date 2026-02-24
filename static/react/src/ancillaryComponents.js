@@ -16,6 +16,9 @@ function toggleEditMode(makeEditModeActive) {
 
 export function ViewOptionsSideMenu() {
 
+    const [showEdit, setShowEdit] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
+
     const [showOrdering, setShowOrdering] = useState(true);
     const [showDates, setShowDates] = useState(true);
     const [showControls, setShowControls] = useState(true);
@@ -71,6 +74,11 @@ export function ViewOptionsSideMenu() {
                         <span className="control-label">show controls</span>
                     </label>
                 </li>
+                <h2 className="menu-label">Edit Options</h2>
+                <li>
+                    <CollectionEditForm show={showEdit} setShow={setShowEdit} />
+                    <CollectionDeleteForm show={showDelete} setShow={setShowDelete} />
+                </li>
             </ul>
         </div>
     );
@@ -102,7 +110,7 @@ export function CollectionCreateForm({show, setShow}) {
 
     return (
         <li class="activated-edit-list-element" id="create-collection-button">
-            <input class="button is-small is-responsive is-sandstone" value="Generate New Collection" type="submit" onClick={() => setShow(true)} />
+            <input class="button is-small is-responsive is-light" value="Generate New Collection" type="submit" onClick={() => setShow(true)} />
             {show && <form onSubmit={handleSubmit} className="crud-form">
                 <label className="form-label label">Create a new collection</label>
                 <div className="form-group field">
@@ -159,7 +167,7 @@ export function CollectionEditForm({show, setShow}) {
 
     return (
         <li class="activated-edit-list-element" id="edit-collection-button">
-            <input class="button is-small is-responsive is-indigo" value="Adjust Collection Properties" type="submit" onClick={() => setShow(true)} />
+            <input class="button is-small is-responsive is-light" value="Adjust Collection Properties" type="submit" onClick={() => setShow(true)} />
             {show && <form onSubmit={handleSubmit} className="crud-form">
                 <label className="form-label label">Edit this collection</label>
                 <div className="form-group field">
