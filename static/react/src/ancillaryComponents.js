@@ -75,10 +75,8 @@ export function ViewOptionsSideMenu() {
                     </label>
                 </li>
                 <h2 className="menu-label">Edit Options</h2>
-                <li>
-                    <CollectionEditForm show={showEdit} setShow={setShowEdit} />
-                    <CollectionDeleteForm show={showDelete} setShow={setShowDelete} />
-                </li>
+                <CollectionEditForm show={showEdit} setShow={setShowEdit} />
+                <CollectionDeleteForm show={showDelete} setShow={setShowDelete} />
             </ul>
         </div>
     );
@@ -102,15 +100,28 @@ export function CollectionCreateForm({show, setShow}) {
 
         xhr.onload = function () {
             if (xhr.status === 200) {
+                // SUCCESS: The collection was created
+                setShow(false);
                 window.location.replace("../collections/" + values["url"]);
-                setShow(false);        
+            } else if (xhr.status === 422) {
+                // ERROR: Title or URL not unique
+                const errorMsg = xhr.responseText; // This will be "url_not_unique" or "title_not_unique"
+                alert("Validation Error: " + errorMsg.replace(/_/g, ' '));
+            } else {
+                // OTHER ERRORS (500, 403, etc.)
+                console.error("Server error: " + xhr.status);
             }
-        }
+        };
+
+        // It's also good practice to handle network-level failures
+        xhr.onerror = function () {
+            alert("Network error. Please check your connection.");
+        };
     };
 
     return (
-        <li class="activated-edit-list-element" id="create-collection-button">
-            <input class="button is-small is-responsive is-light" value="Generate New Collection" type="submit" onClick={() => setShow(true)} />
+        <li className="activated-edit-list-element" id="create-collection-button">
+            <input className="button is-small is-responsive is-light" value="Generate New Collection" type="submit" onClick={() => setShow(true)} />
             {show && <form onSubmit={handleSubmit} className="crud-form">
                 <label className="form-label label">Create a new collection</label>
                 <div className="form-group field">
@@ -166,8 +177,8 @@ export function CollectionEditForm({show, setShow}) {
     };
 
     return (
-        <li class="activated-edit-list-element" id="edit-collection-button">
-            <input class="button is-small is-responsive is-light" value="Adjust Collection Properties" type="submit" onClick={() => setShow(true)} />
+        <li className="activated-edit-list-element" id="edit-collection-button">
+            <input className="button is-small is-responsive is-light" value="Adjust Collection Properties" type="submit" onClick={() => setShow(true)} />
             {show && <form onSubmit={handleSubmit} className="crud-form">
                 <label className="form-label label">Edit this collection</label>
                 <div className="form-group field">
@@ -227,8 +238,8 @@ export function CollectionDeleteForm({show, setShow}) {
     };
 
     return (
-        <li class="activated-edit-list-element" id="delete-collection-button">
-            <input class="button is-small is-responsive is-danger" value="Delete This Collection" type="submit" onClick={() => setShow(true)} />
+        <li className="activated-edit-list-element" id="delete-collection-button">
+            <input className="button is-small is-responsive is-danger" value="Delete This Collection" type="submit" onClick={() => setShow(true)} />
             {show && <form onSubmit={handleSubmit} className="crud-form">
                 <label className="form-label label">Are you sure you want to delete this collection? Doing so will redirect you back to the landing page.</label>
                     <input 
@@ -252,12 +263,12 @@ export function CollectionDeleteForm({show, setShow}) {
 
 export function EnterEditModeButton() {
     return(
-        <input class="button is-small is-responsive is-warning" value="Enter Edit Mode" type="submit" onClick={() => toggleEditMode(true)} />
+        <input className="button is-small is-responsive is-warning" value="Enter Edit Mode" type="submit" onClick={() => toggleEditMode(true)} />
     )
 }
 
 export function ExitEditModeButton() {
     return(
-        <input class="button is-small is-responsive is-success" value="Finish Editing" type="submit" onClick={() => toggleEditMode(false)} />
+        <input className="button is-small is-responsive is-success" value="Finish Editing" type="submit" onClick={() => toggleEditMode(false)} />
     )
 }

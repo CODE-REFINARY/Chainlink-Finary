@@ -2,8 +2,6 @@
 {% load static %}
 {% block content %}
 <input type="hidden" id="collection-url" value="{{ collection.url }}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/generic.css' %}">
-<link rel="stylesheet" href="{% static 'css/edit-mode.css' %}">
 <script src="{{ REACT_STATIC_ROOT }}/generic.js"></script>
 {% if collection.theme == "patchwork" %}
     <link rel="stylesheet" href="{% static 'css/patchwork.css' %}">
@@ -23,9 +21,9 @@
                     {% if element.content.tag == "HEADER1" %}
                         <li><a class="inline-url" href="#{{ element.url }}">{{ element.content.text }}</a></li>
                     {% elif element.content.tag == "HEADER2" %}
-                        <li><a class="inline-url" href="#{{ element.url }}">>>{{ element.content.text }}</a></li>
+                        <li><a class="inline-url" href="#{{ element.url }}"><span class="h2-arrow">→</span>{{ element.content.text }}</a></li>
                     {% elif element.content.tag == "HEADER3" %}
-                        <li><a class="inline-url" href="#{{ element.url }}">>>>>{{ element.content.text }}</a></li>
+                        <li><a class="inline-url" href="#{{ element.url }}"><span class="h3-arrow">⟶</span>{{ element.content.text }}</a></li>
                     {% endif %}
                 {% endfor %}
             {% else %}

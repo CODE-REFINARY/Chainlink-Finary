@@ -385,3 +385,15 @@ p a {
 .paragraphElement p {
   margin: 0px !important;
 }
+
+
+/* Keep the space, but hide the arrow */
+.h2-arrow, .h3-arrow {
+  visibility: hidden;
+}
+
+/* Show it when the parent LI is hovered */
+li:hover .h2-arrow, 
+li:hover .h3-arrow {
+  visibility: visible;
+}

@@ -171,13 +171,13 @@ export function ElementDisplayAsComponents() {
                         case 'HEADER2':
                             return (
                                 <li>    
-                                    <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;{item.text}</a>  
+                                    <a key={item.url} className="inline-url" href={`#${item.url}`}><span class="h2-arrow">→</span>{item.text}</a>  
                                 </li>
                             );
                         case 'HEADER3':
                             return (
                                 <li>    
-                                    <a key={item.url} className="inline-url" href={`#${item.url}`}>&gt;&gt;&gt;&gt;{item.text}</a>
+                                    <a key={item.url} className="inline-url" href={`#${item.url}`}><span class="h3-arrow">⟶</span>{item.text}</a>
                                 </li>
                             );
                     }}

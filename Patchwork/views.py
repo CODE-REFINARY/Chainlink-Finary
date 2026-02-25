@@ -20,6 +20,7 @@ from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
 from datetime import datetime
 from django.core.exceptions import ValidationError, FieldDoesNotExist
 from django.db import models
+from django.utils.text import slugify
 
 
 class HttpRequestWrapper(HttpRequest):
@@ -39,7 +40,7 @@ class HttpRequestWrapper(HttpRequest):
     ###################### database accessors ######################
 
 
-def db_store(payload, collection, is_landing_page=False, user=None):
+def db_store(payload, collection):
     """
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
     :param payload: JSON payload specifying the properties of the Element to write to the database
@@ -51,87 +52,113 @@ def db_store(payload, collection, is_landing_page=False, user=None):
     json_data = json.loads(payload)
     # Read the type of Element to store
     tag = TagType(json_data["tag"])
-    collection = Collection.objects.get(url=collection)
 
-    if tag == TagType.HEADER1:
-        el = Header1()
+    if tag == TagType.COLLECTION:
+        el = Collection()
+        if json_data.get("public") is not None:
+            el.public = json_data.get("public")
+        if json_data.get("title") is not None:
+            try:
+                Collection.objects.get(title=json_data.get("title"))
+                # If we get here, it means a record WAS found
+                return HttpResponse("title_not_unique", status=422)
+            except Collection.DoesNotExist:
+                # This is actually the "success" path where the title is unique
+                pass
+            el.title = json_data.get("title")
+            
+        if json_data.get("url") is not None:
+            # 1. Get and Sanitize the data
+            raw_url = json_data.get("url", "").strip()
 
-    if tag == TagType.HEADER2:
-        # Create a representation of the Chainlink object to write to the database
-        el = Header2()
-        # Update the collection object to indicate that it has a new child
+            # If it's a slug (part of a URL), slugify it to remove spaces/special chars
+            # If it's a full domain, you might skip slugify but still strip()
+            clean_url = slugify(raw_url) 
 
-    if tag == TagType.HEADER3:
-        el = Header3()
+            if not clean_url:
+                return HttpResponse("invalid_url_format", status=422)
 
-    if tag == TagType.PARAGRAPH:
-        el = Paragraph()
+            # 2. Check Uniqueness (using .exists() is cleaner than try/except)
+            if Collection.objects.filter(url=clean_url).exists():
+                return HttpResponse("url_not_unique", status=422)
+            
+            el.url = clean_url
 
-    if tag == TagType.LINEBREAK:
-        el = Linebreak()
+        if json_data.get("css") is not None:
+            el.url = json_data.get("css")
 
-    if tag == TagType.CODE:
-        el = Code()
-        
-    # The url that we'll receive from the front-end will be empty.
-    # We find a unique url for this new element and send it back to
-    # the frontend for it to update itself with it.
-
-    json_data["url"] = db_generate_unique_url()
-    el.url = json_data["url"]
-
-    el.collection = collection
-
-    # Use .get() to safely check for keys
-    if json_data.get("order") is not None:
-        el.order = json_data["order"]
-
-    if json_data.get("text"):
-        el.text = json_data["text"]
-        
-    if json_data.get("public") is not None:
-        el.public = json_data["public"]
-
-    if json_data.get("archive") is not None:
-        el.archive = json_data["archive"]
-
-    if json_data.get("css"):
-        el.css = json_data["css"]
-
-    # Date handling with a fallback
-    raw_date = json_data.get("date")
-    if raw_date:
-        try:
-            el.date = raw_date
-        except (ValueError, TypeError):
+        # Date handling with a fallback
+        raw_date = json_data.get("date")
+        if raw_date:
+            try:
+                el.date = raw_date
+            except (ValueError, TypeError):
+                el.date = timezone.now()
+        else:
             el.date = timezone.now()
+
+        el.save()
+
     else:
-        el.date = timezone.now()
+        collection = Collection.objects.get(url=collection)
 
-    # write objects to the database
-    el.save()
-    """
-    elif tag == TagType.COLLECTION:
-        # Create a representation of the Article as a python object
-        collection = Collection()
-        collection.url = db_try_url(TagType.HEADER1)  # Get a unique url for this collection.
-        collection.public = False
-        collection.date = timezone.now()
+        if tag == TagType.HEADER1:
+            el = Header1()
 
-        # Write Python Article object to database
-        collection.save()
+        if tag == TagType.HEADER2:
+            # Create a representation of the Chainlink object to write to the database
+            el = Header2()
+            # Update the collection object to indicate that it has a new child
 
-        # If the landing page flag is set then also write the generated url to the LANDING_PAGE_URL field of the .env
-        # file
-        if is_landing_page:
-            logged_in_user = Account.objects.get(user=user)
-            #logged_in_user.landing_page_url = collection.url <-- this line should probalby be removed. It's here just for easy revision
-            loggin_in_user.landing_page_collection = collection
-            logged_in_user.save()
+        if tag == TagType.HEADER3:
+            el = Header3()
 
-        # Set the url field now that we've assigned a url so that frontend can redirect the user to this new collection.
-        json_data["url"] = collection.url
-    """
+        if tag == TagType.PARAGRAPH:
+            el = Paragraph()
+
+        if tag == TagType.LINEBREAK:
+            el = Linebreak()
+
+        if tag == TagType.CODE:
+            el = Code()
+            
+        # The url that we'll receive from the front-end will be empty.
+        # We find a unique url for this new element and send it back to
+        # the frontend for it to update itself with it.
+
+        json_data["url"] = db_generate_unique_url()
+        el.url = json_data["url"]
+
+        el.collection = collection
+
+        # Use .get() to safely check for keys
+        if json_data.get("order") is not None:
+            el.order = json_data["order"]
+
+        if json_data.get("text"):
+            el.text = json_data["text"]
+            
+        if json_data.get("public") is not None:
+            el.public = json_data["public"]
+
+        if json_data.get("archive") is not None:
+            el.archive = json_data["archive"]
+
+        if json_data.get("css"):
+            el.css = json_data["css"]
+
+        # Date handling with a fallback
+        raw_date = json_data.get("date")
+        if raw_date:
+            try:
+                el.date = raw_date
+            except (ValueError, TypeError):
+                el.date = timezone.now()
+        else:
+            el.date = timezone.now()
+
+        # write objects to the database
+        el.save()
 
     # Return the JSON payload back to be sent as an HTTP response back to the user. We do this so that we can
     # communicate to the front-end any adjustments or system updates pertinent to the user's request back to them
@@ -140,11 +167,19 @@ def db_store(payload, collection, is_landing_page=False, user=None):
     return json.dumps(json_data)
 
 
-def db_remove(tag, url, order):
+def db_remove(payload, collection):
     """
     Delete data from the database.
     """
-    target = Element.objects.get(url=url)
+    json_data = json.loads(payload)
+    # Read the type of Element to store
+    tag = TagType(json_data["tag"])
+
+    if tag == TagType.COLLECTION:
+        target = Collection.objects.get(url=collection)
+    else:
+        target = Element.objects.get(url=json_data["url"])
+    
     target.delete()
 
 def db_update(payload):
@@ -276,11 +311,7 @@ def generic(request, url=None):
 
     elif request.method == "DELETE":
         payload = request.body
-        payload_json = json.loads(payload)
-        url = payload_json["url"]
-        order = payload_json["order"]
-        tag = TagType(payload_json["tag"])
-        db_remove(tag, url, order)
+        db_remove(payload, url)
 
     elif request.method == "PUT":
         #target_id = request.headers["url"]
