@@ -21,24 +21,93 @@ from datetime import datetime
 from django.core.exceptions import ValidationError, FieldDoesNotExist
 from django.db import models
 from django.utils.text import slugify
+import html
+from django.core.validators import URLValidator
+import bleach
 
 
-class HttpRequestWrapper(HttpRequest):
-    def __init__(self, body_data, user_data, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._body_data = body_data
-        self._user_data = user_data
+###################### Helper Methods ######################
 
-    @property
-    def body(self):
-        return self._body_data
+def secure_validate_input(raw_value, max_length=20000, is_url_component=False):
+    """
+    Validates input: allows safe HTML, blocks scripts/styles, and handles slugs.
+    """
+    if not raw_value or not isinstance(raw_value, str):
+        return None, "Input is empty or invalid"
 
-    @property
-    def user(self):
-        return self._user_data
+    # 1. HTML Sanitization (The "Bleach" Step)
+    # Define which tags and attributes you consider "safe"
+    allowed_tags = ['b', 'i', 'u', 'em', 'strong', 'p', 'br', 'a', 'ul', 'li']
+    allowed_attrs = {
+        'a': ['href', 'title', 'target'], # Allow links but only specific attributes
+    }
 
-    ###################### database accessors ######################
+    # This removes <script>, <style>, <iframe) and strips "onmouseover" etc.
+    cleaned = bleach.clean(
+        raw_value.strip(), 
+        tags=allowed_tags, 
+        attributes=allowed_attrs,
+        strip=True # If False, it escapes the bad tags; if True, it deletes them.
+    )
 
+    # 2. Length Enforcement (Higher limit for HTML)
+    if len(cleaned) > max_length:
+        return None, f"Input too long (max {max_length})"
+
+    # 3. URL/Slug Logic (STILL ESCAPE/STRIP HTML HERE)
+    if is_url_component:
+        # For a URL, we don't want ANY HTML, so we strip tags entirely
+        url_safe = bleach.clean(cleaned, tags=[], strip=True) 
+        cleaned = slugify(url_safe)
+        if not cleaned:
+            return None, "Invalid URL characters"
+
+    return cleaned, None
+
+
+def cast_value(field, value):
+    """
+    Attempts to cast a value to the correct type based on the field's class.
+    """
+    field_type = type(field)
+
+    try:
+        if field_type == models.CharField:
+            # Cast to string for CharField
+            return str(value)
+        elif field_type == models.IntegerField:
+            # Cast to integer for IntegerField
+            return int(value)
+        elif field_type == models.FloatField:
+            # Cast to float for FloatField
+            return float(value)
+        elif field_type == models.BooleanField:
+            # Cast to boolean for BooleanField
+            if value == "False":
+                return False
+            elif value == "True":
+                return True
+            elif isinstance(value, bool):
+                return value
+            else:
+                raise ValueError("Invalid boolean value. The `value` argument must be either a str value of 'True' or 'False' or a boolean value.")
+        elif field_type == models.DateTimeField:
+            # Attempt to parse datetime for DateTimeField
+            if isinstance(value, str):
+                return datetime.fromisoformat(value)
+            return value
+        elif field_type == models.DateField:
+            # Attempt to parse date for DateField
+            if isinstance(value, str):
+                return datetime.strptime(value, '%Y-%m-%d').date()
+            return value
+        # Add more cases as needed for other field types...
+        else:
+            # Return the value as-is if no matching type
+            return value
+    except (ValueError, TypeError) as e:
+        # Log or raise error if casting fails
+        raise ValidationError(f"Failed to cast value '{value}' to {field_type.__name__}: {e}")
 
 def db_store(payload, collection):
     """
@@ -58,22 +127,24 @@ def db_store(payload, collection):
         if json_data.get("public") is not None:
             el.public = json_data.get("public")
         if json_data.get("title") is not None:
+            sanitized_title = secure_validate_input(json_data.get("title"))[0]
             try:
-                Collection.objects.get(title=json_data.get("title"))
+                Collection.objects.get(title=sanitized_title)
                 # If we get here, it means a record WAS found
                 return HttpResponse("title_not_unique", status=422)
             except Collection.DoesNotExist:
                 # This is actually the "success" path where the title is unique
                 pass
-            el.title = json_data.get("title")
+            el.title = sanitized_title
             
         if json_data.get("url") is not None:
             # 1. Get and Sanitize the data
             raw_url = json_data.get("url", "").strip()
+            sanitized_url = secure_validate_input(raw_url, 120, True)[0]
 
             # If it's a slug (part of a URL), slugify it to remove spaces/special chars
             # If it's a full domain, you might skip slugify but still strip()
-            clean_url = slugify(raw_url) 
+            clean_url = slugify(sanitized_url) 
 
             if not clean_url:
                 return HttpResponse("invalid_url_format", status=422)
@@ -85,7 +156,8 @@ def db_store(payload, collection):
             el.url = clean_url
 
         if json_data.get("css") is not None:
-            el.url = json_data.get("css")
+            sanitized_css = secure_validate_input(json_data.get("css"))[0]
+            el.css = json_data.get("css")
 
         # Date handling with a fallback
         raw_date = json_data.get("date")
@@ -136,7 +208,7 @@ def db_store(payload, collection):
             el.order = json_data["order"]
 
         if json_data.get("text"):
-            el.text = json_data["text"]
+            el.text = secure_validate_input(json_data["text"])[0]
             
         if json_data.get("public") is not None:
             el.public = json_data["public"]
@@ -145,7 +217,7 @@ def db_store(payload, collection):
             el.archive = json_data["archive"]
 
         if json_data.get("css"):
-            el.css = json_data["css"]
+            el.css = secure_validate_input(json_data["css"])[0]
 
         # Date handling with a fallback
         raw_date = json_data.get("date")
@@ -166,7 +238,6 @@ def db_store(payload, collection):
     # to this new url).
     return json.dumps(json_data)
 
-
 def db_remove(payload, collection):
     """
     Delete data from the database.
@@ -182,47 +253,38 @@ def db_remove(payload, collection):
     
     target.delete()
 
-def db_update(payload):
-    """
-    Alter the contents of a database item
+def db_update(payload, url):
+    
+    json_data = json.loads(payload)
+    tag = TagType(json_data["tag"])
 
-    :param table: identify table holding the target
-    :param url: url string identifying target item
-    :param order: item identifier used in tandem with url to identify Body type targets
-    :param payload: string indicating changes to make to target item
-    """
-    change_list = json.loads(payload)
-    url = change_list["url"]  # Every Element update request must have a url so that we can identify the correct Element parent object
-    target = Element.objects.get(url=url).content  # Get the record that we want to modify.
-    print(target)
-    print(payload)
-    for change in change_list:
+    if tag == TagType.COLLECTION:
+        target = Collection.objects.get(url=url)
+
+    else:
+        url = json_data["url"]  # Every Element update request must have a url so that we can identify the correct Element parent object
+        target = Element.objects.get(url=url).content  # Get the record that we want to modify.
+
+    for change in json_data:
         key = change
-        value = change_list[key]
+        value = json_data[key]
+
         if hasattr(target, key):
             try:
-                value = cast_value(target._meta.get_field(key), value)
-                print(type(value))
-                print(value==True)
-                setattr(target, key, value)
+                if type(target._meta.get_field(key)) == models.CharField:
+                    value_sanitized = secure_validate_input(value)[0]
+                elif type(target._meta.get_field(key)) == models.SlugField:
+                    value_sanitized = secure_validate_input(value, 120, True)[0]
+                else:
+                    value_sanitized = value
+
+                value_sanitized = cast_value(target._meta.get_field(key), value_sanitized)
+                setattr(target, key, value_sanitized)
                 target.save()
             except ValidationError:
                 print("Validation Error: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
             except FieldDoesNotExist:
                 print("FieldDoesNotExistError: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
-
-
-def db_try_title(table, try_title):
-    """
-    Validate text name input for uniqueness and return unique alternative if needed
-
-    :param table: table within which newly text object resides
-    :param try_title: text string to validate for uniqueness
-    """
-    while table.objects.filter(text=try_title).exists() or try_title == '':
-        try_title += "+"
-    return try_title
-
 
 def db_generate_unique_url():
     """
@@ -235,20 +297,6 @@ def db_generate_unique_url():
     while Element.objects.filter(url=try_url).exists():
         try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()[:10]
     return try_url
-
-
-def db_check_url(tag_type, check_url):
-    """
-    Determine if the parameter url exists in the database as a url attached to record of type tag_type
-
-    :param tag_type: type of record this url will be used for
-    :param check_url: This string is a url that's checked. If the url is tied to a record then return True. Otherwise return False
-    """
-    if TagType.HEADER1:
-        matching_record = Collection.objects.filter(url=check_url)
-    elif TagType.CHAINLINK:
-        matching_record = Chainlink.objects.filter(url=check_url)
-    return matching_record.exists()
 
 
 ###################### View Methods ######################
@@ -314,70 +362,15 @@ def generic(request, url=None):
         db_remove(payload, url)
 
     elif request.method == "PUT":
-        #target_id = request.headers["url"]
-        #target_update = request.headers["payload"]
         payload = request.body
-        db_update(payload)
-        """
-        elif inheritsBody(Tag):
-            db_update(Body, payload_json["url"], payload_json["order"], payload)
-        elif inheritsHeader(Tag):
-            db_update(Header, payload_json["url"], payload_json["order"], payload)
-        elif inheritsFooter(Tag):
-            db_update(Footer, payload_json["url"], payload_json["order"], payload)
-        """
+        db_update(payload, url)
 
     return render(request, "Patchwork/index.html", {})
-
-
-# def generate(request, is_landing_page, user=None):
-@login_required
-def generate(request):
-    """
-    Create an Article. Write the collection to the database and communicate back any updates to the specified collection properties by returning the updated properties as JSON.
-
-    :param request: http request object. The payload is the set of poperties for the Article.
-    <DEPRECATED> :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website
-    """
-    if request.method == "POST":
-        return aux_generate(request, False, None)
 
 
 def index(request):
     collections = Collection.objects.filter(public=True).order_by("date")
     return render(request, "Patchwork/index.html", {"collections": collections, "view": "index"})
-
-def automations(request):
-    """
-    This is a static page that displays interesting (hopefully) information about the automated processes that the
-    web server runs.
-    """
-    return render(request, "Patchwork/automations.html", {"view": "automations"})
-
-
-@login_required
-def profile(request):
-    """
-    Take the user to the configured landing page for the application. If no such page exists then generate a new one
-    and display an explanatory welcome page for the user.
-    """
-    # Determine if a landing page exists and send the user to the landing page if it does
-    if not request.user.is_authenticated:
-        return login(request)
-    if db_check_url(Collection, Account.objects.get(user=request.user).landing_page_collection.url):
-       return generic(request, url=Account.objects.get(user=request.user).landing_page_collection.url)
-
-    # Otherwise generate a new landing page for the site and then direct the user to an informational static page
-    else:
-        post_request_payload = {
-            "type": "header",
-            "text": "Landing Page",
-            "public": True,
-            "date": str(timezone.now())
-        }
-        post_request = HttpRequestWrapper(json.dumps(post_request_payload), request.user)
-        post_request.method = "POST"
-        return aux_generate(post_request, True, request.user)
 
 
 def login(request):
@@ -435,88 +428,3 @@ def logout(request):
 def about(request):
     return render(request, 'Patchwork/about.html', {"view": "about"})
 
-
-def react(request):
-    return render(request, 'Patchwork/react.html', {})
-
-
-###################### Helper Methods ######################
-
-def aux_generate(request, is_landing_page, user=None):
-    """
-    Create a new collection. If the newly created collection should be a landing page send back a static information page. Otherwise send a simple HttpResponse
-
-    :param request: http request object. The payload is the set of properties for the Article.
-    :param is_landing_page: this boolean flag indicates that the created Collection should be set as the landing page for the website.
-    :param user: this is the user object corresponding to the currently logged-in user. The landing page will be set for this user.
-    """
-    # Create a new collection and write it to the database. The payload variable will contain the url for the collection
-    payload = json.dumps({"type": "Collection"})
-    payload = db_store(payload, None, is_landing_page, user)
-    if not is_landing_page:
-        url = reverse("collection", kwargs={"url": json.loads(payload)["url"]})
-        return redirect(url)
-    else:
-        return render(request, 'Patchwork/new_landing_page.html', {})
-
-
-def validate_and_return_count(element):
-    """
-    Validate the Element is defined correctly. If not then fix the issue quietly. Return its child Element count
-    regardless.
-    :param element: - This is an Element to be validated
-    :return: - This function returns an int equal to the number of child elements of `element`.
-    """
-    if element._meta.object_name == "Chainlink":
-        return Body.objects.filter(chainlink=element).count()
-
-    elif element._meta.object_name == "Collection":
-        return Chainlink.objects.filter(collection=element).count()
-
-
-def cast_value(field, value):
-    """
-    Attempts to cast a value to the correct type based on the field's class.
-    """
-    field_type = type(field)
-    print("------")
-    print(field)
-    print(value)
-
-    try:
-        if field_type == models.CharField:
-            # Cast to string for CharField
-            return str(value)
-        elif field_type == models.IntegerField:
-            # Cast to integer for IntegerField
-            return int(value)
-        elif field_type == models.FloatField:
-            # Cast to float for FloatField
-            return float(value)
-        elif field_type == models.BooleanField:
-            # Cast to boolean for BooleanField
-            if value == "False":
-                return False
-            elif value == "True":
-                return True
-            elif isinstance(value, bool):
-                return value
-            else:
-                raise ValueError("Invalid boolean value. The `value` argument must be either a str value of 'True' or 'False' or a boolean value.")
-        elif field_type == models.DateTimeField:
-            # Attempt to parse datetime for DateTimeField
-            if isinstance(value, str):
-                return datetime.fromisoformat(value)
-            return value
-        elif field_type == models.DateField:
-            # Attempt to parse date for DateField
-            if isinstance(value, str):
-                return datetime.strptime(value, '%Y-%m-%d').date()
-            return value
-        # Add more cases as needed for other field types...
-        else:
-            # Return the value as-is if no matching type
-            return value
-    except (ValueError, TypeError) as e:
-        # Log or raise error if casting fails
-        raise ValidationError(f"Failed to cast value '{value}' to {field_type.__name__}: {e}")

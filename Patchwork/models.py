@@ -102,7 +102,7 @@ class Collection(models.Model):
     key = models.BigAutoField(primary_key=True)  # primary key (useful for testing)
     public = models.BooleanField(default=False)  # Indicate whether this collection will be shareable
     date = models.DateTimeField(default=timezone.now)  # Creation date for this collection
-    url = models.CharField(max_length=75)  # relative url for this collection
+    url = models.SlugField(max_length=120, unique=True, blank=False, default=generate_random_key())
     title = models.CharField(max_length=75)
     css = models.CharField(max_length=10000, null=False, blank=True, default="")    # This let's you apply styles to the whole page!
     theme = models.CharField(  # specify tag to wrap text in
@@ -124,7 +124,7 @@ class Element(models.Model):
     order = models.BigIntegerField(default=0)
     public = models.BooleanField(default=True)
     date = models.DateTimeField(default=timezone.now)
-    url = models.CharField(max_length=75, primary_key=True, default=generate_random_key())
+    url = models.SlugField(max_length=120, unique=True, blank=False, primary_key=True, default=generate_random_key())
     archive = models.BooleanField(default=False)
     css = models.CharField(max_length=10000, null=False, blank=True, default="")
 
