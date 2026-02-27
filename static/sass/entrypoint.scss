@@ -19,80 +19,68 @@ $family-monospace: "Share Tech Mono";
 $family-code: "Michroma";
 $family-serif: 'Courier New';
 
-$title-color: hsl(221deg,14%,14%);
-$subtitle-color: hsl(221deg,14%,48%);
+$title-color: hsl(221deg, 14%, 14%);
+$subtitle-color: hsl(221deg, 14%, 48%);
 
-$menu-hover-shade: hsl(221,14%,calc(100% + -5%));
+$menu-hover-shade: hsl(221, 14%, calc(100% + -5%));
 
 
 // Override global Sass variables from the /utilities folder
-@use "bulma/sass/utilities" with (
-  $family-primary: '"Nunito", sans-serif',
-  $size-2: 2rem,  // Default is 2.5rem
+@use "bulma/sass/utilities" with ($family-primary: '"Nunito", sans-serif',
+  $size-2: 2rem, // Default is 2.5rem
   $size-3: 1.4rem, // Default is 2rem
   $primary: $gray-may,
-  $link: $metallic-blue,
   $control-border-width: 3px,
   $danger: $danger-red,
-  $custom-colors: (
-    // WARM TONES
+  $custom-colors: ( // WARM TONES
     "coral": (#ff6b6b, #fff),
     "persimmon": (#ff5733, #fff),
     "mango": (#ff8d1a, #fff),
     "rose": (#f06292, #fff),
     "terracotta": (#e67e22, #fff),
-    
+
     // COOL TONES
     "azure": (#0077b6, #fff),
     "orchid": (#ba68c8, #fff),
     "indigo": (#5c6bc0, #fff),
     "violet": (#8e44ad, #fff),
     "royal": (#4169e1, #fff),
-    
+
     // NATURE TONES
     "jungle": (#2ecc71, #fff),
     "teal-surge": (#00adb5, #fff),
     "emerald": (#1abc9c, #fff),
     "lime": (#9ccc65, #fff),
     "seafoam": (#4db6ac, #fff),
-    
+
     // UTILITY TONES
     "slate": (#607d8b, #fff),
     "charcoal": (#34495e, #fff),
     "sandstone": (#d4a373, #fff),
     "mustard": (#e9c46a, #fff),
-    "crimson": (#9b2226, #fff)
-  )
-);
+    "crimson": (#9b2226, #fff)));
 
 // Override Sass variables from the /form folder
-@use "bulma/sass/form" with (
-  $input-shadow: none
+@use "bulma/sass/form" with ($input-shadow: none);
+
+@use "bulma/sass/elements/button" with ($button-family: $family-monospace,
 );
 
-@use "bulma/sass/elements/button" with (
-  $button-family: $family-monospace,
-);
-
-@use "bulma/sass/components/menu" with (
-  $menu-label-font-size: 1.1em,
+@use "bulma/sass/components/menu" with ($menu-label-font-size: 1.1em,
   $menu-label-spacing: 0.05em,
   $menu-label-letter-spacing: 0.05em,
 );
 
-@use "bulma/sass/elements/title" with (
-  $title-color: $title-color,
+@use "bulma/sass/elements/title" with ($title-color: $title-color,
   $title-family: $family-primary,
   $title-weight: bold,
   $title-line-height: 0.7,
   $subtitle-color: $subtitle-color,
   $subtitle-weight: normal,
   $subtitle-size: 1.25em,
-  $subtitle-family: $family-secondary
-);
+  $subtitle-family: $family-secondary);
 
-@use "bulma/sass/layout/section" with (
-  $section-padding: 0.5rem 0rem,
+@use "bulma/sass/layout/section" with ($section-padding: 0.5rem 0rem,
   $section-padding-desktop: 0.5rem 0rem,
   $section-padding-medium: 0.8rem 0rem,
   $section-padding-large: 5rem 0rem,
@@ -159,17 +147,28 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 
 .code {
   display: block;
-  background-color: #1e1e1e; /* Dark theme background */
-  color: #d4d4d4; /* Light gray text */
-  font-family: 'Fira Code', 'Courier New', monospace; /* Monospaced font for code */
-  font-size: 14px; /* Adjust to your preference */
-  line-height: 1.5; /* Better readability */
-  padding: 16px; /* Inner spacing */
-  border-radius: 8px; /* Rounded corners */
-  overflow-x: auto; /* Horizontal scroll for long code */
-  white-space: pre; /* Preserve whitespace and indentation */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a lifted effect */
-  border: 1px solid #333; /* Border to define the block */
+  background-color: #1e1e1e;
+  /* Dark theme background */
+  color: #d4d4d4;
+  /* Light gray text */
+  font-family: 'Fira Code', 'Courier New', monospace;
+  /* Monospaced font for code */
+  font-size: 14px;
+  /* Adjust to your preference */
+  line-height: 1.5;
+  /* Better readability */
+  padding: 16px;
+  /* Inner spacing */
+  border-radius: 8px;
+  /* Rounded corners */
+  overflow-x: auto;
+  /* Horizontal scroll for long code */
+  white-space: pre;
+  /* Preserve whitespace and indentation */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow for a lifted effect */
+  border: 1px solid #333;
+  /* Border to define the block */
 }
 
 .cell {
@@ -184,7 +183,7 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 // the disabled html attribute.
 .input.is-static {
   background-color: hsl(220, 14.3%, 95.9%);
-  color: hsl(221deg,14%,48%);
+  color: hsl(221deg, 14%, 48%);
   font-style: italic;
 }
 
@@ -194,39 +193,41 @@ $menu-hover-shade: hsl(221,14%,calc(100% + -5%));
 
 // These are the little date and external url items that appear next to each element. I want them not to be broken
 // up on smaller pages.
-.element-date, .header-url {
+.element-date,
+.header-url {
   white-space: nowrap;
 }
 
 body {
-    margin: 2% 20% 1% 20%;
+  margin: 2% 20% 1% 20%;
 }
 
 .crud-form {
-    background-color: rgb(243, 244, 246);
-    padding: 10px;
-    border-bottom-right-radius: 12px;
-    border-bottom-left-radius: 12px;
+  background-color: rgb(243, 244, 246);
+  padding: 10px;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
 }
 
-.header-url, .element-date {
-    margin-left: 10px;
+.header-url,
+.element-date {
+  margin-left: 10px;
 }
 
 .form-submit-buttons {
-    display: flex;
-    justify-content: right;
+  display: flex;
+  justify-content: right;
 }
 
 .element-buttons-wrapper {
-    display: none;
+  display: none;
 }
 
 /* Trigger only if hovered AND the next sibling is NOT a .crud-form */
 .element-wrapper:hover:not(:has(+ .crud-form)) .element-buttons-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .left-buttons,
@@ -235,37 +236,38 @@ body {
 }
 
 .element-date {
-    font-size: small;
-    color: #e35f5f;
+  font-size: small;
+  color: #e35f5f;
 }
+
 .element-order {
-    font-size: x-small;
-    color: #888888;
-    margin-right: 4px;
+  font-size: x-small;
+  color: #888888;
+  margin-right: 4px;
 }
 
 #config-display {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 
 /* Trigger 1: On Hover - Active UNLESS show-controls is explicitly "false" */
 html[edit-mode="true"]:not([show-controls="false"]) .element-wrapper:hover {
-    padding-bottom: 0px;
-    border-width: 3px;
-    border-style: solid;
-    color: hsl(220, 14.3%, 95.9%);
+  padding-bottom: 0px;
+  border-width: 3px;
+  border-style: solid;
+  color: hsl(220, 14.3%, 95.9%);
 }
 
 /* Trigger 2: Form Open - Active UNLESS show-controls is explicitly "false" */
 html[edit-mode="true"]:not([show-controls="false"]) .element-wrapper:has(+ .crud-form) {
-    padding-bottom: 0px;
-    border-width: 3px;
-    border-style: solid;
-    color: hsl(220, 14.3%, 95.9%);
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+  padding-bottom: 0px;
+  border-width: 3px;
+  border-style: solid;
+  color: hsl(220, 14.3%, 95.9%);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 /* 1. Global Rule: If edit-mode is NOT true, hide everything by default */
@@ -273,7 +275,7 @@ html:not([edit-mode="true"]) .element-order,
 html:not([edit-mode="true"]) .element-date,
 html:not([edit-mode="true"]) #element-creation,
 html:not([edit-mode="true"]) .element-buttons-wrapper {
-    display: none !important;
+  display: none !important;
 }
 
 html:not([edit-mode="true"]) .linebreak-enter-icon {
@@ -282,31 +284,35 @@ html:not([edit-mode="true"]) .linebreak-enter-icon {
 
 /* Only hide elements if the attribute is EXPLICITLY set to "false" */
 html[show-ordering="false"] .element-order {
-    display: none !important;
+  display: none !important;
 }
 
 html[show-dates="false"] .element-date {
-    display: none !important;
+  display: none !important;
 }
 
 html[show-controls="false"] #element-creation {
-    display: none !important;
+  display: none !important;
 }
 
 html[show-controls="false"] .element-buttons-wrapper {
-    display: none !important;
+  display: none !important;
 }
 
 pre {
-    white-space: pre-wrap;       /* Preserves spaces/tabs but wraps text */
-    word-wrap: break-word;       /* Forces long strings (like URLs) to break */
-    overflow-x: hidden;          /* Safety net: hides any accidental horizontal spill */
-    max-width: 100%;             /* Ensures it never exceeds the parent's width */
+  white-space: pre-wrap;
+  /* Preserves spaces/tabs but wraps text */
+  word-wrap: break-word;
+  /* Forces long strings (like URLs) to break */
+  overflow-x: hidden;
+  /* Safety net: hides any accidental horizontal spill */
+  max-width: 100%;
+  /* Ensures it never exceeds the parent's width */
 }
 
 .paragraphElement {
   color: black;
-  font-family: nyt-imperial,georgia,'times new roman',times,serif;
+  font-family: nyt-imperial, georgia, 'times new roman', times, serif;
 }
 
 $tag-margins: (
@@ -330,53 +336,63 @@ p a {
 }
 
 /* Match the thickness and rounding of Bulma's 'input' class */
-.ql-toolbar.ql-snow, 
+.ql-toolbar.ql-snow,
 .ql-container.ql-snow {
-    border: 2px solid #dbdbdb !important; /* Thicker borders */
-    transition: border-color 0.2s;
+  border: 2px solid #dbdbdb !important;
+  /* Thicker borders */
+  transition: border-color 0.2s;
 }
 
 /* Round the top of the toolbar */
 .ql-toolbar.ql-snow {
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-    border-bottom: none !important; /* Prevent double-border in the middle */
-    background-color: #f5f5f5;      /* Light background for the "control" look */
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom: none !important;
+  /* Prevent double-border in the middle */
+  background-color: #f5f5f5;
+  /* Light background for the "control" look */
 }
 
 /* Round the bottom of the editor box */
 .ql-container.ql-snow {
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    font-size: 1rem; /* Matches Bulma's standard input font size */
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  font-size: 1rem;
+  /* Matches Bulma's standard input font size */
 }
 
 /* Bulma Focus Effect: Change border color when typing */
 .ql-container.ql-snow:focus-within,
 .ql-container.ql-snow:hover {
-    border-color: #00d1b2 !important; /* Bulma Primary (Turquoise) */
+  border-color: #00d1b2 !important;
+  /* Bulma Primary (Turquoise) */
 }
 
 .ql-editor {
-    font-family: inherit; 
-    min-height: 150px; /* Give users room to breathe */
-    line-height: 1.5;   /* Matches Bulma's readability standards */
+  font-family: inherit;
+  min-height: 150px;
+  /* Give users room to breathe */
+  line-height: 1.5;
+  /* Matches Bulma's readability standards */
 }
 
 
 .textarea-wrapper {
   display: grid;
+
   &::after {
     /* This mirrors the content of the textarea exactly */
     content: attr(data-replicated-value) " ";
     white-space: pre-wrap;
     visibility: hidden;
   }
-  
-  textarea, &::after {
+
+  textarea,
+  &::after {
     /* Both sit in the exact same grid cell */
     grid-area: 1 / 1 / 2 / 2;
-    font: inherit; /* Crucial: fonts must match exactly */
+    font: inherit;
+    /* Crucial: fonts must match exactly */
     padding: 0.5rem;
     border: 1px solid black;
   }
@@ -388,12 +404,13 @@ p a {
 
 
 /* Keep the space, but hide the arrow */
-.h2-arrow, .h3-arrow {
+.h2-arrow,
+.h3-arrow {
   visibility: hidden;
 }
 
 /* Show it when the parent LI is hovered */
-li:hover .h2-arrow, 
+li:hover .h2-arrow,
 li:hover .h3-arrow {
   visibility: visible;
 }

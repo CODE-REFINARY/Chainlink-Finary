@@ -109,6 +109,7 @@ def cast_value(field, value):
         # Log or raise error if casting fails
         raise ValidationError(f"Failed to cast value '{value}' to {field_type.__name__}: {e}")
 
+
 def db_store(payload, collection):
     """
     Write data to the database. Call this function from an HTTP POST for non-idempotent data store.
@@ -238,6 +239,7 @@ def db_store(payload, collection):
     # to this new url).
     return json.dumps(json_data)
 
+
 def db_remove(payload, collection):
     """
     Delete data from the database.
@@ -252,6 +254,7 @@ def db_remove(payload, collection):
         target = Element.objects.get(url=json_data["url"])
     
     target.delete()
+
 
 def db_update(payload, url):
     
@@ -286,6 +289,7 @@ def db_update(payload, url):
             except FieldDoesNotExist:
                 print("FieldDoesNotExistError: Trying to set attribute `" + key + "` of object tag type `" + target.tag + "` but that attribute isn't defined for that object type.")
 
+
 def db_generate_unique_url():
     """
     Generate a unique url for specified record type
@@ -297,7 +301,6 @@ def db_generate_unique_url():
     while Element.objects.filter(url=try_url).exists():
         try_url = hashlib.sha256(str(random.randint(0, 999999999999)).encode('UTF-8')).hexdigest()[:10]
     return try_url
-
 
 ###################### View Methods ######################
 

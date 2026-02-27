@@ -663,8 +663,8 @@ function ElementDeleteForm({ element, elementList, showElementDeleteForm }) {
                 }
             />
             <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                <input className="button is-dark" type="reset" onClick={() => setShowElementDeleteForm(false)} value="CANCEL" />
-                <input className="button is-success is-right" type="submit" value="DELETE" />
+                <input className="button is-dark" type="reset" onClick={() => setShowElementDeleteForm(false)} value="cancel" />
+                <input className="button is-success is-right" type="submit" value="delete" />
             </div>
         </form>
     )
@@ -672,6 +672,7 @@ function ElementDeleteForm({ element, elementList, showElementDeleteForm }) {
 
 function ElementEditForm({ element, elementList, showElementEditForm }) {
 
+    const formRef = useRef(null);
     const [getElementList, setElementList] = elementList;
     const [getShowElementEditForm, setShowElementEditForm] = showElementEditForm;
     const [getParagraphFormValue, setParagraphFormValue] = useState(element.text || "");
@@ -680,10 +681,11 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
     // This variable stores the target element's order before the update so that we can track if it's order was changed.
     let original_order = element.order
 
-    const handleEditSubmit = (e) => {
+    const handleEditSubmit = (e, submit_and_close) => {
         e.preventDefault(); // Prevent page refresh
 
-        const form = e.target;
+        // Always get the form from the Ref, which is guaranteed to be the HTMLFormElement
+        const form = formRef.current;
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
 
@@ -705,11 +707,13 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
             item.url === element.url ? { ...item, ...values } : item
         ));
 
-        setShowElementEditForm(false);
+        if (submit_and_close) {
+            setShowElementEditForm(false);
+        }
     };
 
     return (
-        <form className="crud-form" onSubmit={handleEditSubmit}>
+        <form className="crud-form" ref={formRef} onSubmit={(e) => handleEditSubmit(e, true)}>
             <input type="hidden" name="url" value={element.url} />
             <input type="hidden" name="order" value={parseInt(element.order, 10)} />
             <div className="form-group field">
@@ -801,8 +805,16 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
                 }
             />
             <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                <input className="button is-dark" type="reset" onClick={() => setShowElementEditForm(false)} value="CANCEL" />
-                <input className="button is-success" type="submit" value="UPDATE" />
+                <input className="button is-dark" type="reset" onClick={() => setShowElementEditForm(false)} value="cancel" />
+                {["PARAGRAPH", "CODE"].includes(String(element.tag)) &&
+                    <input
+                        type="button" // Change to type button so it doesn't trigger the form's native submit
+                        className="button is-info is-right"
+                        onClick={(e) => handleEditSubmit(e, false)} // Explicitly pass 'e' and 'false'
+                        value="save changes"
+                    />
+                }
+                <input className="button is-success" type="submit" value="submit & close" />
             </div>
         </form>
     );
@@ -977,8 +989,8 @@ function ElementCreateForm({ tag, elementList, showElementCreateForm }) {
 
                 </div>
                 <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                    <input className="button is-dark" type="reset" onClick={() => setShowElementCreateForm(false)} value="CANCEL" />
-                    <input className="button is-success is-right" type="submit" value="CREATE" />
+                    <input className="button is-dark" type="reset" onClick={() => setShowElementCreateForm(false)} value="cancel" />
+                    <input className="button is-success is-right" type="submit" value="create" />
                 </div>
             </form>}
         </>
