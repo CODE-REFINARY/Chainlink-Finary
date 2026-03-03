@@ -2,19 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),  # landing page
+    path("", views.index, name='collection_index'),   # This is where you end up if you don't specify a collection to view
     path("about.html", views.about, name="about"),  # this is the about page
-
-    # This is the destination for all things Collections related. Supported request types are GET, POST, PUT, DELETE.
-    # GET obviously just returns the webpage. POST is used to create a new Collection. PUT is used to edit an existing
-    # Collection. DELETE is for deleting a Collection.
-    #path("<str:url>", views.generic, name="collection"),  # regularly generated blog pages match here
-    #path("generic.html", views.generic, name="generic"),
-
-    # This is the destination for when you want to view a specific Chainlink. The supported requests are the same as
-    # what you have for generic.
-    #path("collections/<str:key>.html", views.chainlink, name="chainlink"),
-    path("login", views.login, name="login"),
-    path("logout", views.logout, name="logout"),
-    path("<str:url>", views.generic, name="collection"),  # This is the main page.
+    path("login", views.login, name="login"),   # This is reached when you click the log in button
+    path("logout", views.logout, name="logout"),    # This is reached if you click the log out button
+    path("<str:url>", views.generic, name="collection"),    # This is where you go when you specify a collection url after /collections/
 ]

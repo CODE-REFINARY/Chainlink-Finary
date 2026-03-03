@@ -311,12 +311,7 @@ def generic(request, url=None):
     This is the big view. The one that all Collection urls call. Maybe I would want to call this view "Collection"
     instead... Oh well.The url parameter is how you specify which collection to grab.
     """
-    if not request.user.is_authenticated:
-        pass
-
-    if url is None:
-        raise ValueError("A null key and null url value were both supplied to the generic view. At least one of these values must be populated")
-
+    
     if request.method == "GET":
         # Get this collection from the database and return a 404 if it isn"t found
         collection = get_object_or_404(Collection, url=url)
@@ -404,7 +399,7 @@ def login(request):
         return HttpResponseRedirect(new_url)
 
 
-def logout(request):
+"""def logout(request):
     if request.method == "POST":
         backend_logout(request)
         referer = request.META.get('HTTP_REFERER', '/')
@@ -426,7 +421,15 @@ def logout(request):
         new_url = urlunparse(url_parts)
 
         return HttpResponseRedirect(new_url)
+"""
 
+def logout(request):
+    if request.method == "POST":
+        backend_logout(request)
+        
+        # Redirect to the URL named 'generic_empty'
+        base_url = reverse('collection_index')
+        return HttpResponseRedirect(f"{base_url}?logout_successful=true")
 
 def about(request):
     return render(request, 'Patchwork/about.html', {"view": "about"})

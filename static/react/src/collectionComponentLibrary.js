@@ -822,50 +822,79 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
 
 function ElementCreateForm({ tag, elementList, showElementCreateForm }) {
 
+    const formRef = useRef(null);
     const [getElementList, setElementList] = elementList;
     const [getShowElementCreateForm, setShowElementCreateForm] = showElementCreateForm;
     const [getParagraphFormValue, setParagraphFormValue] = useState("");
     const [getCodeFormValue, setCodeFormValue] = useState("");
+    const [getNewElementUrl, setNewElementUrl] = useState("");  // If the user saves an element then we get the new element's url from the backend 
+    // so that subsequent updates using the "Save" button can be sent as "PUT" updates
 
-    const handleSubmit = (e) => {
+    const handleCreateSubmit = (e, submit_and_close) => {
         e.preventDefault(); // Prevent page refresh
 
-        const form = e.target;
+        // Always get the form from the Ref, which is guaranteed to be the HTMLFormElement
+        const form = formRef.current;
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
 
         values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", window.location.href, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        xhr.responseType = "json";
-        xhr.send(JSON.stringify(values));
 
-        xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                // 1. Automatically clone all fields from the response
-                const newComponent = { ...xhr.response };
+        // If we're creating an element without having clicked the "Save" button then do a "POST" request.
+        if (!getNewElementUrl) {
 
-                // 2. Specific fix-ups (like ensuring order is a number)
-                if (newComponent.order) {
-                    newComponent.order = parseInt(newComponent.order, 10);
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", window.location.href, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.responseType = "json";
+            xhr.send(JSON.stringify(values));
+
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    // 1. Automatically clone all fields from the response
+                    const newComponent = { ...xhr.response };
+
+                    // 2. Specific fix-ups (like ensuring order is a number)
+                    if (newComponent.order) {
+                        newComponent.order = parseInt(newComponent.order, 10);
+                    }
+
+                    console.log("Existing List:", getElementList);
+                    console.log("New Component:", newComponent);
+
+                    // 3. Update the state
+                    setElementList(prevList => [...prevList, newComponent]);
+
+                    setNewElementUrl(newComponent.url);
                 }
-
-                console.log("Existing List:", getElementList);
-                console.log("New Component:", newComponent);
-
-                // 3. Update the state
-                setElementList(prevList => [...prevList, newComponent]);
             }
+
+            // This is reached if the user clicked the "Save" button before so the element has already been created and we're just submitting an update
+        } else {
+            let xhr = new XMLHttpRequest();
+            xhr.open("PUT", window.location.href, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.responseType = "json";
+            values["url"] = getNewElementUrl;   // We have to set the url field with the value of the previously set URL that was returned by the backend
+            xhr.send(JSON.stringify(values));
+
+            // This line merges ALL fields from 'values' into the matching item automatically
+            setElementList(prevList => prevList.map(item =>
+                item.url === getNewElementUrl ? { ...item, ...values } : item
+            ));
         }
 
-        setShowElementCreateForm(false);
+        if (submit_and_close) {
+            setShowElementCreateForm(false);
+        }
+
     };
 
     return (
         <>
-            {getShowElementCreateForm && <form onSubmit={handleSubmit} className="crud-form">
+            {getShowElementCreateForm && <form ref={formRef} onSubmit={(e) => handleCreateSubmit(e, true)} className="crud-form">
                 <div id="non-submit-fields" className="field">
                     {["HEADER1", "HEADER2", "HEADER3"].includes(String(tag)) &&
                         <div className="form-group field">
@@ -990,6 +1019,14 @@ function ElementCreateForm({ tag, elementList, showElementCreateForm }) {
                 </div>
                 <div className="form-submit-buttons" id="element-creation-text-align-right field">
                     <input className="button is-dark" type="reset" onClick={() => setShowElementCreateForm(false)} value="cancel" />
+                    {["PARAGRAPH", "CODE"].includes(String(tag)) &&
+                        <input
+                            type="button" // Change to type button so it doesn't trigger the form's native submit
+                            className="button is-info is-right"
+                            onClick={(e) => handleCreateSubmit(e, false)} // Explicitly pass 'e' and 'false'
+                            value="save changes"
+                        />
+                    }
                     <input className="button is-success is-right" type="submit" value="create" />
                 </div>
             </form>}
