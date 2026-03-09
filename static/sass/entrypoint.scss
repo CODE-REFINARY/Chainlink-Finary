@@ -414,3 +414,19 @@ li:hover .h2-arrow,
 li:hover .h3-arrow {
   visibility: visible;
 }
+
+#element-creation {
+  position: sticky;
+  bottom: 0;
+  /* This tells it to stick when it hits the bottom */
+  z-index: 40;
+  /* Ensures it stays above your content but below Bulma modas (usually 1000) */
+
+  background-color: hsl(221, 14%, 100%);
+  -border-top: 2px solid #dbdbdb;
+  /* Subtle separation from the content */
+  -padding: 1rem;
+
+  /* Adds a soft shadow so it looks like it's floating above the page */
+  -box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+}

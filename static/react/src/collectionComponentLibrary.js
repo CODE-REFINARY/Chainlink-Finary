@@ -26,6 +26,41 @@ function ParagraphQuillEditor({ value, onChange }) {
     );
 }
 
+const AngleDownIcon = ({ isRotated }) => (
+    <span className="icon">
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 320 512"
+            style={{
+                transform: isRotated ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.3s ease',
+                width: '1em',
+                height: '1em'
+            }}
+        >
+            <path
+                fill="currentColor"
+                d="M143 352.3L7 216.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.2 9.4-24.4 9.4-33.8 0z"
+            />
+        </svg>
+    </span>
+);
+
+const CloseIcon = () => (
+    <span className="icon">
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 352 512"
+            style={{ width: '1em', height: '1em' }}
+        >
+            <path
+                fill="currentColor"
+                d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.19 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.19 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+            />
+        </svg>
+    </span>
+);
+
 function convertISO8601_to_intl(dateString) {
     // Try to parse the date
     const parsedDate = new Date(dateString);
@@ -592,6 +627,17 @@ function CollapsibleCard({ title, content }) {
 }
 
 function ElementDeleteForm({ element, elementList, showElementDeleteForm }) {
+
+    const formRef = useRef(null);
+    useEffect(() => {
+        if (formRef.current) {
+            formRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center' // Positions the form in the middle of the viewport
+            });
+        }
+    }, []);
+
     const [getElementList, setElementList] = elementList;
     const [getShowElementDeleteForm, setShowElementDeleteForm] = showElementDeleteForm;
 
@@ -615,7 +661,7 @@ function ElementDeleteForm({ element, elementList, showElementDeleteForm }) {
     };
 
     return (
-        <form className="crud-form" onSubmit={handleDeleteSubmit}>
+        <form className="crud-form" ref={formRef} onSubmit={handleDeleteSubmit}>
             <input type="hidden" name="url" value={element.url} />
             <input type="hidden" name="order" value={parseInt(element.order, 10)} />
 
@@ -673,10 +719,34 @@ function ElementDeleteForm({ element, elementList, showElementDeleteForm }) {
 function ElementEditForm({ element, elementList, showElementEditForm }) {
 
     const formRef = useRef(null);
+    useEffect(() => {
+        if (formRef.current) {
+            formRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center' // Positions the form in the middle of the viewport
+            });
+        }
+    }, []);
+
     const [getElementList, setElementList] = elementList;
     const [getShowElementEditForm, setShowElementEditForm] = showElementEditForm;
     const [getParagraphFormValue, setParagraphFormValue] = useState(element.text || "");
     const [getCodeFormValue, setCodeFormValue] = useState(element.text || "");
+
+    // This element's order can change as a result of the user click the order up/down buttons so we have to track
+    // changes with the order of this element so that we can make the form react accordingly.
+    const [orderValue, setOrderValue] = useState(element.order || 0);
+
+    // Watch for changes in element.order and sync them to the input
+    useEffect(() => {
+        setOrderValue(element.order);
+    }, [element.order]); // Only runs when element.order changes
+
+    const closeForm = () => {
+        setCodeFormValue("");
+        setParagraphFormValue("");
+        setShowElementEditForm(false);
+    };
 
     // This variable stores the target element's order before the update so that we can track if it's order was changed.
     let original_order = element.order
@@ -707,8 +777,36 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
             item.url === element.url ? { ...item, ...values } : item
         ));
 
+        // force the browser to focus back on the form.
+        if (!submit_and_close) {
+            setTimeout(() => {
+                formRef.current?.scrollIntoView({
+                    behavior: 'smooth', // 'auto' for instant jump
+                    block: 'center'    // Keeps the form in the middle of the screen
+                });
+            }, 50); // Small timeout to wait for React to finish re-rendering the injected text
+        }
+
         if (submit_and_close) {
-            setShowElementEditForm(false);
+            closeForm();
+
+            // We use a small timeout to ensure the form has closed and the 
+            // layout has "settled" before calculating the scroll position.
+            setTimeout(() => {
+                // Find the element using the unique URL (which you use as an ID)
+                const targetElement = document.getElementById(element.url);
+
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    // Optional: Add a brief "highlight" flash so they see exactly what changed
+                    targetElement.classList.add('is-highlighted');
+                    setTimeout(() => targetElement.classList.remove('is-highlighted'), 2000);
+                }
+            }, 100);
         }
     };
 
@@ -773,7 +871,13 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
             {"order" in element &&
                 <div className="form-group field">
                     <label className="label">Element Ordering</label>
-                    <input className="input" type="text" name="order" defaultValue={element.order} />
+                    <input
+                        className="input"
+                        type="text" 
+                        name="order"
+                        value={orderValue}
+                        onChange={(e) => setOrderValue(e.target.value)}
+                    />
                     <p className="help">This is the order of this element on the page.</p>
                 </div>
             }
@@ -805,7 +909,7 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
                 }
             />
             <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                <input className="button is-dark" type="reset" onClick={() => setShowElementEditForm(false)} value="cancel" />
+                <input className="button is-dark" type="reset" onClick={() => closeForm()} value="cancel" />
                 {["PARAGRAPH", "CODE"].includes(String(element.tag)) &&
                     <input
                         type="button" // Change to type button so it doesn't trigger the form's native submit
@@ -830,6 +934,40 @@ function ElementCreateForm({ tag, elementList, showElementCreateForm }) {
     const [getNewElementUrl, setNewElementUrl] = useState("");  // If the user saves an element then we get the new element's url from the backend 
     // so that subsequent updates using the "Save" button can be sent as "PUT" updates
 
+    // State to track if the form is collapsed
+    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Initialize order state
+    const [getOrderFormValue, setOrderFormValue] = useState(0);
+
+    // Keep the order value set appropriately. It should be reactive to order updates of surrounding elements if this element
+    // has been rendered to the display using the "save now" button.
+    useEffect(() => {
+        // We only care about syncing if this form has successfully 
+        // linked to a real element in the list (getNewElementUrl exists)
+        if (getNewElementUrl) {
+            const currentElement = getElementList.find(item => item.url === getNewElementUrl);
+            
+            if (currentElement && currentElement.order !== getOrderFormValue) {
+                setOrderFormValue(currentElement.order);
+            }
+        } else {
+            // If it's a brand new form, keep it synced to the "end of list" logic
+            const nextOrder = getElementList.length > 0 
+                ? Math.floor((Number(getElementList[getElementList.length - 1].order) + 100) / 100) * 100 
+                : 0;
+            setOrderFormValue(nextOrder);
+        }
+    }, [getElementList, getNewElementUrl]); // Watch the list and the URL status
+
+    const closeForm = () => {
+        setCodeFormValue("");
+        setNewElementUrl("");
+        setParagraphFormValue("");
+        setShowElementCreateForm(false);
+        setIsCollapsed(false);
+    }
+
     const handleCreateSubmit = (e, submit_and_close) => {
         e.preventDefault(); // Prevent page refresh
 
@@ -838,10 +976,10 @@ function ElementCreateForm({ tag, elementList, showElementCreateForm }) {
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
 
-        values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
-
         // If we're creating an element without having clicked the "Save" button then do a "POST" request.
         if (!getNewElementUrl) {
+
+            values.order = getUniqueOrder(values.order, getElementList);  // Automatically increment the order if there is a collision to avoid duplicate orders.
 
             let xhr = new XMLHttpRequest();
             xhr.open("POST", window.location.href, true);
@@ -859,9 +997,6 @@ function ElementCreateForm({ tag, elementList, showElementCreateForm }) {
                     if (newComponent.order) {
                         newComponent.order = parseInt(newComponent.order, 10);
                     }
-
-                    console.log("Existing List:", getElementList);
-                    console.log("New Component:", newComponent);
 
                     // 3. Update the state
                     setElementList(prevList => [...prevList, newComponent]);
@@ -886,150 +1021,219 @@ function ElementCreateForm({ tag, elementList, showElementCreateForm }) {
             ));
         }
 
+        // force the browser to focus back on the form.
+        if (!submit_and_close) {
+            setTimeout(() => {
+                formRef.current?.scrollIntoView({
+                    behavior: 'smooth', // 'auto' for instant jump
+                    block: 'center'    // Keeps the form in the middle of the screen
+                });
+            }, 50); // Small timeout to wait for React to finish re-rendering the injected text
+        }
+
         if (submit_and_close) {
-            setShowElementCreateForm(false);
+            closeForm();
+            // We use a small timeout to ensure the form has closed and the 
+            // layout has "settled" before calculating the scroll position.
+            setTimeout(() => {
+                // Find the element using the unique URL (which you use as an ID)
+                const targetElement = document.getElementById(getNewElementUrl);
+
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    // Optional: Add a brief "highlight" flash so they see exactly what changed
+                    targetElement.classList.add('is-highlighted');
+                    setTimeout(() => targetElement.classList.remove('is-highlighted'), 2000);
+                }
+            }, 100);
         }
 
     };
 
     return (
         <>
-            {getShowElementCreateForm && <form ref={formRef} onSubmit={(e) => handleCreateSubmit(e, true)} className="crud-form">
-                <div id="non-submit-fields" className="field">
-                    {["HEADER1", "HEADER2", "HEADER3"].includes(String(tag)) &&
-                        <div className="form-group field">
-                            <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
-                            <input autoFocus type="text" id="input element-form-text"
-                                name="text"
-                                className="input form-field" />
-                            <p className="help">enter the text for this header.</p>
-                        </div>
-                    }
-                    {["CODE"].includes(String(tag)) &&
-                        <div className="form-group field ">
-                            <label htmlFor="text" id="element-form-text-label"
-                                className="form-label label">Text</label>
-                            <div className="textarea-wrapper" data-replicated-value={getCodeFormValue}>
-                                <textarea autoFocus type="text" id="input element-form-text"
-                                    style={{ backgroundColor: '#282c34', color: '#abb2bf' }}
-                                    defaultValue={getCodeFormValue}
-                                    value={getCodeFormValue}
-                                    onChange={(e) => setCodeFormValue(e.target.value)}
-                                    name="text"
-                                    className="textarea input form-field"
-                                    rows="3">
-                                </textarea>
-                            </div>
-                            <p className="help">enter the text content for this element.</p>
-                        </div>
-                    }
-                    {["PARAGRAPH"].includes(String(tag)) &&
-                        <div className="form-group field">
-                            <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
-                            {/* 1. The Rich Text Editor (Visible to User) */}
-                            <ParagraphQuillEditor
-                                value={getParagraphFormValue}
-                                onChange={(html) => {
-                                    // This ensures your React state stays updated as they type
-                                    setParagraphFormValue(html);
+            {getShowElementCreateForm &&
+                <form ref={formRef} onSubmit={(e) => handleCreateSubmit(e, true)} className="crud-form">
+                    <header
+                        className="card-header"
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        style={{ cursor: 'pointer', boxShadow: 'none', borderBottom: isCollapsed ? 'none' : '1px solid #ededed' }}
+                    >
+                        <p className="card-header-title">
+                            Create New {tag}
+                        </p>
+
+
+                        <div className="card-header-icon" style={{ gap: '0.5rem' }}>
+                            {/* The X Button */}
+                            <button
+                                type="button"
+                                className="button is-ghost p-0 m-0" // is-ghost makes it transparent; p-0 m-0 removes extra spacing
+                                aria-label="close"
+                                style={{ color: 'inherit', height: 'auto', border: 'none' }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    closeForm();
                                 }}
-                            />
+                            >
+                                <CloseIcon />
+                            </button>
 
-                            {/* 2. The Hidden Input (Visible to the Form/XHR) */}
-                            <input
-                                type="hidden"
-                                name="text"
-                                value={getParagraphFormValue}
-                            />
-                            <p className="help">enter a title to be used as the header name for this element</p>
+                            {/* The Arrow Button */}
+                            <AngleDownIcon isRotated={isCollapsed} />
                         </div>
-                    }
-                    <div className="form-group field">
-                        <label className="label">Element Ordering</label>
-                        <input className="input" name="order" defaultValue={getElementList.length > 0 ? Math.floor((Number(getElementList[getElementList.length - 1].order) + 100) / 100) * 100 : 0} />
-                        <p className="help">this is the order of this element relative to others on the
-                            page</p>
-                    </div>
-                    <div className="form-group field">
-                        <input type="hidden" name="archive" value="False" />
-                        <input type="hidden" name="public" value="False" />
-                        <label className="label">Access Controls</label>
-                        <div className="checkboxes">
-                            <label id="element-form-public-label" className="form-label checkbox">
-                                <input type="checkbox" name="public" value="True" id="element-form-archive"
-                                    className="checkbox form-field" style={{ "marginRight": "5px" }} />
-                                Public
-                            </label>
-                            <label id="element-form-archive-label" className="form-label checkbox">
-                                <input type="checkbox" name="archive" value="True" id="element-form-archive"
-                                    className="checkbox form-field" style={{ "marginRight": "5px" }} />
-                                Archive
-                            </label>
-                        </div>
-                        <p className="help">specify which viewers will be able to access the contents of this element
-                            and
-                            what will happen to this element if it's deleted</p>
-                    </div>
-                    <CollapsibleCard
-                        title="Read Only Fields"
-                        content={
-                            <React.Fragment>
-                                <div className="form-group field">
-                                    <label className="label">Element Tag</label>
-                                    <input className="input is-static" name="tag" value={tag} readOnly />
-                                    <p className="help">this is the type of Element being instantiated</p>
-                                </div>
-                                <div className="form-group field">
-                                    <label className="label">Element URL</label>
-                                    <input className="input is-static" name="url" value="" readOnly />
-                                    <p className="help">this is the unique identifier field for this element - if you
-                                        are
-                                        creating a new
-                                        element then this value will be empty until the backend sends us a response</p>
-                                </div>
-                                <div className="form-group field">
-                                    <label htmlFor="date" id="element-form-date-label"
-                                        className="form-label label">Date</label>
-                                    <input type="input" name="date" id="element-form-date"
-                                        className="input form-field is-static"
-                                        value={new Date().toISOString()} readOnly />
-                                    <p className="help">This value represents the creation time of this Element. It is
-                                        automatically set and updated whenever this element is updated.</p>
-                                </div>
-                            </React.Fragment>
-                        }
-                    />
-                    <CollapsibleCard
-                        title="Advanced Fields"
-                        content={
-                            <React.Fragment>
-                                <div className="form-group field">
-                                    <label htmlFor="css" id="element-form-css-label"
-                                        className="form-label label">CSS</label>
-                                    <input type="input" name="css" id="element-form-css"
-                                        className="input form-field" />
-                                    <p className="help">optionally include custom CSS to apply to the header <i>NOTE:
-                                        This is an
-                                        advanced feature</i></p>
-                                </div>
-                            </React.Fragment>
-                        }
-                    />
+                    </header>
+                    <div className={`card-content ${isCollapsed ? 'is-hidden' : ''}`} style={{ padding: isCollapsed ? 0 : '1.5rem' }}>
+                        {!isCollapsed && (
+                            <div id="non-submit-fields" className="field">
+                                {["HEADER1", "HEADER2", "HEADER3"].includes(String(tag)) &&
+                                    <div className="form-group field">
+                                        <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
+                                        <input autoFocus type="text" id="input element-form-text"
+                                            name="text"
+                                            className="input form-field" />
+                                        <p className="help">enter the text for this header.</p>
+                                    </div>
+                                }
+                                {["CODE"].includes(String(tag)) &&
+                                    <div className="form-group field ">
+                                        <label htmlFor="text" id="element-form-text-label"
+                                            className="form-label label">Text</label>
+                                        <div className="textarea-wrapper" data-replicated-value={getCodeFormValue}>
+                                            <textarea autoFocus type="text" id="input element-form-text"
+                                                style={{ backgroundColor: '#282c34', color: '#abb2bf' }}
+                                                defaultValue={getCodeFormValue}
+                                                value={getCodeFormValue}
+                                                onChange={(e) => setCodeFormValue(e.target.value)}
+                                                name="text"
+                                                className="textarea input form-field"
+                                                rows="3">
+                                            </textarea>
+                                        </div>
+                                        <p className="help">enter the text content for this element.</p>
+                                    </div>
+                                }
+                                {["PARAGRAPH"].includes(String(tag)) &&
+                                    <div className="form-group field">
+                                        <label htmlFor="text" id="element-form-text-label" className="form-label label">Text</label>
+                                        {/* 1. The Rich Text Editor (Visible to User) */}
+                                        <ParagraphQuillEditor
+                                            value={getParagraphFormValue}
+                                            onChange={(html) => {
+                                                // This ensures your React state stays updated as they type
+                                                setParagraphFormValue(html);
+                                            }}
+                                        />
 
-                </div>
-                <div className="form-submit-buttons" id="element-creation-text-align-right field">
-                    <input className="button is-dark" type="reset" onClick={() => setShowElementCreateForm(false)} value="cancel" />
-                    {["PARAGRAPH", "CODE"].includes(String(tag)) &&
-                        <input
-                            type="button" // Change to type button so it doesn't trigger the form's native submit
-                            className="button is-info is-right"
-                            onClick={(e) => handleCreateSubmit(e, false)} // Explicitly pass 'e' and 'false'
-                            value="save changes"
-                        />
-                    }
-                    <input className="button is-success is-right" type="submit" value="create" />
-                </div>
-            </form>}
+                                        {/* 2. The Hidden Input (Visible to the Form/XHR) */}
+                                        <input
+                                            type="hidden"
+                                            name="text"
+                                            value={getParagraphFormValue}
+                                        />
+                                        <p className="help">enter a title to be used as the header name for this element</p>
+                                    </div>
+                                }
+                                <div className="form-group field">
+                                    <label className="label">Element Ordering</label>
+                                    <input 
+                                        className="input" 
+                                        name="order" 
+                                        type="number"
+                                        value={getOrderFormValue} // Controlled input
+                                        onChange={(e) => setOrderFormValue(e.target.value)} // Manual editability
+                                    />
+                                    <p className="help">this is the order of this element relative to others on the
+                                        page</p>
+                                </div>
+                                <div className="form-group field">
+                                    <input type="hidden" name="archive" value="False" />
+                                    <input type="hidden" name="public" value="False" />
+                                    <label className="label">Access Controls</label>
+                                    <div className="checkboxes">
+                                        <label id="element-form-public-label" className="form-label checkbox">
+                                            <input type="checkbox" name="public" value="True" id="element-form-archive"
+                                                className="checkbox form-field" style={{ "marginRight": "5px" }} />
+                                            Public
+                                        </label>
+                                        <label id="element-form-archive-label" className="form-label checkbox">
+                                            <input type="checkbox" name="archive" value="True" id="element-form-archive"
+                                                className="checkbox form-field" style={{ "marginRight": "5px" }} />
+                                            Archive
+                                        </label>
+                                    </div>
+                                    <p className="help">specify which viewers will be able to access the contents of this element
+                                        and
+                                        what will happen to this element if it's deleted</p>
+                                </div>
+                                <CollapsibleCard
+                                    title="Read Only Fields"
+                                    content={
+                                        <React.Fragment>
+                                            <div className="form-group field">
+                                                <label className="label">Element Tag</label>
+                                                <input className="input is-static" name="tag" value={tag} readOnly />
+                                                <p className="help">this is the type of Element being instantiated</p>
+                                            </div>
+                                            <div className="form-group field">
+                                                <label className="label">Element URL</label>
+                                                <input className="input is-static" name="url" value="" readOnly />
+                                                <p className="help">this is the unique identifier field for this element - if you
+                                                    are
+                                                    creating a new
+                                                    element then this value will be empty until the backend sends us a response</p>
+                                            </div>
+                                            <div className="form-group field">
+                                                <label htmlFor="date" id="element-form-date-label"
+                                                    className="form-label label">Date</label>
+                                                <input type="input" name="date" id="element-form-date"
+                                                    className="input form-field is-static"
+                                                    value={new Date().toISOString()} readOnly />
+                                                <p className="help">This value represents the creation time of this Element. It is
+                                                    automatically set and updated whenever this element is updated.</p>
+                                            </div>
+                                        </React.Fragment>
+                                    }
+                                />
+                                <CollapsibleCard
+                                    title="Advanced Fields"
+                                    content={
+                                        <React.Fragment>
+                                            <div className="form-group field">
+                                                <label htmlFor="css" id="element-form-css-label"
+                                                    className="form-label label">CSS</label>
+                                                <input type="input" name="css" id="element-form-css"
+                                                    className="input form-field" />
+                                                <p className="help">optionally include custom CSS to apply to the header <i>NOTE:
+                                                    This is an
+                                                    advanced feature</i></p>
+                                            </div>
+                                        </React.Fragment>
+                                    }
+                                />
+                            </div>
+                        )}
+                    </div>
+                    {!isCollapsed && (
+                        <div className="form-submit-buttons" id="element-creation-text-align-right field">
+                            <input className="button is-dark" type="reset" onClick={() => { closeForm(); }} value="cancel" />
+                            {["PARAGRAPH", "CODE"].includes(String(tag)) &&
+                                <input
+                                    type="button" // Change to type button so it doesn't trigger the form's native submit
+                                    className="button is-info is-right"
+                                    onClick={(e) => handleCreateSubmit(e, false)} // Explicitly pass 'e' and 'false'
+                                    value="save changes"
+                                />
+                            }
+                            <input className="button is-success is-right" type="submit" value="create" />
+                        </div>
+                    )}
+                </form>
+            }
         </>
     );
 }

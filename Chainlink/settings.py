@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Chainlink',
     'Patchwork',
-    'YACalendar',
     'CFScrape',
     'blog',
     'django_celery_beat',
