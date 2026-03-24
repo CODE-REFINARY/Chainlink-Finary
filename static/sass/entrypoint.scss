@@ -204,9 +204,22 @@ body {
 
 .crud-form {
   background-color: rgb(243, 244, 246);
-  padding: 10px;
   border-bottom-right-radius: 12px;
   border-bottom-left-radius: 12px;
+  /* Set the limit (e.g., 70% of the screen height) */
+    max-height: 40vh;
+  /* 'auto' only shows the scrollbar if the content actually overflows */
+    overflow-y: auto; 
+    
+    /* Optional: prevents horizontal scrollbars from popping up accidentally */
+    overflow-x: hidden;
+
+  .card-header {
+    position: sticky;
+    top: 0;
+    z-index: 20; /* High enough to stay above Quill and other inputs */
+    background-color: inherit;
+  }
 }
 
 .header-url,
@@ -429,4 +442,8 @@ li:hover .h3-arrow {
 
   /* Adds a soft shadow so it looks like it's floating above the page */
   -box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.element-wrapper li {
+  list-style-position: inside;
 }

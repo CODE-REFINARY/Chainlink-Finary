@@ -662,6 +662,11 @@ function ElementDeleteForm({ element, elementList, showElementDeleteForm }) {
 
     return (
         <form className="crud-form" ref={formRef} onSubmit={handleDeleteSubmit}>
+            <header className="card-header">
+                <p className="card-header-title">
+                    Delete {element.tag}
+                </p>
+            </header>
             <input type="hidden" name="url" value={element.url} />
             <input type="hidden" name="order" value={parseInt(element.order, 10)} />
 
@@ -812,12 +817,13 @@ function ElementEditForm({ element, elementList, showElementEditForm }) {
 
     return (
         <form className="crud-form" ref={formRef} onSubmit={(e) => handleEditSubmit(e, true)}>
+            <header className="card-header">
+                <p className="card-header-title">
+                    Modify {element.tag}
+                </p>
+            </header>
             <input type="hidden" name="url" value={element.url} />
             <input type="hidden" name="order" value={parseInt(element.order, 10)} />
-            <div className="form-group field">
-                <label htmlFor="text" id="element-form-delete-label" className="form-label label">Modify
-                    this element</label>
-            </div>
             {["HEADER1", "HEADER2", "HEADER3"].includes(String(element.tag)) &&
                 <div className="form-group field">
                     <label htmlFor="text" id="element-form-text-label"

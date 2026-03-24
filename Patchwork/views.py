@@ -37,7 +37,7 @@ def secure_validate_input(raw_value, max_length=20000, is_url_component=False):
 
     # 1. HTML Sanitization (The "Bleach" Step)
     # Define which tags and attributes you consider "safe"
-    allowed_tags = ['b', 'i', 'u', 'em', 'strong', 'p', 'br', 'a', 'ul', 'li']
+    allowed_tags = ['b', 'i', 'u', 'em', 'strong', 'p', 'br', 'a', 'ul', 'li', 'code']
     allowed_attrs = {
         'a': ['href', 'title', 'target'], # Allow links but only specific attributes
     }
@@ -399,30 +399,6 @@ def login(request):
         return HttpResponseRedirect(new_url)
 
 
-"""def logout(request):
-    if request.method == "POST":
-        backend_logout(request)
-        referer = request.META.get('HTTP_REFERER', '/')
-
-        # Define your query parameters as a dictionary
-        query_params = {'logout_successful': 'true'}
-
-        # Parse the referer URL
-        url_parts = list(urlparse(referer))
-
-        # Combine the existing query params with the new ones
-        query = dict(parse_qsl(url_parts[4]))
-        query.update(query_params)
-
-        # Update the query part of the URL
-        url_parts[4] = urlencode(query)
-
-        # Construct the new URL
-        new_url = urlunparse(url_parts)
-
-        return HttpResponseRedirect(new_url)
-"""
-
 def logout(request):
     if request.method == "POST":
         backend_logout(request)
@@ -430,6 +406,7 @@ def logout(request):
         # Redirect to the URL named 'generic_empty'
         base_url = reverse('collection_index')
         return HttpResponseRedirect(f"{base_url}?logout_successful=true")
+
 
 def about(request):
     return render(request, 'Patchwork/about.html', {"view": "about"})
